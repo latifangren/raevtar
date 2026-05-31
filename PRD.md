@@ -28,9 +28,10 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 ### 3.2 Server Dashboard
 - Daftar server lokal yang dimonitor
 - Tiap server punya: nama, host, port, tags
-- Metrics: CPU, RAM, disk, uptime, online/offline
+- Metrics: CPU, RAM, disk, uptime, online/stale/offline
 - History metrics (tabel server_metrics)
-- Agent (Hermes cron atau script di tiap server) ngirim data via API
+- Lightweight Bash agent di tiap server ngirim data via API tanpa SSH credentials
+- Per-server agent token bisa di-rotate dari admin panel
 
 ### 3.3 Landing Page
 - Halaman index — profil singkat, link ke blog & dashboard
@@ -41,8 +42,8 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - `POST /api/v1/posts` — create blog post (auth)
 - `GET /api/v1/categories` — daftar kategori
 - `GET /api/v1/servers` — daftar server + status (auth)
-- `POST /api/v1/servers` — register server (auth)
-- `POST /api/v1/servers/{id}/ping` — report metrics (auth)
+- `POST /api/v1/servers` — register server (auth, return one-time agent token)
+- `POST /api/v1/servers/{id}/ping` — report metrics (agent token atau admin key)
 - `GET /api/v1/servers/{id}` — detail server (auth)
 - `GET /api/v1/hoststats` — host resource snapshot (auth)
 - Swagger UI `/docs` untuk static OpenAPI spec
@@ -56,7 +57,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 ### 3.6 Integrasi Hermes
 - Cronjob harian: riset projek GitHub → nulis artikel → POST ke API
 - Hermes bisa manual: "tulis ini ke blog" → curl endpoint
-- Server monitoring: polling dari sini atau agent ngirim data
+- Server monitoring: agent push metrics dari tiap perangkat
 
 ## 4. Non-Goals (sengaja gak dilakukan)
 

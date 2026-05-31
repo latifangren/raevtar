@@ -24,9 +24,11 @@
 
 ### Server Dashboard
 - Daftar server lokal yang dimonitor
-- Metrics: CPU, RAM, uptime, online/offline
+- Metrics: CPU, RAM, uptime, online/stale/offline
 - History metrics per server
 - HTMX auto-refresh tiap 30 detik
+- Lightweight Bash agent push metrics tanpa SSH credentials
+- Per-server agent token dengan rotate dari admin panel
 
 ### Landing Page
 - Hero section + recent posts + kategori + server status
@@ -38,8 +40,8 @@
 - `GET /api/v1/categories` — list categories
 - `GET /api/v1/servers` — list servers (auth required)
 - `GET /api/v1/servers/{id}` — server detail (auth required)
-- `POST /api/v1/servers` — register server (auth required)
-- `POST /api/v1/servers/{id}/ping` — record metrics (auth required)
+- `POST /api/v1/servers` — register server (auth required, returns one-time `agent_token`)
+- `POST /api/v1/servers/{id}/ping` — record metrics (agent token atau admin key)
 - `GET /api/v1/hoststats` — host resource snapshot (auth required)
 - `GET /docs` — Swagger UI untuk `static/openapi.json`
 
@@ -47,6 +49,20 @@
 - Login session di `/admin/login`
 - Manage posts, servers, users, dan audit log
 - RBAC role: `owner`, `admin`, `operator`, `readonly`
+- Install instruction agent per server, support URL publik, LAN, atau tunnel
+
+## Agent Monitoring
+
+Server dimonitor via push model, bukan SSH pull. Tiap perangkat jalanin agent ringan dan kirim metrics ke Raevtar:
+
+```bash
+RAEVTAR_URL=http://192.168.100.5:8080 \
+RAEVTAR_SERVER_ID=2 \
+RAEVTAR_AGENT_TOKEN=token-per-server \
+/usr/local/bin/raevtar-agent.sh
+```
+
+Ambil token dan install command dari `/admin/servers`, atau dari response `POST /api/v1/servers` kalau register via API. Token cuma ditampilkan sekali saat server dibuat atau token di-rotate.
 
 ## Stack
 
