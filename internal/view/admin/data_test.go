@@ -7,9 +7,9 @@ import (
 
 func TestStatusTextUsesDurationSemantics(t *testing.T) {
 	now := time.Now()
-	online := now.Add(-time.Minute)
-	stale := now.Add(-5 * time.Minute)
-	offline := now.Add(-11 * time.Minute)
+	online := now.Add(-2 * time.Minute)
+	stale := now.Add(-14 * time.Minute)
+	offline := now.Add(-16 * time.Minute)
 
 	if got := StatusText(&online); got != "Online" {
 		t.Fatalf("online status = %q", got)

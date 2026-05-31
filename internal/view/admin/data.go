@@ -122,11 +122,11 @@ func PercentText(percent float64) string {
 }
 
 func IsOnline(lastSeen *time.Time) bool {
-	return lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute
+	return lastSeen != nil && time.Since(*lastSeen) < 3*time.Minute
 }
 
 func IsStale(lastSeen *time.Time) bool {
-	return lastSeen != nil && time.Since(*lastSeen) >= 2*time.Minute && time.Since(*lastSeen) < 10*time.Minute
+	return lastSeen != nil && time.Since(*lastSeen) >= 3*time.Minute && time.Since(*lastSeen) < 15*time.Minute
 }
 
 func StatusText(lastSeen *time.Time) string {
