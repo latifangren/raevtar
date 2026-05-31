@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Raevtar API",
-    "description": "Personal blog + server monitoring platform API.\n\n**Auth:** Server and host-stat endpoints require `Authorization: Bearer <admin_key>` header. Public read endpoints are posts and categories.\n\nBase URL: `https://raevtar.tech`",
+    "description": "Personal blog + server monitoring platform API.\n\n**Auth:** Server and host-stat read/admin endpoints require `Authorization: Bearer <admin_key>`. The metrics ping endpoint accepts a per-server agent token, or the admin key for compatibility. Public read endpoints are posts and categories.\n\nBase URL: `https://raevtar.tech`",
     "version": "1.0.0",
     "contact": {
       "name": "latifangren",
@@ -141,7 +141,14 @@
           }
         },
         "responses": {
-          "201": { "description": "Server created" },
+          "201": {
+            "description": "Server created with one-time agent token",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/ServerCreateResponse" }
+              }
+            }
+          },
           "400": { "description": "Invalid input" },
           "401": { "description": "Unauthorized" }
         }
@@ -176,7 +183,7 @@
     "/api/v1/servers/{serverID}/ping": {
       "post": {
         "summary": "Record server metrics",
-        "description": "Used by the monitoring agent to push metrics. Requires Bearer auth.",
+        "description": "Used by the monitoring agent to push metrics. Requires `Authorization: Bearer <agent_token>` for this server, or the admin key for compatibility.",
         "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
@@ -206,7 +213,8 @@
         },
         "responses": {
           "200": { "description": "Metrics recorded" },
-          "401": { "description": "Unauthorized" }
+          "401": { "description": "Unauthorized" },
+          "404": { "description": "Server not found" }
         }
       }
     }
@@ -216,7 +224,7 @@
       "BearerAuth": {
         "type": "http",
         "scheme": "bearer",
-        "description": "Your RAEVTAR_ADMIN_KEY from .env.production"
+        "description": "Bearer token. Use RAEVTAR_ADMIN_KEY for admin APIs, or a per-server agent token for the metrics ping endpoint."
       }
     },
     "schemas": {
@@ -275,6 +283,16 @@
           "tags": { "type": "string" },
           "last_seen": { "type": "string", "nullable": true, "format": "date-time" },
           "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ServerCreateResponse": {
+        "type": "object",
+        "properties": {
+          "server": { "$ref": "#/components/schemas/Server" },
+          "agent_token": {
+            "type": "string",
+            "description": "One-time per-server token for the monitoring agent. Store it now; only the hash is persisted."
+          }
         }
       },
       "HostStats": {
