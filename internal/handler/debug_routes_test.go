@@ -106,9 +106,14 @@ func TestPublicRoutes(t *testing.T) {
 				"raevtar",
 				"Read the Blog",
 				"Open Dashboard",
+				"Platform Showcase",
+				"Lab",
+				`href="/#lab"`,
+				`id="lab"`,
 				"Hello Raevtar",
 				`href="/blog"`,
 				`href="/dashboard"`,
+				`href="/docs"`,
 			},
 		},
 		{
@@ -130,9 +135,11 @@ func TestPublicRoutes(t *testing.T) {
 			wantContentTyp: "text/html",
 			wantContains: []string{
 				"Server Dashboard",
+				"Monitor Grid",
 				"whyred",
 				"127.0.0.1:9100",
 				`href="/dashboard/1"`,
+				`id="server-list"`,
 			},
 		},
 		{

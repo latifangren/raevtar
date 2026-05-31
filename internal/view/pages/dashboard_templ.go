@@ -41,17 +41,17 @@ func Dashboard(data DashboardData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex items-center justify-between mb-6\"><h1 class=\"text-3xl font-black uppercase\">Server Dashboard</h1><button onclick=\"toggleForm()\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">+ Register Server</button></div><div id=\"register-form\" class=\"hidden mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-sm font-black uppercase mb-3\">Register New Server</h2><form hx-post=\"/api/v1/servers\" hx-trigger=\"submit\" hx-target=\"#server-list\" hx-swap=\"outerHTML\" hx-on::after-request=\"if(event.detail.successful){this.reset();document.getElementById('register-form').classList.add('hidden')}\" class=\"space-y-3\"><div class=\"grid grid-cols-1 sm:grid-cols-3 gap-3\"><input type=\"text\" name=\"name\" placeholder=\"Server name\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"text\" name=\"host\" placeholder=\"host or IP\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"number\" name=\"port\" placeholder=\"port\" value=\"9100\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div><input type=\"text\" name=\"tags\" placeholder=\"tags (comma separated)\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Register</button></div></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"grid gap-4 md:grid-cols-[1fr_auto] md:items-end mb-6\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Monitor Grid</p><h1 class=\"text-3xl md:text-5xl font-black uppercase leading-none\">Server Dashboard</h1><p class=\"text-sm font-bold text-retro-muted mt-2\">Responsive cards for local nodes, live status, and direct drill-down pages.</p></div><button onclick=\"toggleForm()\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">+ Register Server</button></div><div id=\"register-form\" class=\"hidden mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-sm font-black uppercase mb-3\">Register New Server</h2><form hx-post=\"/api/v1/servers\" hx-trigger=\"submit\" hx-target=\"#server-list\" hx-swap=\"outerHTML\" hx-on::after-request=\"if(event.detail.successful){this.reset();document.getElementById('register-form').classList.add('hidden')}\" class=\"space-y-3\"><div class=\"grid grid-cols-1 sm:grid-cols-3 gap-3\"><input type=\"text\" name=\"name\" placeholder=\"Server name\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"text\" name=\"host\" placeholder=\"host or IP\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"number\" name=\"port\" placeholder=\"port\" value=\"9100\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div><input type=\"text\" name=\"tags\" placeholder=\"tags (comma separated)\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Register</button></div></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Servers) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">Belum ada server terdaftar.</p><p class=\"text-sm text-retro-muted mt-2\">Klik <button onclick=\"toggleForm()\" class=\"font-bold underline hover:bg-retro-wheat cursor-pointer\">+ Register Server</button> untuk mulai.</p></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div id=\"server-list\" class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">Belum ada server terdaftar.</p><p class=\"text-sm text-retro-muted mt-2\">Klik <button onclick=\"toggleForm()\" class=\"font-bold underline hover:bg-retro-wheat cursor-pointer\">+ Register Server</button> untuk mulai.</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"server-list\" class=\"space-y-4\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div id=\"server-list\" class=\"grid gap-4 sm:grid-cols-2 xl:grid-cols-3\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -63,97 +63,123 @@ func Dashboard(data DashboardData) templ.Component {
 					var templ_7745c5c3_Var3 templ.SafeURL
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/dashboard/" + IDText(server.ID)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 29, Col: 59}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 33, Col: 59}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><div class=\"flex items-center justify-between\"><div><h3 class=\"font-bold text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"group block min-h-full bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><div class=\"flex items-start justify-between gap-4 mb-5\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">node</p><h3 class=\"text-xl font-black text-retro-ink uppercase leading-tight\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(server.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 62}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 37, Col: 91}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h3><p class=\"text-sm font-mono text-retro-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h3></div><div class=\"flex items-center gap-1.5 text-sm border-2 border-retro-ink bg-retro-wheat px-2 py-1\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var5 string
-					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(server.Host)
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 128}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+					var templ_7745c5c3_Var5 = []any{"inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen)}
+					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, ":")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<span class=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var6 string
-					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(server.Port))
+					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var5).String())
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 154}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 1, Col: 0}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</p></div><div class=\"flex items-center gap-1.5 text-sm\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\"></span><span class=\"font-black text-retro-ink\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var7 = []any{"inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen)}
-					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var7...)
+					var templ_7745c5c3_Var7 string
+					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(DashboardStatusText(server.LastSeen))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 39, Col: 288}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></div></div><div class=\"space-y-3\"><div class=\"border-2 border-retro-ink bg-retro-sageLight p-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">endpoint</p><p class=\"text-sm font-mono font-black text-retro-ink break-all\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var8 string
-					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(templ.CSSClasses(templ_7745c5c3_Var7).String())
+					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(server.Host)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 1, Col: 0}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 44, Col: 86}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"></span><span class=\"font-bold text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, ":")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var9 string
-					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(DashboardStatusText(server.LastSeen))
+					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(server.Port))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 32, Col: 236}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 44, Col: 112}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</span></div></div></a>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p></div><div class=\"grid grid-cols-2 gap-3\"><div class=\"border-2 border-retro-ink bg-retro-paper p-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">port</p><p class=\"text-lg font-mono font-black text-retro-ink\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var10 string
+					templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(server.Port))
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 49, Col: 87}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</p></div><div class=\"border-2 border-retro-ink bg-retro-paper p-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">tags</p><p class=\"text-sm font-black text-retro-ink truncate\">")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					var templ_7745c5c3_Var11 string
+					templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(server.Tags)
+					if templ_7745c5c3_Err != nil {
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 53, Col: 76}
+					}
+					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p></div></div><div class=\"flex items-center justify-between border-t-2 border-retro-ink pt-3\"><span class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">details</span> <span class=\"text-sm font-black text-retro-ink group-hover:bg-retro-wheat\">Open &rarr;</span></div></div></a>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " <div class=\"mt-4 text-xs font-bold text-retro-muted\" hx-get=\"/dashboard\" hx-trigger=\"every 30s\" hx-select=\"#server-list\" hx-swap=\"outerHTML\" hx-target=\"#server-list\">Auto-refresh every 30s</div><script>\r\n\t\tfunction toggleForm() {\r\n\t\t\tvar f = document.getElementById('register-form');\r\n\t\t\tf.classList.toggle('hidden');\r\n\t\t}\r\n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " <div class=\"mt-4 text-xs font-bold text-retro-muted\" hx-get=\"/dashboard\" hx-trigger=\"every 30s\" hx-select=\"#server-list\" hx-swap=\"outerHTML\" hx-target=\"#server-list\">Auto-refresh every 30s</div><script>\r\n\t\tfunction toggleForm() {\r\n\t\t\tvar f = document.getElementById('register-form');\r\n\t\t\tf.classList.toggle('hidden');\r\n\t\t}\r\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
