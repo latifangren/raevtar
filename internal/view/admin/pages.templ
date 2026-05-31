@@ -221,7 +221,7 @@ templ Servers(data ServersData) {
 					<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]"><p class="text-retro-muted font-bold text-sm">No servers registered.</p></div>
 				} else {
 					for _, server := range data.Servers {
-						@serverCard(server, data.CSRFToken)
+						@serverCard(server, data.CSRFToken, data.AgentURLExample, data.GeneratedTokenServerID, data.GeneratedAgentToken)
 					}
 				}
 			</div>
@@ -293,7 +293,7 @@ templ resourceCard(label string, usage string, percent float64, high float64, mi
 	</div>
 }
 
-templ serverCard(server model.Server, csrfToken string) {
+templ serverCard(server model.Server, csrfToken string, agentURLExample string, generatedTokenServerID int64, generatedAgentToken string) {
 	<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
 		<div class="flex items-start justify-between mb-4">
 			<div class="flex items-center gap-3">
@@ -321,8 +321,45 @@ templ serverCard(server model.Server, csrfToken string) {
 			</div>
 			<div class="flex items-center gap-3 text-xs font-mono font-bold text-retro-muted">
 				<span>Last seen: { LastSeenLong(server.LastSeen) }</span>
+				<form method="POST" action={ templ.URL("/admin/servers/rotate-token/" + IDText(server.ID)) } class="inline"><input type="hidden" name="_csrf" value={ csrfToken }/><button type="submit" class="font-bold text-retro-muted hover:bg-retro-wheat px-2 py-0.5 border-2 border-retro-ink bg-retro-paper cursor-pointer">Rotate token</button></form>
 				<form method="POST" action={ templ.URL("/admin/servers/delete/" + IDText(server.ID)) } class="inline"><input type="hidden" name="_csrf" value={ csrfToken }/><button type="submit" class="font-bold text-retro-muted hover:bg-retro-blush px-2 py-0.5 border-2 border-retro-ink bg-retro-paper cursor-pointer">✕</button></form>
 			</div>
+		</div>
+		<div class="mt-4 border-2 border-retro-ink bg-retro-sageLight p-4 space-y-3">
+			<div class="flex items-center justify-between gap-3">
+				<div>
+					<p class="text-xs font-black uppercase text-retro-muted">Agent install</p>
+					<p class="text-xs font-bold text-retro-ink">{ AgentTokenStatus(server) } · works over public URL, LAN IP, or tunnel.</p>
+				</div>
+				<span class="text-xs font-mono font-black border-2 border-retro-ink bg-retro-paper px-2 py-1">ID { IDText(server.ID) }</span>
+			</div>
+			if generatedTokenServerID == server.ID && generatedAgentToken != "" {
+				<div class="border-2 border-retro-ink bg-retro-wheat p-3">
+					<p class="text-xs font-black uppercase text-retro-ink mb-1">Copy this token now. It will not be shown again.</p>
+					<code class="block text-xs font-mono font-black text-retro-ink break-all">{ generatedAgentToken }</code>
+				</div>
+			}
+			<div>
+				<p class="text-xs font-black uppercase text-retro-muted mb-1">1. install agent</p>
+				<pre class="overflow-x-auto border-2 border-retro-ink bg-retro-paper p-3 text-xs font-mono font-bold text-retro-ink"><code>{ AgentInstallCommand(agentURLExample) }</code></pre>
+			</div>
+			<div>
+				<p class="text-xs font-black uppercase text-retro-muted mb-1">2. test run</p>
+			if generatedTokenServerID == server.ID && generatedAgentToken != "" {
+				<pre class="overflow-x-auto border-2 border-retro-ink bg-retro-paper p-3 text-xs font-mono font-bold text-retro-ink"><code>{ AgentRunCommand(server.ID, agentURLExample, generatedAgentToken) }</code></pre>
+			} else {
+				<pre class="overflow-x-auto border-2 border-retro-ink bg-retro-paper p-3 text-xs font-mono font-bold text-retro-ink"><code>{ AgentRunCommand(server.ID, agentURLExample, "") }</code></pre>
+			}
+			</div>
+			<div>
+				<p class="text-xs font-black uppercase text-retro-muted mb-1">3. cron every minute</p>
+			if generatedTokenServerID == server.ID && generatedAgentToken != "" {
+				<pre class="overflow-x-auto border-2 border-retro-ink bg-retro-paper p-3 text-xs font-mono font-bold text-retro-ink"><code>{ AgentCronLine(server.ID, agentURLExample, generatedAgentToken) }</code></pre>
+			} else {
+				<pre class="overflow-x-auto border-2 border-retro-ink bg-retro-paper p-3 text-xs font-mono font-bold text-retro-ink"><code>{ AgentCronLine(server.ID, agentURLExample, "") }</code></pre>
+			}
+			</div>
+			<p class="text-xs font-bold text-retro-muted">Endpoint: { AgentURL(server.ID) }</p>
 		</div>
 	</div>
 }

@@ -67,9 +67,42 @@ type PostsData struct {
 }
 
 type ServersData struct {
-	CurrentPath string
-	CSRFToken   string
-	Servers     []model.Server
+	CurrentPath            string
+	CSRFToken              string
+	Servers                []model.Server
+	AgentURLExample        string
+	GeneratedTokenServerID int64
+	GeneratedAgentToken    string
+}
+
+func AgentTokenStatus(server model.Server) string {
+	if server.AgentTokenHash == "" {
+		return "token missing"
+	}
+	return "token ready"
+}
+
+func AgentURL(serverID int64) string {
+	return "$RAEVTAR_URL/api/v1/servers/" + IDText(serverID) + "/ping"
+}
+
+func AgentRunCommand(serverID int64, url, token string) string {
+	if token == "" {
+		token = "paste-token-here"
+	}
+	return "RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " /usr/local/bin/raevtar-agent.sh"
+}
+
+func AgentInstallCommand(url string) string {
+	url = strings.TrimRight(url, "/")
+	return "sudo install -d /usr/local/bin && curl -fsSL " + url + "/static/agent/raevtar-agent.sh | sudo tee /usr/local/bin/raevtar-agent.sh >/dev/null && sudo chmod +x /usr/local/bin/raevtar-agent.sh"
+}
+
+func AgentCronLine(serverID int64, url, token string) string {
+	if token == "" {
+		token = "paste-token-here"
+	}
+	return "*/1 * * * * RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " /usr/local/bin/raevtar-agent.sh >/dev/null 2>&1"
 }
 
 func CountText(value int) string {
@@ -89,14 +122,22 @@ func PercentText(percent float64) string {
 }
 
 func IsOnline(lastSeen *time.Time) bool {
-	return lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute
+	return lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute
+}
+
+func IsStale(lastSeen *time.Time) bool {
+	return lastSeen != nil && time.Since(*lastSeen) >= 2*time.Minute && time.Since(*lastSeen) < 10*time.Minute
 }
 
 func StatusText(lastSeen *time.Time) string {
-	if IsOnline(lastSeen) {
+	switch {
+	case IsOnline(lastSeen):
 		return "Online"
+	case IsStale(lastSeen):
+		return "Stale"
+	default:
+		return "Offline"
 	}
-	return "Offline"
 }
 
 func LastSeenShort(lastSeen *time.Time) string {
@@ -114,17 +155,25 @@ func LastSeenLong(lastSeen *time.Time) string {
 }
 
 func StatusDotClass(lastSeen *time.Time) string {
-	if IsOnline(lastSeen) {
+	switch {
+	case IsOnline(lastSeen):
 		return "bg-retro-sage"
+	case IsStale(lastSeen):
+		return "bg-retro-wheat"
+	default:
+		return "bg-retro-blush"
 	}
-	return "bg-retro-blush"
 }
 
 func StatusBadgeClass(lastSeen *time.Time) string {
-	if IsOnline(lastSeen) {
+	switch {
+	case IsOnline(lastSeen):
 		return "bg-retro-sage text-retro-cream"
+	case IsStale(lastSeen):
+		return "bg-retro-wheat text-retro-ink"
+	default:
+		return "bg-retro-blush text-retro-ink"
 	}
-	return "bg-retro-blush text-retro-ink"
 }
 
 func HeroStatusText(data DashboardData) string {
