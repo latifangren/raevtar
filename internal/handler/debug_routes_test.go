@@ -182,6 +182,22 @@ func TestPublicRoutes(t *testing.T) {
 	}
 }
 
+func TestBlogDetailHidesDraftPosts(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/blog/tools-draft", nil)
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d", rr.Code, http.StatusNotFound)
+	}
+	if strings.Contains(rr.Body.String(), "Tools Draft") {
+		t.Fatalf("draft content leaked in response: %s", rr.Body.String())
+	}
+}
+
 func TestRSSFeedAllowsNoPosts(t *testing.T) {
 	dbPath := filepath.Join(t.TempDir(), "raevtar_empty_feed.db")
 	cfg := &config.Config{

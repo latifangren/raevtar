@@ -62,7 +62,7 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
-	post, err := h.svc.Blog.GetPost(r.PathValue("slug"))
+	post, err := h.svc.Blog.GetPublishedPost(r.PathValue("slug"))
 	if err != nil {
 		http.Error(w, "Post not found", http.StatusNotFound)
 		return
