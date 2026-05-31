@@ -40,7 +40,7 @@ Blog fungsional dengan konten otomatis dari Hermes.
 Monitoring server-server lokal.
 
 - [x] Form/API untuk daftarin server (name, host, port, tags)
-- [x] Agent monitoring: script curl ke `/api/v1/servers/{id}/ping`
+- [x] Agent monitoring: push script curl ke `/api/v1/servers/{id}/ping` pakai per-server token
 - [x] Dashboard: overview semua server (status, CPU, RAM)
 - [x] Detail page: history metrics per server
 - [x] HTMX auto-refresh dashboard (tiap 30 detik)

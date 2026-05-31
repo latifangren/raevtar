@@ -81,7 +81,7 @@ Header: `Authorization: Bearer <RAEVTAR_ADMIN_KEY>`
 ## Hermes Integration Notes
 
 - Cronjob auto-post: Hermes langsung `curl` ke API localhost. Atau pake `cron/auto_post.sh` kalo mau standalone
-- Untuk nambah server monitoring: `POST /api/v1/servers/{id}/ping`
+- Untuk nambah server monitoring: register server di admin, rotate/copy agent token, lalu jalankan `/static/agent/raevtar-agent.sh` di perangkat target dengan `RAEVTAR_URL`, `RAEVTAR_SERVER_ID`, dan `RAEVTAR_AGENT_TOKEN`
 - Gw bisa manual nulis artikel: kasih gw link/topik → gw riset → gw POST ke API
 
 ## Build & Run

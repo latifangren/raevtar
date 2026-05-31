@@ -113,7 +113,7 @@ raevtar/
 │   │
 │   ├── service/
 │   │   ├── blog.go              # Blog logic: slug generation, markdown render, pagination
-│   │   ├── monitor.go           # Server monitoring: health check, polling scheduler
+│   │   ├── monitor.go           # Server monitoring: agent tokens + metrics recording
 │   │   ├── admin.go             # Admin auth/users/audit boundary
 │   │   └── seed.go              # Seed initial data (default categories, admin user)
 │   │
@@ -189,10 +189,10 @@ raevtar/
 │ host       │     │ cpu_percent      │
 │ port       │     │ ram_used_mb      │
 │ tags       │     │ ram_total_mb     │
-│ last_seen  │     │ disk_used_gb     │
-│ created_at │     │ uptime_seconds   │
-└────────────┘     │ online           │
-                   │ recorded_at      │
+│ token_hash │     │ disk_used_gb     │
+│ last_seen  │     │ uptime_seconds   │
+│ created_at │     │ online           │
+└────────────┘     │ recorded_at      │
                    └──────────────────┘
 
 ┌────────────┐     ┌──────────────────┐
@@ -235,9 +235,9 @@ raevtar/
 | GET | `/api/v1/categories` | api.ListCategories | JSON categories |
 | GET | `/api/v1/hoststats` | api.HostStats | Host CPU/RAM/disk/temp (Bearer auth) |
 | GET | `/api/v1/servers` | api.ListServers | JSON server status (Bearer auth) |
-| POST | `/api/v1/servers` | api.CreateServer | Register server |
+| POST | `/api/v1/servers` | api.CreateServer | Register server + return one-time agent token |
 | GET | `/api/v1/servers/{id}` | api.GetServer | JSON detail server (Bearer auth) |
-| POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Record server metrics |
+| POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Record server metrics (agent token atau admin key) |
 | GET | `/docs` | static docs.html | Swagger UI untuk `static/openapi.json` |
 
 Swagger UI disajikan dari static file, bukan generated runtime.
@@ -259,11 +259,13 @@ Swagger UI disajikan dari static file, bukan generated runtime.
 > [Hermes] *curl POST /api/v1/posts* — jadi, langsung muncul
 ```
 
-### Server Monitoring — Agent collecting
+### Server Monitoring — Agent push
 
-- Setiap mesin target jalanin **script kecil** (curl ke `raevtar.tech/api/v1/servers/{id}/ping`) tiap 5 menit
-- Atau cronjob Hermes polling dari sini via SSH
-- Atau lo config `internal/service/monitor.go` buat HTTP ping aja (minimal)
+- Setiap mesin target jalanin **script kecil** dari `/static/agent/raevtar-agent.sh`
+- Agent push metrics ke `${RAEVTAR_URL}/api/v1/servers/{id}/ping` tiap 1 menit
+- `RAEVTAR_URL` bisa domain publik, LAN IP, hostname lokal, atau tunnel
+- Auth pakai token per server; token didapat saat register via admin/API, dan bisa di-rotate dari `/admin/servers`
+- Raevtar tidak perlu SSH user/password ke perangkat target
 
 ---
 
