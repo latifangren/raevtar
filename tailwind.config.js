@@ -2,6 +2,7 @@
 module.exports = {
   content: [
     "./internal/view/**/*.templ",
+    "./internal/view/**/*.go",
     "./internal/handler/*.go",
   ],
   theme: {
