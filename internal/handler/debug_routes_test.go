@@ -1,6 +1,8 @@
 package handler
 
 import (
+	"bytes"
+	"encoding/json"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -27,6 +29,7 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 	cfg := &config.Config{
 		DatabasePath: dbPath,
 		Domain:       "raevtar.test",
+		AdminKey:     "admin-key",
 		AdminUser:    "admin",
 		AdminPass:    "demo-pass-123",
 	}
@@ -426,6 +429,173 @@ func TestServerDetailRendersMetricMarkers(t *testing.T) {
 	}
 }
 
+func TestAgentTokenAuthorizesMetrics(t *testing.T) {
+	app := newPublicTestApp(t)
+	token, err := app.svc.Monitor.RotateAgentToken(app.serverID)
+	if err != nil {
+		t.Fatalf("rotate token: %v", err)
+	}
+
+	payload := []byte(`{"cpu_percent":14.5,"ram_used_mb":512,"ram_total_mb":2048,"disk_used_gb":12,"uptime_seconds":90,"online":true}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers/1/ping", bytes.NewReader(payload))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	metrics, err := app.svc.Monitor.GetRecentMetrics(app.serverID, 1)
+	if err != nil {
+		t.Fatalf("metrics: %v", err)
+	}
+	if len(metrics) != 1 || metrics[0].CPUPercent != 14.5 {
+		t.Fatalf("metrics = %+v, want recorded payload", metrics)
+	}
+}
+
+func TestInvalidAgentTokenRejectsMetrics(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers/1/ping", strings.NewReader(`{"online":true}`))
+	req.Header.Set("Authorization", "Bearer wrong-token")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusUnauthorized {
+		t.Fatalf("status = %d, want %d", rr.Code, http.StatusUnauthorized)
+	}
+}
+
+func TestAdminKeyStillAuthorizesMetrics(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers/1/ping", strings.NewReader(`{"online":true}`))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+}
+
+func TestMissingServerPingReturnsNotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers/999/ping", strings.NewReader(`{"online":true}`))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusNotFound, rr.Body.String())
+	}
+}
+
+func TestAPICreateServerReturnsAgentToken(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	payload := []byte(`{"name":"api-agent","host":"192.168.100.77","port":9100,"tags":"api"}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers", bytes.NewReader(payload))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusCreated {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusCreated, rr.Body.String())
+	}
+	var response struct {
+		Server     model.Server `json:"server"`
+		AgentToken string       `json:"agent_token"`
+	}
+	if err := json.NewDecoder(rr.Body).Decode(&response); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if response.Server.ID == 0 || response.Server.Name != "api-agent" {
+		t.Fatalf("server response = %+v, want created api-agent", response.Server)
+	}
+	if response.Server.AgentTokenHash != "" {
+		t.Fatalf("server JSON leaked token hash: %+v", response.Server)
+	}
+	if response.AgentToken == "" {
+		t.Fatalf("expected one-time agent token")
+	}
+	if !app.svc.Monitor.VerifyAgentToken(response.Server.ID, response.AgentToken) {
+		t.Fatalf("returned agent token should verify")
+	}
+}
+
+func TestAdminRotateMissingServerReturnsNotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(50, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	form := url.Values{"_csrf": {entry.csrfToken}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers/rotate-token/999", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusNotFound, rr.Body.String())
+	}
+}
+
+func TestAdminCreateServerShowsAgentInstallToken(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(49, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	form := url.Values{
+		"name":  {"agent-node"},
+		"host":  {"192.168.100.50"},
+		"port":  {"9100"},
+		"tags":  {"lan,agent"},
+		"_csrf": {entry.csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	status, body := getBody(t, app, "/admin/servers", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Copy this token now")
+	assertContains(t, body, "raevtar-agent.sh")
+	assertContains(t, body, "RAEVTAR_URL=https://raevtar.test")
+	assertContains(t, body, "RAEVTAR_SERVER_ID=2")
+	assertContains(t, body, "RAEVTAR_AGENT_TOKEN=")
+
+	_, secondBody := getBody(t, app, "/admin/servers", &http.Cookie{Name: sessionCookieName, Value: token})
+	assertNotContains(t, secondBody, "Copy this token now")
+}
+
 func TestHostStatsRequireAdminKey(t *testing.T) {
 	app := newPublicTestApp(t)
 
@@ -663,6 +833,7 @@ func TestAdminDeleteRoutesRejectGET(t *testing.T) {
 
 	for _, path := range []string{
 		"/admin/posts/delete/1",
+		"/admin/servers/rotate-token/1",
 		"/admin/servers/delete/1",
 		"/admin/manage-users/delete/1",
 	} {

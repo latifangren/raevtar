@@ -1,12 +1,14 @@
 package handler
 
 import (
+	"errors"
 	"math"
 	"net/http"
 	"strconv"
-	"time"
+	"strings"
 
 	"raevtar/internal/model"
+	"raevtar/internal/service"
 	adminview "raevtar/internal/view/admin"
 )
 
@@ -18,7 +20,7 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 
 	onlineCount := 0
 	for _, server := range servers {
-		if server.LastSeen != nil && time.Since(*server.LastSeen) < 10*time.Minute {
+		if adminview.IsOnline(server.LastSeen) {
 			onlineCount++
 		}
 	}
@@ -189,7 +191,8 @@ func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 	servers, _ := h.svc.Monitor.ListServers()
-	renderHTML(w, r, adminview.Servers(adminview.ServersData{CurrentPath: r.URL.Path, CSRFToken: csrfTokenForRequest(r), Servers: servers}))
+	serverID, token := popAgentTokenFlash(r)
+	h.renderAdminServers(w, r, servers, serverID, token)
 }
 
 func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
@@ -210,13 +213,41 @@ func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err = h.svc.Monitor.CreateServer(name, host, port, tags)
+	server, token, err := h.svc.Monitor.CreateServerWithAgentToken(name, host, port, tags)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	_ = h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, clientIP(r))
+	setAgentTokenFlash(r, server.ID, token)
+	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
+}
+
+func (h *Handler) adminRotateServerToken(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
+	entry, _ := getSessionEntry(r)
+	idStr := r.PathValue("serverID")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	token, err := h.svc.Monitor.RotateAgentToken(id)
+	if err != nil {
+		if errors.Is(err, service.ErrServerNotFound) {
+			http.Error(w, "server not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_ = h.svc.Admin.LogAgentTokenRotated(entry.username, idStr, clientIP(r))
+	setAgentTokenFlash(r, id, token)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 
@@ -236,6 +267,28 @@ func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
 
 	_ = h.svc.Admin.DeleteServer(entry.username, id, idStr, clientIP(r))
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
+}
+
+func (h *Handler) renderAdminServers(w http.ResponseWriter, r *http.Request, servers []model.Server, tokenServerID int64, token string) {
+	renderHTML(w, r, adminview.Servers(adminview.ServersData{
+		CurrentPath:            r.URL.Path,
+		CSRFToken:              csrfTokenForRequest(r),
+		Servers:                servers,
+		AgentURLExample:        agentURLExample(h.cfg.Domain),
+		GeneratedTokenServerID: tokenServerID,
+		GeneratedAgentToken:    token,
+	}))
+}
+
+func agentURLExample(domain string) string {
+	domain = strings.TrimSpace(domain)
+	if domain == "" {
+		return "http://192.168.100.5:8080"
+	}
+	if strings.HasPrefix(domain, "http://") || strings.HasPrefix(domain, "https://") {
+		return domain
+	}
+	return "https://" + domain
 }
 
 func adminHostStats(stats HostStats) adminview.HostStatsData {

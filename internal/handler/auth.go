@@ -15,11 +15,13 @@ import (
 // --- In-memory session store (with role) ---
 
 type sessionEntry struct {
-	userID    int64
-	username  string
-	role      string
-	csrfToken string
-	createdAt time.Time
+	userID              int64
+	username            string
+	role                string
+	csrfToken           string
+	agentTokenServerID  int64
+	generatedAgentToken string
+	createdAt           time.Time
 }
 
 type sessionStore struct {
@@ -75,6 +77,33 @@ func (s *sessionStore) delete(token string) {
 	delete(s.sessions, token)
 }
 
+func (s *sessionStore) setAgentTokenFlash(token string, serverID int64, agentToken string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	entry, ok := s.sessions[token]
+	if !ok {
+		return
+	}
+	entry.agentTokenServerID = serverID
+	entry.generatedAgentToken = agentToken
+	s.sessions[token] = entry
+}
+
+func (s *sessionStore) popAgentTokenFlash(token string) (int64, string) {
+	s.mu.Lock()
+	defer s.mu.Unlock()
+	entry, ok := s.sessions[token]
+	if !ok {
+		return 0, ""
+	}
+	serverID := entry.agentTokenServerID
+	agentToken := entry.generatedAgentToken
+	entry.agentTokenServerID = 0
+	entry.generatedAgentToken = ""
+	s.sessions[token] = entry
+	return serverID, agentToken
+}
+
 func (s *sessionStore) cleanup() {
 	s.mu.Lock()
 	defer s.mu.Unlock()
@@ -109,6 +138,22 @@ func csrfTokenForRequest(r *http.Request) string {
 		return ""
 	}
 	return entry.csrfToken
+}
+
+func setAgentTokenFlash(r *http.Request, serverID int64, agentToken string) {
+	cookie, err := r.Cookie(sessionCookieName)
+	if err != nil {
+		return
+	}
+	sessions.setAgentTokenFlash(cookie.Value, serverID, agentToken)
+}
+
+func popAgentTokenFlash(r *http.Request) (int64, string) {
+	cookie, err := r.Cookie(sessionCookieName)
+	if err != nil {
+		return 0, ""
+	}
+	return sessions.popAgentTokenFlash(cookie.Value)
 }
 
 // --- RBAC Middleware ---

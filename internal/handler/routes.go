@@ -63,6 +63,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Post("/posts/delete/{postID}", h.adminDeletePost)
 				r.Get("/servers", h.adminServers)
 				r.Post("/servers", h.adminCreateServer)
+				r.Post("/servers/rotate-token/{serverID}", h.adminRotateServerToken)
 				r.Post("/servers/delete/{serverID}", h.adminDeleteServer)
 				r.Get("/audit-log", h.adminAuditLog)
 				r.Get("/manage-users", h.adminUsers)
@@ -84,7 +85,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		r.With(h.adminAuth).Get("/servers", h.apiListServers)
 		r.With(h.adminAuth).Get("/servers/{serverID}", h.apiGetServer)
 		r.With(h.adminAuth).Post("/servers", h.apiCreateServer)
-		r.With(h.adminAuth).Post("/servers/{serverID}/ping", h.apiRecordMetrics)
+		r.Post("/servers/{serverID}/ping", h.apiRecordMetrics)
 	})
 
 	// Store mux for debugging

@@ -118,6 +118,13 @@ func (s *AdminService) LogServerCreated(username, name, host, port, ip string) e
 	return nil
 }
 
+func (s *AdminService) LogAgentTokenRotated(username, serverID, ip string) error {
+	if err := s.repos.Audit.Insert(username, "ROTATE_AGENT_TOKEN", "rotated agent token for server id: "+serverID, ip); err != nil {
+		return fmt.Errorf("audit rotate agent token: %w", err)
+	}
+	return nil
+}
+
 func (s *AdminService) DeleteServer(username string, id int64, idText, ip string) error {
 	if err := s.repos.Audit.Insert(username, "DELETE_SERVER", "deleted server id: "+idText, ip); err != nil {
 		return fmt.Errorf("audit delete server: %w", err)

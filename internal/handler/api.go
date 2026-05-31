@@ -3,10 +3,13 @@ package handler
 import (
 	"crypto/subtle"
 	"encoding/json"
+	"errors"
 	"net/http"
 	"strconv"
+	"strings"
 
 	"raevtar/internal/model"
+	"raevtar/internal/service"
 )
 
 func (h *Handler) apiListPosts(w http.ResponseWriter, r *http.Request) {
@@ -76,12 +79,15 @@ func (h *Handler) apiCreateServer(w http.ResponseWriter, r *http.Request) {
 		input.Port = 22
 	}
 
-	s, err := h.svc.Monitor.CreateServer(input.Name, input.Host, input.Port, input.Tags)
+	s, token, err := h.svc.Monitor.CreateServerWithAgentToken(input.Name, input.Host, input.Port, input.Tags)
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
-	writeJSON(w, http.StatusCreated, s)
+	writeJSON(w, http.StatusCreated, map[string]any{
+		"server":      s,
+		"agent_token": token,
+	})
 }
 
 func (h *Handler) apiListServers(w http.ResponseWriter, r *http.Request) {
@@ -111,6 +117,10 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
 		return
 	}
+	if !h.canRecordMetrics(id, r) {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing or invalid agent token"})
+		return
+	}
 
 	var m model.ServerMetric
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
@@ -119,11 +129,26 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if err := h.svc.Monitor.RecordMetrics(id, m); err != nil {
+		if errors.Is(err, service.ErrServerNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "server not found"})
+			return
+		}
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
 
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+func (h *Handler) canRecordMetrics(serverID int64, r *http.Request) bool {
+	token, ok := bearerToken(r)
+	if !ok {
+		return false
+	}
+	if h.cfg.AdminKey != "" && subtle.ConstantTimeCompare([]byte(token), []byte(h.cfg.AdminKey)) == 1 {
+		return true
+	}
+	return h.svc.Monitor.VerifyAgentToken(serverID, token)
 }
 
 func writeJSON(w http.ResponseWriter, status int, data any) {
@@ -141,13 +166,11 @@ func (h *Handler) adminAuth(next http.Handler) http.Handler {
 			return
 		}
 
-		auth := r.Header.Get("Authorization")
-		if len(auth) < 8 || auth[:7] != "Bearer " {
+		provided, ok := bearerToken(r)
+		if !ok {
 			writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing or invalid Authorization header"})
 			return
 		}
-
-		provided := auth[7:]
 		if subtle.ConstantTimeCompare([]byte(provided), []byte(h.cfg.AdminKey)) != 1 {
 			writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid admin key"})
 			return
@@ -155,4 +178,13 @@ func (h *Handler) adminAuth(next http.Handler) http.Handler {
 
 		next.ServeHTTP(w, r)
 	})
+}
+
+func bearerToken(r *http.Request) (string, bool) {
+	auth := r.Header.Get("Authorization")
+	if !strings.HasPrefix(auth, "Bearer ") {
+		return "", false
+	}
+	token := strings.TrimSpace(strings.TrimPrefix(auth, "Bearer "))
+	return token, token != ""
 }
