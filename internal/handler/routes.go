@@ -35,6 +35,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/blog", h.blogList)
 	r.Get("/blog/{slug}", h.blogDetail)
 	r.Get("/dashboard", h.dashboardIndex)
+	r.Get("/dashboard/{serverID}/live", h.dashboardDetailLive)
 	r.Get("/dashboard/{serverID}", h.dashboardDetail)
 
 	// RSS feed

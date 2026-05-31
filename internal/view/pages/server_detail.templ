@@ -5,6 +5,12 @@ templ ServerDetail(data ServerDetailData) {
 		<div class="mb-6">
 			<a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">&larr; Kembali</a>
 		</div>
+		@ServerDetailLive(data)
+	}
+}
+
+templ ServerDetailLive(data ServerDetailData) {
+	<div id="server-detail-live" hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") } hx-trigger="every 15s" hx-swap="outerHTML">
 		<section class="mb-6 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
 			<div class="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
 				<div class="bg-retro-ink text-retro-cream p-6 md:p-8">
@@ -33,12 +39,17 @@ templ ServerDetail(data ServerDetailData) {
 						<div class="flex items-center gap-2"><span class={ "inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClass(data.Server.LastSeen) }></span><span class="text-xl font-black text-retro-ink">{ ServerStatusText(data.Server.LastSeen) }</span></div>
 					</div>
 					<div class="border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">last signal</p>
-						<p class="text-lg font-black text-retro-ink">{ LastSeenText(data.Server.LastSeen) }</p>
+						<p class="text-xs font-black uppercase text-retro-muted mb-2">last signal age</p>
+						<p class="text-lg font-black text-retro-ink">{ LastSignalAgeText(data.Server.LastSeen, data.RefreshedAt) }</p>
 					</div>
 					<div class="border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">registered</p>
-						<p class="text-lg font-black text-retro-ink">{ CreatedText(data.Server.CreatedAt) }</p>
+						<p class="text-xs font-black uppercase text-retro-muted mb-2">latest metric</p>
+						<p class="text-lg font-black text-retro-ink">{ LatestMetricTimestampText(data.Metrics) }</p>
+					</div>
+					<div class="md:col-span-3 border-2 border-retro-ink bg-retro-paper p-4">
+						<p class="text-xs font-black uppercase text-retro-muted mb-2">freshness diagnosis</p>
+						<p class="text-sm font-black text-retro-ink">{ FreshnessCauseHint(data.Server.LastSeen, data.Metrics, data.RefreshedAt) }</p>
+						<p class="text-xs font-bold text-retro-muted mt-2">Panel refreshed { RefreshTimeText(data.RefreshedAt) } &middot; Auto-refresh every 15s</p>
 					</div>
 					<div class="md:col-span-3 border-2 border-retro-ink bg-retro-paper p-4">
 						<p class="text-xs font-black uppercase text-retro-muted mb-2">endpoint</p>
@@ -91,5 +102,5 @@ templ ServerDetail(data ServerDetailData) {
 				}
 			</div>
 		}
-	}
+	</div>
 }

@@ -407,6 +407,86 @@ func TestOwnerServerDetailShowsServerTopology(t *testing.T) {
 	assertContains(t, body, ">local<")
 }
 
+func TestPublicServerDetailLiveRendersFragmentWithPollingAndRedaction(t *testing.T) {
+	app := newPublicTestApp(t)
+	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
+		CPUPercent:    12.5,
+		RAMUsedMB:     256,
+		RAMTotalMB:    1024,
+		DiskUsedGB:    8.5,
+		UptimeSeconds: 3600,
+		Online:        true,
+	}); err != nil {
+		t.Fatalf("record metrics: %v", err)
+	}
+
+	status, body := getBody(t, app, "/dashboard/1/live", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	assertContains(t, body, `id="server-detail-live"`)
+	assertContains(t, body, `hx-get="/dashboard/1/live"`)
+	assertContains(t, body, `hx-trigger="every 15s"`)
+	assertContains(t, body, `hx-swap="outerHTML"`)
+	assertContains(t, body, "freshness diagnosis")
+	assertContains(t, body, "last signal age")
+	assertContains(t, body, "latest metric")
+	assertContains(t, body, "Panel refreshed")
+	assertContains(t, body, "Telemetry is fresh. Latest agent signal arrived recently.")
+	assertContains(t, body, "Endpoint hidden on public view.")
+	assertContains(t, body, "Login as owner/admin for network details.")
+	assertNotContains(t, body, "<!DOCTYPE html>")
+	assertNotContains(t, body, "<html")
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "127.0.0.1:9100")
+	assertNotContains(t, body, "port 9100")
+	assertNotContains(t, body, ">local<")
+	assertNotContains(t, body, "POST /api/v1/servers/")
+}
+
+func TestLimitedRolesServerDetailLiveRedactsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, role := range []string{model.RoleOperator, model.RoleReadonly} {
+		t.Run(role, func(t *testing.T) {
+			cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(104, role, role)}
+			status, body := getBody(t, app, "/dashboard/1/live", cookie)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+
+			assertContains(t, body, "Endpoint hidden on public view.")
+			assertContains(t, body, "No telemetry received yet. Waiting for first agent signal.")
+			assertNotContains(t, body, "127.0.0.1")
+			assertNotContains(t, body, "127.0.0.1:9100")
+			assertNotContains(t, body, "port 9100")
+			assertNotContains(t, body, ">local<")
+			assertNotContains(t, body, `href="/admin/servers"`)
+		})
+	}
+}
+
+func TestOwnerAndAdminServerDetailLiveShowTopologyAndManageLink(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, role := range []string{model.RoleOwner, model.RoleAdmin} {
+		t.Run(role, func(t *testing.T) {
+			cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(102, role, role)}
+			status, body := getBody(t, app, "/dashboard/1/live", cookie)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+
+			assertContains(t, body, "127.0.0.1:9100")
+			assertContains(t, body, "port 9100")
+			assertContains(t, body, ">local<")
+			assertContains(t, body, `href="/admin/servers"`)
+			assertContains(t, body, "Manage in admin")
+		})
+	}
+}
+
 func TestServerDetailRendersMetricMarkers(t *testing.T) {
 	app := newPublicTestApp(t)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{

@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"strconv"
+	"time"
 
 	"raevtar/internal/view/pages"
 )
@@ -104,35 +105,55 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) dashboardDetail(w http.ResponseWriter, r *http.Request) {
+	data, ok := h.loadServerDetailData(w, r)
+	if !ok {
+		return
+	}
+
+	renderHTML(w, r, pages.ServerDetail(data))
+}
+
+func (h *Handler) dashboardDetailLive(w http.ResponseWriter, r *http.Request) {
+	data, ok := h.loadServerDetailData(w, r)
+	if !ok {
+		return
+	}
+
+	renderHTML(w, r, pages.ServerDetailLive(data))
+}
+
+func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (pages.ServerDetailData, bool) {
 	id, err := strconv.ParseInt(r.PathValue("serverID"), 10, 64)
 	if err != nil {
 		http.Error(w, "Invalid server ID", http.StatusBadRequest)
-		return
+		return pages.ServerDetailData{}, false
 	}
 	server, err := h.svc.Monitor.GetServer(id)
 	if err != nil {
 		http.Error(w, "Server not found", http.StatusNotFound)
-		return
+		return pages.ServerDetailData{}, false
 	}
 	metrics, err := h.svc.Monitor.GetRecentMetrics(id, 50)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return pages.ServerDetailData{}, false
 	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
+		return pages.ServerDetailData{}, false
 	}
 
-	renderHTML(w, r, pages.ServerDetail(pages.ServerDetailData{
+	canManage := canManageServer(r)
+	return pages.ServerDetailData{
 		CurrentPath:       r.URL.Path,
 		Server:            server,
 		Metrics:           metrics,
 		Categories:        categories,
-		CanManageServer:   canManageServer(r),
-		CanViewServerInfo: canManageServer(r),
-	}))
+		CanManageServer:   canManage,
+		CanViewServerInfo: canManage,
+		RefreshedAt:       time.Now().UTC(),
+	}, true
 }
 
 func itoa(n int) string { return strconv.Itoa(n) }
