@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"raevtar/internal/model"
-	"raevtar/internal/repo"
 )
 
 // --- In-memory session store (with role) ---
@@ -223,19 +222,9 @@ func (h *Handler) adminLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Look up user from DB
-	user, err := h.svc.Repos.User.GetByUsername(username)
+	user, err := h.svc.Admin.Authenticate(username, password, r.RemoteAddr)
 	if err != nil {
 		sessions.cleanup()
-		// Log failed attempt
-		h.svc.Repos.Audit.Insert(username, "LOGIN_FAILED", "user not found", r.RemoteAddr)
-		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid credentials"})
-		return
-	}
-
-	if !repo.CheckPassword(password, user.PasswordHash) {
-		sessions.cleanup()
-		h.svc.Repos.Audit.Insert(username, "LOGIN_FAILED", "wrong password", r.RemoteAddr)
 		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid credentials"})
 		return
 	}
@@ -248,11 +237,9 @@ func (h *Handler) adminLogin(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
 		MaxAge:   int(sessionMaxAge.Seconds()),
 	})
-
-	h.svc.Repos.Audit.Insert(user.Username, "LOGIN", "login via admin panel", r.RemoteAddr)
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(map[string]string{"status": "ok", "redirect": "/admin"})
@@ -266,7 +253,7 @@ func (h *Handler) adminLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if entry.username != "" {
-		h.svc.Repos.Audit.Insert(entry.username, "LOGOUT", "manual logout", r.RemoteAddr)
+		_ = h.svc.Admin.LogLogout(entry.username, r.RemoteAddr)
 	}
 
 	http.SetCookie(w, &http.Cookie{
@@ -275,7 +262,7 @@ func (h *Handler) adminLogout(w http.ResponseWriter, r *http.Request) {
 		Path:     "/",
 		HttpOnly: true,
 		Secure:   true,
-		SameSite: http.SameSiteLaxMode,
+		SameSite: http.SameSiteStrictMode,
 		MaxAge:   -1,
 	})
 

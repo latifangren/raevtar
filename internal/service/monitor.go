@@ -37,7 +37,13 @@ func (s *MonitorService) GetServer(id int64) (*model.Server, error) {
 func (s *MonitorService) RecordMetrics(serverID int64, m model.ServerMetric) error {
 	m.ServerID = serverID
 	m.RecordedAt = time.Now()
-	return s.repos.Metric.Insert(&m)
+	if err := s.repos.Metric.Insert(&m); err != nil {
+		return fmt.Errorf("record metrics: %w", err)
+	}
+	if err := s.repos.Server.UpdateLastSeen(serverID); err != nil {
+		return fmt.Errorf("update last seen: %w", err)
+	}
+	return nil
 }
 
 func (s *MonitorService) GetRecentMetrics(serverID int64, limit int) ([]model.ServerMetric, error) {

@@ -8,17 +8,19 @@ import (
 // Service bundles all business logic.
 // Handler calls Service. Service calls Repo.
 type Service struct {
-	Repos   *repo.Repositories
+	repos   *repo.Repositories
 	Cfg     *config.Config
 	Blog    *BlogService
 	Monitor *MonitorService
+	Admin   *AdminService
 }
 
 func New(repos *repo.Repositories, cfg *config.Config) *Service {
 	return &Service{
-		Repos:   repos,
+		repos:   repos,
 		Cfg:     cfg,
 		Blog:    NewBlogService(repos),
 		Monitor: &MonitorService{repos: repos},
+		Admin:   &AdminService{repos: repos},
 	}
 }

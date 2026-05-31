@@ -18,13 +18,13 @@ func (s *Service) SeedData() error {
 		{Slug: "tools", Name: "Tools", Description: "Aplikasi & utilities keren"},
 	}
 	for _, cat := range categories {
-		if err := s.Repos.Category.Create(&cat); err != nil {
+		if err := s.repos.Category.Create(&cat); err != nil {
 			return err
 		}
 	}
 
 	// Seed admin user from config if no users exist
-	count, err := s.Repos.User.Count()
+	count, err := s.repos.User.Count()
 	if err != nil {
 		return err
 	}
@@ -33,7 +33,7 @@ func (s *Service) SeedData() error {
 		if err != nil {
 			return err
 		}
-		u, err := s.Repos.User.Create(s.Cfg.AdminUser, hash, model.RoleOwner, s.Cfg.AdminUser)
+		u, err := s.repos.User.Create(s.Cfg.AdminUser, hash, model.RoleOwner, s.Cfg.AdminUser)
 		if err != nil {
 			return err
 		}

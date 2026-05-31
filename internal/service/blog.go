@@ -37,7 +37,7 @@ func (s *BlogService) ListPosts(categorySlug string, page, pageSize int) ([]mode
 	}
 	offset := (page - 1) * pageSize
 
-	total, err := s.repos.Post.Count(categorySlug)
+	total, err := s.repos.Post.Count(categorySlug, true)
 	if err != nil {
 		return nil, 0, fmt.Errorf("count posts: %w", err)
 	}
@@ -48,6 +48,14 @@ func (s *BlogService) ListPosts(categorySlug string, page, pageSize int) ([]mode
 	}
 
 	return posts, total, nil
+}
+
+func (s *BlogService) ListCategories() ([]model.Category, error) {
+	categories, err := s.repos.Category.List()
+	if err != nil {
+		return nil, fmt.Errorf("list categories: %w", err)
+	}
+	return categories, nil
 }
 
 func (s *BlogService) GetPost(slug string) (*model.Post, error) {

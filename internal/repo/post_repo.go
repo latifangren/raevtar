@@ -1,6 +1,8 @@
 package repo
 
 import (
+	"strings"
+
 	"raevtar/internal/model"
 
 	"github.com/jmoiron/sqlx"
@@ -106,12 +108,20 @@ func (r *PostRepo) Delete(id int64) error {
 	return err
 }
 
-func (r *PostRepo) Count(categorySlug string) (int, error) {
+func (r *PostRepo) Count(categorySlug string, publishedOnly bool) (int, error) {
 	var count int
 	query := `SELECT COUNT(*) FROM posts p JOIN categories c ON p.category_id = c.id`
+	conditions := make([]string, 0, 2)
+	args := make([]interface{}, 0, 1)
 	if categorySlug != "" {
-		query += " WHERE c.slug = ?"
-		return count, r.db.Get(&count, query, categorySlug)
+		conditions = append(conditions, "c.slug = ?")
+		args = append(args, categorySlug)
 	}
-	return count, r.db.Get(&count, query)
+	if publishedOnly {
+		conditions = append(conditions, "p.published = 1")
+	}
+	if len(conditions) > 0 {
+		query += " WHERE " + strings.Join(conditions, " AND ")
+	}
+	return count, r.db.Get(&count, query, args...)
 }

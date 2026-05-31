@@ -5,7 +5,6 @@ import (
 	"encoding/json"
 	"net/http"
 	"strconv"
-	"time"
 
 	"raevtar/internal/model"
 )
@@ -39,7 +38,7 @@ func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) apiListCategories(w http.ResponseWriter, r *http.Request) {
-	cats, err := h.svc.Repos.Category.List()
+	cats, err := h.svc.Blog.ListCategories()
 	if err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
@@ -119,15 +118,10 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	m.ServerID = id
-	m.RecordedAt = time.Now()
-	if err := h.svc.Repos.Metric.Insert(&m); err != nil {
+	if err := h.svc.Monitor.RecordMetrics(id, m); err != nil {
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
-
-	// update last_seen on server
-	_ = h.svc.Repos.Server.UpdateLastSeen(id)
 
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
