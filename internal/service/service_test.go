@@ -99,6 +99,28 @@ func TestBlogServiceListPostsFiltersByCategory(t *testing.T) {
 	}
 }
 
+func TestBlogServicePublishedPostLookupHidesDrafts(t *testing.T) {
+	state := newTestServices(t)
+
+	draft, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "tools",
+		Title:        "Hidden Draft",
+		ContentMD:    "# Hidden Draft",
+		Excerpt:      "Draft excerpt",
+		Published:    false,
+	})
+	if err != nil {
+		t.Fatalf("create draft: %v", err)
+	}
+
+	if _, err := state.svc.Blog.GetPost(draft.Slug); err != nil {
+		t.Fatalf("internal get draft: %v", err)
+	}
+	if _, err := state.svc.Blog.GetPublishedPost(draft.Slug); err == nil {
+		t.Fatalf("published get draft should fail")
+	}
+}
+
 func TestMonitorServiceMetricsAndServerAccess(t *testing.T) {
 	state := newTestServices(t)
 

@@ -72,6 +72,17 @@ func (s *BlogService) GetPost(slug string) (*model.Post, error) {
 	return post, nil
 }
 
+func (s *BlogService) GetPublishedPost(slug string) (*model.Post, error) {
+	post, err := s.GetPost(slug)
+	if err != nil {
+		return nil, err
+	}
+	if !post.Published {
+		return nil, fmt.Errorf("post not found: %s", slug)
+	}
+	return post, nil
+}
+
 func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
 	cat, err := s.repos.Category.GetBySlug(input.CategorySlug)
 	if err != nil {
