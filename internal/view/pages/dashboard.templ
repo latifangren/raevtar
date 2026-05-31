@@ -8,24 +8,32 @@ templ Dashboard(data DashboardData) {
 				<h1 class="text-3xl md:text-5xl font-black uppercase leading-none">Server Dashboard</h1>
 				<p class="text-sm font-bold text-retro-muted mt-2">Responsive cards for local nodes, live status, and direct drill-down pages.</p>
 			</div>
-			<button onclick="toggleForm()" class="px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">+ Register Server</button>
+			if data.CanRegisterServer {
+				<button onclick="toggleForm()" class="px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">+ Register Server</button>
+			}
 		</div>
-		<div id="register-form" class="hidden mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-			<h2 class="text-sm font-black uppercase mb-3">Register New Server</h2>
-			<form hx-post="/api/v1/servers" hx-trigger="submit" hx-target="#server-list" hx-swap="outerHTML" hx-on::after-request="if(event.detail.successful){this.reset();document.getElementById('register-form').classList.add('hidden')}" class="space-y-3">
-				<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
-					<input type="text" name="name" placeholder="Server name" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-					<input type="text" name="host" placeholder="host or IP" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-					<input type="number" name="port" placeholder="port" value="9100" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-				</div>
-				<input type="text" name="tags" placeholder="tags (comma separated)" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-				<div class="flex justify-end"><button type="submit" class="px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Register</button></div>
-			</form>
-		</div>
+		if data.CanRegisterServer {
+			<div id="register-form" class="hidden mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-sm font-black uppercase mb-3">Register Server</h2>
+				<form method="POST" action="/admin/servers" class="space-y-3">
+					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
+						<input type="text" name="name" placeholder="Server name" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+						<input type="text" name="host" placeholder="host or IP" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+						<input type="number" name="port" placeholder="port" value="9100" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					</div>
+					<input type="text" name="tags" placeholder="tags (comma separated)" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<div class="flex justify-end"><button type="submit" class="px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Register Server</button></div>
+				</form>
+			</div>
+		}
 		if len(data.Servers) == 0 {
 			<div id="server-list" class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
 				<p class="text-retro-muted font-bold">Belum ada server terdaftar.</p>
-				<p class="text-sm text-retro-muted mt-2">Klik <button onclick="toggleForm()" class="font-bold underline hover:bg-retro-wheat cursor-pointer">+ Register Server</button> untuk mulai.</p>
+				if data.CanRegisterServer {
+					<p class="text-sm text-retro-muted mt-2">Klik <button onclick="toggleForm()" class="font-bold underline hover:bg-retro-wheat cursor-pointer">+ Register Server</button> untuk mulai.</p>
+				} else {
+					<p class="text-sm text-retro-muted mt-2">Belum ada node publik. Admin dapat menambahkan server dari panel admin.</p>
+				}
 			</div>
 		} else {
 			<div id="server-list" class="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
@@ -40,17 +48,30 @@ templ Dashboard(data DashboardData) {
 						</div>
 						<div class="space-y-3">
 							<div class="border-2 border-retro-ink bg-retro-sageLight p-3">
-								<p class="text-xs font-black uppercase tracking-widest text-retro-muted">endpoint</p>
-								<p class="text-sm font-mono font-black text-retro-ink break-all">{ server.Host }:{ PortText(server.Port) }</p>
+								if data.CanViewServerInfo {
+									<p class="text-xs font-black uppercase tracking-widest text-retro-muted">endpoint</p>
+									<p class="text-sm font-mono font-black text-retro-ink break-all">{ server.Host }:{ PortText(server.Port) }</p>
+								} else {
+									<p class="text-xs font-black uppercase tracking-widest text-retro-muted">endpoint</p>
+									<p class="text-sm font-black text-retro-ink">Hidden on public view</p>
+								}
 							</div>
 							<div class="grid grid-cols-2 gap-3">
 								<div class="border-2 border-retro-ink bg-retro-paper p-3">
-									<p class="text-xs font-black uppercase tracking-widest text-retro-muted">port</p>
-									<p class="text-lg font-mono font-black text-retro-ink">{ PortText(server.Port) }</p>
+									<p class="text-xs font-black uppercase tracking-widest text-retro-muted">network</p>
+									if data.CanViewServerInfo {
+										<p class="text-lg font-mono font-black text-retro-ink">{ PortText(server.Port) }</p>
+									} else {
+										<p class="text-sm font-black text-retro-ink">redacted</p>
+									}
 								</div>
 								<div class="border-2 border-retro-ink bg-retro-paper p-3">
-									<p class="text-xs font-black uppercase tracking-widest text-retro-muted">tags</p>
-									<p class="text-sm font-black text-retro-ink truncate">{ server.Tags }</p>
+									<p class="text-xs font-black uppercase tracking-widest text-retro-muted">scope</p>
+									if data.CanViewServerInfo {
+										<p class="text-sm font-black text-retro-ink truncate">{ server.Tags }</p>
+									} else {
+										<p class="text-sm font-black text-retro-ink truncate">{ PublicServerLabel(server) }</p>
+									}
 								</div>
 							</div>
 							<div class="flex items-center justify-between border-t-2 border-retro-ink pt-3">
@@ -63,11 +84,13 @@ templ Dashboard(data DashboardData) {
 			</div>
 		}
 		<div class="mt-4 text-xs font-bold text-retro-muted" hx-get="/dashboard" hx-trigger="every 30s" hx-select="#server-list" hx-swap="outerHTML" hx-target="#server-list">Auto-refresh every 30s</div>
-		<script>
-		function toggleForm() {
-			var f = document.getElementById('register-form');
-			f.classList.toggle('hidden');
+		if data.CanRegisterServer {
+			<script>
+				function toggleForm() {
+					var f = document.getElementById('register-form');
+					f.classList.toggle('hidden');
+				}
+			</script>
 		}
-		</script>
 	}
 }
