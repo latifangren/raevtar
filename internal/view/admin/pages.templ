@@ -1,0 +1,325 @@
+package admin
+
+import "raevtar/internal/model"
+
+templ Dashboard(data DashboardData) {
+	@Shell("Dashboard", data.CurrentPath) {
+		<div class="space-y-6">
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+				<div class="flex items-start justify-between mb-4">
+					<p class="text-xs font-black uppercase tracking-widest text-retro-muted">Online Servers</p>
+					<div class="flex items-center gap-2 px-3 py-1.5 border-2 border-retro-ink bg-retro-paper">
+						<span class="relative flex h-3 w-3">
+							<span class={ "animate-ping absolute inline-flex h-full w-full opacity-75", HeroDotClass(data) }></span>
+							<span class={ "relative inline-flex h-3 w-3 border-2 border-retro-ink", HeroDotClass(data) }></span>
+						</span>
+						<span class="text-xs font-mono font-bold text-retro-ink">{ CountText(data.OnlineCount) }/{ CountText(data.ServerCount) }</span>
+					</div>
+				</div>
+				<div class="flex items-baseline gap-2">
+					<span class="text-5xl md:text-6xl font-black font-mono tracking-tight text-retro-ink">{ CountText(data.OnlineCount) }</span>
+					<span class="text-sm font-bold text-retro-muted lowercase">/ { CountText(data.ServerCount) } servers</span>
+				</div>
+				<p class={ "text-xs mt-2 font-bold", HeroStatusClass(data) }>{ HeroStatusText(data) }</p>
+			</div>
+			<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+				@metricCard("Posts", CountText(data.PostCount), "total articles", "text-retro-ink")
+				@metricCard("Servers", CountText(data.ServerCount), "registered", "text-retro-ink")
+				@metricCard("Users", CountText(data.UserCount), "accounts", "text-retro-ink")
+				@metricCard("CPU Load", data.Stats.CPULoad1, CountText(data.Stats.CPUCores)+" cores · 5m "+data.Stats.CPULoad5, TextToneClass(data.Stats.CPULoadPercent, 90, 70))
+			</div>
+			<div>
+				<div class="flex items-center justify-between mb-3">
+					<h2 class="text-sm font-black uppercase text-retro-ink">Server Status</h2>
+					<a href="/admin/servers" class="text-xs font-bold no-underline hover:bg-retro-wheat">Manage &rarr;</a>
+				</div>
+				<div class="space-y-2">
+					if len(data.Servers) == 0 {
+						<div class="p-6 text-center text-retro-muted font-bold text-sm bg-retro-paper border-2 border-retro-ink">No servers registered</div>
+					} else {
+						for _, server := range data.Servers {
+							@serverStatusRow(server)
+						}
+					}
+				</div>
+			</div>
+			<div>
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-3">Quick Actions</h2>
+				<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+					@quickLink("/admin/posts", "Posts", "Manage articles")
+					@quickLink("/admin/servers", "Servers", "Add or remove")
+					@quickLink("/admin/manage-users", "Users", "Manage accounts")
+					@quickLink("/admin/audit-log", "Audit", "View activity log")
+				</div>
+			</div>
+			<div>
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-3">System Health</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					@resourceCard("RAM", data.Stats.RAMUsed+" / "+data.Stats.RAMTotal, data.Stats.RAMPercent, 90, 75)
+					@resourceCard("Disk", data.Stats.DiskUsed+" / "+data.Stats.DiskTotal, data.Stats.DiskPercent, 90, 75)
+					<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+						<div class="flex items-center justify-between">
+							<p class="text-xs font-black uppercase text-retro-muted">Temperature</p>
+							<p class={ "text-sm font-mono font-black", TextToneClass(data.Stats.TempValue, 80, 60) }>{ data.Stats.Temperature }°C</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+	}
+}
+
+templ Users(data UsersData) {
+	@Shell("Manage Users", data.CurrentPath) {
+		<div class="space-y-6">
+			@pageHeader("Manage Users", CountText(len(data.Users))+" total")
+			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+							<th class="py-3 px-4 font-bold">Username</th>
+							<th class="py-3 px-4 font-bold">Role</th>
+							<th class="py-3 px-4 font-bold">Created</th>
+							<th class="py-3 px-4"></th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, row := range data.Users {
+							<tr class="border-b-2 border-retro-ink last:border-b-0">
+								<td class="py-3 px-4 text-sm font-bold text-retro-ink">{ row.User.Username }</td>
+								<td class="py-3 px-4"><span class={ "text-xs px-1.5 py-0.5 font-bold border-2 border-retro-ink", RoleBadgeClass(row.User.Role) }>{ row.User.Role }</span></td>
+								<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ row.User.CreatedAt.Format("2006-01-02") }</td>
+								<td class="py-3 px-4 text-right text-xs">
+									if row.CanDelete {
+										<form method="POST" action={ templ.URL("/admin/manage-users/delete/" + IDText(row.User.ID)) } class="inline"><button type="submit" class="text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer">✕</button></form>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-4">Add New User</h2>
+				<form method="POST" action="/admin/manage-users" class="grid grid-cols-1 md:grid-cols-3 gap-3">
+					<input type="text" name="username" required placeholder="Username" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<input type="password" name="password" required placeholder="Password (min 8 chars)" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<select name="role" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink">
+						<option value="">Select role...</option>
+						for _, option := range data.RoleOptions {
+							if option.Selected {
+								<option value={ option.Value } selected>{ option.Value }</option>
+							} else {
+								<option value={ option.Value }>{ option.Value }</option>
+							}
+						}
+					</select>
+					<div class="md:col-span-3 flex justify-end"><button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Add User</button></div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ Audit(data AuditData) {
+	@Shell("Audit Log", data.CurrentPath) {
+		<div class="space-y-6">
+			@pageHeader("Audit Log", CountText(len(data.Logs))+" entries")
+			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+							<th class="py-3 px-4 font-bold">Time</th>
+							<th class="py-3 px-4 font-bold">Action</th>
+							<th class="py-3 px-4 font-bold">User</th>
+							<th class="py-3 px-4 font-bold">Details</th>
+							<th class="py-3 px-4 font-bold">IP</th>
+						</tr>
+					</thead>
+					<tbody>
+						if len(data.Logs) == 0 {
+							<tr><td colspan="5" class="py-8 text-center text-retro-muted font-bold text-sm">No audit log entries yet</td></tr>
+						} else {
+							for _, log := range data.Logs {
+								<tr class="border-b-2 border-retro-ink text-xs last:border-b-0">
+									<td class="py-2.5 px-4 text-retro-muted font-mono font-bold whitespace-nowrap">{ log.CreatedAt.Format("02 Jan 15:04") }</td>
+									<td class="py-2.5 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", ActionBadgeClass(log.Action) }>{ log.Action }</span></td>
+									<td class="py-2.5 px-4 font-bold text-retro-ink">{ log.User }</td>
+									<td class="py-2.5 px-4 text-retro-muted font-bold max-w-xs truncate">{ log.Details }</td>
+									<td class="py-2.5 px-4 text-retro-muted font-mono">{ log.IP }</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+		</div>
+	}
+}
+
+templ Posts(data PostsData) {
+	@Shell("Manage Posts", data.CurrentPath) {
+		<div class="space-y-6">
+			@pageHeader("Manage Posts", CountText(len(data.Posts))+" total")
+			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+							<th class="py-3 px-4 font-bold">Title</th>
+							<th class="py-3 px-4 font-bold">Category</th>
+							<th class="py-3 px-4 font-bold">Date</th>
+							<th class="py-3 px-4"></th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, post := range data.Posts {
+							<tr class="border-b-2 border-retro-ink last:border-b-0">
+								<td class="py-3 px-4 text-sm font-bold text-retro-ink max-w-[300px] truncate">{ post.Title }</td>
+								<td class="py-3 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(post.CategorySlug) }>{ post.CategorySlug }</span></td>
+								<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ post.CreatedAt.Format("2006-01-02") }</td>
+								<td class="py-3 px-4 text-right"><form method="POST" action={ templ.URL("/admin/posts/delete/" + IDText(post.ID)) } class="inline"><button type="submit" class="text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer">✕</button></form></td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-4">Create New Post</h2>
+				<form method="POST" action="/admin/posts" class="space-y-4">
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
+						<input type="text" name="title" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Post title"/>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Category</label>
+						<select name="category_slug" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink">
+							<option value="">Select category</option>
+							for _, category := range data.Categories {
+								<option value={ category.Slug }>{ category.Name }</option>
+							}
+						</select>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Content (Markdown)</label>
+						<textarea name="content" rows="15" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Write in Markdown..."></textarea>
+					</div>
+					<div class="flex justify-end"><button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Publish Post</button></div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ Servers(data ServersData) {
+	@Shell("Manage Servers", data.CurrentPath) {
+		<div class="space-y-6">
+			@pageHeader("Manage Servers", CountText(len(data.Servers))+" nodes")
+			<div class="space-y-4">
+				if len(data.Servers) == 0 {
+					<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]"><p class="text-retro-muted font-bold text-sm">No servers registered.</p></div>
+				} else {
+					for _, server := range data.Servers {
+						@serverCard(server)
+					}
+				}
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-4">Register New Server</h2>
+				<form method="POST" action="/admin/servers" class="grid grid-cols-1 md:grid-cols-2 gap-3">
+					<input type="text" name="name" placeholder="Server name" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<input type="text" name="host" placeholder="Host or IP" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<input type="number" name="port" placeholder="Port" value="9100" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<input type="text" name="tags" placeholder="Tags (comma separated)" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+					<div class="md:col-span-2 flex justify-end"><button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Register Server</button></div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ pageHeader(title string, count string) {
+	<div class="flex items-center justify-between">
+		<div>
+			<a href="/admin" class="text-xs font-bold no-underline hover:bg-retro-wheat">&larr; Dashboard</a>
+			<h1 class="text-xl font-black uppercase text-retro-ink mt-1">{ title }</h1>
+		</div>
+		<span class="text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono">{ count }</span>
+	</div>
+}
+
+templ metricCard(label string, value string, caption string, valueClass string) {
+	<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+		<p class="text-xs font-black uppercase text-retro-muted mb-1">{ label }</p>
+		<p class={ "text-3xl font-black font-mono", valueClass }>{ value }</p>
+		<p class="text-xs font-bold text-retro-muted mt-0.5">{ caption }</p>
+	</div>
+}
+
+templ quickLink(href string, label string, caption string) {
+	<a href={ templ.URL(href) } class="block bg-retro-paper border-2 border-retro-ink p-5 shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline group">
+		<p class="text-sm font-black text-retro-ink">{ label }</p>
+		<p class="text-xs font-bold text-retro-muted mt-0.5">{ caption }</p>
+	</a>
+}
+
+templ serverStatusRow(server model.Server) {
+	<div class="flex items-center justify-between p-4 bg-retro-paper border-2 border-retro-ink">
+		<div class="flex items-center gap-3">
+			<span class={ "inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen) }></span>
+			<div>
+				<p class="text-sm font-bold text-retro-ink">{ server.Name }</p>
+				<p class="text-xs font-mono text-retro-muted">{ server.Host }:{ PortText(server.Port) }</p>
+			</div>
+		</div>
+		<div class="flex items-center gap-4">
+			<span class="text-xs font-mono text-retro-muted">{ LastSeenShort(server.LastSeen) }</span>
+			<span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink", StatusBadgeClass(server.LastSeen) }>{ StatusText(server.LastSeen) }</span>
+		</div>
+	</div>
+}
+
+templ resourceCard(label string, usage string, percent float64, high float64, mid float64) {
+	<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+		<div class="flex items-center justify-between mb-1.5">
+			<p class="text-xs font-black uppercase text-retro-muted">{ label }</p>
+			<p class="text-xs font-mono font-bold text-retro-muted">{ usage } · { PercentText(percent) }</p>
+		</div>
+		<div class="w-full bg-retro-wheat border-2 border-retro-ink h-4 mt-1">
+			<div class={ "h-full transition-all", MetricToneClass(percent, high, mid) } style={ MeterWidthStyle(percent) }></div>
+		</div>
+	</div>
+}
+
+templ serverCard(server model.Server) {
+	<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+		<div class="flex items-start justify-between mb-4">
+			<div class="flex items-center gap-3">
+				<div class="w-10 h-10 border-2 border-retro-ink bg-retro-ink flex items-center justify-center">
+					<span class="text-sm font-black text-retro-cream font-mono">{ Initials(server.Name) }</span>
+				</div>
+				<div>
+					<p class="text-sm font-black text-retro-ink">{ server.Name }</p>
+					<p class="text-xs font-mono font-bold text-retro-muted">{ server.Host }:{ PortText(server.Port) }</p>
+				</div>
+			</div>
+			<div class="flex items-center gap-2">
+				<span class="relative flex h-3 w-3">
+					<span class={ "animate-ping absolute inline-flex h-full w-full opacity-75", StatusDotClass(server.LastSeen) }></span>
+					<span class={ "relative inline-flex h-3 w-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen) }></span>
+				</span>
+				<span class="text-xs font-bold text-retro-ink">{ StatusText(server.LastSeen) }</span>
+			</div>
+		</div>
+		<div class="flex items-center justify-between gap-3">
+			<div class="flex flex-wrap gap-1">
+				for _, tag := range TagList(server.Tags) {
+					<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-wheat text-retro-ink font-mono">{ tag }</span>
+				}
+			</div>
+			<div class="flex items-center gap-3 text-xs font-mono font-bold text-retro-muted">
+				<span>Last seen: { LastSeenLong(server.LastSeen) }</span>
+				<form method="POST" action={ templ.URL("/admin/servers/delete/" + IDText(server.ID)) } class="inline"><button type="submit" class="font-bold text-retro-muted hover:bg-retro-blush px-2 py-0.5 border-2 border-retro-ink bg-retro-paper cursor-pointer">✕</button></form>
+			</div>
+		</div>
+	</div>
+}
