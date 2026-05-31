@@ -22,13 +22,16 @@ func tagClass(name string) string {
 }
 
 templ PostCard(post model.Post) {
-	<article class="bg-retro-paper border-2 border-retro-ink p-5 mb-4 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-		<div class="flex items-center gap-2 mb-2 flex-wrap">
+	<article class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
+		<div class="flex items-center gap-2 mb-3 flex-wrap">
 			<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sage text-retro-cream">{ post.CategoryName }</span>
 			<span class="text-xs font-bold text-retro-muted">{ post.CreatedAt.Format("Jan 2, 2006") }</span>
 			@TagBadges(post.Tags)
 		</div>
-		<a href={ templ.URL("/blog/" + post.Slug) } class="text-lg font-bold text-retro-ink hover:bg-retro-wheat no-underline">{ post.Title }</a>
-		<p class="text-sm text-retro-muted mt-1">{ post.Excerpt }</p>
+		<h3 class="text-xl md:text-2xl font-black uppercase leading-tight mb-2">
+			<a href={ templ.URL("/blog/" + post.Slug) } class="text-retro-ink hover:bg-retro-wheat no-underline">{ post.Title }</a>
+		</h3>
+		<p class="text-sm font-bold text-retro-muted mb-4">{ post.Excerpt }</p>
+		<a href={ templ.URL("/blog/" + post.Slug) } class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-retro-ink transition-all">Read dispatch &rarr;</a>
 	</article>
 }
