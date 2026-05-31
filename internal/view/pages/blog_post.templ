@@ -2,21 +2,40 @@ package pages
 
 templ BlogPost(data BlogPostData) {
 	@page(data.Post.Title + " — Raevtar", data.CurrentPath, data.Categories) {
-		<article>
-			<div class="mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-				<div class="flex items-center gap-2 mb-2 flex-wrap">
-					<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sage text-retro-cream">{ data.Post.CategoryName }</span>
-					<span class="text-xs font-bold text-retro-muted">{ data.Post.CreatedAt.Format("Jan 2, 2006") }</span>
-					<span class="text-xs font-bold text-retro-muted">&middot; { ReadMinutes(data.Post.ContentMD) } min read</span>
-					for _, tag := range data.Post.Tags {
-						<span class={ TagClass(tag.Name) }>{ tag.Name }</span>
-					}
+		<article class="mb-12">
+			<header class="full-width bg-retro-sage border-b-2 border-retro-ink mb-10 overflow-hidden">
+				<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">
+					<a href="/blog" class="inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">&larr; Back to blog</a>
+					<div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end">
+						<div>
+							<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">Signal brief</p>
+							<h1 class="text-4xl md:text-6xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Post.Title }</h1>
+							<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Post.Excerpt }</p>
+						</div>
+						<aside class="relative">
+							<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-retro-ink bg-retro-wheat shadow-[4px_4px_0px_0px_#2D3748]"></div>
+							<div class="relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] -rotate-1">
+								<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">Filed under</p>
+								<div class="flex items-center gap-2 mb-4 flex-wrap">
+									<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sage text-retro-cream">{ data.Post.CategoryName }</span>
+									<span class="text-xs font-bold text-retro-muted">{ data.Post.CreatedAt.Format("Jan 2, 2006") }</span>
+									<span class="text-xs font-bold text-retro-muted">{ ReadMinutes(data.Post.ContentMD) } min read</span>
+								</div>
+								<div class="flex flex-wrap gap-2">
+									for _, tag := range data.Post.Tags {
+										<span class={ TagClass(tag.Name) }>{ tag.Name }</span>
+									}
+								</div>
+							</div>
+						</aside>
+					</div>
 				</div>
-				<h1 class="text-3xl font-black uppercase">{ data.Post.Title }</h1>
+			</header>
+			<div class="bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+				<div class="prose text-retro-ink">@templ.Raw(data.Post.ContentHTML)</div>
 			</div>
-			<div class="prose text-retro-ink">@templ.Raw(data.Post.ContentHTML)</div>
 			<div class="mt-8 pt-4 border-t-2 border-retro-ink">
-				<a href="/blog" class="font-bold no-underline hover:bg-retro-wheat">&larr; Kembali ke blog</a>
+				<a href="/blog" class="font-bold no-underline hover:bg-retro-wheat">&larr; Back to blog</a>
 			</div>
 		</article>
 	}
