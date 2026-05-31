@@ -12,6 +12,7 @@ type LoginData struct{}
 
 type DashboardData struct {
 	CurrentPath string
+	CSRFToken   string
 	PostCount   int
 	ServerCount int
 	UserCount   int
@@ -37,6 +38,7 @@ type HostStatsData struct {
 
 type UsersData struct {
 	CurrentPath string
+	CSRFToken   string
 	Users       []UserRow
 	RoleOptions []RoleOption
 }
@@ -53,17 +55,20 @@ type RoleOption struct {
 
 type AuditData struct {
 	CurrentPath string
+	CSRFToken   string
 	Logs        []model.AuditLog
 }
 
 type PostsData struct {
 	CurrentPath string
+	CSRFToken   string
 	Posts       []model.Post
 	Categories  []model.Category
 }
 
 type ServersData struct {
 	CurrentPath string
+	CSRFToken   string
 	Servers     []model.Server
 }
 

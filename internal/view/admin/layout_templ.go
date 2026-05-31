@@ -8,7 +8,7 @@ package admin
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Shell(title string, currentPath string) templ.Component {
+func Shell(title string, currentPath string, csrfToken string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -66,20 +66,33 @@ func Shell(title string, currentPath string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</nav><div class=\"p-4 border-t-2 border-retro-paper\"><a href=\"/admin/logout\" class=\"block text-center px-3 py-2 border-2 border-retro-paper text-retro-cream font-bold no-underline hover:bg-retro-paper hover:text-retro-ink transition-colors\">Logout</a></div></aside><main class=\"flex-1 flex flex-col h-screen overflow-hidden\"><header class=\"h-16 border-b-2 border-retro-ink flex items-center justify-between px-4 md:px-6 bg-retro-ink text-retro-cream sticky top-0 z-10\"><div class=\"flex items-center gap-3\"><div class=\"md:hidden w-7 h-7 bg-retro-sage flex items-center justify-center border-2 border-retro-paper\"><span class=\"text-retro-cream font-black text-sm\">R</span></div><div class=\"text-base md:text-lg font-black text-retro-cream\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</nav><div class=\"p-4 border-t-2 border-retro-paper\"><form method=\"POST\" action=\"/admin/logout\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
-		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(csrfToken)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 42, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 34, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div><div class=\"flex items-center gap-2 px-3 py-1.5 bg-retro-paper border-2 border-retro-ink text-xs md:text-sm\"><span class=\"relative flex h-3 w-3\"><span class=\"animate-ping absolute inline-flex h-full w-full bg-retro-sage opacity-75\"></span> <span class=\"relative inline-flex h-3 w-3 border-2 border-retro-ink bg-retro-sage\"></span></span> <span class=\"text-retro-ink font-bold\">Connected</span></div></header><div class=\"p-4 md:p-8 space-y-6 flex-1 overflow-y-auto bg-retro-cream\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "\"> <button type=\"submit\" class=\"w-full px-3 py-2 border-2 border-retro-paper text-retro-cream font-bold bg-transparent hover:bg-retro-paper hover:text-retro-ink transition-colors cursor-pointer\">Logout</button></form></div></aside><main class=\"flex-1 flex flex-col h-screen overflow-hidden\"><header class=\"h-16 border-b-2 border-retro-ink flex items-center justify-between px-4 md:px-6 bg-retro-ink text-retro-cream sticky top-0 z-10\"><div class=\"flex items-center gap-3\"><div class=\"md:hidden w-7 h-7 bg-retro-sage flex items-center justify-center border-2 border-retro-paper\"><span class=\"text-retro-cream font-black text-sm\">R</span></div><div class=\"text-base md:text-lg font-black text-retro-cream\">")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var4 string
+		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(title)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 45, Col: 76}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></div><div class=\"flex items-center gap-2 px-3 py-1.5 bg-retro-paper border-2 border-retro-ink text-xs md:text-sm\"><span class=\"relative flex h-3 w-3\"><span class=\"animate-ping absolute inline-flex h-full w-full bg-retro-sage opacity-75\"></span> <span class=\"relative inline-flex h-3 w-3 border-2 border-retro-ink bg-retro-sage\"></span></span> <span class=\"text-retro-ink font-bold\">Connected</span></div></header><div class=\"p-4 md:p-8 space-y-6 flex-1 overflow-y-auto bg-retro-cream\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -87,7 +100,7 @@ func Shell(title string, currentPath string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></main></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></main></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -111,70 +124,70 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var4 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var4 == nil {
-			templ_7745c5c3_Var4 = templ.NopComponent
+		templ_7745c5c3_Var5 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var5 == nil {
+			templ_7745c5c3_Var5 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
 		if currentPath == href || currentPath == href+"/" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<a href=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 templ.SafeURL
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
+			var templ_7745c5c3_Var6 templ.SafeURL
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 63, Col: 27}
-			}
-			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "\" class=\"flex items-center gap-3 px-3 py-2.5 text-retro-ink bg-retro-paper font-bold no-underline transition-colors\">")
-			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var6 string
-			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(label)
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 63, Col: 152}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 66, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"flex items-center gap-3 px-3 py-2.5 text-retro-ink bg-retro-paper font-bold no-underline transition-colors\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<a href=\"")
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ_7745c5c3_Err
-			}
-			var templ_7745c5c3_Var7 templ.SafeURL
-			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
-			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 65, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 66, Col: 152}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\" class=\"flex items-center gap-3 px-3 py-2.5 text-retro-cream font-bold no-underline hover:bg-retro-wheat hover:text-retro-ink transition-colors\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var8 string
-			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+		} else {
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<a href=\"")
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 65, Col: 181}
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var8 templ.SafeURL
+			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 68, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</a>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "\" class=\"flex items-center gap-3 px-3 py-2.5 text-retro-cream font-bold no-underline hover:bg-retro-wheat hover:text-retro-ink transition-colors\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var9 string
+			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(label)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 68, Col: 181}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</a>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -199,12 +212,12 @@ func Login() templ.Component {
 			}()
 		}
 		ctx = templ.InitializeContext(ctx)
-		templ_7745c5c3_Var9 := templ.GetChildren(ctx)
-		if templ_7745c5c3_Var9 == nil {
-			templ_7745c5c3_Var9 = templ.NopComponent
+		templ_7745c5c3_Var10 := templ.GetChildren(ctx)
+		if templ_7745c5c3_Var10 == nil {
+			templ_7745c5c3_Var10 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Login — Raevtar Admin</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"/static/css/style.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"></head><body class=\"bg-retro-cream text-retro-ink font-sans min-h-screen flex items-center justify-center antialiased\"><div class=\"w-full max-w-sm mx-4\"><div class=\"bg-retro-paper border-2 border-retro-ink p-8 shadow-[8px_8px_0px_0px_#2D3748]\"><div class=\"text-center mb-8\"><div class=\"w-12 h-12 bg-retro-sage border-2 border-retro-ink flex items-center justify-center mx-auto mb-3\"><span class=\"text-xl font-black text-retro-cream\">R</span></div><h1 class=\"text-2xl font-black text-retro-ink uppercase\">Raevtar</h1><p class=\"text-sm font-bold text-retro-muted mt-1\">admin panel</p></div><form method=\"POST\" action=\"/admin/login\" class=\"space-y-4\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Username</label> <input type=\"text\" name=\"username\" required autocomplete=\"username\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"admin\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Password</label> <input type=\"password\" name=\"password\" required autocomplete=\"current-password\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"••••••••\"></div><button type=\"submit\" class=\"w-full px-4 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream text-sm font-bold shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Sign in</button></form><p class=\"text-xs font-bold text-retro-muted text-center mt-6\">Unauthorized access is prohibited.</p></div></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<!doctype html><html lang=\"en\"><head><meta charset=\"UTF-8\"><meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\"><title>Login — Raevtar Admin</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"/static/css/style.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"></head><body class=\"bg-retro-cream text-retro-ink font-sans min-h-screen flex items-center justify-center antialiased\"><div class=\"w-full max-w-sm mx-4\"><div class=\"bg-retro-paper border-2 border-retro-ink p-8 shadow-[8px_8px_0px_0px_#2D3748]\"><div class=\"text-center mb-8\"><div class=\"w-12 h-12 bg-retro-sage border-2 border-retro-ink flex items-center justify-center mx-auto mb-3\"><span class=\"text-xl font-black text-retro-cream\">R</span></div><h1 class=\"text-2xl font-black text-retro-ink uppercase\">Raevtar</h1><p class=\"text-sm font-bold text-retro-muted mt-1\">admin panel</p></div><form method=\"POST\" action=\"/admin/login\" class=\"space-y-4\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Username</label> <input type=\"text\" name=\"username\" required autocomplete=\"username\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"admin\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Password</label> <input type=\"password\" name=\"password\" required autocomplete=\"current-password\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"••••••••\"></div><button type=\"submit\" class=\"w-full px-4 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream text-sm font-bold shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Sign in</button></form><p class=\"text-xs font-bold text-retro-muted text-center mt-6\">Unauthorized access is prohibited.</p></div></div></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
