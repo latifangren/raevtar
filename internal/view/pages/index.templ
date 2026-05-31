@@ -50,7 +50,7 @@ templ Index(data IndexData) {
 			<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">02 Signals</p>
 				<h2 class="text-xl font-black uppercase mb-2">Monitor Grid</h2>
-				<p class="text-sm font-bold text-retro-muted mb-4">Server health gets compact cards with status, host, port, tags, and direct drill-down links.</p>
+				<p class="text-sm font-bold text-retro-muted mb-4">Server health gets compact cards with public-safe status summaries and direct drill-down links.</p>
 				<a href="/dashboard" class="text-sm font-black no-underline hover:bg-retro-paper">Open dashboard &rarr;</a>
 			</div>
 			<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
@@ -81,7 +81,7 @@ templ Index(data IndexData) {
 					<div class="border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-6">
 						<p class="text-xs font-black uppercase text-retro-muted mb-2">Monitor nodes</p>
 						<p class="text-4xl font-black text-retro-ink">{ PortText(len(data.Servers)) }</p>
-						<p class="text-sm font-bold text-retro-muted">registered hosts visible from dashboard.</p>
+						<p class="text-sm font-bold text-retro-muted">registered nodes visible from dashboard.</p>
 					</div>
 					<div class="border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:col-span-2">
 						<p class="text-xs font-black uppercase text-retro-muted mb-2">Single domain map</p>

@@ -12,7 +12,7 @@ templ ServerCard(server model.Server) {
 		<div class="flex items-center justify-between">
 			<div>
 				<h3 class="font-bold text-retro-ink">{ server.Name }</h3>
-				<p class="text-sm font-mono text-retro-muted">{ server.Host }:{ strconv.Itoa(server.Port) }</p>
+				<p class="text-sm font-bold text-retro-muted">Endpoint hidden on public view</p>
 			</div>
 			<div class="flex items-center gap-1.5 text-sm">
 				<span class={ "inline-block w-3 h-3 border-2 border-retro-ink", statusDotClass(server.LastSeen) }></span>
