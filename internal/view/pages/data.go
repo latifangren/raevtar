@@ -76,11 +76,11 @@ func ReadMinutes(markdown string) string {
 func TagClass(name string) string {
 	switch name {
 	case "auto":
-		return "text-xs px-2 py-0.5 font-bold border-2 border-black bg-violet-300 text-black"
+		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sageLight text-retro-ink"
 	case "commissioned":
-		return "text-xs px-2 py-0.5 font-bold border-2 border-black bg-amber-300 text-black"
+		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-wheat text-retro-ink"
 	default:
-		return "text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black"
+		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-paper text-retro-ink"
 	}
 }
 
@@ -100,14 +100,14 @@ func DashboardStatusText(lastSeen *time.Time) string {
 
 func StatusDotClass(lastSeen *time.Time) string {
 	if lastSeen == nil {
-		return "bg-neutral-300"
+		return "bg-retro-wheat"
 	}
-	return "bg-emerald-400"
+	return "bg-retro-sage"
 }
 
 func MetricDotClass(online bool) string {
 	if online {
-		return "bg-emerald-400"
+		return "bg-retro-sage"
 	}
-	return "bg-rose-400"
+	return "bg-retro-blush"
 }

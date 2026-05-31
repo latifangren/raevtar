@@ -60,7 +60,7 @@ func Base(title string, currentPath string, categories []model.Category) templ.C
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><meta property=\"og:description\" content=\"Personal platform for project notes, server monitoring, and automation.\"><meta property=\"og:url\" content=\"https://raevtar.tech\"><meta name=\"twitter:card\" content=\"summary\"><meta name=\"twitter:title\" content=\"Raevtar\"><meta name=\"twitter:description\" content=\"Personal platform for project notes, server monitoring, and automation.\"></head><body class=\"min-h-screen bg-neutral-100 text-black antialiased\"><div class=\"max-w-5xl mx-auto px-4 pt-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><meta property=\"og:description\" content=\"Personal platform for project notes, server monitoring, and automation.\"><meta property=\"og:url\" content=\"https://raevtar.tech\"><meta name=\"twitter:card\" content=\"summary\"><meta name=\"twitter:title\" content=\"Raevtar\"><meta name=\"twitter:description\" content=\"Personal platform for project notes, server monitoring, and automation.\"></head><body class=\"min-h-screen bg-retro-cream text-retro-ink antialiased\"><div class=\"max-w-5xl mx-auto px-4 pt-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

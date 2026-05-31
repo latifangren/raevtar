@@ -43,54 +43,54 @@ func Index(data IndexData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-emerald-400 border-b-2 border-black mb-12\"><div class=\"max-w-5xl mx-auto px-4 py-24 md:py-32 text-center\"><h1 class=\"text-6xl md:text-7xl font-black mb-4 tracking-tight text-black uppercase\">raevtar</h1><p class=\"text-lg text-black font-bold mb-2 max-w-xl mx-auto opacity-80\">Personal platform for project notes, server monitoring, and automation.</p><p class=\"text-sm text-black font-medium mb-10 opacity-60 max-w-lg mx-auto\">Single Go binary running on postmarketOS (whyred).</p><div class=\"flex flex-wrap gap-4 justify-center\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-black bg-white text-black font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read the Blog &rarr;</a> <a href=\"/dashboard\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-black bg-black text-white font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open Dashboard</a></div></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-sage border-b-2 border-retro-ink mb-12\"><div class=\"max-w-5xl mx-auto px-4 py-24 md:py-32 text-center\"><h1 class=\"text-6xl md:text-7xl font-black mb-4 tracking-tight text-retro-ink uppercase\">raevtar</h1><p class=\"text-lg text-retro-ink font-bold mb-2 max-w-xl mx-auto opacity-80\">Personal platform for project notes, server monitoring, and automation.</p><p class=\"text-sm text-retro-ink font-medium mb-10 opacity-60 max-w-lg mx-auto\">Single Go binary running on postmarketOS (whyred).</p><div class=\"flex flex-wrap gap-4 justify-center\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read the Blog &rarr;</a> <a href=\"/dashboard\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open Dashboard</a></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Posts) > 0 || len(data.Categories) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"flex flex-wrap gap-4 justify-center mb-12 py-4 px-6 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000]\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"flex flex-wrap gap-4 justify-center mb-12 py-4 px-6 bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748]\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if len(data.Posts) > 0 {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-black\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-retro-ink\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Posts)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 21, Col: 107}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 21, Col: 111}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"block text-xs uppercase font-bold text-neutral-600 mt-0.5\">posts</span></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"block text-xs uppercase font-bold text-retro-muted mt-0.5\">posts</span></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 				if len(data.Categories) > 0 {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-black\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-retro-ink\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 24, Col: 112}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 24, Col: 116}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span><span class=\"block text-xs uppercase font-bold text-neutral-600 mt-0.5\">categories</span></div>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span><span class=\"block text-xs uppercase font-bold text-retro-muted mt-0.5\">categories</span></div>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-emerald-600\">1</span><span class=\"block text-xs uppercase font-bold text-neutral-600 mt-0.5\">binary</span></div></section>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-retro-sage\">1</span><span class=\"block text-xs uppercase font-bold text-retro-muted mt-0.5\">binary</span></div></section>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -100,7 +100,7 @@ func Index(data IndexData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Posts) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<section class=\"mb-12\"><div class=\"flex items-center justify-between mb-4\"><h2 class=\"text-lg font-black uppercase\">Latest Posts</h2><a href=\"/blog\" class=\"text-sm font-bold no-underline hover:bg-yellow-200\">View all &rarr;</a></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<section class=\"mb-12\"><div class=\"flex items-center justify-between mb-4\"><h2 class=\"text-lg font-black uppercase\">Latest Posts</h2><a href=\"/blog\" class=\"text-sm font-bold no-underline hover:bg-retro-wheat\">View all &rarr;</a></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -115,7 +115,7 @@ func Index(data IndexData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<section class=\"mb-12 text-center py-12\"><p class=\"text-neutral-500 font-bold\">No posts yet.</p><p class=\"text-sm text-neutral-600 mt-2\">Check the <a href=\"/dashboard\" class=\"font-bold no-underline hover:bg-yellow-200\">dashboard</a> or start publishing via the API.</p></section>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<section class=\"mb-12 text-center py-12\"><p class=\"text-retro-muted font-bold\">No posts yet.</p><p class=\"text-sm text-retro-muted mt-2\">Check the <a href=\"/dashboard\" class=\"font-bold no-underline hover:bg-retro-wheat\">dashboard</a> or start publishing via the API.</p></section>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

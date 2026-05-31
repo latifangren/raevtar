@@ -12,13 +12,13 @@ The old dark-first slate/green design is deprecated. Do not use this file as evi
 
 ## Visual Direction
 
-Raevtar is now bright, blocky, and retro-brutalist:
+Raevtar is now softened, blocky, and retro-brutalist:
 
-- White or near-white page background.
-- Black 2px borders.
-- Hard offset shadows like `shadow-[4px_4px_0px_0px_#000]`.
+- Warm cream page background.
+- Charcoal 2px borders.
+- Hard offset shadows like `shadow-[4px_4px_0px_0px_#2D3748]`.
 - Bold uppercase labels and headings.
-- High-contrast accent blocks.
+- Sage accent blocks.
 - Minimal radius; prefer square corners.
 - Mono text for API paths, timestamps, metrics, and technical labels.
 
@@ -26,22 +26,33 @@ The UI should feel like an opinionated personal dev console, not generic dark da
 
 ## Palette
 
-Use Tailwind tokens directly in templ classes.
+Use Tailwind semantic tokens directly in templ classes.
+
+Core tokens:
+
+- `retro-cream` / `#FDFCF5` — page background.
+- `retro-paper` / `#FFF8E8` — card and form surfaces.
+- `retro-ink` / `#2D3748` — primary text, borders, hard shadows, dark buttons.
+- `retro-sage` / `#6A9B7D` — main accent and online status.
+- `retro-sageLight` / `#A8C3A0` — secondary sage accents.
+- `retro-wheat` / `#EFE2B8` — hover highlight and neutral status.
+- `retro-blush` / `#E9B7A5` — destructive/offline status.
+- `retro-muted` / `#6B7280` — secondary copy.
 
 Primary surfaces:
 
-- `bg-neutral-100` for page background.
-- `bg-white` for cards and content panels.
-- `bg-black text-white` for strong bars, nav, and primary actions.
-- `border-2 border-black` for most containers.
+- `bg-retro-cream` for page background.
+- `bg-retro-paper` for cards and content panels.
+- `bg-retro-ink text-retro-cream` for strong bars, nav, and primary actions.
+- `border-2 border-retro-ink` for most containers.
 
 Accents:
 
-- `bg-emerald-400` for positive/online/primary CTA.
-- `bg-rose-400` or `bg-rose-300` for destructive/offline.
-- `bg-yellow-200` for hover highlights.
-- `bg-purple-300`, `bg-blue-300`, `bg-orange-300`, `bg-cyan-300`, `bg-amber-300` for category/role badges.
-- `text-neutral-500` / `text-neutral-600` for secondary copy.
+- `bg-retro-sage` for positive/online/primary CTA.
+- `bg-retro-blush` for destructive/offline.
+- `bg-retro-wheat` for hover highlights.
+- `bg-retro-sageLight`, `bg-retro-wheat`, and `bg-retro-paper` for category/role badges.
+- `text-retro-muted` for secondary copy.
 
 Avoid:
 
@@ -72,13 +83,13 @@ Guidelines:
 Default card:
 
 ```html
-<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 ```
 
 Interactive card hover:
 
 ```html
-hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all
+hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all
 ```
 
 ### Buttons
@@ -86,27 +97,27 @@ hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2
 Primary:
 
 ```html
-border-2 border-black bg-black text-white font-bold shadow-[4px_4px_0px_0px_#000]
+border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold shadow-[4px_4px_0px_0px_#2D3748]
 ```
 
 Positive action:
 
 ```html
-border-2 border-black bg-emerald-400 text-black font-bold shadow-[3px_3px_0px_0px_#000]
+border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold shadow-[3px_3px_0px_0px_#2D3748]
 ```
 
 Destructive action:
 
 ```html
-border-2 border-black bg-rose-300 text-black font-bold
+border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold
 ```
 
 ### Badges
 
-Badges should use black borders, bold mono text, and strong fill colors:
+Badges should use charcoal borders, bold mono text, and softened fill colors:
 
 ```html
-<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-blue-300 text-black font-mono">
+<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-wheat text-retro-ink font-mono">
 ```
 
 ### Navigation
@@ -141,7 +152,7 @@ Admin panel is still legacy inline HTML in `internal/handler/admin.go`. Keep it 
 Do:
 
 - Follow https://github.com/Logging-Studio/RetroUI for component feel.
-- Use bright surfaces, black borders, hard shadows.
+- Use warm surfaces, charcoal borders, hard shadows.
 - Keep UI server-rendered with templ.
 - Use HTMX only for lightweight interactivity.
 - Preserve Handler -> Service -> Repo.

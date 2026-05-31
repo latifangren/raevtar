@@ -9,9 +9,9 @@ templ Pagination(currentPage int, totalPages int, currentCat string) {
 		<div class="flex gap-2 mt-6 justify-center">
 			for i := 1; i <= totalPages; i++ {
 				if i == currentPage {
-					<span class="px-3 py-1.5 border-2 border-black bg-black text-white font-bold text-sm">{ strconv.Itoa(i) }</span>
+					<span class="px-3 py-1.5 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm">{ strconv.Itoa(i) }</span>
 				} else {
-					<a href={ templ.URL(pageHref(i, currentCat)) } class="px-3 py-1.5 border-2 border-black bg-white text-black font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#000] transition-all">{ strconv.Itoa(i) }</a>
+					<a href={ templ.URL(pageHref(i, currentCat)) } class="px-3 py-1.5 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] transition-all">{ strconv.Itoa(i) }</a>
 				}
 			}
 		</div>

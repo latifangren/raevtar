@@ -124,7 +124,7 @@ func BlogList(data BlogListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Posts) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"text-neutral-500 font-bold\">Belum ada postingan.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<p class=\"text-retro-muted font-bold\">Belum ada postingan.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -155,9 +155,9 @@ func BlogList(data BlogListData) templ.Component {
 
 func categoryClass(active bool) string {
 	if active {
-		return "px-3 py-1.5 border-2 border-black bg-black text-white font-bold text-sm no-underline shadow-[2px_2px_0px_0px_#000]"
+		return "px-3 py-1.5 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[2px_2px_0px_0px_#2D3748]"
 	}
-	return "px-3 py-1.5 border-2 border-black bg-white text-black font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#000] transition-all"
+	return "px-3 py-1.5 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] transition-all"
 }
 
 var _ = templruntime.GeneratedTemplate

@@ -40,14 +40,14 @@ func Pagination(currentPage int, totalPages int, currentCat string) templ.Compon
 			}
 			for i := 1; i <= totalPages; i++ {
 				if i == currentPage {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"px-3 py-1.5 border-2 border-black bg-black text-white font-bold text-sm\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<span class=\"px-3 py-1.5 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var2 string
 					templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(i))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/pagination.templ`, Line: 12, Col: 108}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/pagination.templ`, Line: 12, Col: 122}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 					if templ_7745c5c3_Err != nil {
@@ -71,14 +71,14 @@ func Pagination(currentPage int, totalPages int, currentCat string) templ.Compon
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"px-3 py-1.5 border-2 border-black bg-white text-black font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#000] transition-all\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"px-3 py-1.5 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] transition-all\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(strconv.Itoa(i))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/pagination.templ`, Line: 14, Col: 213}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/pagination.templ`, Line: 14, Col: 230}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {

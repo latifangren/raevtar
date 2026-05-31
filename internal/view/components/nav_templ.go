@@ -31,7 +31,7 @@ func Nav(categories []model.Category, currentPath string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"sticky top-0 z-50 flex items-center gap-4 sm:gap-6 py-3 px-4 sm:px-6 mb-8 bg-black border-b-2 border-black shadow-[0_4px_0px_0px_#000] max-w-5xl mx-auto\" style=\"margin-left:0;margin-right:0\"><a href=\"/\" class=\"text-lg sm:text-xl font-black text-emerald-400 hover:text-emerald-300 no-underline\">raevtar</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"sticky top-0 z-50 flex items-center gap-4 sm:gap-6 py-3 px-4 sm:px-6 mb-8 bg-retro-ink border-b-2 border-retro-ink shadow-[0_4px_0px_0px_#2D3748] max-w-5xl mx-auto\" style=\"margin-left:0;margin-right:0\"><a href=\"/\" class=\"text-lg sm:text-xl font-black text-retro-sageLight hover:text-retro-wheat no-underline\">raevtar</a> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -85,9 +85,9 @@ func Nav(categories []model.Category, currentPath string) templ.Component {
 
 func navClass(active bool) string {
 	if active {
-		return "text-sm font-bold text-white no-underline"
+		return "text-sm font-bold text-retro-cream no-underline"
 	}
-	return "text-sm font-medium text-neutral-400 hover:text-white no-underline transition-colors"
+	return "text-sm font-medium text-retro-sageLight hover:text-retro-cream no-underline transition-colors"
 }
 
 var _ = templruntime.GeneratedTemplate

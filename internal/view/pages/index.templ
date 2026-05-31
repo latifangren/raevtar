@@ -4,33 +4,33 @@ import "raevtar/internal/view/components"
 
 templ Index(data IndexData) {
 	@page("Raevtar", data.CurrentPath, data.Categories) {
-		<section class="full-width bg-emerald-400 border-b-2 border-black mb-12">
+		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12">
 			<div class="max-w-5xl mx-auto px-4 py-24 md:py-32 text-center">
-				<h1 class="text-6xl md:text-7xl font-black mb-4 tracking-tight text-black uppercase">raevtar</h1>
-				<p class="text-lg text-black font-bold mb-2 max-w-xl mx-auto opacity-80">Personal platform for project notes, server monitoring, and automation.</p>
-				<p class="text-sm text-black font-medium mb-10 opacity-60 max-w-lg mx-auto">Single Go binary running on postmarketOS (whyred).</p>
+				<h1 class="text-6xl md:text-7xl font-black mb-4 tracking-tight text-retro-ink uppercase">raevtar</h1>
+				<p class="text-lg text-retro-ink font-bold mb-2 max-w-xl mx-auto opacity-80">Personal platform for project notes, server monitoring, and automation.</p>
+				<p class="text-sm text-retro-ink font-medium mb-10 opacity-60 max-w-lg mx-auto">Single Go binary running on postmarketOS (whyred).</p>
 				<div class="flex flex-wrap gap-4 justify-center">
-					<a href="/blog" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-black bg-white text-black font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Read the Blog &rarr;</a>
-					<a href="/dashboard" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-black bg-black text-white font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Open Dashboard</a>
+					<a href="/blog" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Read the Blog &rarr;</a>
+					<a href="/dashboard" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Open Dashboard</a>
 				</div>
 			</div>
 		</section>
 		if len(data.Posts) > 0 || len(data.Categories) > 0 {
-			<section class="flex flex-wrap gap-4 justify-center mb-12 py-4 px-6 bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000]">
+			<section class="flex flex-wrap gap-4 justify-center mb-12 py-4 px-6 bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748]">
 				if len(data.Posts) > 0 {
-					<div class="text-center px-4"><span class="text-3xl font-black text-black">{ PortText(len(data.Posts)) }</span><span class="block text-xs uppercase font-bold text-neutral-600 mt-0.5">posts</span></div>
+					<div class="text-center px-4"><span class="text-3xl font-black text-retro-ink">{ PortText(len(data.Posts)) }</span><span class="block text-xs uppercase font-bold text-retro-muted mt-0.5">posts</span></div>
 				}
 				if len(data.Categories) > 0 {
-					<div class="text-center px-4"><span class="text-3xl font-black text-black">{ PortText(len(data.Categories)) }</span><span class="block text-xs uppercase font-bold text-neutral-600 mt-0.5">categories</span></div>
+					<div class="text-center px-4"><span class="text-3xl font-black text-retro-ink">{ PortText(len(data.Categories)) }</span><span class="block text-xs uppercase font-bold text-retro-muted mt-0.5">categories</span></div>
 				}
-				<div class="text-center px-4"><span class="text-3xl font-black text-emerald-600">1</span><span class="block text-xs uppercase font-bold text-neutral-600 mt-0.5">binary</span></div>
+				<div class="text-center px-4"><span class="text-3xl font-black text-retro-sage">1</span><span class="block text-xs uppercase font-bold text-retro-muted mt-0.5">binary</span></div>
 			</section>
 		}
 		if len(data.Posts) > 0 {
 			<section class="mb-12">
 				<div class="flex items-center justify-between mb-4">
 					<h2 class="text-lg font-black uppercase">Latest Posts</h2>
-					<a href="/blog" class="text-sm font-bold no-underline hover:bg-yellow-200">View all &rarr;</a>
+					<a href="/blog" class="text-sm font-bold no-underline hover:bg-retro-wheat">View all &rarr;</a>
 				</div>
 				for _, post := range data.Posts {
 					@components.PostCard(post)
@@ -38,8 +38,8 @@ templ Index(data IndexData) {
 			</section>
 		} else {
 			<section class="mb-12 text-center py-12">
-				<p class="text-neutral-500 font-bold">No posts yet.</p>
-				<p class="text-sm text-neutral-600 mt-2">Check the <a href="/dashboard" class="font-bold no-underline hover:bg-yellow-200">dashboard</a> or start publishing via the API.</p>
+				<p class="text-retro-muted font-bold">No posts yet.</p>
+				<p class="text-sm text-retro-muted mt-2">Check the <a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">dashboard</a> or start publishing via the API.</p>
 			</section>
 		}
 	}

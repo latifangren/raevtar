@@ -3,20 +3,20 @@ package pages
 templ BlogPost(data BlogPostData) {
 	@page(data.Post.Title + " — Raevtar", data.CurrentPath, data.Categories) {
 		<article>
-			<div class="mb-6 bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+			<div class="mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 				<div class="flex items-center gap-2 mb-2 flex-wrap">
-					<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-emerald-400">{ data.Post.CategoryName }</span>
-					<span class="text-xs font-bold text-neutral-500">{ data.Post.CreatedAt.Format("Jan 2, 2006") }</span>
-					<span class="text-xs font-bold text-neutral-500">&middot; { ReadMinutes(data.Post.ContentMD) } min read</span>
+					<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sage text-retro-cream">{ data.Post.CategoryName }</span>
+					<span class="text-xs font-bold text-retro-muted">{ data.Post.CreatedAt.Format("Jan 2, 2006") }</span>
+					<span class="text-xs font-bold text-retro-muted">&middot; { ReadMinutes(data.Post.ContentMD) } min read</span>
 					for _, tag := range data.Post.Tags {
 						<span class={ TagClass(tag.Name) }>{ tag.Name }</span>
 					}
 				</div>
 				<h1 class="text-3xl font-black uppercase">{ data.Post.Title }</h1>
 			</div>
-			<div class="prose text-black">@templ.Raw(data.Post.ContentHTML)</div>
-			<div class="mt-8 pt-4 border-t-2 border-black">
-				<a href="/blog" class="font-bold no-underline hover:bg-yellow-200">&larr; Kembali ke blog</a>
+			<div class="prose text-retro-ink">@templ.Raw(data.Post.ContentHTML)</div>
+			<div class="mt-8 pt-4 border-t-2 border-retro-ink">
+				<a href="/blog" class="font-bold no-underline hover:bg-retro-wheat">&larr; Kembali ke blog</a>
 			</div>
 		</article>
 	}

@@ -41,12 +41,12 @@ func Dashboard(data DashboardData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex items-center justify-between mb-6\"><h1 class=\"text-3xl font-black uppercase\">Server Dashboard</h1><button onclick=\"toggleForm()\" class=\"px-4 py-2 border-2 border-black bg-black text-white font-bold text-sm shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">+ Register Server</button></div><div id=\"register-form\" class=\"hidden mb-6 bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]\"><h2 class=\"text-sm font-black uppercase mb-3\">Register New Server</h2><form hx-post=\"/api/v1/servers\" hx-trigger=\"submit\" hx-target=\"#server-list\" hx-swap=\"outerHTML\" hx-on::after-request=\"if(event.detail.successful){this.reset();document.getElementById('register-form').classList.add('hidden')}\" class=\"space-y-3\"><div class=\"grid grid-cols-1 sm:grid-cols-3 gap-3\"><input type=\"text\" name=\"name\" placeholder=\"Server name\" required class=\"w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black\"> <input type=\"text\" name=\"host\" placeholder=\"host or IP\" required class=\"w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black\"> <input type=\"number\" name=\"port\" placeholder=\"port\" value=\"9100\" required class=\"w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black\"></div><input type=\"text\" name=\"tags\" placeholder=\"tags (comma separated)\" class=\"w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black\"><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-black bg-emerald-400 text-black font-bold text-sm shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Register</button></div></form></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex items-center justify-between mb-6\"><h1 class=\"text-3xl font-black uppercase\">Server Dashboard</h1><button onclick=\"toggleForm()\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">+ Register Server</button></div><div id=\"register-form\" class=\"hidden mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-sm font-black uppercase mb-3\">Register New Server</h2><form hx-post=\"/api/v1/servers\" hx-trigger=\"submit\" hx-target=\"#server-list\" hx-swap=\"outerHTML\" hx-on::after-request=\"if(event.detail.successful){this.reset();document.getElementById('register-form').classList.add('hidden')}\" class=\"space-y-3\"><div class=\"grid grid-cols-1 sm:grid-cols-3 gap-3\"><input type=\"text\" name=\"name\" placeholder=\"Server name\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"text\" name=\"host\" placeholder=\"host or IP\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"number\" name=\"port\" placeholder=\"port\" value=\"9100\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div><input type=\"text\" name=\"tags\" placeholder=\"tags (comma separated)\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Register</button></div></form></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Servers) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"bg-white border-2 border-black p-8 text-center shadow-[4px_4px_0px_0px_#000]\"><p class=\"text-neutral-500 font-bold\">Belum ada server terdaftar.</p><p class=\"text-sm text-neutral-600 mt-2\">Klik <button onclick=\"toggleForm()\" class=\"font-bold underline hover:bg-yellow-200 cursor-pointer\">+ Register Server</button> untuk mulai.</p></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">Belum ada server terdaftar.</p><p class=\"text-sm text-retro-muted mt-2\">Klik <button onclick=\"toggleForm()\" class=\"font-bold underline hover:bg-retro-wheat cursor-pointer\">+ Register Server</button> untuk mulai.</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -69,27 +69,27 @@ func Dashboard(data DashboardData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><div class=\"flex items-center justify-between\"><div><h3 class=\"font-bold text-black\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><div class=\"flex items-center justify-between\"><div><h3 class=\"font-bold text-retro-ink\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(server.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 58}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 62}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h3><p class=\"text-sm font-mono text-neutral-600\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h3><p class=\"text-sm font-mono text-retro-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(server.Host)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 124}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 128}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -102,7 +102,7 @@ func Dashboard(data DashboardData) templ.Component {
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(server.Port))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 150}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 31, Col: 154}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
@@ -112,7 +112,7 @@ func Dashboard(data DashboardData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var7 = []any{"inline-block w-3 h-3 border-2 border-black", StatusDotClass(server.LastSeen)}
+					var templ_7745c5c3_Var7 = []any{"inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen)}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var7...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -130,14 +130,14 @@ func Dashboard(data DashboardData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"></span><span class=\"font-bold text-neutral-700\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "\"></span><span class=\"font-bold text-retro-ink\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(DashboardStatusText(server.LastSeen))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 32, Col: 234}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/dashboard.templ`, Line: 32, Col: 236}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -153,7 +153,7 @@ func Dashboard(data DashboardData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " <div class=\"mt-4 text-xs font-bold text-neutral-500\" hx-get=\"/dashboard\" hx-trigger=\"every 30s\" hx-select=\"#server-list\" hx-swap=\"outerHTML\" hx-target=\"#server-list\">Auto-refresh every 30s</div><script>\n\t\tfunction toggleForm() {\n\t\t\tvar f = document.getElementById('register-form');\n\t\t\tf.classList.toggle('hidden');\n\t\t}\n\t\t</script>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " <div class=\"mt-4 text-xs font-bold text-retro-muted\" hx-get=\"/dashboard\" hx-trigger=\"every 30s\" hx-select=\"#server-list\" hx-swap=\"outerHTML\" hx-target=\"#server-list\">Auto-refresh every 30s</div><script>\r\n\t\tfunction toggleForm() {\r\n\t\t\tvar f = document.getElementById('register-form');\r\n\t\t\tf.classList.toggle('hidden');\r\n\t\t}\r\n\t\t</script>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
