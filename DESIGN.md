@@ -122,7 +122,7 @@ Badges should use charcoal borders, bold mono text, and softened fill colors:
 
 ### Navigation
 
-Public navigation uses simple text links with bold weight and highlight hover. Admin navigation remains inline legacy HTML for now but should visually match black sidebar + high-contrast panels.
+Public navigation uses simple text links with bold weight and highlight hover. Admin navigation lives in `internal/view/admin/layout.templ` and should visually match the softened retro sidebar + high-contrast panels.
 
 ## Implementation Rules
 
@@ -132,7 +132,7 @@ Public navigation uses simple text links with bold weight and highlight hover. A
 - Page components live in `internal/view/pages/`.
 - Generated `_templ.go` files are committed but never hand-edited.
 - Run `make templ-gen` or `go run github.com/a-h/templ/cmd/templ@v0.3.906 generate` after editing `.templ` files.
-- Tailwind scans `internal/view/**/*.templ` and admin handler inline HTML.
+- Tailwind scans `internal/view/**/*.templ`, `internal/view/**/*.go`, and handler Go so templ markup plus view helper class literals are included.
 
 ## Current Scope
 
@@ -145,7 +145,7 @@ Public pages are the primary design surface:
 - 404 page.
 - RSS remains XML, not visual UI.
 
-Admin panel is still legacy inline HTML in `internal/handler/admin.go`. Keep it secure and roughly aligned with this visual style, but do not treat admin templ migration as already done.
+Admin panel is implemented in `internal/view/admin/` templ components, with `internal/handler/admin.go` limited to request handling and view data preparation. Keep admin secure and aligned with this visual style.
 
 ## Do / Don't
 

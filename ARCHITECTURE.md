@@ -121,7 +121,7 @@ raevtar/
 │   │   ├── routes.go            # Route mounting (Chi router)
 │   │   ├── handlers.go          # Public page handlers render templ pages
 │   │   ├── render.go            # templ.Component HTML response helper
-│   │   ├── admin.go             # Admin panel handlers (legacy inline HTML)
+│   │   ├── admin.go             # Admin panel handlers render templ views
 │   │   ├── auth.go              # API key + admin session auth
 │   │   ├── api.go               # REST API handlers (JSON)
 │   │   └── rss.go               # RSS feed
@@ -136,6 +136,10 @@ raevtar/
 │       │   ├── dashboard.templ   # Dashboard overview (HTMX auto-refresh)
 │       │   ├── server_detail.templ # Detail satu server
 │       │   └── not_found.templ   # Custom 404 page
+│       ├── admin/
+│       │   ├── layout.templ      # Admin shell + login page
+│       │   ├── pages.templ       # Admin dashboard/posts/servers/users/audit pages
+│       │   └── data.go           # Admin view data + presentation helpers
 │       └── components/
 │           ├── nav.templ         # Navigasi bar
 │           ├── post_card.templ   # Card ringkasan post (reusable)
@@ -272,7 +276,7 @@ Swagger UI disajikan dari static file, bukan generated runtime.
 | **SQLite** | `modernc.org/sqlite` | Pure Go, gak perlu CGO, gak perlu gcc |
 | **ORM/Query** | `github.com/jmoiron/sqlx` | Ringan, tetap SQL mentah tanpa abstraction layer gede |
 | **Markdown** | `github.com/yuin/goldmark` | Standar, extensible |
-| **Tailwind** | Standalone CLI via `npx tailwindcss` | Scan `internal/view/**/*.templ` + admin handler HTML |
+| **Tailwind** | Standalone CLI via `npx tailwindcss` | Scan templ files, view helper Go, and handler Go |
 | **Config** | Environment variables + `.env` | Standard 12-factor |
 
 ---

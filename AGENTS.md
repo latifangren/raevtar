@@ -13,7 +13,7 @@
 | Template | `github.com/a-h/templ` | **Bukan** html/template standar. Compile dulu pake `make templ-gen` |
 | Database | `modernc.org/sqlite` + `github.com/jmoiron/sqlx` | Pure Go, no CGO |
 | Markdown | `github.com/yuin/goldmark` | GFM enabled |
-| CSS | Tailwind | Standalone CLI via `npx tailwindcss`; scan `internal/view/**/*.templ` dan admin handler inline HTML |
+| CSS | Tailwind | Standalone CLI via `npx tailwindcss`; scan `internal/view/**/*.templ`, `internal/view/**/*.go`, dan handler Go |
 | Interactivity | HTMX via CDN | Gak ada JavaScript framework |
 
 ## Arsitektur Layer (WAJIB dipatuhi)
