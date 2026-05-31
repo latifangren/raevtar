@@ -42,7 +42,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/blog/feed.xml", h.rssFeed)
 
 	// 404
-	r.NotFound(page404Handler)
+	r.NotFound(h.page404)
 
 	// Admin routes (session-based auth)
 	r.Route("/admin", func(r chi.Router) {
@@ -55,16 +55,20 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		r.Group(func(r chi.Router) {
 			r.Use(h.adminRequired)
 			r.Get("/", h.adminIndex)
-			r.Get("/posts", h.adminPosts)
-			r.Post("/posts", h.adminCreatePost)
-			r.Get("/posts/delete/{postID}", h.adminDeletePost)
-			r.Get("/servers", h.adminServers)
-			r.Post("/servers", h.adminCreateServer)
-			r.Get("/servers/delete/{serverID}", h.adminDeleteServer)
-			r.Get("/audit-log", h.adminAuditLog)
-			r.Get("/manage-users", h.adminUsers)
-			r.Post("/manage-users", h.adminCreateUser)
-			r.Get("/manage-users/delete/{userID}", h.adminDeleteUser)
+
+			r.Group(func(r chi.Router) {
+				r.Use(h.ownerOrAdminRequired)
+				r.Get("/posts", h.adminPosts)
+				r.Post("/posts", h.adminCreatePost)
+				r.Post("/posts/delete/{postID}", h.adminDeletePost)
+				r.Get("/servers", h.adminServers)
+				r.Post("/servers", h.adminCreateServer)
+				r.Post("/servers/delete/{serverID}", h.adminDeleteServer)
+				r.Get("/audit-log", h.adminAuditLog)
+				r.Get("/manage-users", h.adminUsers)
+				r.Post("/manage-users", h.adminCreateUser)
+				r.Post("/manage-users/delete/{userID}", h.adminDeleteUser)
+			})
 		})
 	})
 

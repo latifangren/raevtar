@@ -1,0 +1,24 @@
+package pages
+
+templ ServerDetail(data ServerDetailData) {
+	@page(data.Server.Name + " — Raevtar", data.CurrentPath, data.Categories) {
+		<a href="/dashboard" class="font-bold no-underline hover:bg-yellow-200">&larr; Kembali</a>
+		<h1 class="text-3xl font-black uppercase mt-2 mb-1">{ data.Server.Name }</h1>
+		<p class="text-sm font-mono text-neutral-600 mb-6">{ data.Server.Host }:{ PortText(data.Server.Port) }</p>
+		if len(data.Metrics) == 0 {
+			<div class="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_#000]">
+				<p class="text-neutral-600 font-bold text-sm">Belum ada data metrics. Kirim data lewat POST /api/v1/servers/{ IDText(data.Server.ID) }/ping</p>
+			</div>
+		} else {
+			<div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000] overflow-hidden">
+				<div class="border-b-2 border-black bg-black text-white px-4 py-2"><h2 class="text-sm font-bold uppercase tracking-wider">Metrics Terakhir</h2></div>
+				for _, metric := range data.Metrics {
+					<div class="flex items-center justify-between py-3 px-4 border-b-2 border-black last:border-b-0">
+						<div class="flex items-center gap-2"><span class={ "inline-block w-3 h-3 border-2 border-black", MetricDotClass(metric.Online) }></span><span class="text-sm font-bold text-black">{ metric.RecordedAt.Format("Jan 2 15:04") }</span></div>
+						<div class="flex gap-4 text-sm font-mono font-bold text-neutral-600"><span>CPU: <span class="text-black">{ MetricText(metric.CPUPercent) }%</span></span><span>RAM: <span class="text-black">{ MetricText(metric.RAMUsedMB) }/{ MetricText(metric.RAMTotalMB) }</span> MB</span></div>
+					</div>
+				}
+			</div>
+		}
+	}
+}

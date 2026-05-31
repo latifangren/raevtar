@@ -1,0 +1,29 @@
+package pages
+
+import "raevtar/internal/view/components"
+
+templ BlogList(data BlogListData) {
+	@page("Blog — Raevtar", data.CurrentPath, data.Categories) {
+		<h1 class="text-3xl font-black uppercase mb-6">Blog</h1>
+		<div class="flex flex-wrap gap-2 mb-6">
+			<a href="/blog" class={ categoryClass(data.CurrentCat == "") }>Semua</a>
+			for _, category := range data.Categories {
+				<a href={ templ.URL("/blog?category=" + category.Slug) } class={ categoryClass(data.CurrentCat == category.Slug) }>{ category.Name }</a>
+			}
+		</div>
+		if len(data.Posts) == 0 {
+			<p class="text-neutral-500 font-bold">Belum ada postingan.</p>
+		}
+		for _, post := range data.Posts {
+			@components.PostCard(post)
+		}
+		@components.Pagination(data.Page, data.TotalPages, data.CurrentCat)
+	}
+}
+
+func categoryClass(active bool) string {
+	if active {
+		return "px-3 py-1.5 border-2 border-black bg-black text-white font-bold text-sm no-underline shadow-[2px_2px_0px_0px_#000]"
+	}
+	return "px-3 py-1.5 border-2 border-black bg-white text-black font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#000] transition-all"
+}

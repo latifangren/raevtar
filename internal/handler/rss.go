@@ -9,8 +9,8 @@ import (
 // RSSFeed generates an RSS 2.0 feed of recent blog posts.
 func (h *Handler) rssFeed(w http.ResponseWriter, r *http.Request) {
 	posts, _, err := h.svc.Blog.ListPosts("", 1, 20)
-	if err != nil || len(posts) == 0 {
-		http.Error(w, "No posts", http.StatusNotFound)
+	if err != nil {
+		http.Error(w, "failed to load posts", http.StatusInternalServerError)
 		return
 	}
 

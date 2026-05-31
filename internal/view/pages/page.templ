@@ -1,0 +1,12 @@
+package pages
+
+import (
+	"raevtar/internal/model"
+	"raevtar/internal/view/layouts"
+)
+
+templ page(title string, currentPath string, categories []model.Category) {
+	@layouts.Base(title, currentPath, categories) {
+		{ children... }
+	}
+}

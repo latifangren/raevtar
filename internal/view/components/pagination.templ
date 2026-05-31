@@ -1,0 +1,27 @@
+package components
+
+import (
+	"strconv"
+)
+
+templ Pagination(currentPage int, totalPages int, currentCat string) {
+	if totalPages > 1 {
+		<div class="flex gap-2 mt-6 justify-center">
+			for i := 1; i <= totalPages; i++ {
+				if i == currentPage {
+					<span class="px-3 py-1.5 border-2 border-black bg-black text-white font-bold text-sm">{ strconv.Itoa(i) }</span>
+				} else {
+					<a href={ templ.URL(pageHref(i, currentCat)) } class="px-3 py-1.5 border-2 border-black bg-white text-black font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#000] transition-all">{ strconv.Itoa(i) }</a>
+				}
+			}
+		</div>
+	}
+}
+
+func pageHref(page int, category string) string {
+	href := "/blog?page=" + strconv.Itoa(page)
+	if category != "" {
+		href += "&category=" + category
+	}
+	return href
+}
