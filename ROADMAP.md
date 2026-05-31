@@ -12,7 +12,7 @@ Setup dasar biar bisa jalan dan diakses publik.
 - [x] `go mod init raevtar` + install dependencies
 - [x] `internal/handler/*.go` — semua handler (landing, blog, dashboard, API)
 - [x] `go build` berhasil di aarch64 (binary 15.7 MB)
-- [x] Landing page + nav menu + halaman blog, dashboard, API
+- [x] Landing page + nav menu + halaman blog, lab, dashboard, API
 - [x] SQLite auto-migrate, seed 5 kategori
 - [x] Auth middleware constant-time untuk API write
 - [x] Systemd service (`/etc/systemd/system/raevtar.service`)
@@ -58,6 +58,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Tailwind standalone CLI (instead of CDN)
 - [x] Favicon, meta tags, Open Graph
 - [x] Custom 404 page
+- [x] Public lab page (`/lab`) untuk ringkasan agregat tanpa detail privat
 
 **Deliverable:** Raevtar keliatan profesional.
 

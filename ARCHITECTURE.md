@@ -1,7 +1,7 @@
 # RAEVTAR — Arsitektur
 
 ```
-raevtar.tech — blog, dashboard, API, landing page
+raevtar.tech — blog, dashboard, lab, API, landing page
 Single binary. Go + Templ + HTMX + SQLite.
 ```
 
@@ -133,6 +133,7 @@ raevtar/
 │       │   ├── index.templ       # Landing page
 │       │   ├── blog_list.templ   # Blog listing dengan filter kategori
 │       │   ├── blog_post.templ   # Single post (render markdown → HTML)
+│       │   ├── lab.templ         # Public-safe aggregate lab page
 │       │   ├── dashboard.templ   # Dashboard overview (HTMX auto-refresh)
 │       │   ├── server_detail.templ # Detail satu server
 │       │   └── not_found.templ   # Custom 404 page
@@ -227,6 +228,7 @@ raevtar/
 | GET | `/blog?category=ai-agent` | blog.List | Filter by kategori |
 | GET | `/blog/{slug}` | blog.Detail | Single post |
 | GET | `/blog/feed.xml` | rss.Feed | RSS feed |
+| GET | `/lab` | lab.Page | Public-safe aggregate lab page |
 | GET | `/dashboard` | dashboard.Index | Server monitoring |
 | GET | `/dashboard/{serverID}` | dashboard.Detail | Detail server |
 | GET | `/dashboard/{serverID}/live` | dashboard.DetailLive | HTMX fragment detail server |

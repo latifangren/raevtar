@@ -140,6 +140,7 @@ Public pages are the primary design surface:
 
 - Landing page.
 - Blog list/detail.
+- Public lab (`/lab`).
 - Dashboard.
 - Server detail.
 - 404 page.

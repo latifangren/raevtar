@@ -1,6 +1,6 @@
 # Raevtar
 
-**Personal platform** — blog rekomendasi projek GitHub, dashboard monitoring server lokal, landing page, dan REST API. Satu binary, jalan di postmarketOS (aarch64, Redmi Note 5/whyred).
+**Personal platform** — blog rekomendasi projek GitHub, dashboard monitoring server lokal, public lab, landing page, dan REST API. Satu binary, jalan di postmarketOS (aarch64, Redmi Note 5/whyred).
 
 ## Status
 
@@ -33,6 +33,11 @@
 ### Landing Page
 - Hero section + recent posts + kategori + server status
 - Navigation menu ke semua halaman
+
+### Public Lab
+- Route `/lab` untuk ringkasan publik: signal, content, dan automation lab
+- Menampilkan hitungan agregat dan status band publik
+- Tidak menampilkan alamat mesin, port, tag privat, token, atau install command
 
 ### REST API
 - `GET /api/v1/posts` — list posts
