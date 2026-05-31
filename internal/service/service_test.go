@@ -179,3 +179,62 @@ func TestMonitorServiceMetricsAndServerAccess(t *testing.T) {
 		t.Fatalf("metric payload mismatch: %+v", metrics[0])
 	}
 }
+
+func TestMonitorServiceRotatesAgentToken(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("agent", "127.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	first, err := state.svc.Monitor.RotateAgentToken(server.ID)
+	if err != nil {
+		t.Fatalf("rotate first token: %v", err)
+	}
+	if first == "" {
+		t.Fatalf("expected token")
+	}
+	if !state.svc.Monitor.VerifyAgentToken(server.ID, first) {
+		t.Fatalf("first token should verify")
+	}
+
+	second, err := state.svc.Monitor.RotateAgentToken(server.ID)
+	if err != nil {
+		t.Fatalf("rotate second token: %v", err)
+	}
+	if second == "" || second == first {
+		t.Fatalf("second token = %q, first = %q", second, first)
+	}
+	if state.svc.Monitor.VerifyAgentToken(server.ID, first) {
+		t.Fatalf("old token should be invalid")
+	}
+	if !state.svc.Monitor.VerifyAgentToken(server.ID, second) {
+		t.Fatalf("second token should verify")
+	}
+}
+
+func TestMonitorServiceRotateAgentTokenRequiresExistingServer(t *testing.T) {
+	state := newTestServices(t)
+
+	if token, err := state.svc.Monitor.RotateAgentToken(999); err == nil || token != "" {
+		t.Fatalf("rotate missing server token = %q, err = %v; want error and empty token", token, err)
+	}
+}
+
+func TestMonitorServiceRecordMetricsRequiresExistingServer(t *testing.T) {
+	state := newTestServices(t)
+
+	err := state.svc.Monitor.RecordMetrics(999, model.ServerMetric{Online: true})
+	if err == nil {
+		t.Fatalf("record metrics for missing server should fail")
+	}
+
+	metrics, err := state.svc.Monitor.GetRecentMetrics(999, 1)
+	if err != nil {
+		t.Fatalf("get recent metrics: %v", err)
+	}
+	if len(metrics) != 0 {
+		t.Fatalf("metrics len = %d, want 0", len(metrics))
+	}
+}
