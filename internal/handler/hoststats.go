@@ -7,7 +7,6 @@ import (
 	"os"
 	"strconv"
 	"strings"
-	"syscall"
 )
 
 // HostStats holds live system metrics for the local host.
@@ -72,24 +71,11 @@ func collectHostStats() HostStats {
 		}
 		if s.RAM.Total > 0 {
 			s.RAM.Used = s.RAM.Total - s.RAM.Available
-			s.RAM.Percent = math.Round(float64(s.RAM.Used)/float64(s.RAM.Total)*100)
+			s.RAM.Percent = math.Round(float64(s.RAM.Used) / float64(s.RAM.Total) * 100)
 		}
 	}
 
-	// --- Disk (root /) ---
-	var stat syscall.Statfs_t
-	if err := syscall.Statfs("/", &stat); err == nil {
-		totalB := stat.Blocks * uint64(stat.Bsize)
-		freeB := stat.Bfree * uint64(stat.Bsize)
-		totalKB := totalB / 1024
-		freeKB := freeB / 1024
-		s.Disk.Total = totalKB
-		s.Disk.Free = freeKB
-		s.Disk.Used = totalKB - freeKB
-		if totalKB > 0 {
-			s.Disk.Percent = math.Round(float64(s.Disk.Used) / float64(totalKB) * 100)
-		}
-	}
+	s.Disk = collectDiskStats()
 
 	// --- Temperature ---
 	s.Temp = readTemp()

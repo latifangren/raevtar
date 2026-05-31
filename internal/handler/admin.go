@@ -1,13 +1,13 @@
 package handler
 
 import (
+	"html"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
 
 	"raevtar/internal/model"
-	"raevtar/internal/repo"
 )
 
 // --- Admin: Dashboard (from existing admin.go) ---
@@ -22,7 +22,7 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 	servers, _ := h.svc.Monitor.ListServers()
 	serverCount := len(servers)
 
-	users, _ := h.svc.Repos.User.List()
+	users, _ := h.svc.Admin.ListUsers()
 	userCount := len(users)
 
 	stats := collectHostStats()
@@ -52,8 +52,8 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 			<div class="flex items-center gap-3">
 				<span class="inline-block w-3 h-3 border-2 border-black ` + statusDot + `"></span>
 				<div>
-					<p class="text-sm font-bold text-black">` + s.Name + `</p>
-					<p class="text-xs font-mono text-neutral-500">` + s.Host + `:` + itoa(s.Port) + `</p>
+					<p class="text-sm font-bold text-black">` + esc(s.Name) + `</p>
+					<p class="text-xs font-mono text-neutral-500">` + esc(s.Host) + `:` + itoa(s.Port) + `</p>
 				</div>
 			</div>
 			<div class="flex items-center gap-4">
@@ -253,7 +253,7 @@ func bgColorForStatus(status string) string {
 // --- Admin: Manage Users ---
 
 func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
-	users, _ := h.svc.Repos.User.List()
+	users, _ := h.svc.Admin.ListUsers()
 	entry, _ := getSessionEntry(r)
 
 	var rows string
@@ -263,11 +263,11 @@ func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
 		canManage := model.CanManage(entry.role, u.Role)
 		delBtn := ""
 		if canManage && u.Username != entry.username {
-			delBtn = `<a href="/admin/manage-users/delete/` + itoa64(u.ID) + `" class="text-xs font-bold text-neutral-500 hover:bg-rose-200 px-2 py-1 border-2 border-black no-underline" onclick="return confirm('Hapus user ` + u.Username + `?')">✕</a>`
+			delBtn = `<form method="POST" action="/admin/manage-users/delete/` + itoa64(u.ID) + `" class="inline"><button type="submit" class="text-xs font-bold text-neutral-500 hover:bg-rose-200 px-2 py-1 border-2 border-black bg-white cursor-pointer">✕</button></form>`
 		}
 
 		rows += `<tr class="border-b-2 border-black">
-			<td class="py-3 px-4 text-sm font-bold text-black">` + u.Username + `</td>
+			<td class="py-3 px-4 text-sm font-bold text-black">` + esc(u.Username) + `</td>
 			<td class="py-3 px-4">` + roleBadge + `</td>
 			<td class="py-3 px-4 text-sm font-mono font-bold text-neutral-500">` + u.CreatedAt.Format("2006-01-02") + `</td>
 			<td class="py-3 px-4 text-right text-xs">
@@ -284,7 +284,7 @@ func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
 			if r == model.RoleOperator {
 				selected = " selected"
 			}
-			roleOptions += `<option value="` + r + `"` + selected + `>` + r + `</option>`
+			roleOptions += `<option value="` + esc(r) + `"` + selected + `>` + esc(r) + `</option>`
 		}
 	}
 
@@ -363,33 +363,26 @@ func (h *Handler) adminCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if !model.IsValidRole(role) {
-		role = model.RoleOperator
-	}
-
-	// Check permission: can't assign a role higher than yourself
-	if !model.CanManage(entry.role, role) {
+	if model.IsValidRole(role) && !model.CanManage(entry.role, role) {
 		http.Error(w, "you cannot create users with this role", http.StatusForbidden)
 		return
 	}
 
-	hash, err := repo.HashPassword(password)
-	if err != nil {
-		http.Error(w, "failed to hash password", http.StatusInternalServerError)
-		return
-	}
-
-	u, err := h.svc.Repos.User.Create(username, hash, role, username)
+	_, err := h.svc.Admin.CreateUser(entry.role, entry.username, username, password, role, r.RemoteAddr)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	h.svc.Repos.Audit.Insert(entry.username, "CREATE_USER", "created user "+u.Username+" with role "+u.Role, r.RemoteAddr)
 	http.Redirect(w, r, "/admin/manage-users", http.StatusSeeOther)
 }
 
 func (h *Handler) adminDeleteUser(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
 	entry, _ := getSessionEntry(r)
 	idStr := r.PathValue("userID")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -398,47 +391,39 @@ func (h *Handler) adminDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	targetUser, err := h.svc.Repos.User.GetByID(id)
-	if err != nil {
-		http.Error(w, "user not found", http.StatusNotFound)
+	if err := h.svc.Admin.DeleteUser(entry.role, entry.username, id, r.RemoteAddr); err != nil {
+		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
 
-	if !model.CanManage(entry.role, targetUser.Role) {
-		http.Error(w, "forbidden", http.StatusForbidden)
-		return
-	}
-
-	h.svc.Repos.Audit.Insert(entry.username, "DELETE_USER", "deleted user: "+targetUser.Username+" (role: "+targetUser.Role+")", r.RemoteAddr)
-	h.svc.Repos.User.Delete(id)
 	http.Redirect(w, r, "/admin/manage-users", http.StatusSeeOther)
 }
 
 // --- Admin: Audit Log ---
 
 func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
-	logs, _ := h.svc.Repos.Audit.List(200, 0)
+	logs, _ := h.svc.Admin.ListAuditLogs(200, 0)
 
 	var rows string
 	for _, l := range logs {
 		var actionBadge string
 		switch {
 		case strings.Contains(l.Action, "LOGIN"):
-			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-emerald-300 text-black font-mono">` + l.Action + `</span>`
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-emerald-300 text-black font-mono">` + esc(l.Action) + `</span>`
 		case strings.Contains(l.Action, "CREATE"):
-			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-blue-300 text-black font-mono">` + l.Action + `</span>`
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-blue-300 text-black font-mono">` + esc(l.Action) + `</span>`
 		case strings.Contains(l.Action, "DELETE"):
-			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-rose-300 text-black font-mono">` + l.Action + `</span>`
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-rose-300 text-black font-mono">` + esc(l.Action) + `</span>`
 		default:
-			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black font-mono">` + l.Action + `</span>`
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black font-mono">` + esc(l.Action) + `</span>`
 		}
 
 		rows += `<tr class="border-b-2 border-black text-xs">
 			<td class="py-2.5 px-4 text-neutral-500 font-mono font-bold whitespace-nowrap">` + l.CreatedAt.Format("02 Jan 15:04") + `</td>
 			<td class="py-2.5 px-4">` + actionBadge + `</td>
-			<td class="py-2.5 px-4 font-bold text-black">` + l.User + `</td>
-			<td class="py-2.5 px-4 text-neutral-600 font-bold max-w-xs truncate">` + l.Details + `</td>
-			<td class="py-2.5 px-4 text-neutral-500 font-mono">` + l.IP + `</td>
+			<td class="py-2.5 px-4 font-bold text-black">` + esc(l.User) + `</td>
+			<td class="py-2.5 px-4 text-neutral-600 font-bold max-w-xs truncate">` + esc(l.Details) + `</td>
+			<td class="py-2.5 px-4 text-neutral-500 font-mono">` + esc(l.IP) + `</td>
 		</tr>`
 	}
 
@@ -484,7 +469,7 @@ func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 	posts, _, _ := h.svc.Blog.ListPosts("", 1, 9999)
-	categories, _ := h.svc.Repos.Category.List()
+	categories, _ := h.svc.Blog.ListCategories()
 
 	var rows string
 	for _, p := range posts {
@@ -503,18 +488,18 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 		}
 
 		rows += `<tr class="border-b-2 border-black">
-			<td class="py-3 px-4 text-sm font-bold text-black max-w-[300px] truncate">` + p.Title + `</td>
-			<td class="py-3 px-4"><span class="text-xs px-2 py-0.5 font-bold border-2 border-black font-mono ` + catColor + `">` + p.CategorySlug + `</span></td>
+			<td class="py-3 px-4 text-sm font-bold text-black max-w-[300px] truncate">` + esc(p.Title) + `</td>
+			<td class="py-3 px-4"><span class="text-xs px-2 py-0.5 font-bold border-2 border-black font-mono ` + catColor + `">` + esc(p.CategorySlug) + `</span></td>
 			<td class="py-3 px-4 text-sm font-mono font-bold text-neutral-500">` + p.CreatedAt.Format("2006-01-02") + `</td>
 			<td class="py-3 px-4 text-right">
-				<a href="/admin/posts/delete/` + itoa64(p.ID) + `" class="text-xs font-bold text-neutral-500 hover:bg-rose-200 px-2 py-1 border-2 border-black no-underline" onclick="return confirm('Hapus post ini?')">✕</a>
+				<form method="POST" action="/admin/posts/delete/` + itoa64(p.ID) + `" class="inline"><button type="submit" class="text-xs font-bold text-neutral-500 hover:bg-rose-200 px-2 py-1 border-2 border-black bg-white cursor-pointer">✕</button></form>
 			</td>
 		</tr>`
 	}
 
 	var catOptions string
 	for _, c := range categories {
-		catOptions += `<option value="` + c.Slug + `">` + c.Name + `</option>`
+		catOptions += `<option value="` + esc(c.Slug) + `">` + esc(c.Name) + `</option>`
 	}
 
 	content := `<div class="space-y-6">
@@ -600,11 +585,16 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.svc.Repos.Audit.Insert(entry.username, "CREATE_POST", "created post: "+post.Title, r.RemoteAddr)
+	_ = h.svc.Admin.LogPostCreated(entry.username, post.Title, r.RemoteAddr)
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
 func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
 	entry, _ := getSessionEntry(r)
 	idStr := r.PathValue("postID")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -613,12 +603,7 @@ func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	post, err := h.svc.Repos.Post.GetByID(id)
-	if err == nil {
-		h.svc.Repos.Audit.Insert(entry.username, "DELETE_POST", "deleted post: "+post.Title, r.RemoteAddr)
-	}
-
-	h.svc.Repos.Post.Delete(id)
+	_ = h.svc.Admin.DeletePost(entry.username, id, r.RemoteAddr)
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
@@ -654,21 +639,22 @@ func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 			for _, t := range tags {
 				t = strings.TrimSpace(t)
 				if t != "" {
-					tagBadges += `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black font-mono">` + t + `</span> `
+					tagBadges += `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black font-mono">` + esc(t) + `</span> `
 				}
 			}
 		}
 
 		inlineStatus := statusText
+		initials := esc(s.Name[:min(len(s.Name), 2)])
 		cards += `<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
 			<div class="flex items-start justify-between mb-4">
 				<div class="flex items-center gap-3">
 					<div class="w-10 h-10 border-2 border-black bg-black flex items-center justify-center">
-						<span class="text-sm font-black text-white font-mono">` + s.Name[:min(len(s.Name), 2)] + `</span>
+						<span class="text-sm font-black text-white font-mono">` + initials + `</span>
 					</div>
 					<div>
-						<p class="text-sm font-black text-black">` + s.Name + `</p>
-						<p class="text-xs font-mono font-bold text-neutral-500">` + s.Host + `:` + itoa(s.Port) + `</p>
+						<p class="text-sm font-black text-black">` + esc(s.Name) + `</p>
+						<p class="text-xs font-mono font-bold text-neutral-500">` + esc(s.Host) + `:` + itoa(s.Port) + `</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
@@ -685,7 +671,7 @@ func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 				</div>
 				<div class="flex items-center gap-3 text-xs font-mono font-bold text-neutral-500">
 					<span>Last seen: ` + lastSeenStr + `</span>
-					<a href="/admin/servers/delete/` + itoa64(s.ID) + `" class="font-bold text-neutral-500 hover:bg-rose-200 px-2 py-0.5 border-2 border-black no-underline" onclick="return confirm('Hapus server ` + s.Name + `?')">✕</a>
+					<form method="POST" action="/admin/servers/delete/` + itoa64(s.ID) + `" class="inline"><button type="submit" class="font-bold text-neutral-500 hover:bg-rose-200 px-2 py-0.5 border-2 border-black bg-white cursor-pointer">✕</button></form>
 				</div>
 			</div>
 		</div>`
@@ -764,11 +750,16 @@ func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.svc.Repos.Audit.Insert(entry.username, "CREATE_SERVER", "created server: "+name+" ("+host+":"+portStr+")", r.RemoteAddr)
+	_ = h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, r.RemoteAddr)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 
 func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
 	entry, _ := getSessionEntry(r)
 	idStr := r.PathValue("serverID")
 	id, err := strconv.ParseInt(idStr, 10, 64)
@@ -777,8 +768,7 @@ func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	h.svc.Repos.Audit.Insert(entry.username, "DELETE_SERVER", "deleted server id: "+idStr, r.RemoteAddr)
-	h.svc.Repos.Server.Delete(id)
+	_ = h.svc.Admin.DeleteServer(entry.username, id, idStr, r.RemoteAddr)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 
@@ -795,17 +785,18 @@ func roleBadgeHTML(role string) string {
 	case model.RoleReadonly:
 		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-neutral-300 text-black">readonly</span>`
 	default:
-		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-neutral-300 text-black">` + role + `</span>`
+		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-neutral-300 text-black">` + esc(role) + `</span>`
 	}
 }
 
 func adminLayout(title, content string) string {
+	safeTitle := esc(title)
 	return `<!DOCTYPE html>
 <html lang="en">
 <head>
 	<meta charset="UTF-8">
 	<meta name="viewport" content="width=device-width, initial-scale=1.0">
-	<title>` + title + ` — Raevtar Admin</title>
+	<title>` + safeTitle + ` — Raevtar Admin</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
@@ -841,7 +832,7 @@ func adminLayout(title, content string) string {
 					<div class="md:hidden w-7 h-7 bg-emerald-400 flex items-center justify-center border-2 border-white">
 						<span class="text-black font-black text-sm">R</span>
 					</div>
-					<div class="text-base md:text-lg font-black text-white">` + title + `</div>
+					<div class="text-base md:text-lg font-black text-white">` + safeTitle + `</div>
 				</div>
 				<div class="flex items-center gap-3">
 					<div class="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-black text-xs md:text-sm">
@@ -861,4 +852,8 @@ func adminLayout(title, content string) string {
 	</div>
 </body>
 </html>`
+}
+
+func esc(s string) string {
+	return html.EscapeString(s)
 }
