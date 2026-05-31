@@ -36,11 +36,11 @@
 - `GET /api/v1/posts` — list posts
 - `POST /api/v1/posts` — create post (auth required)
 - `GET /api/v1/categories` — list categories
-- `GET /api/v1/servers` — list servers
-- `GET /api/v1/servers/{id}` — server detail
+- `GET /api/v1/servers` — list servers (auth required)
+- `GET /api/v1/servers/{id}` — server detail (auth required)
 - `POST /api/v1/servers` — register server (auth required)
 - `POST /api/v1/servers/{id}/ping` — record metrics (auth required)
-- `GET /api/v1/hoststats` — host resource snapshot
+- `GET /api/v1/hoststats` — host resource snapshot (auth required)
 - `GET /docs` — Swagger UI untuk `static/openapi.json`
 
 ### Admin Panel
@@ -93,7 +93,7 @@ Handler gak boleh panggil repo langsung. Service gak tahu HTTP. Repo cuma query.
 | `RAEVTAR_DB` | `~/.raevtar/data.db` | Path SQLite database |
 | `RAEVTAR_DOMAIN` | `raevtar.tech` | Domain public |
 | `RAEVTAR_LOG_LEVEL` | `info` | debug / info / warn / error |
-| `RAEVTAR_ADMIN_KEY` | `""` | **WAJIB** untuk API write. Constant-time validated |
+| `RAEVTAR_ADMIN_KEY` | `""` | **WAJIB** untuk endpoint API auth-protected. Constant-time validated |
 | `RAEVTAR_ADMIN_USER` | `admin` | Admin panel seed username |
 | `RAEVTAR_ADMIN_PASS` | `""` | **WAJIB** untuk admin panel login |
 | `RAEVTAR_ENV` | `""` | Set ke `production` untuk mode produksi |

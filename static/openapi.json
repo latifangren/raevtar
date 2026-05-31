@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Raevtar API",
-    "description": "Personal blog + server monitoring platform API.\n\n**Auth:** Write endpoints require `Authorization: Bearer <admin_key>` header.\n\nBase URL: `https://raevtar.tech`",
+    "description": "Personal blog + server monitoring platform API.\n\n**Auth:** Server and host-stat endpoints require `Authorization: Bearer <admin_key>` header. Public read endpoints are posts and categories.\n\nBase URL: `https://raevtar.tech`",
     "version": "1.0.0",
     "contact": {
       "name": "latifangren",
@@ -87,6 +87,8 @@
     "/api/v1/hoststats": {
       "get": {
         "summary": "Get host resource snapshot",
+        "description": "Requires `Authorization: Bearer <admin_key>` header.",
+        "security": [{ "BearerAuth": [] }],
         "responses": {
           "200": {
             "description": "Current host CPU, RAM, disk, and temperature stats",
@@ -102,6 +104,8 @@
     "/api/v1/servers": {
       "get": {
         "summary": "List servers",
+        "description": "Requires `Authorization: Bearer <admin_key>` header.",
+        "security": [{ "BearerAuth": [] }],
         "responses": {
           "200": {
             "description": "List of registered servers",
@@ -146,6 +150,8 @@
     "/api/v1/servers/{serverID}": {
       "get": {
         "summary": "Get server details",
+        "description": "Requires `Authorization: Bearer <admin_key>` header.",
+        "security": [{ "BearerAuth": [] }],
         "parameters": [
           {
             "name": "serverID",

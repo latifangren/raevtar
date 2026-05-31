@@ -40,11 +40,11 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - `GET /api/v1/posts` — list blog posts
 - `POST /api/v1/posts` — create blog post (auth)
 - `GET /api/v1/categories` — daftar kategori
-- `GET /api/v1/servers` — daftar server + status
+- `GET /api/v1/servers` — daftar server + status (auth)
 - `POST /api/v1/servers` — register server (auth)
 - `POST /api/v1/servers/{id}/ping` — report metrics (auth)
-- `GET /api/v1/servers/{id}` — detail server
-- `GET /api/v1/hoststats` — host resource snapshot
+- `GET /api/v1/servers/{id}` — detail server (auth)
+- `GET /api/v1/hoststats` — host resource snapshot (auth)
 - Swagger UI `/docs` untuk static OpenAPI spec
 
 ### 3.5 Admin Panel

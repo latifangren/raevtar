@@ -233,10 +233,10 @@ raevtar/
 | GET | `/api/v1/posts` | api.ListPosts | JSON posts |
 | POST | `/api/v1/posts` | api.CreatePost | JSON create (cron) |
 | GET | `/api/v1/categories` | api.ListCategories | JSON categories |
-| GET | `/api/v1/hoststats` | api.HostStats | Host CPU/RAM/disk/temp |
-| GET | `/api/v1/servers` | api.ListServers | JSON server status |
+| GET | `/api/v1/hoststats` | api.HostStats | Host CPU/RAM/disk/temp (Bearer auth) |
+| GET | `/api/v1/servers` | api.ListServers | JSON server status (Bearer auth) |
 | POST | `/api/v1/servers` | api.CreateServer | Register server |
-| GET | `/api/v1/servers/{id}` | api.GetServer | JSON detail server |
+| GET | `/api/v1/servers/{id}` | api.GetServer | JSON detail server (Bearer auth) |
 | POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Record server metrics |
 | GET | `/docs` | static docs.html | Swagger UI untuk `static/openapi.json` |
 

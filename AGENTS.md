@@ -111,7 +111,7 @@ make db-reset
 | `RAEVTAR_DB` | `~/.raevtar/data.db` | Tidak |
 | `RAEVTAR_DOMAIN` | `raevtar.tech` | Tidak |
 | `RAEVTAR_LOG_LEVEL` | `info` | Tidak |
-| `RAEVTAR_ADMIN_KEY` | `""` | **Ya** (untuk API write, constant-time validated) |
+| `RAEVTAR_ADMIN_KEY` | `""` | **Ya** (untuk endpoint API auth-protected, constant-time validated) |
 | `RAEVTAR_ADMIN_USER` | `admin` | Tidak |
 | `RAEVTAR_ADMIN_PASS` | `""` | **Ya** (untuk admin panel login) |
 | `RAEVTAR_ENV` | `""` | Set `production` untuk mode produksi |
