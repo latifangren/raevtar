@@ -107,9 +107,9 @@ func ServerCard(server model.Server) templ.Component {
 
 func statusDotClass(lastSeen *time.Time) string {
 	switch {
-	case lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute:
+	case lastSeen != nil && time.Since(*lastSeen) < 3*time.Minute:
 		return "bg-retro-sage"
-	case lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute:
+	case lastSeen != nil && time.Since(*lastSeen) < 15*time.Minute:
 		return "bg-retro-wheat"
 	default:
 		return "bg-retro-blush"
@@ -118,9 +118,9 @@ func statusDotClass(lastSeen *time.Time) string {
 
 func serverStatusText(lastSeen *time.Time) string {
 	switch {
-	case lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute:
+	case lastSeen != nil && time.Since(*lastSeen) < 3*time.Minute:
 		return "Online"
-	case lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute:
+	case lastSeen != nil && time.Since(*lastSeen) < 15*time.Minute:
 		return "Stale"
 	default:
 		return "Offline"

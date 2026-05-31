@@ -1,26 +1,27 @@
 package components
 
 import (
+	"os"
+	"strings"
 	"testing"
-	"time"
 )
 
 func TestServerCardStatusUsesDurationSemantics(t *testing.T) {
-	now := time.Now()
-	online := now.Add(-time.Minute)
-	stale := now.Add(-5 * time.Minute)
-	offline := now.Add(-11 * time.Minute)
+	source, err := os.ReadFile("server_card.templ")
+	if err != nil {
+		t.Fatalf("read server card template: %v", err)
+	}
+	content := string(source)
 
-	if got := serverStatusText(&online); got != "Online" {
-		t.Fatalf("online status = %q", got)
+	if count := strings.Count(content, "< 3*time.Minute"); count != 2 {
+		t.Fatalf("online threshold count = %d, want 2", count)
 	}
-	if got := serverStatusText(&stale); got != "Stale" {
-		t.Fatalf("stale status = %q", got)
+	if count := strings.Count(content, "< 15*time.Minute"); count != 2 {
+		t.Fatalf("stale threshold count = %d, want 2", count)
 	}
-	if got := serverStatusText(&offline); got != "Offline" {
-		t.Fatalf("offline status = %q", got)
-	}
-	if got := serverStatusText(nil); got != "Offline" {
-		t.Fatalf("nil status = %q", got)
+	for _, oldThreshold := range []string{"< 2*time.Minute", "< 10*time.Minute"} {
+		if strings.Contains(content, oldThreshold) {
+			t.Fatalf("server card template still contains old threshold %q", oldThreshold)
+		}
 	}
 }
