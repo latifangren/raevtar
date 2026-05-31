@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
 	"encoding/hex"
 	"net/http"
 	"sync"
@@ -17,6 +18,7 @@ type sessionEntry struct {
 	userID    int64
 	username  string
 	role      string
+	csrfToken string
 	createdAt time.Time
 }
 
@@ -34,7 +36,9 @@ const sessionMaxAge = 24 * time.Hour
 
 func generateSessionToken() string {
 	b := make([]byte, 32)
-	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		panic("generate session token: " + err.Error())
+	}
 	return hex.EncodeToString(b)
 }
 
@@ -46,6 +50,7 @@ func (s *sessionStore) create(userID int64, username, role string) string {
 		userID:    userID,
 		username:  username,
 		role:      role,
+		csrfToken: generateSessionToken(),
 		createdAt: time.Now(),
 	}
 	return token
@@ -96,6 +101,14 @@ func canManageServer(r *http.Request) bool {
 		return false
 	}
 	return entry.role == model.RoleOwner || entry.role == model.RoleAdmin
+}
+
+func csrfTokenForRequest(r *http.Request) string {
+	entry, ok := getSessionEntry(r)
+	if !ok {
+		return ""
+	}
+	return entry.csrfToken
 }
 
 // --- RBAC Middleware ---
@@ -154,6 +167,29 @@ func (h *Handler) adminAPIAuth(next http.Handler) http.Handler {
 	})
 }
 
+func (h *Handler) adminCSRF(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			next.ServeHTTP(w, r)
+			return
+		}
+
+		entry, ok := getSessionEntry(r)
+		if !ok || entry.csrfToken == "" {
+			http.Error(w, "403 — invalid CSRF token", http.StatusForbidden)
+			return
+		}
+
+		sent := r.FormValue("_csrf")
+		if subtle.ConstantTimeCompare([]byte(sent), []byte(entry.csrfToken)) != 1 {
+			http.Error(w, "403 — invalid CSRF token", http.StatusForbidden)
+			return
+		}
+
+		next.ServeHTTP(w, r)
+	})
+}
+
 // --- Login/Logout handlers ---
 
 func (h *Handler) adminLoginPage(w http.ResponseWriter, r *http.Request) {
@@ -180,7 +216,7 @@ func (h *Handler) adminLogin(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	user, err := h.svc.Admin.Authenticate(username, password, r.RemoteAddr)
+	user, err := h.svc.Admin.Authenticate(username, password, clientIP(r))
 	if err != nil {
 		sessions.cleanup()
 		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid credentials"})
@@ -210,7 +246,7 @@ func (h *Handler) adminLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if entry.username != "" {
-		_ = h.svc.Admin.LogLogout(entry.username, r.RemoteAddr)
+		_ = h.svc.Admin.LogLogout(entry.username, clientIP(r))
 	}
 
 	http.SetCookie(w, &http.Cookie{

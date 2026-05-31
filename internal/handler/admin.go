@@ -25,6 +25,7 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, adminview.Dashboard(adminview.DashboardData{
 		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
 		PostCount:   len(allPosts),
 		ServerCount: len(servers),
 		UserCount:   len(users),
@@ -58,6 +59,7 @@ func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, adminview.Users(adminview.UsersData{
 		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
 		Users:       rows,
 		RoleOptions: roleOptions,
 	}))
@@ -89,7 +91,7 @@ func (h *Handler) adminCreateUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_, err := h.svc.Admin.CreateUser(entry.role, entry.username, username, password, role, r.RemoteAddr)
+	_, err := h.svc.Admin.CreateUser(entry.role, entry.username, username, password, role, clientIP(r))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -112,7 +114,7 @@ func (h *Handler) adminDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.svc.Admin.DeleteUser(entry.role, entry.username, id, r.RemoteAddr); err != nil {
+	if err := h.svc.Admin.DeleteUser(entry.role, entry.username, id, clientIP(r)); err != nil {
 		http.Error(w, err.Error(), http.StatusForbidden)
 		return
 	}
@@ -122,7 +124,7 @@ func (h *Handler) adminDeleteUser(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
 	logs, _ := h.svc.Admin.ListAuditLogs(200, 0)
-	renderHTML(w, r, adminview.Audit(adminview.AuditData{CurrentPath: r.URL.Path, Logs: logs}))
+	renderHTML(w, r, adminview.Audit(adminview.AuditData{CurrentPath: r.URL.Path, CSRFToken: csrfTokenForRequest(r), Logs: logs}))
 }
 
 func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
@@ -130,6 +132,7 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 	categories, _ := h.svc.Blog.ListCategories()
 	renderHTML(w, r, adminview.Posts(adminview.PostsData{
 		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
 		Posts:       posts,
 		Categories:  categories,
 	}))
@@ -162,7 +165,7 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.svc.Admin.LogPostCreated(entry.username, post.Title, r.RemoteAddr)
+	_ = h.svc.Admin.LogPostCreated(entry.username, post.Title, clientIP(r))
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
@@ -180,13 +183,13 @@ func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.svc.Admin.DeletePost(entry.username, id, r.RemoteAddr)
+	_ = h.svc.Admin.DeletePost(entry.username, id, clientIP(r))
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
 func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 	servers, _ := h.svc.Monitor.ListServers()
-	renderHTML(w, r, adminview.Servers(adminview.ServersData{CurrentPath: r.URL.Path, Servers: servers}))
+	renderHTML(w, r, adminview.Servers(adminview.ServersData{CurrentPath: r.URL.Path, CSRFToken: csrfTokenForRequest(r), Servers: servers}))
 }
 
 func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
@@ -213,7 +216,7 @@ func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, r.RemoteAddr)
+	_ = h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, clientIP(r))
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 
@@ -231,7 +234,7 @@ func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.svc.Admin.DeleteServer(entry.username, id, idStr, r.RemoteAddr)
+	_ = h.svc.Admin.DeleteServer(entry.username, id, idStr, clientIP(r))
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 

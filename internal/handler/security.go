@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"net"
 	"net/http"
 	"strings"
 	"sync"
@@ -36,15 +37,15 @@ type rateLimiter struct {
 }
 
 type bucketEntry struct {
-	count    int
-	resetAt  time.Time
+	count   int
+	resetAt time.Time
 }
 
 var limiter = &rateLimiter{
 	requests: make(map[string]*bucketEntry),
 }
 
-const maxRequests = 60          // max requests per window
+const maxRequests = 60 // max requests per window
 const windowDuration = 1 * time.Minute
 
 // RateLimit is a middleware that limits requests per IP.
@@ -57,7 +58,7 @@ func RateLimit(next http.Handler) http.Handler {
 			return
 		}
 
-		ip := r.RemoteAddr
+		ip := clientIP(r)
 
 		limiter.mu.Lock()
 		entry, exists := limiter.requests[ip]
@@ -84,6 +85,14 @@ func RateLimit(next http.Handler) http.Handler {
 		limiter.mu.Unlock()
 		next.ServeHTTP(w, r)
 	})
+}
+
+func clientIP(r *http.Request) string {
+	host, _, err := net.SplitHostPort(r.RemoteAddr)
+	if err == nil {
+		return host
+	}
+	return r.RemoteAddr
 }
 
 // Cleanup rate limiter entries periodically (call from background goroutine)
