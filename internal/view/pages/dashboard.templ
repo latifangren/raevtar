@@ -16,6 +16,7 @@ templ Dashboard(data DashboardData) {
 			<div id="register-form" class="hidden mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 				<h2 class="text-sm font-black uppercase mb-3">Register Server</h2>
 				<form method="POST" action="/admin/servers" class="space-y-3">
+					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
 					<div class="grid grid-cols-1 sm:grid-cols-3 gap-3">
 						<input type="text" name="name" placeholder="Server name" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
 						<input type="text" name="host" placeholder="host or IP" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>

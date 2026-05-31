@@ -37,6 +37,7 @@ type DashboardData struct {
 	Categories        []model.Category
 	CanRegisterServer bool
 	CanViewServerInfo bool
+	CSRFToken         string
 }
 
 type ServerDetailData struct {

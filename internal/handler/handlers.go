@@ -92,12 +92,14 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	canManage := canManageServer(r)
 	renderHTML(w, r, pages.Dashboard(pages.DashboardData{
 		CurrentPath:       r.URL.Path,
 		Servers:           servers,
 		Categories:        categories,
-		CanRegisterServer: canManageServer(r),
-		CanViewServerInfo: canManageServer(r),
+		CanRegisterServer: canManage,
+		CanViewServerInfo: canManage,
+		CSRFToken:         csrfTokenForRequest(r),
 	}))
 }
 
