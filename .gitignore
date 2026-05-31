@@ -37,3 +37,4 @@ tmp/
 temp/
 *.swp
 /.omo
+/.playwright-mcp
