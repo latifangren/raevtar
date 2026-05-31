@@ -15,7 +15,9 @@ import (
 )
 
 type publicTestApp struct {
-	handler http.Handler
+	handler  http.Handler
+	svc      *service.Service
+	serverID int64
 }
 
 func newPublicTestApp(t *testing.T) *publicTestApp {
@@ -52,7 +54,8 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		t.Fatalf("create post: %v", err)
 	}
 
-	if _, err := svc.Monitor.CreateServer("whyred", "127.0.0.1", 9100, "local"); err != nil {
+	server, err := svc.Monitor.CreateServer("whyred", "127.0.0.1", 9100, "local")
+	if err != nil {
 		t.Fatalf("create server: %v", err)
 	}
 
@@ -60,7 +63,34 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		t.Fatalf("expected generated slug")
 	}
 
-	return &publicTestApp{handler: New(svc, cfg)}
+	return &publicTestApp{handler: New(svc, cfg), svc: svc, serverID: server.ID}
+}
+
+func assertContains(t *testing.T, body, want string) {
+	t.Helper()
+	if !strings.Contains(body, want) {
+		t.Fatalf("body missing %q\nbody: %s", want, body)
+	}
+}
+
+func assertNotContains(t *testing.T, body, want string) {
+	t.Helper()
+	if strings.Contains(body, want) {
+		t.Fatalf("body leaked %q\nbody: %s", want, body)
+	}
+}
+
+func getBody(t *testing.T, app *publicTestApp, path string, cookie *http.Cookie) (int, string) {
+	t.Helper()
+	req := httptest.NewRequest(http.MethodGet, path, nil)
+	if cookie != nil {
+		req.AddCookie(cookie)
+	}
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	return rr.Code, rr.Body.String()
 }
 
 func TestAdminLoginRedirectsToDashboard(t *testing.T) {
@@ -137,7 +167,8 @@ func TestPublicRoutes(t *testing.T) {
 				"Server Dashboard",
 				"Monitor Grid",
 				"whyred",
-				"127.0.0.1:9100",
+				"Hidden on public view",
+				"redacted",
 				`href="/dashboard/1"`,
 				`id="server-list"`,
 			},
@@ -181,10 +212,206 @@ func TestPublicRoutes(t *testing.T) {
 
 			body := rr.Body.String()
 			for _, want := range tt.wantContains {
-				if !strings.Contains(body, want) {
-					t.Fatalf("body missing %q\nbody: %s", want, body)
-				}
+				assertContains(t, body, want)
 			}
+		})
+	}
+}
+
+func TestPublicDashboardRedactsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/dashboard", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	assertContains(t, body, "whyred")
+	assertContains(t, body, "Hidden on public view")
+	assertContains(t, body, "redacted")
+	assertContains(t, body, "tagged node")
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "127.0.0.1:9100")
+	assertNotContains(t, body, ">9100<")
+	assertNotContains(t, body, ">local<")
+}
+
+func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, role := range []string{model.RoleOperator, model.RoleReadonly} {
+		t.Run(role, func(t *testing.T) {
+			cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(103, role, role)}
+			status, body := getBody(t, app, "/dashboard", cookie)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+
+			assertContains(t, body, "Hidden on public view")
+			assertContains(t, body, "redacted")
+			assertNotContains(t, body, "127.0.0.1")
+			assertNotContains(t, body, "127.0.0.1:9100")
+			assertNotContains(t, body, ">9100<")
+			assertNotContains(t, body, ">local<")
+		})
+	}
+}
+
+func TestOwnerDashboardShowsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+	cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(101, "owner", model.RoleOwner)}
+
+	status, body := getBody(t, app, "/dashboard", cookie)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	assertContains(t, body, "127.0.0.1:9100")
+	assertContains(t, body, ">9100<")
+	assertContains(t, body, ">local<")
+}
+
+func TestDashboardRegisterControlsAreRoleGated(t *testing.T) {
+	app := newPublicTestApp(t)
+	roles := []struct {
+		name         string
+		role         string
+		wantRegister bool
+	}{
+		{name: "public", wantRegister: false},
+		{name: "operator", role: model.RoleOperator, wantRegister: false},
+		{name: "readonly", role: model.RoleReadonly, wantRegister: false},
+		{name: "owner", role: model.RoleOwner, wantRegister: true},
+		{name: "admin", role: model.RoleAdmin, wantRegister: true},
+	}
+
+	for _, tt := range roles {
+		t.Run(tt.name, func(t *testing.T) {
+			var cookie *http.Cookie
+			if tt.role != "" {
+				cookie = &http.Cookie{Name: sessionCookieName, Value: sessions.create(100, tt.name, tt.role)}
+			}
+
+			status, body := getBody(t, app, "/dashboard", cookie)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+
+			if tt.wantRegister {
+				assertContains(t, body, "Register Server")
+				assertContains(t, body, `action="/admin/servers"`)
+				assertNotContains(t, body, `hx-post="/api/v1/servers"`)
+			} else {
+				assertNotContains(t, body, "Register Server")
+				assertNotContains(t, body, `hx-post="/api/v1/servers"`)
+				assertNotContains(t, body, `action="/admin/servers"`)
+			}
+		})
+	}
+}
+
+func TestPublicServerDetailHidesPingGuidance(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/dashboard/1", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	assertNotContains(t, body, "POST /api/v1/servers/1/ping")
+	assertNotContains(t, body, "POST /api/v1/servers/{id}/ping")
+	assertNotContains(t, body, "POST /api/v1/servers/")
+}
+
+func TestPublicServerDetailRedactsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/dashboard/1", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	assertContains(t, body, "whyred")
+	assertContains(t, body, "Endpoint hidden on public view.")
+	assertContains(t, body, "Login as owner/admin for network details.")
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "127.0.0.1:9100")
+	assertNotContains(t, body, "port 9100")
+	assertNotContains(t, body, ">local<")
+}
+
+func TestLimitedRolesServerDetailRedactsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, role := range []string{model.RoleOperator, model.RoleReadonly} {
+		t.Run(role, func(t *testing.T) {
+			cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(104, role, role)}
+			status, body := getBody(t, app, "/dashboard/1", cookie)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+
+			assertContains(t, body, "Endpoint hidden on public view.")
+			assertContains(t, body, "Login as owner/admin for network details.")
+			assertNotContains(t, body, "127.0.0.1")
+			assertNotContains(t, body, "127.0.0.1:9100")
+			assertNotContains(t, body, "port 9100")
+			assertNotContains(t, body, ">local<")
+		})
+	}
+}
+
+func TestOwnerServerDetailShowsServerTopology(t *testing.T) {
+	app := newPublicTestApp(t)
+	cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(102, "owner", model.RoleOwner)}
+
+	status, body := getBody(t, app, "/dashboard/1", cookie)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	assertContains(t, body, "127.0.0.1:9100")
+	assertContains(t, body, "port 9100")
+	assertContains(t, body, ">local<")
+}
+
+func TestServerDetailRendersMetricMarkers(t *testing.T) {
+	app := newPublicTestApp(t)
+	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
+		CPUPercent:    12.5,
+		RAMUsedMB:     256,
+		RAMTotalMB:    1024,
+		DiskUsedGB:    8.5,
+		UptimeSeconds: 3600,
+		Online:        true,
+	}); err != nil {
+		t.Fatalf("record metrics: %v", err)
+	}
+
+	status, body := getBody(t, app, "/dashboard/1", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	for _, want := range []string{"CPU", "RAM", "Disk", "Uptime"} {
+		assertContains(t, body, want)
+	}
+}
+
+func TestHostStatsRequireAdminKey(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, path := range []string{"/api/v1/hoststats", "/api/v1/servers", "/api/v1/servers/1"} {
+		t.Run(path, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			rr := httptest.NewRecorder()
+
+			app.handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusUnauthorized {
+				t.Fatalf("status = %d, want %d", rr.Code, http.StatusUnauthorized)
+			}
+			assertNotContains(t, rr.Body.String(), "127.0.0.1")
+			assertNotContains(t, rr.Body.String(), "whyred")
+			assertNotContains(t, rr.Body.String(), "load1")
 		})
 	}
 }
