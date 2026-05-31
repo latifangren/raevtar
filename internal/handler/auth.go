@@ -90,6 +90,14 @@ func getSessionEntry(r *http.Request) (sessionEntry, bool) {
 	return sessions.get(cookie.Value)
 }
 
+func canManageServer(r *http.Request) bool {
+	entry, ok := getSessionEntry(r)
+	if !ok {
+		return false
+	}
+	return entry.role == model.RoleOwner || entry.role == model.RoleAdmin
+}
+
 // --- RBAC Middleware ---
 
 // adminRequired: any authenticated user (role = owner/admin/operator/readonly)

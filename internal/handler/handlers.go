@@ -93,9 +93,11 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderHTML(w, r, pages.Dashboard(pages.DashboardData{
-		CurrentPath: r.URL.Path,
-		Servers:     servers,
-		Categories:  categories,
+		CurrentPath:       r.URL.Path,
+		Servers:           servers,
+		Categories:        categories,
+		CanRegisterServer: canManageServer(r),
+		CanViewServerInfo: canManageServer(r),
 	}))
 }
 
@@ -122,10 +124,12 @@ func (h *Handler) dashboardDetail(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderHTML(w, r, pages.ServerDetail(pages.ServerDetailData{
-		CurrentPath: r.URL.Path,
-		Server:      server,
-		Metrics:     metrics,
-		Categories:  categories,
+		CurrentPath:       r.URL.Path,
+		Server:            server,
+		Metrics:           metrics,
+		Categories:        categories,
+		CanManageServer:   canManageServer(r),
+		CanViewServerInfo: canManageServer(r),
 	}))
 }
 
