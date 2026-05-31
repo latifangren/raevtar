@@ -68,12 +68,13 @@ func (s *MonitorService) RecordMetrics(serverID int64, m model.ServerMetric) err
 		return fmt.Errorf("get server: %w", err)
 	}
 
+	recordedAt := time.Now().UTC()
 	m.ServerID = serverID
-	m.RecordedAt = time.Now()
+	m.RecordedAt = recordedAt
 	if err := s.repos.Metric.Insert(&m); err != nil {
 		return fmt.Errorf("record metrics: %w", err)
 	}
-	if err := s.repos.Server.UpdateLastSeen(serverID); err != nil {
+	if err := s.repos.Server.UpdateLastSeen(serverID, recordedAt); err != nil {
 		return fmt.Errorf("update last seen: %w", err)
 	}
 	return nil

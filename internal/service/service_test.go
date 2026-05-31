@@ -3,6 +3,7 @@ package service
 import (
 	"path/filepath"
 	"testing"
+	"time"
 
 	"raevtar/internal/config"
 	"raevtar/internal/model"
@@ -177,6 +178,59 @@ func TestMonitorServiceMetricsAndServerAccess(t *testing.T) {
 	}
 	if metrics[0].CPUPercent != 12.5 || metrics[0].RAMUsedMB != 256 || metrics[0].RAMTotalMB != 1024 {
 		t.Fatalf("metric payload mismatch: %+v", metrics[0])
+	}
+	updated, err := state.svc.Monitor.GetServer(server.ID)
+	if err != nil {
+		t.Fatalf("get updated server: %v", err)
+	}
+	if updated.LastSeen == nil {
+		t.Fatalf("last seen should be set")
+	}
+	if !updated.LastSeen.Equal(metrics[0].RecordedAt) {
+		t.Fatalf("last seen = %s, recorded at = %s; want same timestamp", updated.LastSeen.Format(time.RFC3339Nano), metrics[0].RecordedAt.Format(time.RFC3339Nano))
+	}
+	if metrics[0].RecordedAt.Location() != time.UTC {
+		t.Fatalf("recorded at location = %s, want UTC", metrics[0].RecordedAt.Location())
+	}
+	if updated.LastSeen.Location() != time.UTC {
+		t.Fatalf("last seen location = %s, want UTC", updated.LastSeen.Location())
+	}
+}
+
+func TestMonitorServiceRecordMetricsKeepsLastSeenCloseToLatestMetric(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("fresh", "127.0.0.1", 9100, "local")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	before := time.Now().UTC()
+	if err := state.svc.Monitor.RecordMetrics(server.ID, model.ServerMetric{Online: true}); err != nil {
+		t.Fatalf("record metrics: %v", err)
+	}
+	after := time.Now().UTC()
+
+	metrics, err := state.svc.Monitor.GetRecentMetrics(server.ID, 1)
+	if err != nil {
+		t.Fatalf("get recent metrics: %v", err)
+	}
+	if len(metrics) != 1 {
+		t.Fatalf("metrics len = %d, want 1", len(metrics))
+	}
+
+	updated, err := state.svc.Monitor.GetServer(server.ID)
+	if err != nil {
+		t.Fatalf("get server: %v", err)
+	}
+	if updated.LastSeen == nil {
+		t.Fatalf("last seen should be set")
+	}
+	if updated.LastSeen.Before(before) || updated.LastSeen.After(after) {
+		t.Fatalf("last seen = %s, want between %s and %s", updated.LastSeen.Format(time.RFC3339Nano), before.Format(time.RFC3339Nano), after.Format(time.RFC3339Nano))
+	}
+	if !updated.LastSeen.Equal(metrics[0].RecordedAt) {
+		t.Fatalf("last seen = %s, latest metric recorded at = %s; want same timestamp", updated.LastSeen.Format(time.RFC3339Nano), metrics[0].RecordedAt.Format(time.RFC3339Nano))
 	}
 }
 

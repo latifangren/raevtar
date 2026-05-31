@@ -44,8 +44,8 @@ func (r *ServerRepo) Delete(id int64) error {
 	return err
 }
 
-func (r *ServerRepo) UpdateLastSeen(id int64) error {
-	_, err := r.db.Exec("UPDATE servers SET last_seen = datetime('now') WHERE id = ?", id)
+func (r *ServerRepo) UpdateLastSeen(id int64, lastSeen time.Time) error {
+	_, err := r.db.Exec("UPDATE servers SET last_seen = ? WHERE id = ?", lastSeen, id)
 	return err
 }
 
