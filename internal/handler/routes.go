@@ -21,7 +21,6 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
-	r.Use(middleware.RealIP)
 	r.Use(RateLimit)
 
 	// static files
@@ -49,12 +48,13 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		// Public (no auth needed)
 		r.Get("/login", h.adminLoginPage)
 		r.Post("/login", h.adminLogin)
-		r.Get("/logout", h.adminLogout)
 
 		// Protected — require valid session
 		r.Group(func(r chi.Router) {
 			r.Use(h.adminRequired)
+			r.Use(h.adminCSRF)
 			r.Get("/", h.adminIndex)
+			r.Post("/logout", h.adminLogout)
 
 			r.Group(func(r chi.Router) {
 				r.Use(h.ownerOrAdminRequired)
