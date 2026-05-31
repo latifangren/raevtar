@@ -31,6 +31,14 @@ type BlogPostData struct {
 	Categories  []model.Category
 }
 
+type LabData struct {
+	CurrentPath   string
+	Categories    []model.Category
+	PostCount     int
+	CategoryCount int
+	ServerCount   int
+}
+
 type DashboardData struct {
 	CurrentPath       string
 	Servers           []model.Server
