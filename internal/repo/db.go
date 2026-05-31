@@ -1,6 +1,7 @@
 package repo
 
 import (
+	"fmt"
 	"log/slog"
 
 	"github.com/jmoiron/sqlx"
@@ -47,6 +48,7 @@ func AutoMigrate(db *sqlx.DB) {
 		host TEXT NOT NULL,
 		port INTEGER DEFAULT 22,
 		tags TEXT DEFAULT '',
+		agent_token_hash TEXT NOT NULL DEFAULT '',
 		last_seen DATETIME,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
@@ -111,7 +113,42 @@ func AutoMigrate(db *sqlx.DB) {
 		slog.Error("migration failed", "error", err)
 		panic(err)
 	}
+	ensureColumn(db, "servers", "agent_token_hash", "TEXT NOT NULL DEFAULT ''")
 	slog.Info("database migrated")
+}
+
+func ensureColumn(db *sqlx.DB, table, column, definition string) {
+	rows, err := db.Queryx("PRAGMA table_info(" + table + ")")
+	if err != nil {
+		slog.Error("column inspection failed", "table", table, "column", column, "error", err)
+		panic(err)
+	}
+	defer rows.Close()
+
+	for rows.Next() {
+		var cid int
+		var name, colType string
+		var notNull int
+		var defaultValue any
+		var pk int
+		if err := rows.Scan(&cid, &name, &colType, &notNull, &defaultValue, &pk); err != nil {
+			slog.Error("column inspection scan failed", "table", table, "column", column, "error", err)
+			panic(err)
+		}
+		if name == column {
+			return
+		}
+	}
+	if err := rows.Err(); err != nil {
+		slog.Error("column inspection iteration failed", "table", table, "column", column, "error", err)
+		panic(err)
+	}
+
+	query := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, column, definition)
+	if _, err := db.Exec(query); err != nil {
+		slog.Error("column migration failed", "table", table, "column", column, "error", err)
+		panic(err)
+	}
 }
 
 // Repositories groups all repos

@@ -28,6 +28,7 @@ CREATE TABLE IF NOT EXISTS servers (
     host TEXT NOT NULL,
     port INTEGER DEFAULT 22,
     tags TEXT DEFAULT '',
+    agent_token_hash TEXT NOT NULL DEFAULT '',
     last_seen DATETIME,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

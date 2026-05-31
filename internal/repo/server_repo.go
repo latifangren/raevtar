@@ -28,8 +28,8 @@ func (r *ServerRepo) Create(s *model.Server) error {
 	now := time.Now()
 	s.CreatedAt = now
 	result, err := r.db.Exec(
-		"INSERT INTO servers (name, host, port, tags, created_at) VALUES (?, ?, ?, ?, ?)",
-		s.Name, s.Host, s.Port, s.Tags, now,
+		"INSERT INTO servers (name, host, port, tags, agent_token_hash, created_at) VALUES (?, ?, ?, ?, ?, ?)",
+		s.Name, s.Host, s.Port, s.Tags, s.AgentTokenHash, now,
 	)
 	if err != nil {
 		return err
@@ -46,5 +46,10 @@ func (r *ServerRepo) Delete(id int64) error {
 
 func (r *ServerRepo) UpdateLastSeen(id int64) error {
 	_, err := r.db.Exec("UPDATE servers SET last_seen = datetime('now') WHERE id = ?", id)
+	return err
+}
+
+func (r *ServerRepo) UpdateAgentTokenHash(id int64, hash string) error {
+	_, err := r.db.Exec("UPDATE servers SET agent_token_hash = ? WHERE id = ?", hash, id)
 	return err
 }
