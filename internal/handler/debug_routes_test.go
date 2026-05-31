@@ -7,6 +7,7 @@ import (
 	"net/http/httptest"
 	"net/url"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"testing"
 
@@ -171,7 +172,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Open Dashboard",
 				"Platform Showcase",
 				"Lab",
-				`href="/#lab"`,
+				`href="/lab"`,
 				`id="lab"`,
 				"Hello Raevtar",
 				`href="/blog"`,
@@ -180,15 +181,43 @@ func TestPublicRoutes(t *testing.T) {
 			},
 		},
 		{
+			name:           "lab page",
+			path:           "/lab",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "text/html",
+			wantContains: []string{
+				"Public lab bench",
+				"Signal Lab",
+				"Content Lab",
+				"Automation Lab",
+			},
+		},
+		{
 			name:           "blog index",
 			path:           "/blog",
 			wantStatus:     http.StatusOK,
 			wantContentTyp: "text/html",
 			wantContains: []string{
+				"Field Notes",
+				"Latest dispatches",
 				"Blog",
 				"Hello Raevtar",
+				"Read dispatch",
 				`href="/blog?category=devops"`,
 				`href="/blog/hello-raevtar"`,
+			},
+		},
+		{
+			name:           "blog detail",
+			path:           "/blog/hello-raevtar",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "text/html",
+			wantContains: []string{
+				"Signal brief",
+				"Filed under",
+				"Back to blog",
+				"Hello Raevtar",
+				"Baseline route test.",
 			},
 		},
 		{
@@ -199,11 +228,21 @@ func TestPublicRoutes(t *testing.T) {
 			wantContains: []string{
 				"Server Dashboard",
 				"Monitor Grid",
+				"Online",
+				"Stale",
+				"Offline",
+				"last agent signal",
+				"grid refresh every 30s",
 				"whyred",
 				"Hidden on public view",
 				"redacted",
 				`href="/dashboard/1"`,
 				`id="server-list"`,
+				`hx-get="/dashboard"`,
+				`hx-trigger="every 30s"`,
+				`hx-select="#server-list"`,
+				`hx-target="#server-list"`,
+				`hx-swap="outerHTML"`,
 			},
 		},
 		{
@@ -263,10 +302,45 @@ func TestPublicDashboardRedactsServerTopology(t *testing.T) {
 	assertContains(t, body, "Hidden on public view")
 	assertContains(t, body, "redacted")
 	assertContains(t, body, "tagged node")
+	assertContains(t, body, "last agent signal")
+	assertContains(t, body, "grid refresh every 30s")
+	assertContains(t, body, "Online")
+	assertContains(t, body, "Stale")
+	assertContains(t, body, "Offline")
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, ">9100<")
 	assertNotContains(t, body, ">local<")
+	assertNotContains(t, body, "agent token")
+	assertNotContains(t, body, "raevtar-agent.sh")
+	assertNotContains(t, body, "POST /api/v1/servers")
+	assertNotContains(t, body, "Register Server")
+	assertNotContains(t, body, "host or IP")
+	assertNotContains(t, body, "tags (comma separated)")
+	assertNotContains(t, body, `value="9100"`)
+}
+
+func TestPublicLabRedactsPrivateTopologyAndGuidance(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/lab", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	for _, want := range []string{"Public lab bench", "Signal Lab", "Content Lab", "Automation Lab"} {
+		assertContains(t, body, want)
+	}
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "127.0.0.1:9100")
+	assertNotContains(t, body, ">9100<")
+	assertNotContains(t, body, ">local<")
+	assertNotContains(t, body, "agent token")
+	assertNotContains(t, body, "raevtar-agent.sh")
+	assertNotContains(t, body, "POST /api/v1/servers")
+	assertNotContains(t, body, "host or IP")
+	assertNotContains(t, body, "tags (comma separated)")
+	assertNotContains(t, body, `value="9100"`)
 }
 
 func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
@@ -282,10 +356,23 @@ func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
 
 			assertContains(t, body, "Hidden on public view")
 			assertContains(t, body, "redacted")
+			assertContains(t, body, "last agent signal")
+			assertContains(t, body, "grid refresh every 30s")
+			assertContains(t, body, "Online")
+			assertContains(t, body, "Stale")
+			assertContains(t, body, "Offline")
+
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, ">9100<")
 			assertNotContains(t, body, ">local<")
+			assertNotContains(t, body, "agent token")
+			assertNotContains(t, body, "raevtar-agent.sh")
+			assertNotContains(t, body, "POST /api/v1/servers")
+			assertNotContains(t, body, "Register Server")
+			assertNotContains(t, body, "host or IP")
+			assertNotContains(t, body, "tags (comma separated)")
+			assertNotContains(t, body, `value="9100"`)
 		})
 	}
 }
@@ -338,6 +425,9 @@ func TestDashboardRegisterControlsAreRoleGated(t *testing.T) {
 				assertNotContains(t, body, "Register Server")
 				assertNotContains(t, body, `hx-post="/api/v1/servers"`)
 				assertNotContains(t, body, `action="/admin/servers"`)
+				assertNotContains(t, body, "host or IP")
+				assertNotContains(t, body, "tags (comma separated)")
+				assertNotContains(t, body, `value="9100"`)
 			}
 		})
 	}
@@ -385,10 +475,14 @@ func TestLimitedRolesServerDetailRedactsServerTopology(t *testing.T) {
 
 			assertContains(t, body, "Endpoint hidden on public view.")
 			assertContains(t, body, "Login as owner/admin for network details.")
+
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, "port 9100")
 			assertNotContains(t, body, ">local<")
+			assertNotContains(t, body, "agent token")
+			assertNotContains(t, body, "raevtar-agent.sh")
+			assertNotContains(t, body, "POST /api/v1/servers")
 		})
 	}
 }
@@ -458,11 +552,15 @@ func TestLimitedRolesServerDetailLiveRedactsServerTopology(t *testing.T) {
 
 			assertContains(t, body, "Endpoint hidden on public view.")
 			assertContains(t, body, "No telemetry received yet. Waiting for first agent signal.")
+
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, "port 9100")
 			assertNotContains(t, body, ">local<")
 			assertNotContains(t, body, `href="/admin/servers"`)
+			assertNotContains(t, body, "agent token")
+			assertNotContains(t, body, "raevtar-agent.sh")
+			assertNotContains(t, body, "POST /api/v1/servers")
 		})
 	}
 }
@@ -911,7 +1009,7 @@ func TestAdminDeleteRoutesRejectGET(t *testing.T) {
 	app := newPublicTestApp(t)
 	token := sessions.create(43, "owner", model.RoleOwner)
 
-	for _, path := range []string{
+	for i, path := range []string{
 		"/admin/posts/delete/1",
 		"/admin/servers/rotate-token/1",
 		"/admin/servers/delete/1",
@@ -919,6 +1017,7 @@ func TestAdminDeleteRoutesRejectGET(t *testing.T) {
 	} {
 		t.Run(path, func(t *testing.T) {
 			req := httptest.NewRequest(http.MethodGet, path, nil)
+			req.RemoteAddr = "198.51.100." + strconv.Itoa(i+1) + ":1234"
 			req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
 			rr := httptest.NewRecorder()
 
