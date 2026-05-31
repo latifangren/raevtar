@@ -142,24 +142,32 @@ func TagClass(name string) string {
 }
 
 func ServerStatusText(lastSeen *time.Time) string {
-	if lastSeen == nil {
-		return "Unknown"
+	switch {
+	case lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute:
+		return "Online"
+	case lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute:
+		return "Stale"
+	default:
+		return "Offline"
 	}
-	return "Online"
 }
 
 func DashboardStatusText(lastSeen *time.Time) string {
 	if lastSeen == nil {
-		return "Unknown"
+		return "Offline"
 	}
-	return "Online — " + lastSeen.Format("Jan 2 15:04")
+	return ServerStatusText(lastSeen) + " — " + lastSeen.Format("Jan 2 15:04")
 }
 
 func StatusDotClass(lastSeen *time.Time) string {
-	if lastSeen == nil {
+	switch {
+	case lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute:
+		return "bg-retro-sage"
+	case lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute:
 		return "bg-retro-wheat"
+	default:
+		return "bg-retro-blush"
 	}
-	return "bg-retro-sage"
 }
 
 func MetricDotClass(online bool) string {

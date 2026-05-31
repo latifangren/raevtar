@@ -106,17 +106,25 @@ func ServerCard(server model.Server) templ.Component {
 }
 
 func statusDotClass(lastSeen *time.Time) string {
-	if lastSeen == nil {
+	switch {
+	case lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute:
+		return "bg-retro-sage"
+	case lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute:
 		return "bg-retro-wheat"
+	default:
+		return "bg-retro-blush"
 	}
-	return "bg-retro-sage"
 }
 
 func serverStatusText(lastSeen *time.Time) string {
-	if lastSeen == nil {
-		return "Unknown"
+	switch {
+	case lastSeen != nil && time.Since(*lastSeen) < 2*time.Minute:
+		return "Online"
+	case lastSeen != nil && time.Since(*lastSeen) < 10*time.Minute:
+		return "Stale"
+	default:
+		return "Offline"
 	}
-	return "Online"
 }
 
 var _ = templruntime.GeneratedTemplate
