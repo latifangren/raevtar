@@ -3,7 +3,6 @@ package handler
 import (
 	"crypto/rand"
 	"encoding/hex"
-	"encoding/json"
 	"net/http"
 	"sync"
 	"time"
@@ -192,8 +191,7 @@ func (h *Handler) adminLogin(w http.ResponseWriter, r *http.Request) {
 		MaxAge:   int(sessionMaxAge.Seconds()),
 	})
 
-	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(map[string]string{"status": "ok", "redirect": "/admin"})
+	http.Redirect(w, r, "/admin", http.StatusSeeOther)
 }
 
 func (h *Handler) adminLogout(w http.ResponseWriter, r *http.Request) {

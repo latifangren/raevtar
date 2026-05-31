@@ -26,6 +26,7 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		DatabasePath: dbPath,
 		Domain:       "raevtar.test",
 		AdminUser:    "admin",
+		AdminPass:    "demo-pass-123",
 	}
 
 	db := repo.InitSQLite(cfg.DatabasePath)
@@ -60,6 +61,30 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 	}
 
 	return &publicTestApp{handler: New(svc, cfg)}
+}
+
+func TestAdminLoginRedirectsToDashboard(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	form := url.Values{
+		"username": {"admin"},
+		"password": {"demo-pass-123"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin" {
+		t.Fatalf("Location = %q, want /admin", got)
+	}
+	if strings.Contains(rr.Body.String(), `"redirect":"/admin"`) {
+		t.Fatalf("login returned JSON redirect body: %s", rr.Body.String())
+	}
 }
 
 func TestPublicRoutes(t *testing.T) {
