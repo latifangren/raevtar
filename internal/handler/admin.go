@@ -25,6 +25,8 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 	users, _ := h.svc.Repos.User.List()
 	userCount := len(users)
 
+	stats := collectHostStats()
+
 	// Calculate online/offline + build server rows
 	onlineCount := 0
 	var serverRows string
@@ -34,10 +36,10 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 			onlineCount++
 		}
 
-		statusDot := "bg-red-500"
+		statusDot := "bg-rose-400"
 		statusText := "Offline"
 		if online {
-			statusDot = "bg-green-500"
+			statusDot = "bg-emerald-400"
 			statusText = "Online"
 		}
 
@@ -46,95 +48,93 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 			lastSeenStr = s.LastSeen.Local().Format("15:04")
 		}
 
-		serverRows += `<div class="flex items-center justify-between p-4 bg-zinc-900 border border-zinc-800 rounded-lg">
+		serverRows += `<div class="flex items-center justify-between p-4 bg-white border-2 border-black">
 			<div class="flex items-center gap-3">
-				<span class="relative flex h-2.5 w-2.5">
-					<span class="` + statusDot + ` inline-flex h-2.5 w-2.5 rounded-full"></span>
-				</span>
+				<span class="inline-block w-3 h-3 border-2 border-black ` + statusDot + `"></span>
 				<div>
-					<p class="text-sm font-medium text-white">` + s.Name + `</p>
-					<p class="text-xs text-zinc-500 font-mono">` + s.Host + `:` + itoa(s.Port) + `</p>
+					<p class="text-sm font-bold text-black">` + s.Name + `</p>
+					<p class="text-xs font-mono text-neutral-500">` + s.Host + `:` + itoa(s.Port) + `</p>
 				</div>
 			</div>
 			<div class="flex items-center gap-4">
-				<span class="text-xs text-zinc-500 font-mono">` + lastSeenStr + `</span>
-				<span class="text-xs px-2 py-0.5 rounded-full font-medium ` + textColorForStatus(statusText) + ` ` + bgColorForStatus(statusText) + `">` + statusText + `</span>
+				<span class="text-xs font-mono text-neutral-500">` + lastSeenStr + `</span>
+				<span class="text-xs px-2 py-0.5 font-bold border-2 border-black ` + bgColorForStatus(statusText) + ` ` + textColorForStatus(statusText) + `">` + statusText + `</span>
 			</div>
 		</div>`
 	}
 
 	if serverRows == "" {
-		serverRows = `<div class="p-6 text-center text-zinc-500 text-sm">No servers registered</div>`
+		serverRows = `<div class="p-6 text-center text-neutral-500 font-bold text-sm">No servers registered</div>`
 	}
 
 	heroStatusText := "All systems operational"
-	heroStatusColor := "text-green-400"
-	heroDotColor := "bg-green-500"
-	heroPingColor := "bg-green-400"
+	heroStatusColor := "text-emerald-600"
+	heroDotColor := "bg-emerald-400"
+	heroPingColor := "bg-emerald-400"
 	if onlineCount == 0 && serverCount > 0 {
 		heroStatusText = "No servers online"
-		heroStatusColor = "text-red-400"
-		heroDotColor = "bg-red-500"
-		heroPingColor = "bg-red-400"
+		heroStatusColor = "text-rose-600"
+		heroDotColor = "bg-rose-400"
+		heroPingColor = "bg-rose-400"
 	} else if serverCount == 0 {
 		heroStatusText = "No servers registered"
-		heroStatusColor = "text-zinc-500"
-		heroDotColor = "bg-zinc-500"
-		heroPingColor = "bg-zinc-400"
+		heroStatusColor = "text-neutral-500"
+		heroDotColor = "bg-neutral-300"
+		heroPingColor = "bg-neutral-300"
 	}
 
 	content := `<div class="space-y-6">
 
 		<!-- Hero Metric -->
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6 md:p-8">
+		<div class="bg-white border-2 border-black p-6 md:p-8 shadow-[4px_4px_0px_0px_#000]">
 			<div class="flex items-start justify-between mb-4">
 				<div>
-					<p class="text-xs font-medium text-zinc-500 uppercase tracking-widest">Online Servers</p>
+					<p class="text-xs font-black uppercase tracking-widest text-neutral-500">Online Servers</p>
 				</div>
-				<div class="flex items-center gap-2 px-3 py-1.5 bg-zinc-950 border border-zinc-800 rounded-full">
-					<span class="relative flex h-2 w-2">
-						<span class="animate-ping absolute inline-flex h-full w-full rounded-full ` + heroPingColor + ` opacity-75"></span>
-						<span class="relative inline-flex rounded-full h-2 w-2 ` + heroDotColor + `"></span>
+				<div class="flex items-center gap-2 px-3 py-1.5 border-2 border-black bg-white">
+					<span class="relative flex h-3 w-3">
+						<span class="animate-ping absolute inline-flex h-full w-full rounded-none ` + heroPingColor + ` opacity-75"></span>
+						<span class="relative inline-flex rounded-none h-3 w-3 border-2 border-black ` + heroDotColor + `"></span>
 					</span>
-					<span class="text-xs text-zinc-400 font-mono">` + itoa(onlineCount) + `/` + itoa(serverCount) + `</span>
+					<span class="text-xs font-mono font-bold text-black">` + itoa(onlineCount) + `/` + itoa(serverCount) + `</span>
 				</div>
 			</div>
 			<div class="flex items-baseline gap-2">
-				<span class="text-5xl md:text-6xl font-bold font-mono tracking-tight text-white">` + itoa(onlineCount) + `</span>
-				<span class="text-sm text-zinc-500 lowercase">/ ` + itoa(serverCount) + ` servers</span>
+				<span class="text-5xl md:text-6xl font-black font-mono tracking-tight text-black">` + itoa(onlineCount) + `</span>
+				<span class="text-sm font-bold text-neutral-500 lowercase">/ ` + itoa(serverCount) + ` servers</span>
 			</div>
-			<p class="text-xs mt-2 ` + heroStatusColor + `">` + heroStatusText + `</p>
+			<p class="text-xs mt-2 font-bold ` + heroStatusColor + `">` + heroStatusText + `</p>
 		</div>
 
 		<!-- Metric Cards Row -->
-		<div class="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
-			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-5">
-				<p class="text-xs text-zinc-500 font-medium mb-1">Posts</p>
-				<p class="text-2xl md:text-3xl font-bold font-mono text-white">` + itoa(postCount) + `</p>
-				<p class="text-xs text-zinc-600 mt-0.5">total articles</p>
+		<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+			<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+				<p class="text-xs font-black uppercase text-neutral-500 mb-1">Posts</p>
+				<p class="text-3xl font-black font-mono text-black">` + itoa(postCount) + `</p>
+				<p class="text-xs font-bold text-neutral-500 mt-0.5">total articles</p>
 			</div>
-			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-5">
-				<p class="text-xs text-zinc-500 font-medium mb-1">Servers</p>
-				<p class="text-2xl md:text-3xl font-bold font-mono text-white">` + itoa(serverCount) + `</p>
-				<p class="text-xs text-zinc-600 mt-0.5">registered</p>
+			<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+				<p class="text-xs font-black uppercase text-neutral-500 mb-1">Servers</p>
+				<p class="text-3xl font-black font-mono text-black">` + itoa(serverCount) + `</p>
+				<p class="text-xs font-bold text-neutral-500 mt-0.5">registered</p>
 			</div>
-			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-5">
-				<p class="text-xs text-zinc-500 font-medium mb-1">Users</p>
-				<p class="text-2xl md:text-3xl font-bold font-mono text-white">` + itoa(userCount) + `</p>
-				<p class="text-xs text-zinc-600 mt-0.5">accounts</p>
+			<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+				<p class="text-xs font-black uppercase text-neutral-500 mb-1">Users</p>
+				<p class="text-3xl font-black font-mono text-black">` + itoa(userCount) + `</p>
+				<p class="text-xs font-bold text-neutral-500 mt-0.5">accounts</p>
 			</div>
-			<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-4 md:p-5">
-				<p class="text-xs text-zinc-500 font-medium mb-1">System</p>
-				<p class="text-2xl md:text-3xl font-bold font-mono text-green-400">OK</p>
-				<p class="text-xs text-zinc-600 mt-0.5">binary running</p>
+			<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+				<p class="text-xs font-black uppercase text-neutral-500 mb-1">CPU Load</p>
+				<p class="text-3xl font-black font-mono ` + cpuLoadColor(stats.CPU.Load1, stats.CPU.Cores) + `">` + strconv.FormatFloat(stats.CPU.Load1, 'f', 2, 64) + `</p>
+				<p class="text-xs font-bold text-neutral-500 mt-0.5">` + itoa(stats.CPU.Cores) + ` cores &middot; 5m ` + strconv.FormatFloat(stats.CPU.Load5, 'f', 2, 64) + `</p>
 			</div>
 		</div>
 
 		<!-- Server List -->
 		<div>
 			<div class="flex items-center justify-between mb-3">
-				<h2 class="text-sm font-semibold text-zinc-200">Server Status</h2>
-				<a href="/admin/servers" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors no-underline">Manage →</a>
+				<h2 class="text-sm font-black uppercase">Server Status</h2>
+				<a href="/admin/servers" class="text-xs font-bold no-underline hover:bg-yellow-200">Manage &rarr;</a>
 			</div>
 			<div class="space-y-2">
 				` + serverRows + `
@@ -143,24 +143,55 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 
 		<!-- Quick Links -->
 		<div>
-			<h2 class="text-sm font-semibold text-zinc-200 mb-3">Quick Actions</h2>
-			<div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-				<a href="/admin/posts" class="block bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-green-500/30 transition-colors no-underline group">
-					<p class="text-sm text-zinc-400 group-hover:text-white transition-colors">Posts</p>
-					<p class="text-xs text-zinc-600 mt-0.5">Manage articles</p>
+			<h2 class="text-sm font-black uppercase mb-3">Quick Actions</h2>
+			<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+				<a href="/admin/posts" class="block bg-white border-2 border-black p-5 shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline group">
+					<p class="text-sm font-black text-black">Posts</p>
+					<p class="text-xs font-bold text-neutral-500 mt-0.5">Manage articles</p>
 				</a>
-				<a href="/admin/servers" class="block bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-green-500/30 transition-colors no-underline group">
-					<p class="text-sm text-zinc-400 group-hover:text-white transition-colors">Servers</p>
-					<p class="text-xs text-zinc-600 mt-0.5">Add or remove</p>
+				<a href="/admin/servers" class="block bg-white border-2 border-black p-5 shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline group">
+					<p class="text-sm font-black text-black">Servers</p>
+					<p class="text-xs font-bold text-neutral-500 mt-0.5">Add or remove</p>
 				</a>
-				<a href="/admin/manage-users" class="block bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-green-500/30 transition-colors no-underline group">
-					<p class="text-sm text-zinc-400 group-hover:text-white transition-colors">Users</p>
-					<p class="text-xs text-zinc-600 mt-0.5">Manage accounts</p>
+				<a href="/admin/manage-users" class="block bg-white border-2 border-black p-5 shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline group">
+					<p class="text-sm font-black text-black">Users</p>
+					<p class="text-xs font-bold text-neutral-500 mt-0.5">Manage accounts</p>
 				</a>
-				<a href="/admin/audit-log" class="block bg-zinc-900 border border-zinc-800 rounded-xl p-4 hover:border-green-500/30 transition-colors no-underline group">
-					<p class="text-sm text-zinc-400 group-hover:text-white transition-colors">Audit</p>
-					<p class="text-xs text-zinc-600 mt-0.5">View activity log</p>
+				<a href="/admin/audit-log" class="block bg-white border-2 border-black p-5 shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline group">
+					<p class="text-sm font-black text-black">Audit</p>
+					<p class="text-xs font-bold text-neutral-500 mt-0.5">View activity log</p>
 				</a>
+			</div>
+		</div>
+
+		<!-- System Health -->
+		<div>
+			<h2 class="text-sm font-black uppercase mb-3">System Health</h2>
+			<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+				<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+					<div class="flex items-center justify-between mb-1.5">
+						<p class="text-xs font-black uppercase text-neutral-500">RAM</p>
+						<p class="text-xs font-mono font-bold text-neutral-600">` + formatBytes(stats.RAM.Used) + ` / ` + formatBytes(stats.RAM.Total) + `</p>
+					</div>
+					<div class="w-full bg-neutral-200 border-2 border-black h-4 mt-1">
+						<div class="` + barColor(stats.RAM.Percent, 90, 75) + ` h-full transition-all" style="width: ` + strconv.FormatFloat(stats.RAM.Percent, 'f', 0, 64) + `%"></div>
+					</div>
+				</div>
+				<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+					<div class="flex items-center justify-between mb-1.5">
+						<p class="text-xs font-black uppercase text-neutral-500">Disk</p>
+						<p class="text-xs font-mono font-bold text-neutral-600">` + formatBytes(stats.Disk.Used) + ` / ` + formatBytes(stats.Disk.Total) + `</p>
+					</div>
+					<div class="w-full bg-neutral-200 border-2 border-black h-4 mt-1">
+						<div class="` + barColor(stats.Disk.Percent, 90, 75) + ` h-full transition-all" style="width: ` + strconv.FormatFloat(stats.Disk.Percent, 'f', 0, 64) + `%"></div>
+					</div>
+				</div>
+				<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000]">
+					<div class="flex items-center justify-between">
+						<p class="text-xs font-black uppercase text-neutral-500">Temperature</p>
+						<p class="text-sm font-mono font-black ` + tempColor(stats.Temp) + `">` + strconv.FormatFloat(stats.Temp, 'f', 1, 64) + `&deg;C</p>
+					</div>
+				</div>
 			</div>
 		</div>
 
@@ -171,18 +202,52 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(html))
 }
 
+func cpuLoadColor(load float64, cores int) string {
+	ratio := load / float64(cores)
+	switch {
+	case ratio > 0.9:
+		return "text-rose-600"
+	case ratio > 0.7:
+		return "text-amber-600"
+	default:
+		return "text-emerald-600"
+	}
+}
+
+func barColor(percent float64, high, mid float64) string {
+	switch {
+	case percent > high:
+		return "bg-rose-400"
+	case percent > mid:
+		return "bg-amber-300"
+	default:
+		return "bg-emerald-400"
+	}
+}
+
+func tempColor(temp float64) string {
+	switch {
+	case temp > 80:
+		return "text-rose-600"
+	case temp > 60:
+		return "text-amber-600"
+	default:
+		return "text-emerald-600"
+	}
+}
+
 func textColorForStatus(status string) string {
 	if status == "Online" {
-		return "text-green-400"
+		return "text-black"
 	}
-	return "text-red-400"
+	return "text-black"
 }
 
 func bgColorForStatus(status string) string {
 	if status == "Online" {
-		return "bg-green-500/10"
+		return "bg-emerald-400"
 	}
-	return "bg-red-500/10"
+	return "bg-rose-400"
 }
 
 // --- Admin: Manage Users ---
@@ -198,13 +263,13 @@ func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
 		canManage := model.CanManage(entry.role, u.Role)
 		delBtn := ""
 		if canManage && u.Username != entry.username {
-			delBtn = `<a href="/admin/manage-users/delete/` + itoa64(u.ID) + `" class="text-xs text-zinc-600 hover:text-red-400 transition-colors no-underline" onclick="return confirm('Hapus user ` + u.Username + `?')">✕</a>`
+			delBtn = `<a href="/admin/manage-users/delete/` + itoa64(u.ID) + `" class="text-xs font-bold text-neutral-500 hover:bg-rose-200 px-2 py-1 border-2 border-black no-underline" onclick="return confirm('Hapus user ` + u.Username + `?')">✕</a>`
 		}
 
-		rows += `<tr class="border-b border-zinc-800 hover:bg-zinc-800/30">
-			<td class="py-3 px-4 text-sm text-white font-medium">` + u.Username + `</td>
+		rows += `<tr class="border-b-2 border-black">
+			<td class="py-3 px-4 text-sm font-bold text-black">` + u.Username + `</td>
 			<td class="py-3 px-4">` + roleBadge + `</td>
-			<td class="py-3 px-4 text-sm text-zinc-500 font-mono">` + u.CreatedAt.Format("2006-01-02") + `</td>
+			<td class="py-3 px-4 text-sm font-mono font-bold text-neutral-500">` + u.CreatedAt.Format("2006-01-02") + `</td>
 			<td class="py-3 px-4 text-right text-xs">
 				` + delBtn + `
 			</td>
@@ -227,19 +292,19 @@ func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
 
 		<div class="flex items-center justify-between">
 			<div>
-				<a href="/admin" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors no-underline">&larr; Dashboard</a>
-				<h1 class="text-xl font-bold text-white mt-1">Manage Users</h1>
+				<a href="/admin" class="text-xs font-bold no-underline hover:bg-yellow-200">&larr; Dashboard</a>
+				<h1 class="text-xl font-black uppercase text-black mt-1">Manage Users</h1>
 			</div>
-			<span class="text-xs text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800 font-mono">` + itoa(len(users)) + ` total</span>
+			<span class="text-xs font-bold bg-white border-2 border-black px-2.5 py-1 font-mono">` + itoa(len(users)) + ` total</span>
 		</div>
 
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-x-auto">
+		<div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000] overflow-x-auto">
 			<table class="w-full text-left">
 				<thead>
-					<tr class="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
-						<th class="py-3 px-4 font-medium">Username</th>
-						<th class="py-3 px-4 font-medium">Role</th>
-						<th class="py-3 px-4 font-medium">Created</th>
+					<tr class="border-b-2 border-black text-xs uppercase bg-black text-white">
+						<th class="py-3 px-4 font-bold">Username</th>
+						<th class="py-3 px-4 font-bold">Role</th>
+						<th class="py-3 px-4 font-bold">Created</th>
 						<th class="py-3 px-4"></th>
 					</tr>
 				</thead>
@@ -249,23 +314,23 @@ func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
 			</table>
 		</div>
 
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-			<h2 class="text-sm font-semibold text-zinc-200 mb-4">Add New User</h2>
+		<div class="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_#000]">
+			<h2 class="text-sm font-black uppercase text-black mb-4">Add New User</h2>
 			<form method="POST" action="/admin/manage-users" class="grid grid-cols-1 md:grid-cols-3 gap-3">
 				<div>
-					<input type="text" name="username" required placeholder="Username" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors">
+					<input type="text" name="username" required placeholder="Username" class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black">
 				</div>
 				<div>
-					<input type="password" name="password" required placeholder="Password (min 8 chars)" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors">
+					<input type="password" name="password" required placeholder="Password (min 8 chars)" class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black">
 				</div>
 				<div>
-					<select name="role" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-green-500/50 transition-colors">
+					<select name="role" class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold text-black focus:outline-none focus:ring-2 focus:ring-black">
 						<option value="">Select role...</option>
 						` + roleOptions + `
 					</select>
 				</div>
 				<div class="md:col-span-3 flex justify-end">
-					<button type="submit" class="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-medium transition-colors">Add User</button>
+					<button type="submit" class="px-5 py-2 border-2 border-black bg-emerald-400 text-black font-bold text-sm shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Add User</button>
 				</div>
 			</form>
 		</div>
@@ -339,24 +404,13 @@ func (h *Handler) adminDeleteUser(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// Can't delete yourself
-	if targetUser.Username == entry.username {
-		http.Error(w, "cannot delete yourself", http.StatusForbidden)
-		return
-	}
-
-	// Can't delete users of higher privilege
 	if !model.CanManage(entry.role, targetUser.Role) {
-		http.Error(w, "you cannot delete this user", http.StatusForbidden)
+		http.Error(w, "forbidden", http.StatusForbidden)
 		return
 	}
 
-	if err := h.svc.Repos.User.Delete(id); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-		return
-	}
-
-	h.svc.Repos.Audit.Insert(entry.username, "DELETE_USER", "deleted user "+targetUser.Username, r.RemoteAddr)
+	h.svc.Repos.Audit.Insert(entry.username, "DELETE_USER", "deleted user: "+targetUser.Username+" (role: "+targetUser.Role+")", r.RemoteAddr)
+	h.svc.Repos.User.Delete(id)
 	http.Redirect(w, r, "/admin/manage-users", http.StatusSeeOther)
 }
 
@@ -367,54 +421,50 @@ func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
 
 	var rows string
 	for _, l := range logs {
-		actionBadge := ""
-		switch l.Action {
-		case "LOGIN", "LOGIN_SUCCESS":
-			actionBadge = `<span class="text-xs px-2 py-0.5 rounded-md bg-green-500/10 text-green-400 border border-green-500/20 font-mono">` + l.Action + `</span>`
-		case "LOGIN_FAILED":
-			actionBadge = `<span class="text-xs px-2 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/20 font-mono">` + l.Action + `</span>`
-		case "LOGOUT":
-			actionBadge = `<span class="text-xs px-2 py-0.5 rounded-md bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 font-mono">` + l.Action + `</span>`
-		case "CREATE_POST", "CREATE_USER", "CREATE_SERVER":
-			actionBadge = `<span class="text-xs px-2 py-0.5 rounded-md bg-blue-500/10 text-blue-400 border border-blue-500/20 font-mono">` + l.Action + `</span>`
-		case "DELETE_POST", "DELETE_USER", "DELETE_SERVER":
-			actionBadge = `<span class="text-xs px-2 py-0.5 rounded-md bg-red-500/10 text-red-400 border border-red-500/20 font-mono">` + l.Action + `</span>`
+		var actionBadge string
+		switch {
+		case strings.Contains(l.Action, "LOGIN"):
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-emerald-300 text-black font-mono">` + l.Action + `</span>`
+		case strings.Contains(l.Action, "CREATE"):
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-blue-300 text-black font-mono">` + l.Action + `</span>`
+		case strings.Contains(l.Action, "DELETE"):
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-rose-300 text-black font-mono">` + l.Action + `</span>`
 		default:
-			actionBadge = `<span class="text-xs px-2 py-0.5 rounded-md bg-zinc-500/10 text-zinc-400 border border-zinc-500/20 font-mono">` + l.Action + `</span>`
+			actionBadge = `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black font-mono">` + l.Action + `</span>`
 		}
 
-		rows += `<tr class="border-b border-zinc-800 hover:bg-zinc-800/30 text-xs">
-			<td class="py-2.5 px-4 text-zinc-500 font-mono whitespace-nowrap">` + l.CreatedAt.Format("02 Jan 15:04") + `</td>
+		rows += `<tr class="border-b-2 border-black text-xs">
+			<td class="py-2.5 px-4 text-neutral-500 font-mono font-bold whitespace-nowrap">` + l.CreatedAt.Format("02 Jan 15:04") + `</td>
 			<td class="py-2.5 px-4">` + actionBadge + `</td>
-			<td class="py-2.5 px-4 text-zinc-300">` + l.User + `</td>
-			<td class="py-2.5 px-4 text-zinc-500 max-w-xs truncate">` + l.Details + `</td>
-			<td class="py-2.5 px-4 text-zinc-600 font-mono">` + l.IP + `</td>
+			<td class="py-2.5 px-4 font-bold text-black">` + l.User + `</td>
+			<td class="py-2.5 px-4 text-neutral-600 font-bold max-w-xs truncate">` + l.Details + `</td>
+			<td class="py-2.5 px-4 text-neutral-500 font-mono">` + l.IP + `</td>
 		</tr>`
 	}
 
 	if rows == "" {
-		rows = `<tr><td colspan="5" class="py-8 text-center text-zinc-600 text-sm">No audit log entries yet</td></tr>`
+		rows = `<tr><td colspan="5" class="py-8 text-center text-neutral-500 font-bold text-sm">No audit log entries yet</td></tr>`
 	}
 
 	content := `<div class="space-y-6">
 
 		<div class="flex items-center justify-between">
 			<div>
-				<a href="/admin" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors no-underline">&larr; Dashboard</a>
-				<h1 class="text-xl font-bold text-white mt-1">Audit Log</h1>
+				<a href="/admin" class="text-xs font-bold no-underline hover:bg-yellow-200">&larr; Dashboard</a>
+				<h1 class="text-xl font-black uppercase text-black mt-1">Audit Log</h1>
 			</div>
-			<span class="text-xs text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800 font-mono">` + itoa(len(logs)) + ` entries</span>
+			<span class="text-xs font-bold bg-white border-2 border-black px-2.5 py-1 font-mono">` + itoa(len(logs)) + ` entries</span>
 		</div>
 
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-x-auto">
+		<div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000] overflow-x-auto">
 			<table class="w-full text-left">
 				<thead>
-					<tr class="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
-						<th class="py-3 px-4 font-medium">Time</th>
-						<th class="py-3 px-4 font-medium">Action</th>
-						<th class="py-3 px-4 font-medium">User</th>
-						<th class="py-3 px-4 font-medium">Details</th>
-						<th class="py-3 px-4 font-medium">IP</th>
+					<tr class="border-b-2 border-black text-xs uppercase bg-black text-white">
+						<th class="py-3 px-4 font-bold">Time</th>
+						<th class="py-3 px-4 font-bold">Action</th>
+						<th class="py-3 px-4 font-bold">User</th>
+						<th class="py-3 px-4 font-bold">Details</th>
+						<th class="py-3 px-4 font-bold">IP</th>
 					</tr>
 				</thead>
 				<tbody>
@@ -438,26 +488,26 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 
 	var rows string
 	for _, p := range posts {
-		catColor := "bg-cyan-500/10 text-cyan-400 border-cyan-500/20"
+		catColor := "bg-cyan-300 text-black border-black"
 		switch p.CategorySlug {
 		case "ai-agent":
-			catColor = "bg-purple-500/10 text-purple-400 border-purple-500/20"
+			catColor = "bg-purple-300 text-black border-black"
 		case "security":
-			catColor = "bg-red-500/10 text-red-400 border-red-500/20"
+			catColor = "bg-rose-300 text-black border-black"
 		case "kernel-embedded":
-			catColor = "bg-orange-500/10 text-orange-400 border-orange-500/20"
+			catColor = "bg-orange-300 text-black border-black"
 		case "devops":
-			catColor = "bg-blue-500/10 text-blue-400 border-blue-500/20"
+			catColor = "bg-blue-300 text-black border-black"
 		case "tools":
-			catColor = "bg-green-500/10 text-green-400 border-green-500/20"
+			catColor = "bg-emerald-300 text-black border-black"
 		}
 
-		rows += `<tr class="border-b border-zinc-800 hover:bg-zinc-800/30">
-			<td class="py-3 px-4 text-sm text-white max-w-[300px] truncate">` + p.Title + `</td>
-			<td class="py-3 px-4"><span class="text-xs px-2 py-0.5 rounded-md font-mono border ` + catColor + `">` + p.CategorySlug + `</span></td>
-			<td class="py-3 px-4 text-sm text-zinc-500 font-mono">` + p.CreatedAt.Format("2006-01-02") + `</td>
+		rows += `<tr class="border-b-2 border-black">
+			<td class="py-3 px-4 text-sm font-bold text-black max-w-[300px] truncate">` + p.Title + `</td>
+			<td class="py-3 px-4"><span class="text-xs px-2 py-0.5 font-bold border-2 border-black font-mono ` + catColor + `">` + p.CategorySlug + `</span></td>
+			<td class="py-3 px-4 text-sm font-mono font-bold text-neutral-500">` + p.CreatedAt.Format("2006-01-02") + `</td>
 			<td class="py-3 px-4 text-right">
-				<a href="/admin/posts/delete/` + itoa64(p.ID) + `" class="text-xs text-zinc-600 hover:text-red-400 transition-colors no-underline" onclick="return confirm('Hapus post ini?')">✕</a>
+				<a href="/admin/posts/delete/` + itoa64(p.ID) + `" class="text-xs font-bold text-neutral-500 hover:bg-rose-200 px-2 py-1 border-2 border-black no-underline" onclick="return confirm('Hapus post ini?')">✕</a>
 			</td>
 		</tr>`
 	}
@@ -471,19 +521,19 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 
 		<div class="flex items-center justify-between">
 			<div>
-				<a href="/admin" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors no-underline">&larr; Dashboard</a>
-				<h1 class="text-xl font-bold text-white mt-1">Manage Posts</h1>
+				<a href="/admin" class="text-xs font-bold no-underline hover:bg-yellow-200">&larr; Dashboard</a>
+				<h1 class="text-xl font-black uppercase text-black mt-1">Manage Posts</h1>
 			</div>
-			<span class="text-xs text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800 font-mono">` + itoa(len(posts)) + ` total</span>
+			<span class="text-xs font-bold bg-white border-2 border-black px-2.5 py-1 font-mono">` + itoa(len(posts)) + ` total</span>
 		</div>
 
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl overflow-x-auto">
+		<div class="bg-white border-2 border-black shadow-[4px_4px_0px_0px_#000] overflow-x-auto">
 			<table class="w-full text-left">
 				<thead>
-					<tr class="border-b border-zinc-800 text-xs uppercase tracking-wider text-zinc-500">
-						<th class="py-3 px-4 font-medium">Title</th>
-						<th class="py-3 px-4 font-medium">Category</th>
-						<th class="py-3 px-4 font-medium">Date</th>
+					<tr class="border-b-2 border-black text-xs uppercase bg-black text-white">
+						<th class="py-3 px-4 font-bold">Title</th>
+						<th class="py-3 px-4 font-bold">Category</th>
+						<th class="py-3 px-4 font-bold">Date</th>
 						<th class="py-3 px-4"></th>
 					</tr>
 				</thead>
@@ -493,25 +543,25 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 			</table>
 		</div>
 
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-			<h2 class="text-sm font-semibold text-zinc-200 mb-4">Create New Post</h2>
+		<div class="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_#000]">
+			<h2 class="text-sm font-black uppercase text-black mb-4">Create New Post</h2>
 			<form method="POST" action="/admin/posts" class="space-y-4">
 				<div>
-					<label class="block text-sm text-zinc-500 mb-1">Title</label>
-					<input type="text" name="title" required class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors" placeholder="Post title">
+					<label class="block text-sm font-bold text-neutral-600 mb-1">Title</label>
+					<input type="text" name="title" required class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold text-black placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black" placeholder="Post title">
 				</div>
 				<div>
-					<label class="block text-sm text-zinc-500 mb-1">Category</label>
-					<select name="category_slug" required class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white focus:outline-none focus:border-green-500/50 transition-colors">
+					<label class="block text-sm font-bold text-neutral-600 mb-1">Category</label>
+					<select name="category_slug" required class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold text-black focus:outline-none focus:ring-2 focus:ring-black">
 						<option value="">Select category</option>` + catOptions + `
 					</select>
 				</div>
 				<div>
-					<label class="block text-sm text-zinc-500 mb-1">Content (Markdown)</label>
-					<textarea name="content" rows="15" required class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white font-mono placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors" placeholder="Write in Markdown..."></textarea>
+					<label class="block text-sm font-bold text-neutral-600 mb-1">Content (Markdown)</label>
+					<textarea name="content" rows="15" required class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold text-black font-mono placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black" placeholder="Write in Markdown..."></textarea>
 				</div>
 				<div class="flex justify-end">
-					<button type="submit" class="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-medium transition-colors">Publish Post</button>
+					<button type="submit" class="px-5 py-2 border-2 border-black bg-emerald-400 text-black font-bold text-sm shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Publish Post</button>
 				</div>
 			</form>
 		</div>
@@ -581,15 +631,15 @@ func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 	for _, s := range servers {
 		online := s.LastSeen != nil && time.Since(*s.LastSeen) < 10*time.Minute
 
-		statusDot := "bg-red-500"
-		statusPing := "bg-red-400"
+		statusDot := "bg-rose-400"
+		statusPing := "bg-rose-400"
 		statusText := "Offline"
-		statusBadgeColor := "text-red-400"
+		statusBadgeColor := "text-black"
 		if online {
-			statusDot = "bg-green-500"
-			statusPing = "bg-green-400"
+			statusDot = "bg-emerald-400"
+			statusPing = "bg-emerald-400"
 			statusText = "Online"
-			statusBadgeColor = "text-green-400"
+			statusBadgeColor = "text-black"
 		}
 
 		lastSeenStr := "Never"
@@ -604,80 +654,81 @@ func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 			for _, t := range tags {
 				t = strings.TrimSpace(t)
 				if t != "" {
-					tagBadges += `<span class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-zinc-400 border border-zinc-700 font-mono">` + t + `</span>`
+					tagBadges += `<span class="text-xs px-2 py-0.5 font-bold border-2 border-black bg-neutral-200 text-black font-mono">` + t + `</span> `
 				}
 			}
 		}
 
-		cards += `<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-5 hover:border-zinc-700 transition-colors">
+		inlineStatus := statusText
+		cards += `<div class="bg-white border-2 border-black p-5 shadow-[4px_4px_0px_0px_#000] hover:shadow-[2px_2px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
 			<div class="flex items-start justify-between mb-4">
 				<div class="flex items-center gap-3">
-					<div class="w-9 h-9 rounded-lg bg-zinc-950 border border-zinc-700 flex items-center justify-center">
-						<span class="text-sm font-bold text-zinc-400 font-mono">` + s.Name[:min(len(s.Name), 2)] + `</span>
+					<div class="w-10 h-10 border-2 border-black bg-black flex items-center justify-center">
+						<span class="text-sm font-black text-white font-mono">` + s.Name[:min(len(s.Name), 2)] + `</span>
 					</div>
 					<div>
-						<p class="text-sm font-semibold text-white">` + s.Name + `</p>
-						<p class="text-xs text-zinc-500 font-mono">` + s.Host + `:` + itoa(s.Port) + `</p>
+						<p class="text-sm font-black text-black">` + s.Name + `</p>
+						<p class="text-xs font-mono font-bold text-neutral-500">` + s.Host + `:` + itoa(s.Port) + `</p>
 					</div>
 				</div>
 				<div class="flex items-center gap-2">
-					<span class="relative flex h-2.5 w-2.5">
-						<span class="animate-ping absolute inline-flex h-full w-full rounded-full ` + statusPing + ` opacity-75"></span>
-						<span class="relative inline-flex rounded-full h-2.5 w-2.5 ` + statusDot + `"></span>
+					<span class="relative flex h-3 w-3">
+						<span class="animate-ping absolute inline-flex h-full w-full rounded-none ` + statusPing + ` opacity-75"></span>
+						<span class="relative inline-flex rounded-none h-3 w-3 border-2 border-black ` + statusDot + `"></span>
 					</span>
-					<span class="text-xs font-medium ` + statusBadgeColor + `">` + statusText + `</span>
+					<span class="text-xs font-bold ` + statusBadgeColor + `">` + inlineStatus + `</span>
 				</div>
 			</div>
 			<div class="flex items-center justify-between">
-				<div class="flex flex-wrap gap-1.5">
+				<div class="flex flex-wrap gap-1">
 					` + tagBadges + `
 				</div>
-				<div class="flex items-center gap-3">
-					<span class="text-xs text-zinc-600">Last seen: ` + lastSeenStr + `</span>
-					<a href="/admin/servers/delete/` + itoa64(s.ID) + `" class="text-xs text-zinc-600 hover:text-red-400 transition-colors no-underline" onclick="return confirm('Hapus server ` + s.Name + `?')">✕</a>
+				<div class="flex items-center gap-3 text-xs font-mono font-bold text-neutral-500">
+					<span>Last seen: ` + lastSeenStr + `</span>
+					<a href="/admin/servers/delete/` + itoa64(s.ID) + `" class="font-bold text-neutral-500 hover:bg-rose-200 px-2 py-0.5 border-2 border-black no-underline" onclick="return confirm('Hapus server ` + s.Name + `?')">✕</a>
 				</div>
 			</div>
 		</div>`
 	}
 
 	if cards == "" {
-		cards = `<div class="p-10 text-center text-zinc-500 text-sm border border-dashed border-zinc-800 rounded-xl">No servers registered yet</div>`
+		cards = `<div class="bg-white border-2 border-black p-8 text-center shadow-[4px_4px_0px_0px_#000]">
+			<p class="text-neutral-500 font-bold text-sm">No servers registered.</p>
+		</div>`
 	}
 
 	content := `<div class="space-y-6">
 
-		<!-- Header -->
 		<div class="flex items-center justify-between">
 			<div>
-				<a href="/admin" class="text-xs text-zinc-500 hover:text-zinc-300 transition-colors no-underline">&larr; Dashboard</a>
-				<h1 class="text-xl font-bold text-white mt-1">Manage Servers</h1>
+				<a href="/admin" class="text-xs font-bold no-underline hover:bg-yellow-200">&larr; Dashboard</a>
+				<h1 class="text-xl font-black uppercase text-black mt-1">Manage Servers</h1>
 			</div>
-			<span class="text-xs text-zinc-500 bg-zinc-900 px-2.5 py-1 rounded-full border border-zinc-800 font-mono">` + itoa(len(servers)) + ` total</span>
+			<span class="text-xs font-bold bg-white border-2 border-black px-2.5 py-1 font-mono">` + itoa(len(servers)) + ` nodes</span>
 		</div>
 
-		<!-- Server Cards -->
-		<div class="space-y-3">
+		<div class="space-y-4">
 			` + cards + `
 		</div>
 
-		<!-- Register Form -->
-		<div class="bg-zinc-900 border border-zinc-800 rounded-xl p-6">
-			<h2 class="text-sm font-semibold text-zinc-200 mb-4">Register New Server</h2>
-			<form method="POST" action="/admin/servers" class="grid grid-cols-1 md:grid-cols-4 gap-3">
+		<!-- Register Server -->
+		<div class="bg-white border-2 border-black p-6 shadow-[4px_4px_0px_0px_#000]">
+			<h2 class="text-sm font-black uppercase text-black mb-4">Register New Server</h2>
+			<form method="POST" action="/admin/servers" class="grid grid-cols-1 md:grid-cols-2 gap-3">
 				<div>
-					<input type="text" name="name" required placeholder="Name" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors">
+					<input type="text" name="name" placeholder="Server name" required class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black">
 				</div>
 				<div>
-					<input type="text" name="host" required placeholder="IP or hostname" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors">
+					<input type="text" name="host" placeholder="Host or IP" required class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black">
 				</div>
 				<div>
-					<input type="number" name="port" value="22" placeholder="Port" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors font-mono">
+					<input type="number" name="port" placeholder="Port" value="9100" required class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black">
 				</div>
 				<div>
-					<input type="text" name="tags" placeholder="tags (comma,separated)" class="w-full px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-sm text-white placeholder-zinc-600 focus:outline-none focus:border-green-500/50 transition-colors">
+					<input type="text" name="tags" placeholder="Tags (comma separated)" class="w-full px-3 py-2 border-2 border-black bg-white text-sm font-bold placeholder:text-neutral-400 focus:outline-none focus:ring-2 focus:ring-black">
 				</div>
-				<div class="md:col-span-4 flex justify-end">
-					<button type="submit" class="px-5 py-2 rounded-lg bg-green-600 hover:bg-green-500 text-white text-sm font-medium transition-colors">Add Server</button>
+				<div class="md:col-span-2 flex justify-end">
+					<button type="submit" class="px-5 py-2 border-2 border-black bg-emerald-400 text-black font-bold text-sm shadow-[3px_3px_0px_0px_#000] hover:shadow-[1px_1px_0px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Register Server</button>
 				</div>
 			</form>
 		</div>
@@ -689,13 +740,6 @@ func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(html))
 }
 
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}
-
 func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "POST required", http.StatusMethodNotAllowed)
@@ -705,23 +749,22 @@ func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 	entry, _ := getSessionEntry(r)
 	name := r.FormValue("name")
 	host := r.FormValue("host")
-	port := 22
-	if p, err := strconv.Atoi(r.FormValue("port")); err == nil {
-		port = p
-	}
+	portStr := r.FormValue("port")
 	tags := r.FormValue("tags")
 
-	if name == "" || host == "" {
-		http.Error(w, "name and host required", http.StatusBadRequest)
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		http.Error(w, "invalid port", http.StatusBadRequest)
 		return
 	}
 
-	if _, err := h.svc.Monitor.CreateServer(name, host, port, tags); err != nil {
+	_, err = h.svc.Monitor.CreateServer(name, host, port, tags)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	h.svc.Repos.Audit.Insert(entry.username, "CREATE_SERVER", "registered server: "+name, r.RemoteAddr)
+	h.svc.Repos.Audit.Insert(entry.username, "CREATE_SERVER", "created server: "+name+" ("+host+":"+portStr+")", r.RemoteAddr)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 
@@ -744,15 +787,15 @@ func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
 func roleBadgeHTML(role string) string {
 	switch role {
 	case model.RoleOwner:
-		return `<span class="text-xs px-1.5 py-0.5 rounded bg-red-500/10 text-red-400 border border-red-500/30 font-medium">owner</span>`
+		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-rose-300 text-black">owner</span>`
 	case model.RoleAdmin:
-		return `<span class="text-xs px-1.5 py-0.5 rounded bg-amber-500/10 text-amber-400 border border-amber-500/30 font-medium">admin</span>`
+		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-amber-300 text-black">admin</span>`
 	case model.RoleOperator:
-		return `<span class="text-xs px-1.5 py-0.5 rounded bg-blue-500/10 text-blue-400 border border-blue-500/30 font-medium">operator</span>`
+		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-blue-300 text-black">operator</span>`
 	case model.RoleReadonly:
-		return `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-500/10 text-slate-400 border border-slate-500/30 font-medium">readonly</span>`
+		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-neutral-300 text-black">readonly</span>`
 	default:
-		return `<span class="text-xs px-1.5 py-0.5 rounded bg-slate-500/10 text-slate-400 border border-slate-500/30 font-medium">` + role + `</span>`
+		return `<span class="text-xs px-1.5 py-0.5 font-bold border-2 border-black bg-neutral-300 text-black">` + role + `</span>`
 	}
 }
 
@@ -765,53 +808,53 @@ func adminLayout(title, content string) string {
 	<title>` + title + ` — Raevtar Admin</title>
 	<link rel="preconnect" href="https://fonts.googleapis.com">
 	<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+	<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="/static/css/style.css">
 	<link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
 </head>
-<body class="bg-zinc-950 text-zinc-100 font-sans min-h-screen">
+<body class="bg-neutral-100 text-black font-sans min-h-screen">
 	<div class="min-h-screen flex">
 		<!-- Sidebar (desktop) -->
-		<aside class="w-64 bg-zinc-900 border-r border-zinc-800 hidden md:flex flex-col">
-			<div class="p-6 flex items-center gap-3">
-				<div class="w-8 h-8 bg-green-500 rounded-lg flex items-center justify-center">
-					<span class="text-zinc-950 font-black">R</span>
+		<aside class="w-64 bg-black text-white hidden md:flex flex-col border-r-2 border-black">
+			<div class="p-6 flex items-center gap-3 border-b-2 border-white/20">
+				<div class="w-8 h-8 bg-emerald-400 flex items-center justify-center border-2 border-white">
+					<span class="text-black font-black">R</span>
 				</div>
-				<span class="text-xl font-bold tracking-tight">Raevtar</span>
+				<span class="text-xl font-black tracking-tight text-white">Raevtar</span>
 			</div>
-			<nav class="flex-1 px-4 space-y-2 mt-2">
-				<a href="/admin" class="flex items-center gap-3 px-3 py-2.5 text-zinc-200 hover:bg-zinc-800/50 rounded-lg transition-colors font-medium">Dashboard</a>
-				<a href="/admin/posts" class="flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 rounded-lg transition-colors font-medium">Posts</a>
-				<a href="/admin/servers" class="flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 rounded-lg transition-colors font-medium">Servers</a>
-				<a href="/admin/manage-users" class="flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 rounded-lg transition-colors font-medium">Users</a>
-				<a href="/admin/audit-log" class="flex items-center gap-3 px-3 py-2.5 text-zinc-400 hover:text-zinc-100 hover:bg-zinc-800/50 rounded-lg transition-colors font-medium">Audit</a>
+			<nav class="flex-1 px-4 space-y-2 mt-4">
+				<a href="/admin" class="flex items-center gap-3 px-3 py-2.5 text-white hover:bg-white/10 font-bold transition-colors">Dashboard</a>
+				<a href="/admin/posts" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-white hover:bg-white/10 font-bold transition-colors">Posts</a>
+				<a href="/admin/servers" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-white hover:bg-white/10 font-bold transition-colors">Servers</a>
+				<a href="/admin/manage-users" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-white hover:bg-white/10 font-bold transition-colors">Users</a>
+				<a href="/admin/audit-log" class="flex items-center gap-3 px-3 py-2.5 text-neutral-400 hover:text-white hover:bg-white/10 font-bold transition-colors">Audit</a>
 			</nav>
-			<div class="p-4 border-t border-zinc-800">
-				<a href="/admin/logout" class="block text-center px-3 py-2 rounded-lg bg-zinc-950 border border-zinc-800 text-zinc-300 hover:text-red-300 hover:border-red-500/30 transition-colors">Logout</a>
+			<div class="p-4 border-t-2 border-white/20">
+				<a href="/admin/logout" class="block text-center px-3 py-2 border-2 border-white text-white font-bold hover:bg-white hover:text-black transition-colors">Logout</a>
 			</div>
 		</aside>
 
 		<!-- Main -->
 		<main class="flex-1 flex flex-col h-screen overflow-hidden">
-			<header class="h-16 border-b border-zinc-800 flex items-center justify-between px-4 md:px-6 bg-zinc-900/50 backdrop-blur-md sticky top-0 z-10">
+			<header class="h-16 border-b-2 border-black flex items-center justify-between px-4 md:px-6 bg-black text-white sticky top-0 z-10">
 				<div class="flex items-center gap-3">
-					<div class="md:hidden w-7 h-7 bg-green-500 rounded-md flex items-center justify-center">
-						<span class="text-zinc-950 font-black text-sm">R</span>
+					<div class="md:hidden w-7 h-7 bg-emerald-400 flex items-center justify-center border-2 border-white">
+						<span class="text-black font-black text-sm">R</span>
 					</div>
-					<div class="text-base md:text-lg font-semibold text-zinc-200">` + title + `</div>
+					<div class="text-base md:text-lg font-black text-white">` + title + `</div>
 				</div>
 				<div class="flex items-center gap-3">
-					<div class="flex items-center gap-2 px-3 py-1.5 bg-zinc-900 border border-zinc-800 rounded-full text-xs md:text-sm">
-						<span class="relative flex h-2.5 w-2.5">
-							<span class="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75"></span>
-							<span class="relative inline-flex rounded-full h-2.5 w-2.5 bg-green-500"></span>
+					<div class="flex items-center gap-2 px-3 py-1.5 bg-white border-2 border-black text-xs md:text-sm">
+						<span class="relative flex h-3 w-3">
+							<span class="animate-ping absolute inline-flex h-full w-full bg-emerald-400 opacity-75"></span>
+							<span class="relative inline-flex h-3 w-3 border-2 border-black bg-emerald-400"></span>
 						</span>
-						<span class="text-zinc-300 font-medium">Connected</span>
+						<span class="text-black font-bold">Connected</span>
 					</div>
 				</div>
 			</header>
 
-			<div class="p-4 md:p-8 space-y-6 flex-1 overflow-y-auto">
+			<div class="p-4 md:p-8 space-y-6 flex-1 overflow-y-auto bg-neutral-100">
 				` + content + `
 			</div>
 		</main>

@@ -75,6 +75,8 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 
 		r.Get("/categories", h.apiListCategories)
 
+		r.Get("/hoststats", h.apiHostStats)
+
 		r.Get("/servers", h.apiListServers)
 		r.Get("/servers/{serverID}", h.apiGetServer)
 		r.With(h.adminAuth).Post("/servers", h.apiCreateServer)

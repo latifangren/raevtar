@@ -2,62 +2,83 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Custom base styles */
+/* Neobrutalism base */
 body {
-  background: #0F172A;
-  color: #F1F5F9;
+  background: #F5F5F4;
+  color: #171717;
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
 }
 
-a { @apply text-green-400 hover:text-green-300 transition-colors; }
+a { @apply text-black underline decoration-2 hover:bg-yellow-200 transition-all; }
+a.no-underline { text-decoration: none; }
 
-/* Prose styles for blog content */
+/* Prose styles for blog content — light theme neobrutalism */
 .prose h1 { font-size: 2.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; }
 .prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; }
 .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; }
 .prose p { margin-bottom: 1rem; line-height: 1.7; }
 .prose code {
-  background: #1E293B;
+  background: #E7E5E4;
   padding: 0.2em 0.4em;
-  border-radius: 4px;
+  border: 2px solid #171717;
   font-family: 'JetBrains Mono', 'Fira Code', monospace;
   font-size: 0.875rem;
 }
 .prose pre {
-  background: #1E293B;
+  background: #FAFAF9;
   padding: 1rem;
-  border-radius: 8px;
   overflow-x: auto;
   margin-bottom: 1rem;
-  border: 1px solid #334155;
+  border: 2px solid #171717;
+  box-shadow: 4px 4px 0px 0px #171717;
 }
-.prose pre code { background: none; padding: 0; }
-.prose a { @apply text-green-400 underline; }
+.prose pre code { background: none; padding: 0; border: none; box-shadow: none; }
+.prose a { @apply text-black underline decoration-2; }
+.prose a:hover { @apply bg-yellow-200; }
 .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; }
 .prose li { margin-bottom: 0.25rem; }
-.prose strong { color: #fff; }
+.prose strong { color: #000; }
 .prose blockquote {
-  border-left: 3px solid #22c55e;
+  border-left: 5px solid #171717;
   padding-left: 1rem;
   margin-left: 0;
-  color: #94A3B8;
+  color: #444;
+  font-style: italic;
+  font-weight: 600;
 }
-.prose img { max-width: 100%; border-radius: 8px; }
+.prose img { max-width: 100%; border: 2px solid #171717; }
 .prose table { @apply w-full border-collapse mb-4; }
-.prose th, .prose td { @apply border border-slate-700 px-3 py-2 text-sm; }
-.prose th { @apply bg-slate-800 font-semibold; }
+.prose th, .prose td { @apply border-2 border-black px-3 py-2 text-sm; }
+.prose th { @apply bg-black text-white font-bold; }
 
-/* Full-width breakout */
+/* Full-width breakout (light) */
 .full-width {
   width: 100vw;
   margin-left: calc(-50vw + 50%);
   margin-right: calc(-50vw + 50%);
 }
 
-/* Scrollbar styling */
+/* Scrollbar */
 ::-webkit-scrollbar { width: 8px; }
-::-webkit-scrollbar-track { background: #0F172A; }
-::-webkit-scrollbar-thumb { @apply bg-slate-700 rounded; }
+::-webkit-scrollbar-track { background: #E7E5E4; }
+::-webkit-scrollbar-thumb { @apply bg-neutral-400 border-2 border-black; }
 
 /* Selection */
-::selection { @apply bg-green-500/30 text-white; }
+::selection { @apply bg-yellow-300 text-black; }
+
+/* Animations for neobrutalism */
+@keyframes pulse-neo {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.5; }
+}
+.animate-pulse-neo {
+  animation: pulse-neo 1.5s ease-in-out infinite;
+}
+
+/* Status dot minimal */
+.status-dot {
+  @apply inline-block w-3 h-3 border-2 border-black;
+}
+.status-online { @apply bg-emerald-400; }
+.status-offline { @apply bg-rose-400; }
+.status-unknown { @apply bg-neutral-300; }
