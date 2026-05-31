@@ -229,6 +229,7 @@ raevtar/
 | GET | `/blog/feed.xml` | rss.Feed | RSS feed |
 | GET | `/dashboard` | dashboard.Index | Server monitoring |
 | GET | `/dashboard/{serverID}` | dashboard.Detail | Detail server |
+| GET | `/dashboard/{serverID}/live` | dashboard.DetailLive | HTMX fragment detail server |
 | GET | `/admin/*` | admin.* | Admin panel session auth |
 | GET | `/api/v1/posts` | api.ListPosts | JSON posts |
 | POST | `/api/v1/posts` | api.CreatePost | JSON create (cron) |

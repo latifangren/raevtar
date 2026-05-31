@@ -26,7 +26,7 @@
 - Daftar server lokal yang dimonitor
 - Metrics: CPU, RAM, uptime, online/stale/offline
 - History metrics per server
-- HTMX auto-refresh tiap 30 detik
+- HTMX auto-refresh: grid tiap 30 detik, detail node tiap 15 detik
 - Lightweight Bash agent push metrics tanpa SSH credentials
 - Per-server agent token dengan rotate dari admin panel
 
