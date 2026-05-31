@@ -43,64 +43,77 @@ func Index(data IndexData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-sage border-b-2 border-retro-ink mb-12\"><div class=\"max-w-5xl mx-auto px-4 py-24 md:py-32 text-center\"><h1 class=\"text-6xl md:text-7xl font-black mb-4 tracking-tight text-retro-ink uppercase\">raevtar</h1><p class=\"text-lg text-retro-ink font-bold mb-2 max-w-xl mx-auto opacity-80\">Personal platform for project notes, server monitoring, and automation.</p><p class=\"text-sm text-retro-ink font-medium mb-10 opacity-60 max-w-lg mx-auto\">Single Go binary running on postmarketOS (whyred).</p><div class=\"flex flex-wrap gap-4 justify-center\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read the Blog &rarr;</a> <a href=\"/dashboard\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open Dashboard</a></div></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-16 md:py-24\"><div class=\"grid gap-8 lg:grid-cols-[1.25fr_0.75fr] items-center\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">Go 1.26</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">HTMX</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">SQLite</span></div><h1 class=\"text-6xl md:text-8xl font-black mb-5 tracking-tight text-retro-ink uppercase leading-none\">raevtar</h1><p class=\"text-xl md:text-2xl text-retro-ink font-black mb-3 max-w-2xl\">Personal platform for project notes, server monitoring, and automation.</p><p class=\"text-sm md:text-base text-retro-ink font-bold mb-8 opacity-75 max-w-xl\">Single Go binary running on postmarketOS (whyred), serving blog notes, live monitor cards, API docs, and automation hooks from one small machine.</p><div class=\"flex flex-wrap gap-4\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read the Blog &rarr;</a> <a href=\"/dashboard\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open Dashboard</a> <a href=\"/docs\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read API Docs</a></div></div><div class=\"relative\"><div class=\"absolute -right-6 -top-6 h-24 w-24 border-2 border-retro-ink bg-retro-wheat shadow-[4px_4px_0px_0px_#2D3748]\"></div><div class=\"relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-4\">live stack board</p><div class=\"grid grid-cols-3 gap-3 text-center\"><div class=\"border-2 border-retro-ink bg-retro-sageLight p-3\"><span class=\"block text-3xl font-black text-retro-ink\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			if len(data.Posts) > 0 || len(data.Categories) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<section class=\"flex flex-wrap gap-4 justify-center mb-12 py-4 px-6 bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748]\">")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
-				if len(data.Posts) > 0 {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-retro-ink\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var3 string
-					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Posts)))
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 21, Col: 111}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"block text-xs uppercase font-bold text-retro-muted mt-0.5\">posts</span></div>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				if len(data.Categories) > 0 {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-retro-ink\">")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					var templ_7745c5c3_Var4 string
-					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
-					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 24, Col: 116}
-					}
-					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span><span class=\"block text-xs uppercase font-bold text-retro-muted mt-0.5\">categories</span></div>")
-					if templ_7745c5c3_Err != nil {
-						return templ_7745c5c3_Err
-					}
-				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<div class=\"text-center px-4\"><span class=\"text-3xl font-black text-retro-sage\">1</span><span class=\"block text-xs uppercase font-bold text-retro-muted mt-0.5\">binary</span></div></section>")
-				if templ_7745c5c3_Err != nil {
-					return templ_7745c5c3_Err
-				}
+			var templ_7745c5c3_Var3 string
+			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Posts)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 30, Col: 152}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, " ")
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</span><span class=\"text-xs font-bold uppercase text-retro-muted\">posts</span></div><div class=\"border-2 border-retro-ink bg-retro-wheat p-3\"><span class=\"block text-3xl font-black text-retro-ink\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var4 string
+			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 31, Col: 153}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</span><span class=\"text-xs font-bold uppercase text-retro-muted\">topics</span></div><div class=\"border-2 border-retro-ink bg-retro-blush p-3\"><span class=\"block text-3xl font-black text-retro-ink\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var5 string
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Servers)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 32, Col: 150}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"text-xs font-bold uppercase text-retro-muted\">nodes</span></div></div><div class=\"mt-4 border-2 border-retro-ink bg-retro-ink text-retro-cream p-4\"><p class=\"text-xs font-mono font-bold uppercase tracking-widest\">raevtar.tech</p><p class=\"text-sm font-bold mt-1\">Blog, monitor, docs, and API in one public control room.</p></div></div></div></div></div></section><section class=\"grid gap-4 md:grid-cols-3 mb-12\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">01 Notes</p><h2 class=\"text-xl font-black uppercase mb-2\">Project Log</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">Fresh research, tools, security notes, and devops logs stay readable from the public blog.</p><a href=\"/blog\" class=\"text-sm font-black no-underline hover:bg-retro-wheat\">Browse posts &rarr;</a></div><div class=\"bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">02 Signals</p><h2 class=\"text-xl font-black uppercase mb-2\">Monitor Grid</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">Server health gets compact cards with status, host, port, tags, and direct drill-down links.</p><a href=\"/dashboard\" class=\"text-sm font-black no-underline hover:bg-retro-paper\">Open dashboard &rarr;</a></div><div class=\"bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">03 Hooks</p><h2 class=\"text-xl font-black uppercase mb-2\">Automation API</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">Hermes can publish posts, ping monitors, and inspect categories through documented endpoints.</p><a href=\"/docs\" class=\"text-sm font-black no-underline hover:bg-retro-wheat\">Read docs &rarr;</a></div></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.85fr_1.15fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">Platform Showcase</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Small server, loud interface.</h2><p class=\"text-sm font-bold text-retro-sageLight mb-6\">Raevtar is the public surface for a personal lab: notes on one side, machine telemetry on the other, plus API rails for automation.</p><div class=\"flex flex-wrap gap-2\"><span class=\"text-xs px-2 py-1 font-black uppercase border-2 border-retro-cream bg-retro-sage text-retro-cream\">templ</span> <span class=\"text-xs px-2 py-1 font-black uppercase border-2 border-retro-cream bg-retro-wheat text-retro-ink\">chi</span> <span class=\"text-xs px-2 py-1 font-black uppercase border-2 border-retro-cream bg-retro-paper text-retro-ink\">goldmark</span></div></div><div class=\"grid gap-4 p-6 md:grid-cols-2 md:p-8\"><div class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">Content lanes</p><p class=\"text-4xl font-black text-retro-ink\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var6 string
+			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 78, Col: 84}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</p><p class=\"text-sm font-bold text-retro-muted\">seeded categories for public posts.</p></div><div class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-6\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">Monitor nodes</p><p class=\"text-4xl font-black text-retro-ink\">")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var7 string
+			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Servers)))
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 83, Col: 81}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</p><p class=\"text-sm font-bold text-retro-muted\">registered hosts visible from dashboard.</p></div><div class=\"border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:col-span-2\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">Single domain map</p><div class=\"grid gap-2 sm:grid-cols-3\"><a href=\"/blog\" class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat\">/blog</a> <a href=\"/dashboard\" class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat\">/dashboard</a> <a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat\">/docs</a></div></div></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Posts) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<section class=\"mb-12\"><div class=\"flex items-center justify-between mb-4\"><h2 class=\"text-lg font-black uppercase\">Latest Posts</h2><a href=\"/blog\" class=\"text-sm font-bold no-underline hover:bg-retro-wheat\">View all &rarr;</a></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "<section class=\"mb-12\"><div class=\"flex items-center justify-between mb-4\"><h2 class=\"text-lg font-black uppercase\">Latest Posts</h2><a href=\"/blog\" class=\"text-sm font-bold no-underline hover:bg-retro-wheat\">View all &rarr;</a></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -110,15 +123,19 @@ func Index(data IndexData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</section>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</section>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<section class=\"mb-12 text-center py-12\"><p class=\"text-retro-muted font-bold\">No posts yet.</p><p class=\"text-sm text-retro-muted mt-2\">Check the <a href=\"/dashboard\" class=\"font-bold no-underline hover:bg-retro-wheat\">dashboard</a> or start publishing via the API.</p></section>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<section class=\"mb-12 text-center py-12\"><p class=\"text-retro-muted font-bold\">No posts yet.</p><p class=\"text-sm text-retro-muted mt-2\">Check the <a href=\"/dashboard\" class=\"font-bold no-underline hover:bg-retro-wheat\">dashboard</a> or start publishing via the API.</p></section>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " <section id=\"lab\" class=\"mb-12 scroll-mt-24\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-4\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Lab</p><h2 class=\"text-3xl font-black uppercase\">Public lab bench</h2></div><a href=\"/docs\" class=\"text-sm font-black no-underline hover:bg-retro-wheat\">API reference &rarr;</a></div><div class=\"grid gap-4 md:grid-cols-3\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-sage text-retro-cream font-black\">01</span><h3 class=\"font-black uppercase mb-2\">Publish Queue</h3><p class=\"text-sm font-bold text-retro-muted\">Commissioned and automated notes land in the same blog index with tags intact.</p></div><div class=\"bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-4\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-ink text-retro-cream font-black\">02</span><h3 class=\"font-black uppercase mb-2\">Telemetry Wall</h3><p class=\"text-sm font-bold text-retro-muted\">Local hosts ping Raevtar, and the dashboard redraws itself through HTMX refreshes.</p></div><div class=\"bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-blush text-retro-ink font-black\">03</span><h3 class=\"font-black uppercase mb-2\">Docs Dock</h3><p class=\"text-sm font-bold text-retro-muted\">OpenAPI docs keep the write surface clear without adding any new public route.</p></div></div></section>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
 			}
 			return nil
 		})
