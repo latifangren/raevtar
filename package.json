@@ -1,0 +1,16 @@
+{
+  "name": "raevtar",
+  "version": "1.0.0",
+  "description": "**Personal platform** — blog rekomendasi projek GitHub, dashboard monitoring server lokal, landing page, dan REST API. Satu binary, jalan di postmarketOS (aarch64, Redmi Note 5/whyred).",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "tailwindcss": "^3.4.19"
+  }
+}

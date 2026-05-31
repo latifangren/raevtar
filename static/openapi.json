@@ -1,0 +1,276 @@
+{
+  "openapi": "3.0.3",
+  "info": {
+    "title": "Raevtar API",
+    "description": "Personal blog + server monitoring platform API.\n\n**Auth:** Write endpoints require `Authorization: Bearer <admin_key>` header.\n\nBase URL: `https://raevtar.tech`",
+    "version": "1.0.0",
+    "contact": {
+      "name": "latifangren",
+      "url": "https://raevtar.tech"
+    }
+  },
+  "servers": [
+    { "url": "/", "description": "Same-origin (local or raevtar.tech)" }
+  ],
+  "paths": {
+    "/api/v1/posts": {
+      "get": {
+        "summary": "List blog posts",
+        "description": "Returns published blog posts, ordered by date descending.",
+        "parameters": [
+          {
+            "name": "category",
+            "in": "query",
+            "description": "Filter by category slug",
+            "required": false,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "limit",
+            "in": "query",
+            "description": "Max results (default 100)",
+            "required": false,
+            "schema": { "type": "integer", "default": 100 }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of posts",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Post" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Create a blog post",
+        "description": "Requires `Authorization: Bearer <admin_key>` header.",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": { "$ref": "#/components/schemas/PostCreate" }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created post",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Post" }
+              }
+            }
+          },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/categories": {
+      "get": {
+        "summary": "List categories",
+        "responses": {
+          "200": {
+            "description": "List of categories",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Category" }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/servers": {
+      "get": {
+        "summary": "List servers",
+        "responses": {
+          "200": {
+            "description": "List of registered servers",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Server" }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "summary": "Register a new server",
+        "security": [{ "BearerAuth": [] }],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "required": ["name", "host"],
+                "properties": {
+                  "name": { "type": "string", "description": "Server name" },
+                  "host": { "type": "string", "description": "Hostname or IP" },
+                  "port": { "type": "integer", "default": 22 },
+                  "tags": { "type": "string", "description": "Comma-separated tags" }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": { "description": "Server created" },
+          "400": { "description": "Invalid input" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    },
+    "/api/v1/servers/{serverID}": {
+      "get": {
+        "summary": "Get server details",
+        "parameters": [
+          {
+            "name": "serverID",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Server details",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/Server" }
+              }
+            }
+          },
+          "404": { "description": "Server not found" }
+        }
+      }
+    },
+    "/api/v1/servers/{serverID}/ping": {
+      "post": {
+        "summary": "Record server metrics",
+        "description": "Used by the monitoring agent to push metrics. Requires Bearer auth.",
+        "security": [{ "BearerAuth": [] }],
+        "parameters": [
+          {
+            "name": "serverID",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "cpu_percent": { "type": "number" },
+                  "ram_used_mb": { "type": "number" },
+                  "ram_total_mb": { "type": "number" },
+                  "disk_used_gb": { "type": "number" },
+                  "uptime_seconds": { "type": "integer" },
+                  "online": { "type": "boolean", "default": true }
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": { "description": "Metrics recorded" },
+          "401": { "description": "Unauthorized" }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "description": "Your RAEVTAR_ADMIN_KEY from .env.production"
+      }
+    },
+    "schemas": {
+      "Post": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "category_id": { "type": "integer" },
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "content_md": { "type": "string" },
+          "excerpt": { "type": "string" },
+          "published": { "type": "boolean" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
+          "category_name": { "type": "string" },
+          "category_slug": { "type": "string" },
+          "tags": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Tag" }
+          }
+        }
+      },
+      "PostCreate": {
+        "type": "object",
+        "required": ["title", "category_slug"],
+        "properties": {
+          "category_slug": { "type": "string" },
+          "title": { "type": "string" },
+          "content_md": { "type": "string", "description": "Markdown content" },
+          "excerpt": { "type": "string" },
+          "published": { "type": "boolean", "default": true },
+          "tags": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Tag names to attach"
+          }
+        }
+      },
+      "Category": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "slug": { "type": "string" },
+          "name": { "type": "string" },
+          "description": { "type": "string" }
+        }
+      },
+      "Server": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "host": { "type": "string" },
+          "port": { "type": "integer" },
+          "tags": { "type": "string" },
+          "last_seen": { "type": "string", "nullable": true, "format": "date-time" },
+          "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "Tag": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "name": { "type": "string" },
+          "slug": { "type": "string" }
+        }
+      }
+    }
+  }
+}

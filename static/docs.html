@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Raevtar API Docs</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui.css">
+  <link rel="icon" type="image/svg+xml" href="/static/favicon.svg">
+  <style>
+    body { margin: 0; background: #0f172a; }
+    .swagger-ui .topbar { display: none; }
+    .swagger-ui .info .title { color: #e2e8f0 !important; }
+    .swagger-ui .info { margin: 20px 0; }
+    .swagger-ui .info p, .swagger-ui .info li { color: #94a3b8; }
+    .swagger-ui .info a { color: #4ade80; }
+    .swagger-ui .scheme-container { background: #1e293b; box-shadow: none; padding: 10px 0; }
+    .swagger-ui select { background: #1e293b; color: #e2e8f0; border-color: #334155; }
+    .swagger-ui .opblock-tag { color: #e2e8f0 !important; }
+    .swagger-ui .opblock-tag small { color: #64748b !important; }
+    .swagger-ui .opblock .opblock-summary-description { color: #94a3b8; }
+    .swagger-ui .opblock .opblock-summary-method { border-radius: 4px; }
+    .swagger-ui .opblock .opblock-summary { border-color: #334155; }
+    .swagger-ui .opblock { background: #1e293b; border-color: #334155; }
+    .swagger-ui .opblock .opblock-section-header { background: #334155; border-color: #475569; }
+    .swagger-ui .opblock .opblock-section-header h4 { color: #e2e8f0; }
+    .swagger-ui .opblock-description-wrapper p { color: #cbd5e1; }
+    .swagger-ui .parameter__name { color: #e2e8f0; }
+    .swagger-ui .parameter__type { color: #94a3b8; }
+    .swagger-ui .parameter__in { color: #64748b; }
+    .swagger-ui table thead tr td { color: #94a3b8; border-color: #334155; }
+    .swagger-ui table tbody tr td { color: #cbd5e1; border-color: #334155; }
+    .swagger-ui .responses-inner h4 { color: #e2e8f0; }
+    .swagger-ui .response-col_status { color: #e2e8f0; }
+    .swagger-ui .response-col_description { color: #cbd5e1; }
+    .swagger-ui .model-box { background: #0f172a; border-color: #334155; }
+    .swagger-ui .model { color: #94a3b8; }
+    .swagger-ui .model-title { color: #e2e8f0; }
+    .swagger-ui .prop-type { color: #64748b; }
+    .swagger-ui .btn.authorize { border-color: #4ade80; color: #4ade80; }
+    .swagger-ui .btn.authorize svg { fill: #4ade80; }
+    .swagger-ui .auth-container { background: #1e293b; border-color: #334155; }
+    .swagger-ui .auth-container .auth-btn-wrapper .btn-done { border-color: #4ade80; color: #4ade80; }
+    .swagger-ui .auth-container input[type=text] { background: #1e293b; border-color: #334155; color: #e2e8f0; }
+    .swagger-ui .auth-container h4 { color: #e2e8f0; }
+    .swagger-ui .auth-container label { color: #94a3b8; }
+    .swagger-ui .markdown p { color: #94a3b8; }
+    .swagger-ui .loading-container { padding: 40px; }
+    .swagger-ui .loading-container .loading { color: #e2e8f0; }
+    .swagger-ui section.models { border-color: #334155; }
+    .swagger-ui section.models h4 { color: #e2e8f0; }
+    .swagger-ui section.models .model-container { background: #1e293b; }
+  </style>
+</head>
+<body>
+  <div id="swagger-ui"></div>
+  <script src="https://cdn.jsdelivr.net/npm/swagger-ui-dist@5/swagger-ui-bundle.js"></script>
+  <script>
+    SwaggerUIBundle({
+      url: '/static/openapi.json',
+      dom_id: '#swagger-ui',
+      deepLinking: true,
+      presets: [
+        SwaggerUIBundle.presets.apis,
+        SwaggerUIBundle.SwaggerUIStandalonePreset
+      ],
+      layout: "BaseLayout",
+      supportedSubmitMethods: [],
+      docExpansion: "list"
+    });
+  </script>
+</body>
+</html>

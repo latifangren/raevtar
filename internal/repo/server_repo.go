@@ -1,0 +1,50 @@
+package repo
+
+import (
+	"time"
+
+	"raevtar/internal/model"
+
+	"github.com/jmoiron/sqlx"
+)
+
+type ServerRepo struct{ db *sqlx.DB }
+
+func (r *ServerRepo) List() ([]model.Server, error) {
+	var servers []model.Server
+	return servers, r.db.Select(&servers, "SELECT * FROM servers ORDER BY name")
+}
+
+func (r *ServerRepo) GetByID(id int64) (*model.Server, error) {
+	var s model.Server
+	err := r.db.Get(&s, "SELECT * FROM servers WHERE id = ?", id)
+	if err != nil {
+		return nil, err
+	}
+	return &s, nil
+}
+
+func (r *ServerRepo) Create(s *model.Server) error {
+	now := time.Now()
+	s.CreatedAt = now
+	result, err := r.db.Exec(
+		"INSERT INTO servers (name, host, port, tags, created_at) VALUES (?, ?, ?, ?, ?)",
+		s.Name, s.Host, s.Port, s.Tags, now,
+	)
+	if err != nil {
+		return err
+	}
+	id, _ := result.LastInsertId()
+	s.ID = id
+	return nil
+}
+
+func (r *ServerRepo) Delete(id int64) error {
+	_, err := r.db.Exec("DELETE FROM servers WHERE id = ?", id)
+	return err
+}
+
+func (r *ServerRepo) UpdateLastSeen(id int64) error {
+	_, err := r.db.Exec("UPDATE servers SET last_seen = datetime('now') WHERE id = ?", id)
+	return err
+}

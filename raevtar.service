@@ -1,0 +1,16 @@
+[Unit]
+Description=Raevtar — personal blog and dashboard
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=latif
+WorkingDirectory=/home/latif/raevtar
+ExecStart=/home/latif/raevtar/raevtar
+EnvironmentFile=/home/latif/raevtar/.env.production
+Restart=on-failure
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

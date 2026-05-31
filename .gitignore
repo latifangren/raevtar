@@ -1,0 +1,38 @@
+# Binary
+raevtar
+
+# Environment (contains secrets)
+.env
+.env.production
+.env.local
+.env.*.local
+
+# Node.js (Tailwind)
+node_modules/
+package-lock.json
+
+# SQLite databases
+*.db
+*.db-*
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Hermes (AI agent config)
+.hermes/
+
+# Editor
+.vscode/
+.idea/
+
+# GoLand / IntelliJ
+*.iml
+
+# Auto-generated Go test binary
+*.test
+
+# Temp
+tmp/
+temp/
+*.swp
