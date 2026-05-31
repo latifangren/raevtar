@@ -10,7 +10,7 @@ Single binary. Go + Templ + HTMX + SQLite.
 ## Prinsip
 
 1. **Satu bahasa, satu runtime** — Go. Gak ada Node, gak ada Python, gak ada PHP.
-2. **Single binary** — `go build` → `./raevtar` → langsung jalan. Gak ada dependency runtime.
+2. **Single binary** — `make build` → `./raevtar` → langsung jalan. Templ/Tailwind cuma build-time.
 3. **Separation of concerns** — handler jangan ngotak-atik DB langsung. Model jangan tau soal HTTP.
 4. **Backend process stateless** — persistent state di SQLite. Restart server = gak ada data ilang.
 5. **Progressive enhancement** — HTML dikirim dari server (SSR). HTMX untuk interaktivitas tanpa JS berat. API untuk akses dari luar.
@@ -90,42 +90,52 @@ raevtar/
 │
 ├── internal/
 │   ├── config/
-│   │   └── config.go            # Struct + loader dari env/file
+│   │   └── config.go            # Struct + loader dari env
 │   │
 │   ├── model/
 │   │   ├── post.go              # Post struct — blog article
 │   │   ├── category.go          # Category struct
 │   │   ├── server.go            # Server struct — monitoring target
-│   │   └── server_metric.go     # Metrics history (CPU, RAM, uptime)
+│   │   ├── server_metric.go     # Metrics history (CPU, RAM, uptime)
+│   │   ├── tag.go               # Normalized blog tags
+│   │   ├── user.go              # Admin users + RBAC roles
+│   │   └── audit.go             # Admin audit log
 │   │
 │   ├── repo/
 │   │   ├── db.go                # Init SQLite connection + migrations auto-run
 │   │   ├── post_repo.go         # CRUD posts
 │   │   ├── category_repo.go     # CRUD categories
 │   │   ├── server_repo.go       # CRUD servers
-│   │   └── metric_repo.go       # Insert/query metrics history
+│   │   ├── metric_repo.go       # Insert/query server metrics
+│   │   ├── tag_repo.go          # Tags + post_tags join table
+│   │   ├── user_repo.go         # Admin users
+│   │   └── audit_repo.go        # Audit log queries
 │   │
 │   ├── service/
 │   │   ├── blog.go              # Blog logic: slug generation, markdown render, pagination
 │   │   ├── monitor.go           # Server monitoring: health check, polling scheduler
-│   │   └── seed.go              # Seed initial data (default categories, dll)
+│   │   ├── admin.go             # Admin auth/users/audit boundary
+│   │   └── seed.go              # Seed initial data (default categories, admin user)
 │   │
 │   ├── handler/
 │   │   ├── routes.go            # Route mounting (Chi router)
-│   │   ├── blog.go              # Blog page handlers (list, detail, kategori)
-│   │   ├── dashboard.go         # Dashboard page handlers
-│   │   ├── landing.go           # Landing page (index)
-│   │   └── api.go               # REST API handlers (JSON)
+│   │   ├── handlers.go          # Public page handlers render templ pages
+│   │   ├── render.go            # templ.Component HTML response helper
+│   │   ├── admin.go             # Admin panel handlers (legacy inline HTML)
+│   │   ├── auth.go              # API key + admin session auth
+│   │   ├── api.go               # REST API handlers (JSON)
+│   │   └── rss.go               # RSS feed
 │   │
 │   └── view/
 │       ├── layouts/
-│       │   └── base.templ       # HTML shell: <head>, nav, footer, Tailwind CDN
+│       │   └── base.templ       # HTML shell: <head>, nav, footer, CSS, HTMX CDN
 │       ├── pages/
 │       │   ├── index.templ       # Landing page
 │       │   ├── blog_list.templ   # Blog listing dengan filter kategori
 │       │   ├── blog_post.templ   # Single post (render markdown → HTML)
 │       │   ├── dashboard.templ   # Dashboard overview (HTMX auto-refresh)
-│       │   └── server_detail.templ # Detail satu server
+│       │   ├── server_detail.templ # Detail satu server
+│       │   └── not_found.templ   # Custom 404 page
 │       └── components/
 │           ├── nav.templ         # Navigasi bar
 │           ├── post_card.templ   # Card ringkasan post (reusable)
@@ -180,6 +190,26 @@ raevtar/
 └────────────┘     │ online           │
                    │ recorded_at      │
                    └──────────────────┘
+
+┌────────────┐     ┌──────────────────┐
+│    tags    │     │    post_tags     │
+├────────────┤     ├──────────────────┤
+│ id (PK)    │◄────│ tag_id (FK)      │
+│ name       │     │ post_id (FK)     │────► posts.id
+│ slug       │     └──────────────────┘
+│ created_at │
+└────────────┘
+
+┌────────────┐     ┌──────────────────┐
+│   users    │     │    audit_logs    │
+├────────────┤     ├──────────────────┤
+│ id (PK)    │     │ id (PK)          │
+│ username   │     │ user             │
+│ role       │     │ action           │
+│ display_name     │ details          │
+│ created_at │     │ ip               │
+│ updated_at │     │ created_at       │
+└────────────┘     └──────────────────┘
 ```
 
 ---
@@ -191,16 +221,22 @@ raevtar/
 | GET | `/` | landing.Index | Landing page |
 | GET | `/blog` | blog.List | Blog list (semua) |
 | GET | `/blog?category=ai-agent` | blog.List | Filter by kategori |
-| GET | `/blog/:slug` | blog.Detail | Single post |
+| GET | `/blog/{slug}` | blog.Detail | Single post |
+| GET | `/blog/feed.xml` | rss.Feed | RSS feed |
 | GET | `/dashboard` | dashboard.Index | Server monitoring |
-| GET | `/dashboard/:server_id` | dashboard.Detail | Detail server |
+| GET | `/dashboard/{serverID}` | dashboard.Detail | Detail server |
+| GET | `/admin/*` | admin.* | Admin panel session auth |
 | GET | `/api/v1/posts` | api.ListPosts | JSON posts |
 | POST | `/api/v1/posts` | api.CreatePost | JSON create (cron) |
 | GET | `/api/v1/categories` | api.ListCategories | JSON categories |
+| GET | `/api/v1/hoststats` | api.HostStats | Host CPU/RAM/disk/temp |
 | GET | `/api/v1/servers` | api.ListServers | JSON server status |
-| GET | `/api/v1/servers/:id` | api.GetServer | JSON detail server |
+| POST | `/api/v1/servers` | api.CreateServer | Register server |
+| GET | `/api/v1/servers/{id}` | api.GetServer | JSON detail server |
+| POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Record server metrics |
+| GET | `/docs` | static docs.html | Swagger UI untuk `static/openapi.json` |
 
-Tambah `/docs` → auto-generated OpenAPI docs (swagger).
+Swagger UI disajikan dari static file, bukan generated runtime.
 
 ---
 
@@ -221,7 +257,7 @@ Tambah `/docs` → auto-generated OpenAPI docs (swagger).
 
 ### Server Monitoring — Agent collecting
 
-- Setiap mesin target jalanin **script kecil** (curl ke `raevtar.tech/api/v1/ping`) tiap 5 menit
+- Setiap mesin target jalanin **script kecil** (curl ke `raevtar.tech/api/v1/servers/{id}/ping`) tiap 5 menit
 - Atau cronjob Hermes polling dari sini via SSH
 - Atau lo config `internal/service/monitor.go` buat HTTP ping aja (minimal)
 
@@ -236,7 +272,7 @@ Tambah `/docs` → auto-generated OpenAPI docs (swagger).
 | **SQLite** | `modernc.org/sqlite` | Pure Go, gak perlu CGO, gak perlu gcc |
 | **ORM/Query** | `github.com/jmoiron/sqlx` | Ringan, tetap SQL mentah tanpa abstraction layer gede |
 | **Markdown** | `github.com/yuin/goldmark` | Standar, extensible |
-| **Tailwind** | CDN dulu → standalone CLI nanti | Zero setup awal |
+| **Tailwind** | Standalone CLI via `npx tailwindcss` | Scan `internal/view/**/*.templ` + admin handler HTML |
 | **Config** | Environment variables + `.env` | Standard 12-factor |
 
 ---
@@ -246,4 +282,4 @@ Tambah `/docs` → auto-generated OpenAPI docs (swagger).
 - **Testable** — handler > service > repo, tiap layer bisa di-test sendiri
 - **Expandable** — mau tambah fitur baru (comments, newsletter, webhook)? Tinggal tambah handler + service, gak perlu rombak struktuk
 - **Portable** — binary bisa di-copy ke server lain, laptop, VPS, jalan sama persis
-- **Lo-fi** — gak perlu Docker, gak perlu k8s, gak perlu CI/CD pipeline. Cuma `go build && ./raevtar`
+- **Lo-fi** — gak perlu Docker, gak perlu k8s, gak perlu CI/CD pipeline. Cuma `make build && ./raevtar`

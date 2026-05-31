@@ -24,13 +24,6 @@
             "description": "Filter by category slug",
             "required": false,
             "schema": { "type": "string" }
-          },
-          {
-            "name": "limit",
-            "in": "query",
-            "description": "Max results (default 100)",
-            "required": false,
-            "schema": { "type": "integer", "default": 100 }
           }
         ],
         "responses": {
@@ -85,6 +78,21 @@
                   "type": "array",
                   "items": { "$ref": "#/components/schemas/Category" }
                 }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/hoststats": {
+      "get": {
+        "summary": "Get host resource snapshot",
+        "responses": {
+          "200": {
+            "description": "Current host CPU, RAM, disk, and temperature stats",
+            "content": {
+              "application/json": {
+                "schema": { "$ref": "#/components/schemas/HostStats" }
               }
             }
           }
@@ -261,6 +269,42 @@
           "tags": { "type": "string" },
           "last_seen": { "type": "string", "nullable": true, "format": "date-time" },
           "created_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "HostStats": {
+        "type": "object",
+        "properties": {
+          "cpu": { "$ref": "#/components/schemas/CPUStats" },
+          "ram": { "$ref": "#/components/schemas/RAMStats" },
+          "disk": { "$ref": "#/components/schemas/DiskStats" },
+          "temp": { "type": "number" }
+        }
+      },
+      "CPUStats": {
+        "type": "object",
+        "properties": {
+          "load1": { "type": "number" },
+          "load5": { "type": "number" },
+          "load15": { "type": "number" },
+          "cores": { "type": "integer" }
+        }
+      },
+      "RAMStats": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer", "description": "Value from /proc/meminfo in kB" },
+          "available": { "type": "integer", "description": "Value from /proc/meminfo in kB" },
+          "used": { "type": "integer", "description": "Calculated from total - available, in kB" },
+          "percent": { "type": "number" }
+        }
+      },
+      "DiskStats": {
+        "type": "object",
+        "properties": {
+          "total": { "type": "integer", "description": "Filesystem blocks converted to bytes" },
+          "free": { "type": "integer", "description": "Available filesystem blocks converted to bytes" },
+          "used": { "type": "integer", "description": "Calculated from total - free, in bytes" },
+          "percent": { "type": "number" }
         }
       },
       "Tag": {

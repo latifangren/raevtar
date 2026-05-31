@@ -10,10 +10,10 @@
 |----------|-----------|---------|
 | Bahasa | **Go 1.26** | Gak ada Node, gak ada PHP, gak ada Ruby. Python hanya di automation opsional (Hermes cron), bukan runtime utama |
 | HTTP Router | `github.com/go-chi/chi/v5` | Bukan gin, bukan echo |
-| Template | `github.com/a-h/templ` | **Bukan** html/template standar. Compile dulu pake `templ generate` |
+| Template | `github.com/a-h/templ` | **Bukan** html/template standar. Compile dulu pake `make templ-gen` |
 | Database | `modernc.org/sqlite` + `github.com/jmoiron/sqlx` | Pure Go, no CGO |
 | Markdown | `github.com/yuin/goldmark` | GFM enabled |
-| CSS | Tailwind | CDN dulu. Nanti standalone CLI. |
+| CSS | Tailwind | Standalone CLI via `npx tailwindcss`; scan `internal/view/**/*.templ` dan admin handler inline HTML |
 | Interactivity | HTMX via CDN | Gak ada JavaScript framework |
 
 ## Arsitektur Layer (WAJIB dipatuhi)
@@ -57,7 +57,7 @@ Handler → Service → Repo → SQLite
 - SQLite write lock: `db.SetMaxOpenConns(1)` — jangan diubah
 
 ### Templating
-- Template di-compile: `templ generate` sebelum build
+- Template di-compile: `make templ-gen` atau `go run github.com/a-h/templ/cmd/templ@v0.3.906 generate` sebelum build
 - Komponen reusable di `internal/view/components/`
 - Layout base di `internal/view/layouts/base.templ`
 - Halaman di `internal/view/pages/`
@@ -81,7 +81,7 @@ Header: `Authorization: Bearer <RAEVTAR_ADMIN_KEY>`
 ## Hermes Integration Notes
 
 - Cronjob auto-post: Hermes langsung `curl` ke API localhost. Atau pake `cron/auto_post.sh` kalo mau standalone
-- Untuk nambah server monitoring: `POST /api/v1/servers/:id/ping`
+- Untuk nambah server monitoring: `POST /api/v1/servers/{id}/ping`
 - Gw bisa manual nulis artikel: kasih gw link/topik → gw riset → gw POST ke API
 
 ## Build & Run
@@ -97,7 +97,7 @@ make build
 ./raevtar
 
 # Generate templ
-templ generate
+make templ-gen
 
 # Reset database
 make db-reset
@@ -112,6 +112,8 @@ make db-reset
 | `RAEVTAR_DOMAIN` | `raevtar.tech` | Tidak |
 | `RAEVTAR_LOG_LEVEL` | `info` | Tidak |
 | `RAEVTAR_ADMIN_KEY` | `""` | **Ya** (untuk API write, constant-time validated) |
+| `RAEVTAR_ADMIN_USER` | `admin` | Tidak |
+| `RAEVTAR_ADMIN_PASS` | `""` | **Ya** (untuk admin panel login) |
 | `RAEVTAR_ENV` | `""` | Set `production` untuk mode produksi |
 
 ## Ketika Lo Bingung

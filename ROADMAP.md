@@ -40,7 +40,7 @@ Blog fungsional dengan konten otomatis dari Hermes.
 Monitoring server-server lokal.
 
 - [x] Form/API untuk daftarin server (name, host, port, tags)
-- [x] Agent monitoring: script curl ke `/api/v1/servers/:id/ping`
+- [x] Agent monitoring: script curl ke `/api/v1/servers/{id}/ping`
 - [x] Dashboard: overview semua server (status, CPU, RAM)
 - [x] Detail page: history metrics per server
 - [x] HTMX auto-refresh dashboard (tiap 30 detik)
@@ -68,7 +68,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] auth middleware (constant-time) untuk write endpoints
 - [x] Tag system (normalized: tags + post_tags + UI badges)
 - [x] RSS feed di `/blog/feed.xml` + auto-discovery `<link>` tag
-- [ ] OpenAPI spec + Swagger UI (`/docs`)
+- [x] OpenAPI spec + Swagger UI (`/docs`)
 - [ ] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.
@@ -88,7 +88,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Admin creds via env file (`/home/latif/raevtar/.env.production`)
 - [x] Health check: Hermes cronjob tiap 5 menit (silent if healthy)
 - [ ] Update dependencies periodik (go mod update, npm update)
-- [ ] OpenAPI spec + Swagger UI (`/docs`)
+- [x] OpenAPI spec + Swagger UI (`/docs`)
 
 **Deliverable:** Platform stabil, aman exposed ke internet.
 

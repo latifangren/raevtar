@@ -23,6 +23,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - API endpoint untuk nulis artikel dari agent (Hermes)
 - List per kategori, pagination
 - Detail artikel dengan markdown render (goldmark)
+- Tags normalized dan RSS feed `/blog/feed.xml`
 
 ### 3.2 Server Dashboard
 - Daftar server lokal yang dimonitor
@@ -36,26 +37,35 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - Static tapi dirender via Templ (gak perlu HTML manual)
 
 ### 3.4 REST API (v1)
-- `GET/POST /api/v1/posts` — CRUD blog posts
+- `GET /api/v1/posts` — list blog posts
+- `POST /api/v1/posts` — create blog post (auth)
 - `GET /api/v1/categories` — daftar kategori
 - `GET /api/v1/servers` — daftar server + status
-- `POST /api/v1/servers/:id/ping` — report metrics
-- `GET /api/v1/servers/:id` — detail server + history
-- Auto-generated OpenAPI docs via `/docs`
+- `POST /api/v1/servers` — register server (auth)
+- `POST /api/v1/servers/{id}/ping` — report metrics (auth)
+- `GET /api/v1/servers/{id}` — detail server
+- `GET /api/v1/hoststats` — host resource snapshot
+- Swagger UI `/docs` untuk static OpenAPI spec
 
-### 3.5 Integrasi Hermes
+### 3.5 Admin Panel
+- Session login di `/admin/login`
+- Manage posts, servers, users
+- RBAC role: `owner`, `admin`, `operator`, `readonly`
+- Audit log untuk login/logout dan aksi admin
+
+### 3.6 Integrasi Hermes
 - Cronjob harian: riset projek GitHub → nulis artikel → POST ke API
 - Hermes bisa manual: "tulis ini ke blog" → curl endpoint
 - Server monitoring: polling dari sini atau agent ngirim data
 
 ## 4. Non-Goals (sengaja gak dilakukan)
 
-- ❌ Multi-user / auth system (single-user, tunnel udah cukup)
+- ❌ Public account registration / multi-tenant SaaS
 - ❌ Comments / diskusi (ini bukan platform sosial)
 - ❌ Database server terpisah (SQLite cukup)
 - ❌ SPA / React / Next.js (RAM hp gak cukup)
 - ❌ Docker / Kubernetes (gak perlu untuk satu binary)
-- ❌ CI/CD pipeline (cukup `go build && ./raevtar`)
+- ❌ CI/CD pipeline (cukup `make build && ./raevtar`)
 - ❌ Search engine (bisa nanti, gak wajib awal)
 
 ## 5. Constraints
@@ -86,5 +96,5 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - Ada artikel baru tiap hari (dari Hermes)
 - Dashboard nunjukin status semua server lokal
 - API bisa dipanggil dari luar
-- Binary bisa jalan di background via OpenRC
+- Binary bisa jalan di background via service manager
 - Restart hp → service jalan otomatis

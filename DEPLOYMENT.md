@@ -8,12 +8,16 @@ Cara deploy Raevtar di postmarketOS (Alpine dengan systemd) atau Linux lain.
 apk add go cloudflared
 ```
 
+Build juga butuh Node/npm untuk Tailwind CLI kalau `static/css/style.css` mau diregenerate.
+
 ## Build
 
 ```bash
 cd /home/latif/raevtar
-go build -o raevtar ./cmd/server/
+make build
 ```
+
+`make build` menjalankan `go run github.com/a-h/templ/cmd/templ@v0.3.906 generate`, Tailwind CLI, lalu `go build`.
 
 ## System Service (systemd)
 
@@ -34,6 +38,8 @@ User=latif
 WorkingDirectory=/home/latif/raevtar
 ExecStart=/home/latif/raevtar/raevtar
 Environment=RAEVTAR_ADMIN_KEY=<isi-admin-key>
+Environment=RAEVTAR_ADMIN_USER=admin
+Environment=RAEVTAR_ADMIN_PASS=<isi-password-admin>
 Restart=on-failure
 RestartSec=5
 # Journald capture stdout/stderr otomatis — gak perlu redirect manual
@@ -148,6 +154,6 @@ journalctl -u raevtar -f
 ```bash
 cd /home/latif/raevtar
 git pull
-go build -o raevtar ./cmd/server/
+make build
 sudo systemctl restart raevtar
 ```
