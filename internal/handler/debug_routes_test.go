@@ -117,6 +117,36 @@ func TestAdminLoginRedirectsToDashboard(t *testing.T) {
 	}
 }
 
+func TestAdminLoginIgnoresForwardedForHeader(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	form := url.Values{
+		"username": {"admin"},
+		"password": {"demo-pass-123"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+	req.RemoteAddr = "192.0.2.10:4567"
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("X-Forwarded-For", "203.0.113.99")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	logs, err := app.svc.Admin.ListAuditLogs(5, 0)
+	if err != nil {
+		t.Fatalf("list audit logs: %v", err)
+	}
+	if len(logs) == 0 {
+		t.Fatalf("expected login audit log")
+	}
+	if logs[0].IP != "192.0.2.10" {
+		t.Fatalf("audit IP = %q, want RemoteAddr host", logs[0].IP)
+	}
+}
+
 func TestPublicRoutes(t *testing.T) {
 	app := newPublicTestApp(t)
 
@@ -472,6 +502,32 @@ func TestRSSFeedAllowsNoPosts(t *testing.T) {
 func TestAdminMutationsRequireOwnerOrAdmin(t *testing.T) {
 	app := newPublicTestApp(t)
 	token := sessions.create(42, "reader", model.RoleReadonly)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	form := url.Values{
+		"title":         {"Blocked Post"},
+		"category_slug": {"devops"},
+		"content":       {"# Blocked"},
+		"_csrf":         {entry.csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusForbidden {
+		t.Fatalf("status = %d, want %d", rr.Code, http.StatusForbidden)
+	}
+}
+
+func TestAdminMutationsRequireCSRF(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(45, "owner", model.RoleOwner)
 
 	form := url.Values{
 		"title":         {"Blocked Post"},
@@ -487,6 +543,93 @@ func TestAdminMutationsRequireOwnerOrAdmin(t *testing.T) {
 
 	if rr.Code != http.StatusForbidden {
 		t.Fatalf("status = %d, want %d", rr.Code, http.StatusForbidden)
+	}
+	assertContains(t, rr.Body.String(), "invalid CSRF token")
+}
+
+func TestAdminMutationsAcceptValidCSRF(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(46, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	form := url.Values{
+		"title":         {"Allowed Post"},
+		"category_slug": {"devops"},
+		"content":       {"# Allowed"},
+		"_csrf":         {entry.csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+}
+
+func TestAdminPagesRenderCSRFTokens(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(47, "owner", model.RoleOwner)
+
+	for _, path := range []string{"/admin", "/admin/posts", "/admin/servers", "/admin/manage-users", "/dashboard"} {
+		t.Run(path, func(t *testing.T) {
+			status, body := getBody(t, app, path, &http.Cookie{Name: sessionCookieName, Value: token})
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+			assertContains(t, body, `name="_csrf"`)
+		})
+	}
+}
+
+func TestAdminLogoutRequiresPOSTAndCSRF(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(48, "owner", model.RoleOwner)
+
+	getReq := httptest.NewRequest(http.MethodGet, "/admin/logout", nil)
+	getReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	getRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(getRR, getReq)
+	if getRR.Code != http.StatusMethodNotAllowed {
+		t.Fatalf("GET status = %d, want %d", getRR.Code, http.StatusMethodNotAllowed)
+	}
+	if _, ok := sessions.get(token); !ok {
+		t.Fatalf("GET logout deleted session")
+	}
+
+	postReq := httptest.NewRequest(http.MethodPost, "/admin/logout", strings.NewReader(url.Values{}.Encode()))
+	postReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	postReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	postRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(postRR, postReq)
+	if postRR.Code != http.StatusForbidden {
+		t.Fatalf("POST without CSRF status = %d, want %d", postRR.Code, http.StatusForbidden)
+	}
+	if _, ok := sessions.get(token); !ok {
+		t.Fatalf("CSRF-blocked logout deleted session")
+	}
+
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+	form := url.Values{"_csrf": {entry.csrfToken}}
+	validReq := httptest.NewRequest(http.MethodPost, "/admin/logout", strings.NewReader(form.Encode()))
+	validReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	validReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	validRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(validRR, validReq)
+	if validRR.Code != http.StatusSeeOther {
+		t.Fatalf("valid logout status = %d, want %d", validRR.Code, http.StatusSeeOther)
+	}
+	if _, ok := sessions.get(token); ok {
+		t.Fatalf("valid logout kept session")
 	}
 }
 
