@@ -17,12 +17,14 @@ body {
   background: var(--retro-cream);
   color: var(--retro-ink);
   font-family: 'Inter', system-ui, -apple-system, sans-serif;
+  overflow-x: clip;
 }
 
 a { @apply text-retro-ink underline decoration-2 hover:bg-retro-wheat transition-all; }
 a.no-underline { text-decoration: none; }
 
 /* Prose styles for blog content - softened neobrutalism */
+.prose { max-width: 100%; overflow-wrap: break-word; }
 .prose h1 { font-size: 2.25rem; font-weight: 700; margin-top: 2rem; margin-bottom: 1rem; color: var(--retro-ink); }
 .prose h2 { font-size: 1.5rem; font-weight: 600; margin-top: 1.5rem; margin-bottom: 0.75rem; color: var(--retro-ink); }
 .prose h3 { font-size: 1.25rem; font-weight: 600; margin-top: 1.25rem; margin-bottom: 0.5rem; color: var(--retro-ink); }
@@ -38,11 +40,12 @@ a.no-underline { text-decoration: none; }
   background: var(--retro-paper);
   padding: 1rem;
   overflow-x: auto;
+  max-width: 100%;
   margin-bottom: 1rem;
   border: 2px solid var(--retro-ink);
   box-shadow: 4px 4px 0px 0px var(--retro-ink);
 }
-.prose pre code { background: none; padding: 0; border: none; box-shadow: none; }
+.prose pre code { background: none; padding: 0; border: none; box-shadow: none; white-space: pre; }
 .prose a { @apply text-retro-ink underline decoration-2; }
 .prose a:hover { @apply bg-retro-wheat; }
 .prose ul, .prose ol { margin-bottom: 1rem; padding-left: 1.5rem; }
@@ -56,8 +59,8 @@ a.no-underline { text-decoration: none; }
   font-style: italic;
   font-weight: 600;
 }
-.prose img { max-width: 100%; border: 2px solid var(--retro-ink); }
-.prose table { @apply w-full border-collapse mb-4; }
+.prose img { max-width: 100%; height: auto; border: 2px solid var(--retro-ink); }
+.prose table { @apply w-full border-collapse mb-4; display: block; max-width: 100%; overflow-x: auto; white-space: nowrap; }
 .prose th, .prose td { @apply border-2 border-retro-ink px-3 py-2 text-sm; }
 .prose th { @apply bg-retro-ink text-retro-cream font-bold; }
 
