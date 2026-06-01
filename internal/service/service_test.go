@@ -122,6 +122,90 @@ func TestBlogServicePublishedPostLookupHidesDrafts(t *testing.T) {
 	}
 }
 
+func TestBlogServiceCreatePostGeneratesUniqueSlugs(t *testing.T) {
+	state := newTestServices(t)
+
+	first, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Duplicate Title",
+		ContentMD:    "# First",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create first post: %v", err)
+	}
+	second, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Duplicate Title",
+		ContentMD:    "# Second",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create second post: %v", err)
+	}
+
+	if first.Slug != "duplicate-title" {
+		t.Fatalf("first slug = %q, want duplicate-title", first.Slug)
+	}
+	if second.Slug != "duplicate-title-2" {
+		t.Fatalf("second slug = %q, want duplicate-title-2", second.Slug)
+	}
+}
+
+func TestBlogServiceUpdatePostPreservesSlugAndReplacesTags(t *testing.T) {
+	state := newTestServices(t)
+
+	post, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Original Title",
+		ContentMD:    "# Original",
+		Published:    true,
+		Tags:         []string{"old"},
+	})
+	if err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+	updated, err := state.svc.Blog.UpdatePost(post.ID, model.PostUpdate{
+		CategorySlug: "tools",
+		Title:        "Updated Title",
+		ContentMD:    "# Updated",
+		Excerpt:      "New excerpt",
+		Published:    false,
+		Tags:         []string{"new", " commissioned "},
+	})
+	if err != nil {
+		t.Fatalf("update post: %v", err)
+	}
+
+	if updated.Slug != post.Slug {
+		t.Fatalf("updated slug = %q, want preserved %q", updated.Slug, post.Slug)
+	}
+	if updated.Title != "Updated Title" || updated.CategorySlug != "tools" || updated.ContentMD != "# Updated" || updated.Excerpt != "New excerpt" || updated.Published {
+		t.Fatalf("updated post mismatch: %+v", updated)
+	}
+	if len(updated.Tags) != 2 || updated.Tags[0].Name != "commissioned" || updated.Tags[1].Name != "new" {
+		t.Fatalf("updated tags = %+v, want commissioned,new", updated.Tags)
+	}
+}
+
+func TestBlogServiceListAllPostsIncludesDrafts(t *testing.T) {
+	state := newTestServices(t)
+
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{CategorySlug: "devops", Title: "Published", ContentMD: "# Published", Published: true}); err != nil {
+		t.Fatalf("create published post: %v", err)
+	}
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{CategorySlug: "tools", Title: "Draft", ContentMD: "# Draft", Published: false}); err != nil {
+		t.Fatalf("create draft post: %v", err)
+	}
+	posts, total, err := state.svc.Blog.ListAllPosts(1, 10)
+	if err != nil {
+		t.Fatalf("list all posts: %v", err)
+	}
+	if total != 2 || len(posts) != 2 {
+		t.Fatalf("posts total=%d len=%d, want 2/2", total, len(posts))
+	}
+}
+
 func TestMonitorServiceMetricsAndServerAccess(t *testing.T) {
 	state := newTestServices(t)
 

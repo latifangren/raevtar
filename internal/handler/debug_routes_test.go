@@ -156,6 +156,70 @@ func TestAdminLoginIgnoresForwardedForHeader(t *testing.T) {
 	}
 }
 
+func TestAdminLoginUsesCFConnectingIPFromTrustedProxy(t *testing.T) {
+	app := newPublicTestApp(t)
+	app.svc.Cfg.TrustedProxyCIDRs = []string{"192.0.2.10/32"}
+	app.handler = New(app.svc, app.svc.Cfg)
+
+	form := url.Values{
+		"username": {"admin"},
+		"password": {"demo-pass-123"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+	req.RemoteAddr = "192.0.2.10:4567"
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("CF-Connecting-IP", "203.0.113.99")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	logs, err := app.svc.Admin.ListAuditLogs(5, 0)
+	if err != nil {
+		t.Fatalf("list audit logs: %v", err)
+	}
+	if len(logs) == 0 {
+		t.Fatalf("expected login audit log")
+	}
+	if logs[0].IP != "203.0.113.99" {
+		t.Fatalf("audit IP = %q, want trusted CF header", logs[0].IP)
+	}
+}
+
+func TestAdminLoginIgnoresForwardedHeaderFromUntrustedProxy(t *testing.T) {
+	app := newPublicTestApp(t)
+	app.svc.Cfg.TrustedProxyCIDRs = []string{"198.51.100.10/32"}
+	app.handler = New(app.svc, app.svc.Cfg)
+
+	form := url.Values{
+		"username": {"admin"},
+		"password": {"demo-pass-123"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+	req.RemoteAddr = "192.0.2.10:4567"
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Set("CF-Connecting-IP", "203.0.113.99")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	logs, err := app.svc.Admin.ListAuditLogs(5, 0)
+	if err != nil {
+		t.Fatalf("list audit logs: %v", err)
+	}
+	if len(logs) == 0 {
+		t.Fatalf("expected login audit log")
+	}
+	if logs[0].IP != "192.0.2.10" {
+		t.Fatalf("audit IP = %q, want RemoteAddr host", logs[0].IP)
+	}
+}
+
 func TestPublicRoutes(t *testing.T) {
 	app := newPublicTestApp(t)
 
@@ -217,6 +281,15 @@ func TestPublicRoutes(t *testing.T) {
 			wantContains: []string{
 				"Public docs",
 				"Public front, admin back room",
+			},
+		},
+		{
+			name:           "stale swagger shell removed",
+			path:           "/static/docs.html",
+			wantStatus:     http.StatusNotFound,
+			wantContentTyp: "text/plain",
+			wantContains: []string{
+				"404 page not found",
 			},
 		},
 		{
@@ -423,7 +496,7 @@ func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
 	}
 }
 
-func TestOwnerDashboardShowsServerTopology(t *testing.T) {
+func TestOwnerDashboardKeepsServerTopologyInAdminOnly(t *testing.T) {
 	app := newPublicTestApp(t)
 	cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(101, "owner", model.RoleOwner)}
 
@@ -432,9 +505,12 @@ func TestOwnerDashboardShowsServerTopology(t *testing.T) {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
 
-	assertContains(t, body, "127.0.0.1:9100")
-	assertContains(t, body, ">9100<")
-	assertContains(t, body, ">local<")
+	assertContains(t, body, "Hidden on public view")
+	assertContains(t, body, "redacted")
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "127.0.0.1:9100")
+	assertNotContains(t, body, ">9100<")
+	assertNotContains(t, body, ">local<")
 }
 
 func TestDashboardRegisterControlsAreRoleGated(t *testing.T) {
@@ -447,8 +523,8 @@ func TestDashboardRegisterControlsAreRoleGated(t *testing.T) {
 		{name: "public", wantRegister: false},
 		{name: "operator", role: model.RoleOperator, wantRegister: false},
 		{name: "readonly", role: model.RoleReadonly, wantRegister: false},
-		{name: "owner", role: model.RoleOwner, wantRegister: true},
-		{name: "admin", role: model.RoleAdmin, wantRegister: true},
+		{name: "owner", role: model.RoleOwner, wantRegister: false},
+		{name: "admin", role: model.RoleAdmin, wantRegister: false},
 	}
 
 	for _, tt := range roles {
@@ -501,7 +577,7 @@ func TestPublicServerDetailRedactsServerTopology(t *testing.T) {
 
 	assertContains(t, body, "whyred")
 	assertContains(t, body, "Endpoint hidden on public view.")
-	assertContains(t, body, "Login as owner/admin for network details.")
+	assertContains(t, body, "Use admin diagnostics for network details.")
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, "port 9100")
@@ -520,7 +596,7 @@ func TestLimitedRolesServerDetailRedactsServerTopology(t *testing.T) {
 			}
 
 			assertContains(t, body, "Endpoint hidden on public view.")
-			assertContains(t, body, "Login as owner/admin for network details.")
+			assertContains(t, body, "Use admin diagnostics for network details.")
 
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
@@ -533,7 +609,7 @@ func TestLimitedRolesServerDetailRedactsServerTopology(t *testing.T) {
 	}
 }
 
-func TestOwnerServerDetailShowsServerTopology(t *testing.T) {
+func TestOwnerServerDetailKeepsTopologyInAdminOnly(t *testing.T) {
 	app := newPublicTestApp(t)
 	cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(102, "owner", model.RoleOwner)}
 
@@ -542,9 +618,11 @@ func TestOwnerServerDetailShowsServerTopology(t *testing.T) {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
 
-	assertContains(t, body, "127.0.0.1:9100")
-	assertContains(t, body, "port 9100")
-	assertContains(t, body, ">local<")
+	assertContains(t, body, "Endpoint hidden on public view.")
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "127.0.0.1:9100")
+	assertNotContains(t, body, "port 9100")
+	assertNotContains(t, body, ">local<")
 }
 
 func TestPublicServerDetailLiveRendersFragmentWithPollingAndRedaction(t *testing.T) {
@@ -576,7 +654,7 @@ func TestPublicServerDetailLiveRendersFragmentWithPollingAndRedaction(t *testing
 	assertContains(t, body, "Panel refreshed")
 	assertContains(t, body, "Telemetry is fresh. Latest agent signal arrived recently.")
 	assertContains(t, body, "Endpoint hidden on public view.")
-	assertContains(t, body, "Login as owner/admin for network details.")
+	assertContains(t, body, "Use admin diagnostics for network details.")
 	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "sample count", "history window", "availability"} {
 		assertNotContains(t, body, leak)
 	}
@@ -619,7 +697,7 @@ func TestLimitedRolesServerDetailLiveRedactsServerTopology(t *testing.T) {
 	}
 }
 
-func TestOwnerAndAdminServerDetailLiveShowTopologyAndManageLink(t *testing.T) {
+func TestOwnerAndAdminServerDetailLiveKeepsTopologyInAdminOnly(t *testing.T) {
 	app := newPublicTestApp(t)
 
 	for _, role := range []string{model.RoleOwner, model.RoleAdmin} {
@@ -630,15 +708,16 @@ func TestOwnerAndAdminServerDetailLiveShowTopologyAndManageLink(t *testing.T) {
 				t.Fatalf("status = %d, want %d", status, http.StatusOK)
 			}
 
-			assertContains(t, body, "127.0.0.1:9100")
-			assertContains(t, body, "port 9100")
-			assertContains(t, body, ">local<")
-			assertContains(t, body, `href="/admin/servers"`)
-			assertContains(t, body, "Manage in admin")
-			assertContains(t, body, "latest metric")
-			assertContains(t, body, "sample count")
-			assertContains(t, body, "history window")
-			assertContains(t, body, "availability")
+			assertContains(t, body, "Endpoint hidden on public view.")
+			assertContains(t, body, "Metric detail hidden on public view.")
+			assertNotContains(t, body, "127.0.0.1")
+			assertNotContains(t, body, "127.0.0.1:9100")
+			assertNotContains(t, body, "port 9100")
+			assertNotContains(t, body, ">local<")
+			assertNotContains(t, body, `href="/admin/servers"`)
+			for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "sample count", "history window", "availability"} {
+				assertNotContains(t, body, leak)
+			}
 		})
 	}
 }
@@ -666,7 +745,7 @@ func TestPublicServerDetailRedactsMetricValues(t *testing.T) {
 	}
 }
 
-func TestOwnerServerDetailRendersMetricMarkers(t *testing.T) {
+func TestOwnerServerDetailKeepsMetricMarkersInAdminOnly(t *testing.T) {
 	app := newPublicTestApp(t)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
 		CPUPercent:    12.5,
@@ -684,8 +763,8 @@ func TestOwnerServerDetailRendersMetricMarkers(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	for _, want := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB"} {
-		assertContains(t, body, want)
+	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB"} {
+		assertNotContains(t, body, leak)
 	}
 }
 
@@ -860,12 +939,22 @@ func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
 	app := newPublicTestApp(t)
 	ownerToken := sessions.create(51, "owner", model.RoleOwner)
 	readonlyToken := sessions.create(52, "reader", model.RoleReadonly)
+	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
+		CPUPercent:    12.5,
+		RAMUsedMB:     256,
+		RAMTotalMB:    1024,
+		DiskUsedGB:    8.5,
+		UptimeSeconds: 3600,
+		Online:        true,
+	}); err != nil {
+		t.Fatalf("record metrics: %v", err)
+	}
 
 	status, body := getBody(t, app, "/admin/servers/1", &http.Cookie{Name: sessionCookieName, Value: ownerToken})
 	if status != http.StatusOK {
 		t.Fatalf("owner status = %d, want %d", status, http.StatusOK)
 	}
-	for _, want := range []string{"whyred diagnostics", "127.0.0.1", "9100", "local", "Agent setup", "raevtar-agent.sh", "Admin activity"} {
+	for _, want := range []string{"whyred diagnostics", "127.0.0.1", "9100", "local", "Agent setup", "raevtar-agent.sh", "Last payload summary", "CPU 12.5%", "Status timeline", "Online sample recorded", "Admin activity"} {
 		assertContains(t, body, want)
 	}
 	assertNotContains(t, body, "agent_token_hash")
@@ -876,6 +965,82 @@ func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
 	}
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "raevtar-agent.sh")
+}
+
+func TestAdminPostEditUpdatesExistingPost(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(54, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+	post, err := app.svc.Blog.GetPost("hello-raevtar")
+	if err != nil {
+		t.Fatalf("get post: %v", err)
+	}
+
+	status, body := getBody(t, app, "/admin/posts/edit/"+strconv.FormatInt(post.ID, 10), &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("edit status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Edit post")
+	assertContains(t, body, "Hello Raevtar")
+
+	form := url.Values{
+		"_csrf":         {entry.csrfToken},
+		"title":         {"Updated Dispatch"},
+		"category_slug": {"tools"},
+		"content":       {"# Updated Dispatch"},
+		"excerpt":       {"Updated excerpt"},
+		"tags":          {"new, commissioned"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(post.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("update status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	updated, err := app.svc.Blog.GetPost("hello-raevtar")
+	if err != nil {
+		t.Fatalf("get updated post by preserved slug: %v", err)
+	}
+	if updated.Title != "Updated Dispatch" || updated.CategorySlug != "tools" || updated.Excerpt != "Updated excerpt" || updated.Published {
+		t.Fatalf("updated post = %+v", updated)
+	}
+	if len(updated.Tags) != 2 {
+		t.Fatalf("updated tags = %+v, want 2", updated.Tags)
+	}
+	status, body = getBody(t, app, "/admin/posts", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("posts status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Updated Dispatch")
+	assertContains(t, body, "draft")
+}
+
+func TestAdminPostUpdateMissingPostReturnsNotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(55, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+	form := url.Values{
+		"_csrf":         {entry.csrfToken},
+		"title":         {"Missing"},
+		"category_slug": {"devops"},
+		"content":       {"# Missing"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/999", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusNotFound, rr.Body.String())
+	}
 }
 
 func TestAdminServerDiagnosticsDoNotMixAuditLogIDs(t *testing.T) {
@@ -1104,7 +1269,7 @@ func TestAdminPagesRenderCSRFTokens(t *testing.T) {
 	app := newPublicTestApp(t)
 	token := sessions.create(47, "owner", model.RoleOwner)
 
-	for _, path := range []string{"/admin", "/admin/posts", "/admin/servers", "/admin/manage-users", "/dashboard"} {
+	for _, path := range []string{"/admin", "/admin/posts", "/admin/servers", "/admin/manage-users"} {
 		t.Run(path, func(t *testing.T) {
 			status, body := getBody(t, app, path, &http.Cookie{Name: sessionCookieName, Value: token})
 			if status != http.StatusOK {
