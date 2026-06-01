@@ -91,9 +91,9 @@ func (r *PostRepo) GetByID(id int64) (*model.Post, error) {
 
 func (r *PostRepo) Create(p *model.Post) error {
 	result, err := r.db.Exec(`
-		INSERT INTO posts (category_id, title, slug, content_md, excerpt, published)
-		VALUES (?, ?, ?, ?, ?, ?)`,
-		p.CategoryID, p.Title, p.Slug, p.ContentMD, p.Excerpt, p.Published,
+		INSERT INTO posts (category_id, title, slug, content_md, excerpt, cover_image_url, published)
+		VALUES (?, ?, ?, ?, ?, ?, ?)`,
+		p.CategoryID, p.Title, p.Slug, p.ContentMD, p.Excerpt, p.CoverImageURL, p.Published,
 	)
 	if err != nil {
 		return err
@@ -106,9 +106,9 @@ func (r *PostRepo) Create(p *model.Post) error {
 func (r *PostRepo) Update(p *model.Post) error {
 	_, err := r.db.Exec(`
 		UPDATE posts
-		SET category_id = ?, title = ?, content_md = ?, excerpt = ?, published = ?, updated_at = ?
+		SET category_id = ?, title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, updated_at = ?
 		WHERE id = ?`,
-		p.CategoryID, p.Title, p.ContentMD, p.Excerpt, p.Published, p.UpdatedAt, p.ID,
+		p.CategoryID, p.Title, p.ContentMD, p.Excerpt, p.CoverImageURL, p.Published, p.UpdatedAt, p.ID,
 	)
 	return err
 }

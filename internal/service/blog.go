@@ -84,12 +84,10 @@ func (s *BlogService) GetPost(slug string) (*model.Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	// render markdown to HTML
-	var buf strings.Builder
-	if err := s.markdown.Convert([]byte(post.ContentMD), &buf); err != nil {
-		return nil, fmt.Errorf("render markdown: %w", err)
+	post.ContentHTML, err = s.RenderMarkdown(post.ContentMD)
+	if err != nil {
+		return nil, err
 	}
-	post.ContentHTML = buf.String()
 	return post, nil
 }
 
@@ -116,14 +114,15 @@ func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
 	}
 
 	post := &model.Post{
-		CategoryID: cat.ID,
-		Title:      input.Title,
-		Slug:       "",
-		ContentMD:  input.ContentMD,
-		Excerpt:    input.Excerpt,
-		Published:  input.Published,
-		CreatedAt:  time.Now(),
-		UpdatedAt:  time.Now(),
+		CategoryID:    cat.ID,
+		Title:         input.Title,
+		Slug:          "",
+		ContentMD:     input.ContentMD,
+		Excerpt:       input.Excerpt,
+		CoverImageURL: input.CoverImageURL,
+		Published:     input.Published,
+		CreatedAt:     time.Now(),
+		UpdatedAt:     time.Now(),
 	}
 	post.Slug, err = s.uniqueSlug(input.Title)
 	if err != nil {
@@ -149,12 +148,19 @@ func (s *BlogService) GetPostByID(id int64) (*model.Post, error) {
 	if err != nil {
 		return nil, err
 	}
-	var buf strings.Builder
-	if err := s.markdown.Convert([]byte(post.ContentMD), &buf); err != nil {
-		return nil, fmt.Errorf("render markdown: %w", err)
+	post.ContentHTML, err = s.RenderMarkdown(post.ContentMD)
+	if err != nil {
+		return nil, err
 	}
-	post.ContentHTML = buf.String()
 	return post, nil
+}
+
+func (s *BlogService) RenderMarkdown(content string) (string, error) {
+	var buf strings.Builder
+	if err := s.markdown.Convert([]byte(content), &buf); err != nil {
+		return "", fmt.Errorf("render markdown: %w", err)
+	}
+	return buf.String(), nil
 }
 
 func (s *BlogService) UpdatePost(id int64, input model.PostUpdate) (*model.Post, error) {
@@ -162,6 +168,7 @@ func (s *BlogService) UpdatePost(id int64, input model.PostUpdate) (*model.Post,
 	input.Title = strings.TrimSpace(input.Title)
 	input.ContentMD = strings.TrimSpace(input.ContentMD)
 	input.Excerpt = strings.TrimSpace(input.Excerpt)
+	input.CoverImageURL = strings.TrimSpace(input.CoverImageURL)
 	cleanTags := make([]string, 0, len(input.Tags))
 	for _, tag := range input.Tags {
 		tag = strings.TrimSpace(tag)
@@ -188,6 +195,7 @@ func (s *BlogService) UpdatePost(id int64, input model.PostUpdate) (*model.Post,
 	post.Title = input.Title
 	post.ContentMD = input.ContentMD
 	post.Excerpt = input.Excerpt
+	post.CoverImageURL = input.CoverImageURL
 	post.Published = input.Published
 	post.UpdatedAt = time.Now()
 	if err := s.repos.Post.Update(post); err != nil {
@@ -204,6 +212,7 @@ func cleanPostCreate(input model.PostCreate) model.PostCreate {
 	input.Title = strings.TrimSpace(input.Title)
 	input.ContentMD = strings.TrimSpace(input.ContentMD)
 	input.Excerpt = strings.TrimSpace(input.Excerpt)
+	input.CoverImageURL = strings.TrimSpace(input.CoverImageURL)
 	cleanTags := make([]string, 0, len(input.Tags))
 	for _, tag := range input.Tags {
 		tag = strings.TrimSpace(tag)
