@@ -8,6 +8,11 @@ import (
 	"raevtar/internal/model"
 )
 
+const (
+	freshSignalWindow = 3 * time.Minute
+	staleSignalWindow = 15 * time.Minute
+)
+
 type IndexData struct {
 	CurrentPath string
 	Posts       []model.Post
@@ -37,6 +42,12 @@ type LabData struct {
 	PostCount     int
 	CategoryCount int
 	ServerCount   int
+}
+
+type DocsData struct {
+	CurrentPath string
+	Categories  []model.Category
+	PostCount   int
 }
 
 type DashboardData struct {
@@ -123,13 +134,141 @@ func FreshnessCauseHint(lastSeen *time.Time, metrics []model.ServerMetric, now t
 		age = 0
 	}
 	switch {
-	case age < 3*time.Minute:
+	case age < freshSignalWindow:
 		return "Telemetry is fresh. Latest agent signal arrived recently."
-	case age < 15*time.Minute:
+	case age < staleSignalWindow:
 		return "Telemetry is delayed. Agent may be between scheduled reports."
 	default:
 		return "Telemetry is offline. No recent agent signal has reached Raevtar."
 	}
+}
+
+func DashboardStatusHint(lastSeen *time.Time) string {
+	if lastSeen == nil {
+		return "No agent signal has arrived yet."
+	}
+	age := time.Since(*lastSeen)
+	if age < 0 {
+		age = 0
+	}
+	switch {
+	case age < 3*time.Minute:
+		return "Agent checked in recently."
+	case age < 15*time.Minute:
+		return "Agent signal is delayed; one cron run may have been missed."
+	default:
+		return "No recent agent signal reached Raevtar."
+	}
+}
+
+func OnlineServerCount(servers []model.Server) int {
+	count := 0
+	for _, server := range servers {
+		if server.LastSeen != nil && time.Since(*server.LastSeen) < 3*time.Minute {
+			count++
+		}
+	}
+	return count
+}
+
+func StaleServerCount(servers []model.Server) int {
+	count := 0
+	for _, server := range servers {
+		if server.LastSeen != nil && time.Since(*server.LastSeen) >= 3*time.Minute && time.Since(*server.LastSeen) < 15*time.Minute {
+			count++
+		}
+	}
+	return count
+}
+
+func OfflineServerCount(servers []model.Server) int {
+	count := 0
+	for _, server := range servers {
+		if server.LastSeen == nil || time.Since(*server.LastSeen) >= 15*time.Minute {
+			count++
+		}
+	}
+	return count
+}
+
+func MetricAvailabilityText(metrics []model.ServerMetric) string {
+	if len(metrics) == 0 {
+		return "No availability window yet"
+	}
+	online := 0
+	for _, metric := range metrics {
+		if metric.Online {
+			online++
+		}
+	}
+	percent := (online * 100) / len(metrics)
+	return strconv.Itoa(percent) + "% online in recent samples"
+}
+
+func DashboardFreshnessReason(lastSeen *time.Time) string {
+	return DashboardFreshnessReasonAt(lastSeen, time.Now())
+}
+
+func DashboardFreshnessReasonAt(lastSeen *time.Time, now time.Time) string {
+	if lastSeen == nil {
+		return "Why: no last agent signal has reached Raevtar yet."
+	}
+	age := now.Sub(*lastSeen)
+	if age < 0 {
+		age = 0
+	}
+	switch {
+	case age < freshSignalWindow:
+		return "Why: last agent signal is inside the <3m online window."
+	case age < staleSignalWindow:
+		return "Why: last agent signal is older than 3m but still inside the 15m stale window."
+	default:
+		return "Why: last agent signal is older than 15m, so public status is offline."
+	}
+}
+
+func FreshnessWindowText(lastSeen *time.Time, now time.Time) string {
+	if lastSeen == nil {
+		return "No signal recorded"
+	}
+	age := now.Sub(*lastSeen)
+	if age < 0 {
+		age = 0
+	}
+	switch {
+	case age < freshSignalWindow:
+		return "Fresh window: <3m"
+	case age < staleSignalWindow:
+		return "Stale window: 3-15m"
+	default:
+		return "Offline window: 15m+"
+	}
+}
+
+func MetricSampleCountText(metrics []model.ServerMetric) string {
+	if len(metrics) == 1 {
+		return "1 sample"
+	}
+	return strconv.Itoa(len(metrics)) + " samples"
+}
+
+func MetricWindowText(metrics []model.ServerMetric) string {
+	if len(metrics) == 0 {
+		return "No history yet"
+	}
+	newest := metrics[0].RecordedAt
+	oldest := metrics[len(metrics)-1].RecordedAt
+	if newest.IsZero() || oldest.IsZero() {
+		return "History window unknown"
+	}
+	return AgeText(newest.Sub(oldest)) + " captured"
+}
+
+func MetricRecordedAgeText(recordedAt time.Time, now time.Time) string {
+	if recordedAt.IsZero() {
+		return "unknown age"
+	}
+	return AgeText(now.Sub(recordedAt)) + " ago"
 }
 
 func AgeText(duration time.Duration) string {
@@ -213,10 +352,14 @@ func TagClass(name string) string {
 }
 
 func ServerStatusText(lastSeen *time.Time) string {
+	return ServerStatusTextAt(lastSeen, time.Now())
+}
+
+func ServerStatusTextAt(lastSeen *time.Time, now time.Time) string {
 	switch {
-	case lastSeen != nil && time.Since(*lastSeen) < 3*time.Minute:
+	case lastSeen != nil && now.Sub(*lastSeen) < freshSignalWindow:
 		return "Online"
-	case lastSeen != nil && time.Since(*lastSeen) < 15*time.Minute:
+	case lastSeen != nil && now.Sub(*lastSeen) < staleSignalWindow:
 		return "Stale"
 	default:
 		return "Offline"
@@ -224,17 +367,25 @@ func ServerStatusText(lastSeen *time.Time) string {
 }
 
 func DashboardStatusText(lastSeen *time.Time) string {
+	return DashboardStatusTextAt(lastSeen, time.Now())
+}
+
+func DashboardStatusTextAt(lastSeen *time.Time, now time.Time) string {
 	if lastSeen == nil {
-		return "Offline"
+		return "Offline — no signal"
 	}
-	return ServerStatusText(lastSeen) + " — " + lastSeen.Format("Jan 2 15:04")
+	return ServerStatusTextAt(lastSeen, now) + " — " + LastSignalAgeText(lastSeen, now)
 }
 
 func StatusDotClass(lastSeen *time.Time) string {
+	return StatusDotClassAt(lastSeen, time.Now())
+}
+
+func StatusDotClassAt(lastSeen *time.Time, now time.Time) string {
 	switch {
-	case lastSeen != nil && time.Since(*lastSeen) < 3*time.Minute:
+	case lastSeen != nil && now.Sub(*lastSeen) < freshSignalWindow:
 		return "bg-retro-sage"
-	case lastSeen != nil && time.Since(*lastSeen) < 15*time.Minute:
+	case lastSeen != nil && now.Sub(*lastSeen) < staleSignalWindow:
 		return "bg-retro-wheat"
 	default:
 		return "bg-retro-blush"
