@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"strings"
 	"time"
 
 	"raevtar/internal/model"
@@ -58,6 +59,35 @@ func (s *MonitorService) ListServers() ([]model.Server, error) {
 
 func (s *MonitorService) GetServer(id int64) (*model.Server, error) {
 	return s.repos.Server.GetByID(id)
+}
+
+func (s *MonitorService) UpdateServer(id int64, name, host string, port int, tags string) (*model.Server, error) {
+	server, err := s.repos.Server.GetByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %w", ErrServerNotFound, err)
+		}
+		return nil, fmt.Errorf("get server: %w", err)
+	}
+
+	name = strings.TrimSpace(name)
+	host = strings.TrimSpace(host)
+	tags = strings.TrimSpace(tags)
+	if name == "" || host == "" {
+		return nil, fmt.Errorf("update server: name and host required")
+	}
+	if port <= 0 {
+		return nil, fmt.Errorf("update server: port required")
+	}
+
+	server.Name = name
+	server.Host = host
+	server.Port = port
+	server.Tags = tags
+	if err := s.repos.Server.Update(server); err != nil {
+		return nil, fmt.Errorf("update server: %w", err)
+	}
+	return server, nil
 }
 
 func (s *MonitorService) RecordMetrics(serverID int64, m model.ServerMetric) error {

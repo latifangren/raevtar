@@ -44,6 +44,14 @@ func (r *ServerRepo) Delete(id int64) error {
 	return err
 }
 
+func (r *ServerRepo) Update(s *model.Server) error {
+	_, err := r.db.Exec(
+		"UPDATE servers SET name = ?, host = ?, port = ?, tags = ? WHERE id = ?",
+		s.Name, s.Host, s.Port, s.Tags, s.ID,
+	)
+	return err
+}
+
 func (r *ServerRepo) UpdateLastSeen(id int64, lastSeen time.Time) error {
 	_, err := r.db.Exec("UPDATE servers SET last_seen = ? WHERE id = ?", lastSeen, id)
 	return err
