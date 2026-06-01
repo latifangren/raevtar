@@ -7,6 +7,7 @@ templ Nav(categories []model.Category, currentPath string) {
 		<a href="/" class="text-lg sm:text-xl font-black text-retro-sageLight hover:text-retro-wheat no-underline">raevtar</a>
 		<a href="/blog" class={ navClass(currentPath == "/blog") }>blog</a>
 		<a href="/lab" class={ navClass(currentPath == "/lab") }>lab</a>
+		<a href="/docs" class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
 		<a href="/dashboard" class={ navClass(currentPath == "/dashboard") }>dashboard</a>
 	</nav>
 }
