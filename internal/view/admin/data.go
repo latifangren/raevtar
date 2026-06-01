@@ -66,6 +66,13 @@ type PostsData struct {
 	Categories  []model.Category
 }
 
+type PostEditData struct {
+	CurrentPath string
+	CSRFToken   string
+	Post        *model.Post
+	Categories  []model.Category
+}
+
 type ServersData struct {
 	CurrentPath            string
 	CSRFToken              string
@@ -139,6 +146,103 @@ func ServerMetricAvailabilityText(metrics []model.ServerMetric) string {
 		}
 	}
 	return strconv.Itoa((online*100)/len(metrics)) + "% online"
+}
+
+func LastPayloadSummaryText(metrics []model.ServerMetric, now time.Time) string {
+	if len(metrics) == 0 {
+		return "No payload received yet"
+	}
+	metric := metrics[0]
+	return "CPU " + MetricText(metric.CPUPercent) + "% · RAM " + RAMUsageText(metric.RAMUsedMB, metric.RAMTotalMB) + " · Disk " + MetricText(metric.DiskUsedGB) + " GB · Uptime " + UptimeText(metric.UptimeSeconds) + " · " + MetricRecordedAgeText(metric.RecordedAt, now)
+}
+
+func LastPayloadStateText(metrics []model.ServerMetric) string {
+	if len(metrics) == 0 {
+		return "No payload"
+	}
+	if metrics[0].Online {
+		return "Online payload"
+	}
+	return "Offline payload"
+}
+
+func MetricRecordedAgeText(recordedAt time.Time, now time.Time) string {
+	if recordedAt.IsZero() {
+		return "unknown age"
+	}
+	return AgeText(now.Sub(recordedAt)) + " ago"
+}
+
+func AgeText(duration time.Duration) string {
+	if duration < 0 {
+		duration = 0
+	}
+	if duration < time.Minute {
+		return "<1m"
+	}
+	minutes := int(duration.Minutes())
+	if minutes < 60 {
+		return strconv.Itoa(minutes) + "m"
+	}
+	hours := minutes / 60
+	if hours < 24 {
+		return strconv.Itoa(hours) + "h " + strconv.Itoa(minutes%60) + "m"
+	}
+	days := hours / 24
+	return strconv.Itoa(days) + "d " + strconv.Itoa(hours%24) + "h"
+}
+
+func RAMUsageText(used, total float64) string {
+	if total <= 0 {
+		return MetricText(used) + " MB"
+	}
+	return MetricText(used) + " / " + MetricText(total) + " MB"
+}
+
+func UptimeText(seconds int64) string {
+	if seconds <= 0 {
+		return "Unknown"
+	}
+	d := time.Duration(seconds) * time.Second
+	days := int(d.Hours()) / 24
+	hours := int(d.Hours()) % 24
+	minutes := int(d.Minutes()) % 60
+	if days > 0 {
+		return strconv.Itoa(days) + "d " + strconv.Itoa(hours) + "h"
+	}
+	if hours > 0 {
+		return strconv.Itoa(hours) + "h " + strconv.Itoa(minutes) + "m"
+	}
+	return strconv.Itoa(minutes) + "m"
+}
+
+func MetricDotClass(online bool) string {
+	if online {
+		return "bg-retro-sage"
+	}
+	return "bg-retro-blush"
+}
+
+func MetricStateText(online bool) string {
+	if online {
+		return "Online"
+	}
+	return "Offline"
+}
+
+func MetricTimelineText(metrics []model.ServerMetric, index int) string {
+	if index < 0 || index >= len(metrics) {
+		return "Sample recorded"
+	}
+	current := metrics[index]
+	if index == len(metrics)-1 {
+		return MetricStateText(current.Online) + " sample recorded"
+	}
+	previous := metrics[index+1]
+	if current.Online != previous.Online {
+		return MetricStateText(previous.Online) + " to " + MetricStateText(current.Online)
+	}
+	return MetricStateText(current.Online) + " sample continued"
 }
 
 func CountText(value int) string {
@@ -325,6 +429,14 @@ func CategoryBadgeClass(slug string) string {
 	default:
 		return "bg-retro-paper text-retro-ink"
 	}
+}
+
+func TagsInput(tags []model.Tag) string {
+	parts := make([]string, 0, len(tags))
+	for _, tag := range tags {
+		parts = append(parts, tag.Name)
+	}
+	return strings.Join(parts, ", ")
 }
 
 func TagList(tags string) []string {
