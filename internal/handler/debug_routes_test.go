@@ -925,14 +925,94 @@ func TestAdminCreateServerShowsAgentInstallToken(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	assertContains(t, body, "Copy this token now")
+	assertContains(t, body, "One-time agent token")
+	assertContains(t, body, "Copy before leaving or reloading")
+	assertContains(t, body, "Copy token")
+	assertContains(t, body, `data-copy-target="server-2-agent-token"`)
+	assertContains(t, body, `id="server-2-agent-token"`)
+	assertContains(t, body, "Copy install command")
+	assertContains(t, body, "Copy run command")
+	assertContains(t, body, "Copy cron line")
+	assertContains(t, body, `data-copy-target="server-2-install-command"`)
+	assertContains(t, body, `data-copy-target="server-2-run-command"`)
+	assertContains(t, body, `data-copy-target="server-2-cron-command"`)
+	assertContains(t, body, `data-confirm="Rotate agent token?`)
+	assertContains(t, body, `data-confirm="Delete this server?`)
+	assertContains(t, body, `data-confirm="Register this server and issue a one-time agent token?"`)
 	assertContains(t, body, "raevtar-agent.sh")
 	assertContains(t, body, "RAEVTAR_URL=https://raevtar.test")
 	assertContains(t, body, "RAEVTAR_SERVER_ID=2")
 	assertContains(t, body, "RAEVTAR_AGENT_TOKEN=")
+	assertNotContains(t, body, `data-copy-target="`+app.svc.Cfg.AdminKey)
 
 	_, secondBody := getBody(t, app, "/admin/servers", &http.Cookie{Name: sessionCookieName, Value: token})
-	assertNotContains(t, secondBody, "Copy this token now")
+	assertNotContains(t, secondBody, "One-time agent token")
+}
+
+func TestAdminServersEmptyStateShowsSetupAffordances(t *testing.T) {
+	dbPath := filepath.Join(t.TempDir(), "raevtar_empty_servers.db")
+	cfg := &config.Config{
+		DatabasePath: dbPath,
+		Domain:       "raevtar.test",
+		AdminKey:     "admin-key",
+		AdminUser:    "admin",
+		AdminPass:    "demo-pass-123",
+	}
+	db := repo.InitSQLite(cfg.DatabasePath)
+	t.Cleanup(func() { _ = db.Close() })
+	repo.AutoMigrate(db)
+	svc := service.New(repo.New(db), cfg)
+	if err := svc.SeedData(); err != nil {
+		t.Fatalf("seed data: %v", err)
+	}
+
+	app := &publicTestApp{handler: New(svc, cfg), svc: svc}
+	token := sessions.create(56, "owner", model.RoleOwner)
+	status, body := getBody(t, app, "/admin/servers", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+
+	for _, want := range []string{
+		"No servers registered yet.",
+		"Register the first node below",
+		"Jump to registration form",
+		`href="#register-server"`,
+		`id="register-server"`,
+		`data-confirm="Register this server and issue a one-time agent token?"`,
+		"Register New Server",
+	} {
+		assertContains(t, body, want)
+	}
+	for _, leak := range []string{"One-time agent token", "Copy token", `data-copy-target="server-`, "Copy install command", "Copy run command", "Copy cron line", "RAEVTAR_AGENT_TOKEN=", "paste-token-here", "raevtar-agent.sh"} {
+		assertNotContains(t, body, leak)
+	}
+}
+
+func TestPublicPagesDoNotLeakAdminAgentSetupAffordances(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, path := range []string{"/dashboard", "/dashboard/1", "/lab", "/docs", "/lab/docs"} {
+		t.Run(path, func(t *testing.T) {
+			status, body := getBody(t, app, path, nil)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+
+			for _, leak := range []string{
+				"RAEVTAR_AGENT_TOKEN=",
+				"paste-token-here",
+				"raevtar-agent.sh",
+				"Copy install command",
+				"Copy run command",
+				"Copy cron line",
+				"One-time agent token",
+				"data-copy-target",
+			} {
+				assertNotContains(t, body, leak)
+			}
+		})
+	}
 }
 
 func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
@@ -957,6 +1037,20 @@ func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
 	for _, want := range []string{"whyred diagnostics", "127.0.0.1", "9100", "local", "Agent setup", "raevtar-agent.sh", "Last payload summary", "CPU 12.5%", "Status timeline", "Online sample recorded", "Admin activity"} {
 		assertContains(t, body, want)
 	}
+	for _, want := range []string{
+		"Copy install command",
+		"Copy run command",
+		"Copy cron line",
+		`data-copy-target="diagnostics-1-install-command"`,
+		`data-copy-target="diagnostics-1-run-command"`,
+		`data-copy-target="diagnostics-1-cron-command"`,
+		`data-confirm="Update server metadata?"`,
+		`data-confirm="Rotate agent token?`,
+		"paste-token-here",
+	} {
+		assertContains(t, body, want)
+	}
+	assertNotContains(t, body, "One-time agent token")
 	assertNotContains(t, body, "agent_token_hash")
 
 	status, body = getBody(t, app, "/admin/servers/1", &http.Cookie{Name: sessionCookieName, Value: readonlyToken})
@@ -985,6 +1079,7 @@ func TestAdminPostEditUpdatesExistingPost(t *testing.T) {
 	}
 	assertContains(t, body, "Edit post")
 	assertContains(t, body, "Hello Raevtar")
+	assertContains(t, body, `data-confirm="Update this post?"`)
 
 	form := url.Values{
 		"_csrf":         {entry.csrfToken},
