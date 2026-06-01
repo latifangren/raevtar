@@ -3,6 +3,7 @@ package handler
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -16,6 +17,8 @@ import (
 	"raevtar/internal/repo"
 	"raevtar/internal/service"
 )
+
+var testRequestCounter int
 
 type publicTestApp struct {
 	handler  http.Handler
@@ -87,6 +90,8 @@ func assertNotContains(t *testing.T, body, want string) {
 func getBody(t *testing.T, app *publicTestApp, path string, cookie *http.Cookie) (int, string) {
 	t.Helper()
 	req := httptest.NewRequest(http.MethodGet, path, nil)
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
 	if cookie != nil {
 		req.AddCookie(cookie)
 	}
@@ -190,6 +195,28 @@ func TestPublicRoutes(t *testing.T) {
 				"Signal Lab",
 				"Content Lab",
 				"Automation Lab",
+			},
+		},
+		{
+			name:           "docs page",
+			path:           "/docs",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "text/html",
+			wantContains: []string{
+				"Public docs",
+				"Public front, admin back room",
+				"GET /api/v1/posts",
+				"GET /api/v1/categories",
+			},
+		},
+		{
+			name:           "lab docs page",
+			path:           "/lab/docs",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "text/html",
+			wantContains: []string{
+				"Public docs",
+				"Public front, admin back room",
 			},
 		},
 		{
@@ -341,6 +368,25 @@ func TestPublicLabRedactsPrivateTopologyAndGuidance(t *testing.T) {
 	assertNotContains(t, body, "host or IP")
 	assertNotContains(t, body, "tags (comma separated)")
 	assertNotContains(t, body, `value="9100"`)
+}
+
+func TestPublicDocsRedactPrivateTopologyAndGuidance(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, path := range []string{"/docs", "/lab/docs"} {
+		t.Run(path, func(t *testing.T) {
+			status, body := getBody(t, app, path, nil)
+			if status != http.StatusOK {
+				t.Fatalf("status = %d, want %d", status, http.StatusOK)
+			}
+			for _, want := range []string{"Public docs", "GET /api/v1/posts", "GET /api/v1/categories"} {
+				assertContains(t, body, want)
+			}
+			for _, leak := range []string{"127.0.0.1", "127.0.0.1:9100", ">9100<", ">local<", "agent token", "raevtar-agent.sh", "POST /api/v1/servers", "POST /api/v1/servers/1/ping", "host or IP", "tags (comma separated)", `value="9100"`} {
+				assertNotContains(t, body, leak)
+			}
+		})
+	}
 }
 
 func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
@@ -525,11 +571,15 @@ func TestPublicServerDetailLiveRendersFragmentWithPollingAndRedaction(t *testing
 	assertContains(t, body, `hx-swap="outerHTML"`)
 	assertContains(t, body, "freshness diagnosis")
 	assertContains(t, body, "last signal age")
-	assertContains(t, body, "latest metric")
+	assertContains(t, body, "metric detail")
+	assertContains(t, body, "Metric detail hidden on public view.")
 	assertContains(t, body, "Panel refreshed")
 	assertContains(t, body, "Telemetry is fresh. Latest agent signal arrived recently.")
 	assertContains(t, body, "Endpoint hidden on public view.")
 	assertContains(t, body, "Login as owner/admin for network details.")
+	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "sample count", "history window", "availability"} {
+		assertNotContains(t, body, leak)
+	}
 	assertNotContains(t, body, "<!DOCTYPE html>")
 	assertNotContains(t, body, "<html")
 	assertNotContains(t, body, "127.0.0.1")
@@ -552,7 +602,11 @@ func TestLimitedRolesServerDetailLiveRedactsServerTopology(t *testing.T) {
 
 			assertContains(t, body, "Endpoint hidden on public view.")
 			assertContains(t, body, "No telemetry received yet. Waiting for first agent signal.")
+			assertContains(t, body, "Metric detail hidden on public view.")
 
+			for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "sample count", "history window", "availability"} {
+				assertNotContains(t, body, leak)
+			}
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, "port 9100")
@@ -581,11 +635,15 @@ func TestOwnerAndAdminServerDetailLiveShowTopologyAndManageLink(t *testing.T) {
 			assertContains(t, body, ">local<")
 			assertContains(t, body, `href="/admin/servers"`)
 			assertContains(t, body, "Manage in admin")
+			assertContains(t, body, "latest metric")
+			assertContains(t, body, "sample count")
+			assertContains(t, body, "history window")
+			assertContains(t, body, "availability")
 		})
 	}
 }
 
-func TestServerDetailRendersMetricMarkers(t *testing.T) {
+func TestPublicServerDetailRedactsMetricValues(t *testing.T) {
 	app := newPublicTestApp(t)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
 		CPUPercent:    12.5,
@@ -602,7 +660,31 @@ func TestServerDetailRendersMetricMarkers(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	for _, want := range []string{"CPU", "RAM", "Disk", "Uptime"} {
+	assertContains(t, body, "Metric detail hidden on public view.")
+	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "sample count", "history window", "availability"} {
+		assertNotContains(t, body, leak)
+	}
+}
+
+func TestOwnerServerDetailRendersMetricMarkers(t *testing.T) {
+	app := newPublicTestApp(t)
+	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
+		CPUPercent:    12.5,
+		RAMUsedMB:     256,
+		RAMTotalMB:    1024,
+		DiskUsedGB:    8.5,
+		UptimeSeconds: 3600,
+		Online:        true,
+	}); err != nil {
+		t.Fatalf("record metrics: %v", err)
+	}
+
+	cookie := &http.Cookie{Name: sessionCookieName, Value: sessions.create(106, "owner", model.RoleOwner)}
+	status, body := getBody(t, app, "/dashboard/1", cookie)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	for _, want := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB"} {
 		assertContains(t, body, want)
 	}
 }
@@ -772,6 +854,103 @@ func TestAdminCreateServerShowsAgentInstallToken(t *testing.T) {
 
 	_, secondBody := getBody(t, app, "/admin/servers", &http.Cookie{Name: sessionCookieName, Value: token})
 	assertNotContains(t, secondBody, "Copy this token now")
+}
+
+func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
+	app := newPublicTestApp(t)
+	ownerToken := sessions.create(51, "owner", model.RoleOwner)
+	readonlyToken := sessions.create(52, "reader", model.RoleReadonly)
+
+	status, body := getBody(t, app, "/admin/servers/1", &http.Cookie{Name: sessionCookieName, Value: ownerToken})
+	if status != http.StatusOK {
+		t.Fatalf("owner status = %d, want %d", status, http.StatusOK)
+	}
+	for _, want := range []string{"whyred diagnostics", "127.0.0.1", "9100", "local", "Agent setup", "raevtar-agent.sh", "Admin activity"} {
+		assertContains(t, body, want)
+	}
+	assertNotContains(t, body, "agent_token_hash")
+
+	status, body = getBody(t, app, "/admin/servers/1", &http.Cookie{Name: sessionCookieName, Value: readonlyToken})
+	if status != http.StatusForbidden {
+		t.Fatalf("readonly status = %d, want %d", status, http.StatusForbidden)
+	}
+	assertNotContains(t, body, "127.0.0.1")
+	assertNotContains(t, body, "raevtar-agent.sh")
+}
+
+func TestAdminServerDiagnosticsDoNotMixAuditLogIDs(t *testing.T) {
+	app := newPublicTestApp(t)
+	ownerToken := sessions.create(53, "owner", model.RoleOwner)
+	entry, ok := sessions.get(ownerToken)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	server, err := app.svc.Monitor.CreateServer("ten", "192.0.2.10", 9100, "admin")
+	if err != nil {
+		t.Fatalf("create server 10-ish: %v", err)
+	}
+	if err := app.svc.Admin.LogServerUpdated("owner", server.ID, "ten", "192.0.2.10", "9100", "198.51.100.10"); err != nil {
+		t.Fatalf("log server update: %v", err)
+	}
+	if err := app.svc.Admin.LogServerUpdated("owner", app.serverID, "whyred", "127.0.0.1", "9100", "198.51.100.1"); err != nil {
+		t.Fatalf("log server update 1: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf": {entry.csrfToken},
+		"name":  {"node-10"},
+		"host":  {"192.0.2.10"},
+		"port":  {"9100"},
+		"tags":  {"admin"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers/update/"+strconv.FormatInt(server.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: ownerToken})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("update status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+
+	status, body := getBody(t, app, "/admin/servers/"+strconv.FormatInt(app.serverID, 10), &http.Cookie{Name: sessionCookieName, Value: ownerToken})
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "updated server id: 1")
+	assertNotContains(t, body, "updated server id: 2")
+	assertNotContains(t, body, "node-10")
+}
+
+func TestHermesPostPayloadRequiresContentAndPreservesTags(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	missingContent := []byte(`{"category_slug":"devops","title":"No Body"}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/posts", bytes.NewReader(missingContent))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("missing content status = %d, want %d; body: %s", rr.Code, http.StatusBadRequest, rr.Body.String())
+	}
+
+	payload := []byte(`{"category_slug":"devops","title":"Hermes Dispatch","content_md":"# Hermes Dispatch","excerpt":"Automation note","published":true,"tags":["auto"," commissioned "]}`)
+	req = httptest.NewRequest(http.MethodPost, "/api/v1/posts", bytes.NewReader(payload))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	rr = httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusCreated {
+		t.Fatalf("create status = %d, want %d; body: %s", rr.Code, http.StatusCreated, rr.Body.String())
+	}
+	var post model.Post
+	if err := json.NewDecoder(rr.Body).Decode(&post); err != nil {
+		t.Fatalf("decode post: %v", err)
+	}
+	if post.Excerpt != "Automation note" || len(post.Tags) != 2 {
+		t.Fatalf("post excerpt/tags = %q/%+v", post.Excerpt, post.Tags)
+	}
 }
 
 func TestHostStatsRequireAdminKey(t *testing.T) {
