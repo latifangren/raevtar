@@ -241,9 +241,10 @@ raevtar/
 | POST | `/api/v1/servers` | api.CreateServer | Register server + return one-time agent token |
 | GET | `/api/v1/servers/{id}` | api.GetServer | JSON detail server (Bearer auth) |
 | POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Record server metrics (agent token atau admin key) |
-| GET | `/docs` | static docs.html | Swagger UI untuk `static/openapi.json` |
+| GET | `/docs` | public docs page | Public-safe docs untuk read-only API, route map, dan privacy boundary |
+| GET | `/lab/docs` | public docs page | Alias docs dari area lab |
 
-Swagger UI disajikan dari static file, bukan generated runtime.
+Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai public read-only spec dan sengaja tidak mendokumentasikan endpoint admin/server/agent.
 
 ---
 

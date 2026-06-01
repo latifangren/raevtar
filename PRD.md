@@ -46,7 +46,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - `POST /api/v1/servers/{id}/ping` — report metrics (agent token atau admin key)
 - `GET /api/v1/servers/{id}` — detail server (auth)
 - `GET /api/v1/hoststats` — host resource snapshot (auth)
-- Swagger UI `/docs` untuk static OpenAPI spec
+- `/docs` untuk public-safe docs dan read-only OpenAPI surface; endpoint admin/server/agent tidak dipublikasikan di docs publik
 
 ### 3.5 Admin Panel
 - Session login di `/admin/login`

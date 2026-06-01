@@ -48,11 +48,13 @@
 - `POST /api/v1/servers` — register server (auth required, returns one-time `agent_token`)
 - `POST /api/v1/servers/{id}/ping` — record metrics (agent token atau admin key)
 - `GET /api/v1/hoststats` — host resource snapshot (auth required)
-- `GET /docs` — Swagger UI untuk `static/openapi.json`
+- `GET /docs` — dokumentasi publik aman untuk posts, categories, RSS, dan batas redaksi admin
+- `GET /lab/docs` — alias dokumentasi publik dari area lab
 
 ### Admin Panel
 - Login session di `/admin/login`
 - Manage posts, servers, users, dan audit log
+- Server diagnostics detail di `/admin/servers/{id}` berisi endpoint, metric history, setup command, dan activity log admin-only
 - RBAC role: `owner`, `admin`, `operator`, `readonly`
 - Install instruction agent per server, support URL publik, LAN, atau tunnel
 

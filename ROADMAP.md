@@ -69,7 +69,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] auth middleware (constant-time) untuk write endpoints
 - [x] Tag system (normalized: tags + post_tags + UI badges)
 - [x] RSS feed di `/blog/feed.xml` + auto-discovery `<link>` tag
-- [x] OpenAPI spec + Swagger UI (`/docs`)
+- [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
 - [ ] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.
@@ -89,7 +89,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Admin creds via env file (`/home/latif/raevtar/.env.production`)
 - [x] Health check: Hermes cronjob tiap 5 menit (silent if healthy)
 - [ ] Update dependencies periodik (go mod update, npm update)
-- [x] OpenAPI spec + Swagger UI (`/docs`)
+- [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
 
 **Deliverable:** Platform stabil, aman exposed ke internet.
 
