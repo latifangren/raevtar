@@ -75,6 +75,15 @@ type ServersData struct {
 	GeneratedAgentToken    string
 }
 
+type ServerDetailData struct {
+	CurrentPath     string
+	CSRFToken       string
+	Server          *model.Server
+	Metrics         []model.ServerMetric
+	Logs            []model.AuditLog
+	AgentURLExample string
+}
+
 func AgentTokenStatus(server model.Server) string {
 	if server.AgentTokenHash == "" {
 		return "token missing"
@@ -105,6 +114,33 @@ func AgentCronLine(serverID int64, url, token string) string {
 	return "*/1 * * * * RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " /usr/local/bin/raevtar-agent.sh >/dev/null 2>&1"
 }
 
+func ServerMetricCountText(metrics []model.ServerMetric) string {
+	if len(metrics) == 1 {
+		return "1 sample"
+	}
+	return strconv.Itoa(len(metrics)) + " samples"
+}
+
+func ServerMetricLatestText(metrics []model.ServerMetric) string {
+	if len(metrics) == 0 || metrics[0].RecordedAt.IsZero() {
+		return "No metrics yet"
+	}
+	return metrics[0].RecordedAt.Local().Format("02 Jan 2006 15:04:05")
+}
+
+func ServerMetricAvailabilityText(metrics []model.ServerMetric) string {
+	if len(metrics) == 0 {
+		return "No availability data"
+	}
+	online := 0
+	for _, metric := range metrics {
+		if metric.Online {
+			online++
+		}
+	}
+	return strconv.Itoa((online*100)/len(metrics)) + "% online"
+}
+
 func CountText(value int) string {
 	return strconv.Itoa(value)
 }
@@ -119,6 +155,10 @@ func PortText(port int) string {
 
 func PercentText(percent float64) string {
 	return strconv.FormatFloat(percent, 'f', 0, 64) + "%"
+}
+
+func MetricText(value float64) string {
+	return strconv.FormatFloat(value, 'f', 1, 64)
 }
 
 func IsOnline(lastSeen *time.Time) bool {

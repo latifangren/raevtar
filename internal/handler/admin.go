@@ -150,6 +150,8 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 	title := r.FormValue("title")
 	catSlug := r.FormValue("category_slug")
 	content := r.FormValue("content")
+	excerpt := r.FormValue("excerpt")
+	tags := splitTags(r.FormValue("tags"))
 
 	if title == "" || catSlug == "" || content == "" {
 		http.Error(w, "title, category_slug, and content required", http.StatusBadRequest)
@@ -159,8 +161,10 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 	post, err := h.svc.Blog.CreatePost(model.PostCreate{
 		Title:        title,
 		ContentMD:    content,
+		Excerpt:      excerpt,
 		CategorySlug: catSlug,
 		Published:    true,
+		Tags:         tags,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -195,6 +199,37 @@ func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 	h.renderAdminServers(w, r, servers, serverID, token)
 }
 
+func (h *Handler) adminServerDetail(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("serverID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	server, err := h.svc.Monitor.GetServer(id)
+	if err != nil {
+		http.Error(w, "server not found", http.StatusNotFound)
+		return
+	}
+	metrics, err := h.svc.Monitor.GetRecentMetrics(id, 50)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	logs, err := h.svc.Admin.ListServerAuditLogs(id, 20)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	renderHTML(w, r, adminview.ServerDetail(adminview.ServerDetailData{
+		CurrentPath:     r.URL.Path,
+		CSRFToken:       csrfTokenForRequest(r),
+		Server:          server,
+		Metrics:         metrics,
+		Logs:            logs,
+		AgentURLExample: agentURLExample(h.cfg.Domain),
+	}))
+}
+
 func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
 		http.Error(w, "POST required", http.StatusMethodNotAllowed)
@@ -222,6 +257,36 @@ func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 	_ = h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, clientIP(r))
 	setAgentTokenFlash(r, server.ID, token)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
+}
+
+func (h *Handler) adminUpdateServer(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("serverID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	port, err := strconv.Atoi(r.FormValue("port"))
+	if err != nil {
+		http.Error(w, "invalid port", http.StatusBadRequest)
+		return
+	}
+	server, err := h.svc.Monitor.UpdateServer(id, r.FormValue("name"), r.FormValue("host"), port, r.FormValue("tags"))
+	if err != nil {
+		if errors.Is(err, service.ErrServerNotFound) {
+			http.Error(w, "server not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	_ = h.svc.Admin.LogServerUpdated(entry.username, id, server.Name, server.Host, strconv.Itoa(server.Port), clientIP(r))
+	http.Redirect(w, r, "/admin/servers/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
 }
 
 func (h *Handler) adminRotateServerToken(w http.ResponseWriter, r *http.Request) {
@@ -311,4 +376,16 @@ func adminHostStats(stats HostStats) adminview.HostStatsData {
 		TempValue:      stats.Temp,
 		CPULoadPercent: math.Round(loadPercent),
 	}
+}
+
+func splitTags(tags string) []string {
+	parts := strings.Split(tags, ",")
+	out := make([]string, 0, len(parts))
+	for _, part := range parts {
+		part = strings.TrimSpace(part)
+		if part != "" {
+			out = append(out, part)
+		}
+	}
+	return out
 }
