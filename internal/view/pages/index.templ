@@ -4,7 +4,7 @@ import "raevtar/internal/view/components"
 
 templ Index(data IndexData) {
 	@page("Raevtar", data.CurrentPath, data.Categories) {
-		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
+		<section class="rv-hero-ambient full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
 			<div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
 				<div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] items-center">
 					<div>
@@ -37,6 +37,20 @@ templ Index(data IndexData) {
 							</div>
 						</div>
 					</div>
+				</div>
+			</div>
+			<div class="rv-marquee border-t-2 border-retro-ink bg-retro-ink text-retro-cream" aria-label="Raevtar platform signals">
+				<div class="rv-marquee-track py-3 text-xs font-black uppercase tracking-widest">
+					<span class="px-4">One Go binary</span>
+					<span class="px-4">HTMX refresh loops</span>
+					<span class="px-4">SQLite field notes</span>
+					<span class="px-4">Public-safe monitor board</span>
+					<span class="px-4">Lab automation rails</span>
+					<span class="px-4" aria-hidden="true">One Go binary</span>
+					<span class="px-4" aria-hidden="true">HTMX refresh loops</span>
+					<span class="px-4" aria-hidden="true">SQLite field notes</span>
+					<span class="px-4" aria-hidden="true">Public-safe monitor board</span>
+					<span class="px-4" aria-hidden="true">Lab automation rails</span>
 				</div>
 			</div>
 		</section>

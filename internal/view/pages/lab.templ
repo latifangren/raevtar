@@ -2,7 +2,7 @@ package pages
 
 templ Lab(data LabData) {
 	@page("Lab - Raevtar", data.CurrentPath, data.Categories) {
-		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
+		<section class="rv-hero-ambient full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
 			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
 				<div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] items-end">
 					<div>
@@ -55,6 +55,24 @@ templ Lab(data LabData) {
 				<h2 class="text-2xl font-black uppercase mb-2">Automation Lab</h2>
 				<p class="text-sm font-bold text-retro-muted mb-4">Public docs explain readable surfaces and safe workflows while protected write actions remain behind admin checks.</p>
 				<a href="/docs" class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Read docs &rarr;</a>
+			</div>
+		</section>
+		<section class="rv-timeline mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[6px_6px_0px_0px_#2D3748]">
+			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">public timeline</p>
+			<h2 class="text-3xl font-black uppercase leading-tight mb-5">Lab work, safe by default.</h2>
+			<div class="grid gap-4 md:grid-cols-3">
+				<div class="rv-timeline-item border-2 border-retro-ink bg-retro-sageLight p-4">
+					<p class="text-xs font-black uppercase text-retro-muted mb-2">01 Signal</p>
+					<p class="text-sm font-bold text-retro-ink">Freshness bands show public health without exposing private paths.</p>
+				</div>
+				<div class="rv-timeline-item border-2 border-retro-ink bg-retro-wheat p-4">
+					<p class="text-xs font-black uppercase text-retro-muted mb-2">02 Publish</p>
+					<p class="text-sm font-bold text-retro-ink">Notes move into browsable topics with excerpts and route-safe links.</p>
+				</div>
+				<div class="rv-timeline-item border-2 border-retro-ink bg-retro-blush p-4">
+					<p class="text-xs font-black uppercase text-retro-muted mb-2">03 Automate</p>
+					<p class="text-sm font-bold text-retro-ink">Protected actions stay behind admin checks while public docs stay readable.</p>
+				</div>
 			</div>
 		</section>
 		<section class="mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
