@@ -1,8 +1,8 @@
 {
   "openapi": "3.0.3",
   "info": {
-    "title": "Raevtar API",
-    "description": "Personal blog + server monitoring platform API.\n\n**Auth:** Server and host-stat read/admin endpoints require `Authorization: Bearer <admin_key>`. The metrics ping endpoint accepts a per-server agent token, or the admin key for compatibility. Public read endpoints are posts and categories.\n\nBase URL: `https://raevtar.tech`",
+    "title": "Raevtar Public API",
+    "description": "Public read-only API for published posts and categories. Operator and monitoring endpoints are intentionally omitted from this public spec.",
     "version": "1.0.0",
     "contact": {
       "name": "latifangren",
@@ -10,25 +10,25 @@
     }
   },
   "servers": [
-    { "url": "/", "description": "Same-origin (local or raevtar.tech)" }
+    { "url": "/", "description": "Same-origin" }
   ],
   "paths": {
     "/api/v1/posts": {
       "get": {
-        "summary": "List blog posts",
-        "description": "Returns published blog posts, ordered by date descending.",
+        "summary": "List published blog posts",
+        "description": "Returns published posts only, newest first.",
         "parameters": [
           {
             "name": "category",
             "in": "query",
-            "description": "Filter by category slug",
+            "description": "Optional category slug filter",
             "required": false,
             "schema": { "type": "string" }
           }
         ],
         "responses": {
           "200": {
-            "description": "List of posts",
+            "description": "Published posts",
             "content": {
               "application/json": {
                 "schema": {
@@ -39,39 +39,14 @@
             }
           }
         }
-      },
-      "post": {
-        "summary": "Create a blog post",
-        "description": "Requires `Authorization: Bearer <admin_key>` header.",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": { "$ref": "#/components/schemas/PostCreate" }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Created post",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Post" }
-              }
-            }
-          },
-          "400": { "description": "Invalid input" },
-          "401": { "description": "Unauthorized" }
-        }
       }
     },
     "/api/v1/categories": {
       "get": {
-        "summary": "List categories",
+        "summary": "List public categories",
         "responses": {
           "200": {
-            "description": "List of categories",
+            "description": "Categories",
             "content": {
               "application/json": {
                 "schema": {
@@ -83,150 +58,9 @@
           }
         }
       }
-    },
-    "/api/v1/hoststats": {
-      "get": {
-        "summary": "Get host resource snapshot",
-        "description": "Requires `Authorization: Bearer <admin_key>` header.",
-        "security": [{ "BearerAuth": [] }],
-        "responses": {
-          "200": {
-            "description": "Current host CPU, RAM, disk, and temperature stats",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/HostStats" }
-              }
-            }
-          }
-        }
-      }
-    },
-    "/api/v1/servers": {
-      "get": {
-        "summary": "List servers",
-        "description": "Requires `Authorization: Bearer <admin_key>` header.",
-        "security": [{ "BearerAuth": [] }],
-        "responses": {
-          "200": {
-            "description": "List of registered servers",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "array",
-                  "items": { "$ref": "#/components/schemas/Server" }
-                }
-              }
-            }
-          }
-        }
-      },
-      "post": {
-        "summary": "Register a new server",
-        "security": [{ "BearerAuth": [] }],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "required": ["name", "host"],
-                "properties": {
-                  "name": { "type": "string", "description": "Server name" },
-                  "host": { "type": "string", "description": "Hostname or IP" },
-                  "port": { "type": "integer", "default": 22 },
-                  "tags": { "type": "string", "description": "Comma-separated tags" }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "201": {
-            "description": "Server created with one-time agent token",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/ServerCreateResponse" }
-              }
-            }
-          },
-          "400": { "description": "Invalid input" },
-          "401": { "description": "Unauthorized" }
-        }
-      }
-    },
-    "/api/v1/servers/{serverID}": {
-      "get": {
-        "summary": "Get server details",
-        "description": "Requires `Authorization: Bearer <admin_key>` header.",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "serverID",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "integer" }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "Server details",
-            "content": {
-              "application/json": {
-                "schema": { "$ref": "#/components/schemas/Server" }
-              }
-            }
-          },
-          "404": { "description": "Server not found" }
-        }
-      }
-    },
-    "/api/v1/servers/{serverID}/ping": {
-      "post": {
-        "summary": "Record server metrics",
-        "description": "Used by the monitoring agent to push metrics. Requires `Authorization: Bearer <agent_token>` for this server, or the admin key for compatibility.",
-        "security": [{ "BearerAuth": [] }],
-        "parameters": [
-          {
-            "name": "serverID",
-            "in": "path",
-            "required": true,
-            "schema": { "type": "integer" }
-          }
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "type": "object",
-                "properties": {
-                  "cpu_percent": { "type": "number" },
-                  "ram_used_mb": { "type": "number" },
-                  "ram_total_mb": { "type": "number" },
-                  "disk_used_gb": { "type": "number" },
-                  "uptime_seconds": { "type": "integer" },
-                  "online": { "type": "boolean", "default": true }
-                }
-              }
-            }
-          }
-        },
-        "responses": {
-          "200": { "description": "Metrics recorded" },
-          "401": { "description": "Unauthorized" },
-          "404": { "description": "Server not found" }
-        }
-      }
     }
   },
   "components": {
-    "securitySchemes": {
-      "BearerAuth": {
-        "type": "http",
-        "scheme": "bearer",
-        "description": "Bearer token. Use RAEVTAR_ADMIN_KEY for admin APIs, or a per-server agent token for the metrics ping endpoint."
-      }
-    },
     "schemas": {
       "Post": {
         "type": "object",
@@ -248,22 +82,6 @@
           }
         }
       },
-      "PostCreate": {
-        "type": "object",
-        "required": ["title", "category_slug"],
-        "properties": {
-          "category_slug": { "type": "string" },
-          "title": { "type": "string" },
-          "content_md": { "type": "string", "description": "Markdown content" },
-          "excerpt": { "type": "string" },
-          "published": { "type": "boolean", "default": true },
-          "tags": {
-            "type": "array",
-            "items": { "type": "string" },
-            "description": "Tag names to attach"
-          }
-        }
-      },
       "Category": {
         "type": "object",
         "properties": {
@@ -271,64 +89,6 @@
           "slug": { "type": "string" },
           "name": { "type": "string" },
           "description": { "type": "string" }
-        }
-      },
-      "Server": {
-        "type": "object",
-        "properties": {
-          "id": { "type": "integer" },
-          "name": { "type": "string" },
-          "host": { "type": "string" },
-          "port": { "type": "integer" },
-          "tags": { "type": "string" },
-          "last_seen": { "type": "string", "nullable": true, "format": "date-time" },
-          "created_at": { "type": "string", "format": "date-time" }
-        }
-      },
-      "ServerCreateResponse": {
-        "type": "object",
-        "properties": {
-          "server": { "$ref": "#/components/schemas/Server" },
-          "agent_token": {
-            "type": "string",
-            "description": "One-time per-server token for the monitoring agent. Store it now; only the hash is persisted."
-          }
-        }
-      },
-      "HostStats": {
-        "type": "object",
-        "properties": {
-          "cpu": { "$ref": "#/components/schemas/CPUStats" },
-          "ram": { "$ref": "#/components/schemas/RAMStats" },
-          "disk": { "$ref": "#/components/schemas/DiskStats" },
-          "temp": { "type": "number" }
-        }
-      },
-      "CPUStats": {
-        "type": "object",
-        "properties": {
-          "load1": { "type": "number" },
-          "load5": { "type": "number" },
-          "load15": { "type": "number" },
-          "cores": { "type": "integer" }
-        }
-      },
-      "RAMStats": {
-        "type": "object",
-        "properties": {
-          "total": { "type": "integer", "description": "Value from /proc/meminfo in kB" },
-          "available": { "type": "integer", "description": "Value from /proc/meminfo in kB" },
-          "used": { "type": "integer", "description": "Calculated from total - available, in kB" },
-          "percent": { "type": "number" }
-        }
-      },
-      "DiskStats": {
-        "type": "object",
-        "properties": {
-          "total": { "type": "integer", "description": "Filesystem blocks converted to bytes" },
-          "free": { "type": "integer", "description": "Available filesystem blocks converted to bytes" },
-          "used": { "type": "integer", "description": "Calculated from total - free, in bytes" },
-          "percent": { "type": "number" }
         }
       },
       "Tag": {
