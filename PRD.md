@@ -89,7 +89,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 | CSS | Tailwind | Bootstrap, vanilla CSS | Utility-first, responsive out of box |
 | Interaksi | HTMX | Alpine.js, React, Vue | Gak perlu JS build, ringan |
 | Database | SQLite + modernc | PostgreSQL, MySQL | Gak perlu server, pure Go |
-| Tunnel | cloudflared | ngrok, frp | DNS sendiri (raevtar.tech), OpenRC support |
+| Tunnel | cloudflared | ngrok, frp | DNS sendiri (raevtar.tech), systemd setup aktif |
 
 ## 7. Success Metrics
 

@@ -1,6 +1,6 @@
 # DEPLOYMENT — Raevtar
 
-Cara deploy Raevtar di postmarketOS (Alpine dengan systemd) atau Linux lain.
+Cara deploy Raevtar di setup postmarketOS/Linux yang dipakai di mesin ini: systemd, SQLite lokal, dan Cloudflare Tunnel.
 
 ## Prasyarat
 
@@ -22,6 +22,7 @@ make build
 ## System Service (systemd)
 
 Biar jalan otomatis pas hp boot + restart kalo crash.
+Set `RAEVTAR_ENV=production`; kalau `RAEVTAR_ADMIN_KEY` atau `RAEVTAR_ADMIN_PASS` kosong, Raevtar akan gagal start supaya endpoint admin/API tidak hidup tanpa secret.
 
 ### 1. Buat service file
 
@@ -37,6 +38,7 @@ Type=exec
 User=latif
 WorkingDirectory=/home/latif/raevtar
 ExecStart=/home/latif/raevtar/raevtar
+Environment=RAEVTAR_ENV=production
 Environment=RAEVTAR_ADMIN_KEY=<isi-admin-key>
 Environment=RAEVTAR_ADMIN_USER=admin
 Environment=RAEVTAR_ADMIN_PASS=<isi-password-admin>
@@ -134,12 +136,24 @@ EOF
 cloudflared tunnel run raevtar  # jalan di terminal dulu buat test
 ```
 
+Opsional trusted proxy untuk audit IP/rate limit kalau request dari tunnel masuk dari localhost:
+
+```bash
+RAEVTAR_TRUSTED_PROXY_CIDRS=127.0.0.1/32,::1/128
+```
+
 Atau pake `cloudflared service install` buat systemd:
 
 ```bash
 sudo cloudflared service install
 # Config wajib di /etc/cloudflared/config.yml
 ```
+
+Jangan aktifkan trusted proxy untuk IP publik sembarang. Default Raevtar sengaja mengabaikan `X-Forwarded-For`; hanya `CF-Connecting-IP`/forwarded header dari CIDR tepercaya yang dipakai untuk audit log dan rate limit.
+
+## Public Docs
+
+`/docs` dan `/lab/docs` adalah halaman Templ public-safe. File Swagger shell lama tidak dikirim lagi; `static/openapi.json` tetap read-only dan hanya mendokumentasikan endpoint publik.
 
 ## Service Status
 

@@ -114,7 +114,8 @@ make db-reset
 | `RAEVTAR_ADMIN_KEY` | `""` | **Ya** (untuk endpoint API auth-protected, constant-time validated) |
 | `RAEVTAR_ADMIN_USER` | `admin` | Tidak |
 | `RAEVTAR_ADMIN_PASS` | `""` | **Ya** (untuk admin panel login) |
-| `RAEVTAR_ENV` | `""` | Set `production` untuk mode produksi |
+| `RAEVTAR_ENV` | `""` | Set `production` untuk strict secret check |
+| `RAEVTAR_TRUSTED_PROXY_CIDRS` | `""` | Opsional, CIDR proxy tepercaya untuk `CF-Connecting-IP` |
 
 ## Ketika Lo Bingung
 

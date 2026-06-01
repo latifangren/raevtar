@@ -119,7 +119,8 @@ Handler gak boleh panggil repo langsung. Service gak tahu HTTP. Repo cuma query.
 | `RAEVTAR_ADMIN_KEY` | `""` | **WAJIB** untuk endpoint API auth-protected. Constant-time validated |
 | `RAEVTAR_ADMIN_USER` | `admin` | Admin panel seed username |
 | `RAEVTAR_ADMIN_PASS` | `""` | **WAJIB** untuk admin panel login |
-| `RAEVTAR_ENV` | `""` | Set ke `production` untuk mode produksi |
+| `RAEVTAR_ENV` | `""` | Set ke `production` untuk strict secret check |
+| `RAEVTAR_TRUSTED_PROXY_CIDRS` | `""` | Opsional, CIDR proxy tepercaya untuk `CF-Connecting-IP` |
 
 ## Quick Start
 
@@ -138,7 +139,7 @@ curl http://localhost:8080/
 ## Deploy (postmarketOS)
 
 ```bash
-# systemd service
+# systemd service (setup yang dipakai project ini)
 sudo cp raevtar.service /etc/systemd/system/
 sudo systemctl enable --now raevtar
 
