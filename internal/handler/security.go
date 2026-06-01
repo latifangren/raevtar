@@ -3,6 +3,7 @@ package handler
 import (
 	"net"
 	"net/http"
+	"raevtar/internal/config"
 	"strings"
 	"sync"
 	"time"
@@ -44,6 +45,8 @@ type bucketEntry struct {
 var limiter = &rateLimiter{
 	requests: make(map[string]*bucketEntry),
 }
+
+var trustedProxyNets []*net.IPNet
 
 const maxRequests = 60 // max requests per window
 const windowDuration = 1 * time.Minute
@@ -90,9 +93,76 @@ func RateLimit(next http.Handler) http.Handler {
 func clientIP(r *http.Request) string {
 	host, _, err := net.SplitHostPort(r.RemoteAddr)
 	if err == nil {
+		if headerIP := trustedHeaderIP(host, r); headerIP != "" {
+			return headerIP
+		}
 		return host
 	}
+	if headerIP := trustedHeaderIP(r.RemoteAddr, r); headerIP != "" {
+		return headerIP
+	}
 	return r.RemoteAddr
+}
+
+func configureTrustedProxies(cfg *config.Config) {
+	trustedProxyNets = trustedProxyNets[:0]
+	if cfg == nil {
+		return
+	}
+	for _, value := range cfg.TrustedProxyCIDRs {
+		if strings.TrimSpace(value) == "" {
+			continue
+		}
+		if strings.Contains(value, "/") {
+			if _, network, err := net.ParseCIDR(value); err == nil {
+				trustedProxyNets = append(trustedProxyNets, network)
+			}
+			continue
+		}
+		ip := net.ParseIP(value)
+		if ip == nil {
+			continue
+		}
+		bits := 32
+		if ip.To4() == nil {
+			bits = 128
+		}
+		trustedProxyNets = append(trustedProxyNets, &net.IPNet{IP: ip, Mask: net.CIDRMask(bits, bits)})
+	}
+}
+
+func trustedHeaderIP(remoteHost string, r *http.Request) string {
+	if !isTrustedProxy(remoteHost) {
+		return ""
+	}
+	for _, value := range []string{r.Header.Get("CF-Connecting-IP"), firstForwardedFor(r.Header.Get("X-Forwarded-For")), r.Header.Get("X-Real-IP")} {
+		ip := net.ParseIP(strings.TrimSpace(value))
+		if ip != nil {
+			return ip.String()
+		}
+	}
+	return ""
+}
+
+func firstForwardedFor(value string) string {
+	parts := strings.Split(value, ",")
+	if len(parts) == 0 {
+		return ""
+	}
+	return strings.TrimSpace(parts[0])
+}
+
+func isTrustedProxy(remoteHost string) bool {
+	ip := net.ParseIP(remoteHost)
+	if ip == nil {
+		return false
+	}
+	for _, network := range trustedProxyNets {
+		if network.Contains(ip) {
+			return true
+		}
+	}
+	return false
 }
 
 // Cleanup rate limiter entries periodically (call from background goroutine)

@@ -17,6 +17,7 @@ type Handler struct {
 
 func New(svc *service.Service, cfg *config.Config) http.Handler {
 	h := &Handler{svc: svc, cfg: cfg}
+	configureTrustedProxies(cfg)
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
@@ -63,6 +64,8 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Use(h.ownerOrAdminRequired)
 				r.Get("/posts", h.adminPosts)
 				r.Post("/posts", h.adminCreatePost)
+				r.Get("/posts/edit/{postID}", h.adminEditPost)
+				r.Post("/posts/update/{postID}", h.adminUpdatePost)
 				r.Post("/posts/delete/{postID}", h.adminDeletePost)
 				r.Get("/servers", h.adminServers)
 				r.Get("/servers/{serverID}", h.adminServerDetail)
