@@ -38,6 +38,7 @@ func AutoMigrate(db *sqlx.DB) {
 		content_md TEXT NOT NULL DEFAULT '',
 		excerpt TEXT NOT NULL DEFAULT '',
 		published INTEGER DEFAULT 1,
+		cover_image_url TEXT NOT NULL DEFAULT '',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
@@ -86,6 +87,18 @@ func AutoMigrate(db *sqlx.DB) {
 	CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);
 	CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
 
+	CREATE TABLE IF NOT EXISTS media_assets (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		original_name TEXT NOT NULL,
+		stored_name TEXT UNIQUE NOT NULL,
+		url TEXT UNIQUE NOT NULL,
+		mime_type TEXT NOT NULL,
+		size_bytes INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_media_assets_created ON media_assets(created_at);
+
 	CREATE TABLE IF NOT EXISTS users (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		username TEXT UNIQUE NOT NULL,
@@ -114,6 +127,7 @@ func AutoMigrate(db *sqlx.DB) {
 		panic(err)
 	}
 	ensureColumn(db, "servers", "agent_token_hash", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "posts", "cover_image_url", "TEXT NOT NULL DEFAULT ''")
 	slog.Info("database migrated")
 }
 
@@ -158,6 +172,7 @@ type Repositories struct {
 	Server   *ServerRepo
 	Metric   *MetricRepo
 	Tag      *TagRepo
+	Media    *MediaRepo
 	User     *UserRepo
 	Audit    *AuditRepo
 }
@@ -169,6 +184,7 @@ func New(db *sqlx.DB) *Repositories {
 		Server:   &ServerRepo{db: db},
 		Metric:   &MetricRepo{db: db},
 		Tag:      &TagRepo{db: db},
+		Media:    &MediaRepo{db: db},
 		User:     &UserRepo{db: db},
 		Audit:    &AuditRepo{db: db},
 	}

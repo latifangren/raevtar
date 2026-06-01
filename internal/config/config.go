@@ -16,7 +16,8 @@ type Config struct {
 	AdminKey          string     // API key for write operations (cron auto-post)
 	AdminUser         string     // Admin panel username
 	AdminPass         string     // Admin panel password
-	IsProduction      bool       // production mode — stricter checks
+	MediaDir          string
+	IsProduction      bool // production mode — stricter checks
 	TrustedProxyCIDRs []string
 }
 
@@ -29,6 +30,7 @@ func Load() *Config {
 		AdminKey:          getEnv("RAEVTAR_ADMIN_KEY", ""),
 		AdminUser:         getEnv("RAEVTAR_ADMIN_USER", "admin"),
 		AdminPass:         getEnv("RAEVTAR_ADMIN_PASS", ""),
+		MediaDir:          getEnv("RAEVTAR_MEDIA_DIR", expandHome("~/.raevtar/uploads")),
 		IsProduction:      os.Getenv("RAEVTAR_ENV") == "production",
 		TrustedProxyCIDRs: parseCSV(os.Getenv("RAEVTAR_TRUSTED_PROXY_CIDRS")),
 	}
