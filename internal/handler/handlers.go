@@ -60,6 +60,25 @@ func (h *Handler) labPage(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	_, postCount, err := h.svc.Blog.ListPosts("", 1, 1)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	renderHTML(w, r, pages.Docs(pages.DocsData{
+		CurrentPath: r.URL.Path,
+		Categories:  categories,
+		PostCount:   postCount,
+	}))
+}
+
 func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 	cat := r.URL.Query().Get("category")
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
