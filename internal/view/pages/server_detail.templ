@@ -10,7 +10,7 @@ templ ServerDetail(data ServerDetailData) {
 }
 
 templ ServerDetailLive(data ServerDetailData) {
-	<div id="server-detail-live" hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") } hx-trigger="every 15s" hx-swap="outerHTML">
+	<div id="server-detail-live" class="rv-refresh-target" hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") } hx-trigger="every 15s" hx-swap="outerHTML" hx-indicator="#server-detail-live">
 		<section class="mb-6 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
 			<div class="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
 				<div class="bg-retro-ink text-retro-cream p-6 md:p-8">
@@ -82,6 +82,24 @@ templ ServerDetailLive(data ServerDetailData) {
 			</div>
 		</section>
 		if !data.CanViewServerInfo {
+			<section class="rv-timeline mb-6 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">public timeline</p>
+				<h2 class="text-2xl font-black uppercase leading-tight mb-5">Signal path, public labels only.</h2>
+				<div class="grid gap-4 md:grid-cols-3">
+					<div class="rv-timeline-item border-2 border-retro-ink bg-retro-sageLight p-4">
+						<p class="text-xs font-black uppercase text-retro-muted mb-2">01 Signal</p>
+						<p class="text-sm font-bold text-retro-ink">Node sends a freshness pulse into Raevtar.</p>
+					</div>
+					<div class="rv-timeline-item border-2 border-retro-ink bg-retro-wheat p-4">
+						<p class="text-xs font-black uppercase text-retro-muted mb-2">02 Redact</p>
+						<p class="text-sm font-bold text-retro-ink">Private topology stays hidden before public render.</p>
+					</div>
+					<div class="rv-timeline-item border-2 border-retro-ink bg-retro-blush p-4">
+						<p class="text-xs font-black uppercase text-retro-muted mb-2">03 Refresh</p>
+						<p class="text-sm font-bold text-retro-ink">HTMX swaps this safe summary every 15 seconds.</p>
+					</div>
+				</div>
+			</section>
 			<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
 				<p class="text-retro-muted font-bold text-sm">Metric detail hidden on public view.</p>
 				<p class="text-sm text-retro-muted mt-2">Public view shows signal freshness only. Login as owner/admin for resource telemetry.</p>

@@ -118,7 +118,7 @@ func Dashboard(data DashboardData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Servers) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"server-list\" class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">Belum ada server terdaftar.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<div id=\"server-list\" class=\"rv-refresh-target bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">Belum ada server terdaftar.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -138,7 +138,7 @@ func Dashboard(data DashboardData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div id=\"server-list\" class=\"grid gap-4 sm:grid-cols-2 xl:grid-cols-3\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div id=\"server-list\" class=\"rv-refresh-target grid gap-4 sm:grid-cols-2 xl:grid-cols-3\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -156,7 +156,7 @@ func Dashboard(data DashboardData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"group block min-h-full bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><div class=\"flex items-start justify-between gap-4 mb-5\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">node</p><h3 class=\"text-xl font-black text-retro-ink uppercase leading-tight\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "\" class=\"rv-card-lift group block min-h-full bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><div class=\"flex items-start justify-between gap-4 mb-5\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">node</p><h3 class=\"text-xl font-black text-retro-ink uppercase leading-tight\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -350,7 +350,7 @@ func Dashboard(data DashboardData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, " <div class=\"mt-4 text-xs font-bold text-retro-muted\" hx-get=\"/dashboard\" hx-trigger=\"every 30s\" hx-select=\"#server-list\" hx-target=\"#server-list\" hx-swap=\"outerHTML\">Auto-refresh every 30s</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, " <div class=\"mt-4 text-xs font-bold text-retro-muted\" hx-get=\"/dashboard\" hx-trigger=\"every 30s\" hx-select=\"#server-list\" hx-target=\"#server-list\" hx-swap=\"outerHTML\" hx-indicator=\"#server-list\">Auto-refresh every 30s</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
