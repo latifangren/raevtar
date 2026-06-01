@@ -138,13 +138,12 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	canManage := canManageServer(r)
 	renderHTML(w, r, pages.Dashboard(pages.DashboardData{
 		CurrentPath:       r.URL.Path,
 		Servers:           servers,
 		Categories:        categories,
-		CanRegisterServer: canManage,
-		CanViewServerInfo: canManage,
+		CanRegisterServer: false,
+		CanViewServerInfo: false,
 		CSRFToken:         csrfTokenForRequest(r),
 	}))
 }
@@ -189,14 +188,13 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 		return pages.ServerDetailData{}, false
 	}
 
-	canManage := canManageServer(r)
 	return pages.ServerDetailData{
 		CurrentPath:       r.URL.Path,
 		Server:            server,
 		Metrics:           metrics,
 		Categories:        categories,
-		CanManageServer:   canManage,
-		CanViewServerInfo: canManage,
+		CanManageServer:   false,
+		CanViewServerInfo: false,
 		RefreshedAt:       time.Now().UTC(),
 	}, true
 }

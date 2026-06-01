@@ -72,7 +72,7 @@ templ ServerDetailLive(data ServerDetailData) {
 						if data.CanViewServerInfo {
 							<p class="text-sm font-mono font-black text-retro-ink break-all">{ data.Server.Host }:{ PortText(data.Server.Port) }</p>
 						} else {
-							<p class="text-sm font-black text-retro-ink">Hidden on public view. Login as owner/admin for network details.</p>
+							<p class="text-sm font-black text-retro-ink">Hidden on public view. Use admin diagnostics for network details.</p>
 						}
 					</div>
 					if data.CanManageServer {

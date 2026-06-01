@@ -433,7 +433,7 @@ func ServerDetailLive(data ServerDetailData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<p class=\"text-sm font-black text-retro-ink\">Hidden on public view. Login as owner/admin for network details.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<p class=\"text-sm font-black text-retro-ink\">Hidden on public view. Use admin diagnostics for network details.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
