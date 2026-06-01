@@ -9,6 +9,7 @@ import (
 	"net/http"
 	"net/http/httptest"
 	"net/url"
+	"os"
 	"path/filepath"
 	"strconv"
 	"strings"
@@ -417,6 +418,74 @@ func TestPublicRoutes(t *testing.T) {
 
 			body := rr.Body.String()
 			for _, want := range tt.wantContains {
+				assertContains(t, body, want)
+			}
+		})
+	}
+}
+
+func TestUIPolishSourceHooks(t *testing.T) {
+	files := map[string][]string{
+		filepath.Join("..", "..", "internal", "view", "components", "post_card.templ"): {
+			`rv-card-lift`,
+		},
+		filepath.Join("..", "..", "internal", "view", "components", "server_card.templ"): {
+			`rv-card-lift`,
+		},
+		filepath.Join("..", "..", "internal", "view", "pages", "index.templ"): {
+			`rv-hero-ambient`,
+			`rv-marquee`,
+			`rv-marquee-track`,
+			`aria-hidden="true"`,
+		},
+		filepath.Join("..", "..", "internal", "view", "pages", "lab.templ"): {
+			`rv-hero-ambient`,
+			`rv-timeline`,
+		},
+		filepath.Join("..", "..", "internal", "view", "pages", "dashboard.templ"): {
+			`id="server-list"`,
+			`rv-refresh-target`,
+			`rv-card-lift`,
+			`hx-get="/dashboard"`,
+			`hx-trigger="every 30s"`,
+			`hx-select="#server-list"`,
+			`hx-target="#server-list"`,
+			`hx-indicator="#server-list"`,
+		},
+		filepath.Join("..", "..", "internal", "view", "pages", "server_detail.templ"): {
+			`id="server-detail-live"`,
+			`rv-refresh-target`,
+			`hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") }`,
+			`hx-trigger="every 15s"`,
+			`hx-swap="outerHTML"`,
+			`hx-indicator="#server-detail-live"`,
+			`rv-timeline`,
+		},
+		filepath.Join("..", "..", "static", "css", "tailwind.src.css"): {
+			`.rv-card-lift`,
+			`.rv-marquee`,
+			`.rv-marquee-track`,
+			`.rv-hero-ambient`,
+			`.rv-refresh-target`,
+			`.rv-timeline`,
+			`@keyframes rv-marquee-scroll`,
+			`@keyframes rv-ambient-drift`,
+			`.rv-refresh-target.htmx-request`,
+			`.rv-refresh-target.htmx-swapping`,
+			`.rv-refresh-target.htmx-settling`,
+			`.rv-refresh-target.htmx-added`,
+			`@media (prefers-reduced-motion: reduce)`,
+		},
+	}
+
+	for path, wants := range files {
+		t.Run(path, func(t *testing.T) {
+			content, err := os.ReadFile(path)
+			if err != nil {
+				t.Fatalf("read %s: %v", path, err)
+			}
+			body := string(content)
+			for _, want := range wants {
 				assertContains(t, body, want)
 			}
 		})
