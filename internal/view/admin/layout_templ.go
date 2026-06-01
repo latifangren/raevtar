@@ -100,7 +100,7 @@ func Shell(title string, currentPath string, csrfToken string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></main></div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</div></main></div><script>\n\t\t\t\t(() => {\n\t\t\t\t\tconst writeClipboard = (text) => {\n\t\t\t\t\t\tif (navigator.clipboard && navigator.clipboard.writeText) {\n\t\t\t\t\t\t\treturn navigator.clipboard.writeText(text);\n\t\t\t\t\t\t}\n\t\t\t\t\t\tconst field = document.createElement(\"textarea\");\n\t\t\t\t\t\tfield.value = text;\n\t\t\t\t\t\tfield.setAttribute(\"readonly\", \"\");\n\t\t\t\t\t\tfield.style.position = \"fixed\";\n\t\t\t\t\t\tfield.style.left = \"-9999px\";\n\t\t\t\t\t\tdocument.body.appendChild(field);\n\t\t\t\t\t\tfield.select();\n\t\t\t\t\t\tconst copied = document.execCommand(\"copy\");\n\t\t\t\t\t\tdocument.body.removeChild(field);\n\t\t\t\t\t\treturn copied ? Promise.resolve() : Promise.reject(new Error(\"copy failed\"));\n\t\t\t\t\t};\n\n\t\t\t\t\tdocument.addEventListener(\"click\", (event) => {\n\t\t\t\t\t\tconst button = event.target.closest(\"button[data-copy-target]\");\n\t\t\t\t\t\tif (!button) return;\n\t\t\t\t\t\tconst target = document.getElementById(button.getAttribute(\"data-copy-target\"));\n\t\t\t\t\t\tif (!target) return;\n\t\t\t\t\t\tconst original = button.textContent;\n\t\t\t\t\t\twriteClipboard(target.innerText).then(() => {\n\t\t\t\t\t\t\tbutton.textContent = \"Copied\";\n\t\t\t\t\t\t\twindow.setTimeout(() => { button.textContent = original; }, 1400);\n\t\t\t\t\t\t}).catch(() => {\n\t\t\t\t\t\t\tbutton.textContent = \"Copy failed\";\n\t\t\t\t\t\t\twindow.setTimeout(() => { button.textContent = original; }, 1400);\n\t\t\t\t\t\t});\n\t\t\t\t\t});\n\n\t\t\t\t\tdocument.addEventListener(\"submit\", (event) => {\n\t\t\t\t\t\tconst form = event.target;\n\t\t\t\t\t\tif (!(form instanceof HTMLFormElement)) return;\n\t\t\t\t\t\tconst message = form.getAttribute(\"data-confirm\");\n\t\t\t\t\t\tif (message && !window.confirm(message)) event.preventDefault();\n\t\t\t\t\t});\n\t\t\t\t})();\n\t\t\t</script></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -137,7 +137,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var6 templ.SafeURL
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 66, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 107, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -150,7 +150,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 66, Col: 152}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 107, Col: 152}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -168,7 +168,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var8 templ.SafeURL
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 68, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 109, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -181,7 +181,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 68, Col: 181}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 109, Col: 181}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {

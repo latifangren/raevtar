@@ -57,6 +57,47 @@ templ Shell(title string, currentPath string, csrfToken string) {
 					</div>
 				</main>
 			</div>
+			<script>
+				(() => {
+					const writeClipboard = (text) => {
+						if (navigator.clipboard && navigator.clipboard.writeText) {
+							return navigator.clipboard.writeText(text);
+						}
+						const field = document.createElement("textarea");
+						field.value = text;
+						field.setAttribute("readonly", "");
+						field.style.position = "fixed";
+						field.style.left = "-9999px";
+						document.body.appendChild(field);
+						field.select();
+						const copied = document.execCommand("copy");
+						document.body.removeChild(field);
+						return copied ? Promise.resolve() : Promise.reject(new Error("copy failed"));
+					};
+
+					document.addEventListener("click", (event) => {
+						const button = event.target.closest("button[data-copy-target]");
+						if (!button) return;
+						const target = document.getElementById(button.getAttribute("data-copy-target"));
+						if (!target) return;
+						const original = button.textContent;
+						writeClipboard(target.innerText).then(() => {
+							button.textContent = "Copied";
+							window.setTimeout(() => { button.textContent = original; }, 1400);
+						}).catch(() => {
+							button.textContent = "Copy failed";
+							window.setTimeout(() => { button.textContent = original; }, 1400);
+						});
+					});
+
+					document.addEventListener("submit", (event) => {
+						const form = event.target;
+						if (!(form instanceof HTMLFormElement)) return;
+						const message = form.getAttribute("data-confirm");
+						if (message && !window.confirm(message)) event.preventDefault();
+					});
+				})();
+			</script>
 		</body>
 	</html>
 }
