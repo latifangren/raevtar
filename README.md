@@ -17,6 +17,7 @@
 - Artikel markdown, disimpan di SQLite
 - 5 kategori: AI Agent, Security, Kernel & Embedded, DevOps, Tools
 - Tags normalized (`tags` + `post_tags`) dan badge di UI
+- Admin Content Studio: save draft, publish, Markdown preview, media upload, dan cover image
 - Pagination + filter kategori
 - RSS feed di `/blog/feed.xml`
 - Auto-post via Hermes cron setiap hari
@@ -53,7 +54,7 @@
 
 ### Admin Panel
 - Login session di `/admin/login`
-- Manage posts, servers, users, dan audit log
+- Manage posts, media, servers, users, dan audit log
 - Server diagnostics detail di `/admin/servers/{id}` berisi endpoint, metric history, setup command, dan activity log admin-only
 - RBAC role: `owner`, `admin`, `operator`, `readonly`
 - Install instruction agent per server, support URL publik, LAN, atau tunnel
@@ -114,6 +115,7 @@ Handler gak boleh panggil repo langsung. Service gak tahu HTTP. Repo cuma query.
 |----------|---------|------------|
 | `RAEVTAR_ADDR` | `:8080` | Listen address |
 | `RAEVTAR_DB` | `~/.raevtar/data.db` | Path SQLite database |
+| `RAEVTAR_MEDIA_DIR` | `~/.raevtar/uploads` | Direktori upload media publik |
 | `RAEVTAR_DOMAIN` | `raevtar.tech` | Domain public |
 | `RAEVTAR_LOG_LEVEL` | `info` | debug / info / warn / error |
 | `RAEVTAR_ADMIN_KEY` | `""` | **WAJIB** untuk endpoint API auth-protected. Constant-time validated |

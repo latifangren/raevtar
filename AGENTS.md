@@ -109,6 +109,7 @@ make db-reset
 |----------|---------|-------|
 | `RAEVTAR_ADDR` | `:8080` | Tidak |
 | `RAEVTAR_DB` | `~/.raevtar/data.db` | Tidak |
+| `RAEVTAR_MEDIA_DIR` | `~/.raevtar/uploads` | Tidak |
 | `RAEVTAR_DOMAIN` | `raevtar.tech` | Tidak |
 | `RAEVTAR_LOG_LEVEL` | `info` | Tidak |
 | `RAEVTAR_ADMIN_KEY` | `""` | **Ya** (untuk endpoint API auth-protected, constant-time validated) |
