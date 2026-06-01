@@ -147,7 +147,7 @@ func BlogPost(data BlogPostData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></aside></div></div></header><div class=\"bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></aside></div></div></header><div class=\"max-w-4xl mx-auto bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

@@ -31,7 +31,7 @@ templ BlogPost(data BlogPostData) {
 					</div>
 				</div>
 			</header>
-			<div class="bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+			<div class="max-w-4xl mx-auto bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
 				if data.Post.CoverImageURL != "" {
 					<img src={ data.Post.CoverImageURL } alt={ data.Post.Title } class="w-full max-h-[460px] object-cover border-2 border-retro-ink bg-retro-cream mb-6"/>
 				}
