@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"strconv"
 
 	"raevtar/internal/model"
 	"raevtar/internal/repo"
@@ -91,6 +92,14 @@ func (s *AdminService) ListAuditLogs(limit, offset int) ([]model.AuditLog, error
 	return logs, nil
 }
 
+func (s *AdminService) ListServerAuditLogs(serverID int64, limit int) ([]model.AuditLog, error) {
+	logs, err := s.repos.Audit.ListServerLogs(strconv.FormatInt(serverID, 10), limit)
+	if err != nil {
+		return nil, fmt.Errorf("list server audit logs: %w", err)
+	}
+	return logs, nil
+}
+
 func (s *AdminService) LogPostCreated(username, title, ip string) error {
 	if err := s.repos.Audit.Insert(username, "CREATE_POST", "created post: "+title, ip); err != nil {
 		return fmt.Errorf("audit create post: %w", err)
@@ -114,6 +123,14 @@ func (s *AdminService) DeletePost(username string, id int64, ip string) error {
 func (s *AdminService) LogServerCreated(username, name, host, port, ip string) error {
 	if err := s.repos.Audit.Insert(username, "CREATE_SERVER", "created server: "+name+" ("+host+":"+port+")", ip); err != nil {
 		return fmt.Errorf("audit create server: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) LogServerUpdated(username string, serverID int64, name, host, port, ip string) error {
+	details := "updated server id: " + strconv.FormatInt(serverID, 10) + " (" + name + " " + host + ":" + port + ")"
+	if err := s.repos.Audit.Insert(username, "UPDATE_SERVER", details, ip); err != nil {
+		return fmt.Errorf("audit update server: %w", err)
 	}
 	return nil
 }
