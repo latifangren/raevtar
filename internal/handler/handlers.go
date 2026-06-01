@@ -10,7 +10,7 @@ import (
 )
 
 func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
-	posts, _, err := h.svc.Blog.ListPosts("", 1, 3)
+	posts, postCount, err := h.svc.Blog.ListPosts("", 1, 3)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -29,6 +29,7 @@ func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, r, pages.Index(pages.IndexData{
 		CurrentPath: r.URL.Path,
 		Posts:       posts,
+		PostCount:   postCount,
 		Servers:     servers,
 		Categories:  categories,
 		Domain:      h.cfg.Domain,

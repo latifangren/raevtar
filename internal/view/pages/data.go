@@ -16,6 +16,7 @@ const (
 type IndexData struct {
 	CurrentPath string
 	Posts       []model.Post
+	PostCount   int
 	Servers     []model.Server
 	Categories  []model.Category
 	Domain      string
