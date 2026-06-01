@@ -1,6 +1,7 @@
 package service
 
 import (
+	"database/sql"
 	"errors"
 	"fmt"
 	"regexp"
@@ -18,6 +19,7 @@ import (
 var slugRe = regexp.MustCompile(`[^a-z0-9-]`)
 
 var ErrInvalidPostInput = errors.New("invalid post input")
+var ErrPostNotFound = errors.New("post not found")
 
 type BlogService struct {
 	repos    *repo.Repositories
@@ -50,6 +52,22 @@ func (s *BlogService) ListPosts(categorySlug string, page, pageSize int) ([]mode
 		return nil, 0, fmt.Errorf("list posts: %w", err)
 	}
 
+	return posts, total, nil
+}
+
+func (s *BlogService) ListAllPosts(page, pageSize int) ([]model.Post, int, error) {
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	offset := (page - 1) * pageSize
+	total, err := s.repos.Post.Count("", false)
+	if err != nil {
+		return nil, 0, fmt.Errorf("count posts: %w", err)
+	}
+	posts, err := s.repos.Post.List("", false, pageSize, offset)
+	if err != nil {
+		return nil, 0, fmt.Errorf("list posts: %w", err)
+	}
 	return posts, total, nil
 }
 
@@ -100,12 +118,16 @@ func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
 	post := &model.Post{
 		CategoryID: cat.ID,
 		Title:      input.Title,
-		Slug:       generateSlug(input.Title),
+		Slug:       "",
 		ContentMD:  input.ContentMD,
 		Excerpt:    input.Excerpt,
 		Published:  input.Published,
 		CreatedAt:  time.Now(),
 		UpdatedAt:  time.Now(),
+	}
+	post.Slug, err = s.uniqueSlug(input.Title)
+	if err != nil {
+		return nil, fmt.Errorf("generate slug: %w", err)
 	}
 
 	if err := s.repos.Post.Create(post); err != nil {
@@ -120,6 +142,61 @@ func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
 	}
 
 	return s.GetPost(post.Slug) // reload with tags + rendered markdown
+}
+
+func (s *BlogService) GetPostByID(id int64) (*model.Post, error) {
+	post, err := s.repos.Post.GetByID(id)
+	if err != nil {
+		return nil, err
+	}
+	var buf strings.Builder
+	if err := s.markdown.Convert([]byte(post.ContentMD), &buf); err != nil {
+		return nil, fmt.Errorf("render markdown: %w", err)
+	}
+	post.ContentHTML = buf.String()
+	return post, nil
+}
+
+func (s *BlogService) UpdatePost(id int64, input model.PostUpdate) (*model.Post, error) {
+	input.CategorySlug = strings.TrimSpace(input.CategorySlug)
+	input.Title = strings.TrimSpace(input.Title)
+	input.ContentMD = strings.TrimSpace(input.ContentMD)
+	input.Excerpt = strings.TrimSpace(input.Excerpt)
+	cleanTags := make([]string, 0, len(input.Tags))
+	for _, tag := range input.Tags {
+		tag = strings.TrimSpace(tag)
+		if tag != "" {
+			cleanTags = append(cleanTags, tag)
+		}
+	}
+	input.Tags = cleanTags
+	if input.Title == "" || input.CategorySlug == "" || input.ContentMD == "" {
+		return nil, fmt.Errorf("%w: title, category_slug, and content_md required", ErrInvalidPostInput)
+	}
+	post, err := s.repos.Post.GetByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %w", ErrPostNotFound, err)
+		}
+		return nil, fmt.Errorf("get post: %w", err)
+	}
+	cat, err := s.repos.Category.GetBySlug(input.CategorySlug)
+	if err != nil {
+		return nil, fmt.Errorf("category not found: %s", input.CategorySlug)
+	}
+	post.CategoryID = cat.ID
+	post.Title = input.Title
+	post.ContentMD = input.ContentMD
+	post.Excerpt = input.Excerpt
+	post.Published = input.Published
+	post.UpdatedAt = time.Now()
+	if err := s.repos.Post.Update(post); err != nil {
+		return nil, fmt.Errorf("update post: %w", err)
+	}
+	if err := s.repos.Tag.SetTags(post.ID, input.Tags); err != nil {
+		return nil, fmt.Errorf("set tags: %w", err)
+	}
+	return s.GetPostByID(post.ID)
 }
 
 func cleanPostCreate(input model.PostCreate) model.PostCreate {
@@ -149,4 +226,21 @@ func generateSlug(title string) string {
 		slug = fmt.Sprintf("post-%d", time.Now().Unix())
 	}
 	return slug
+}
+
+func (s *BlogService) uniqueSlug(title string) (string, error) {
+	base := generateSlug(title)
+	for i := 1; ; i++ {
+		slug := base
+		if i > 1 {
+			slug = fmt.Sprintf("%s-%d", base, i)
+		}
+		exists, err := s.repos.Post.SlugExists(slug)
+		if err != nil {
+			return "", err
+		}
+		if !exists {
+			return slug, nil
+		}
+	}
 }

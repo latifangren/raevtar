@@ -13,7 +13,7 @@ import (
 )
 
 func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
-	allPosts, _, _ := h.svc.Blog.ListPosts("", 1, 9999)
+	allPosts, _, _ := h.svc.Blog.ListAllPosts(1, 9999)
 	servers, _ := h.svc.Monitor.ListServers()
 	users, _ := h.svc.Admin.ListUsers()
 	stats := collectHostStats()
@@ -130,7 +130,7 @@ func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
-	posts, _, _ := h.svc.Blog.ListPosts("", 1, 9999)
+	posts, _, _ := h.svc.Blog.ListAllPosts(1, 9999)
 	categories, _ := h.svc.Blog.ListCategories()
 	renderHTML(w, r, adminview.Posts(adminview.PostsData{
 		CurrentPath: r.URL.Path,
@@ -172,6 +172,57 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	_ = h.svc.Admin.LogPostCreated(entry.username, post.Title, clientIP(r))
+	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
+}
+
+func (h *Handler) adminEditPost(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("postID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	post, err := h.svc.Blog.GetPostByID(id)
+	if err != nil {
+		http.Error(w, "post not found", http.StatusNotFound)
+		return
+	}
+	categories, _ := h.svc.Blog.ListCategories()
+	renderHTML(w, r, adminview.PostEdit(adminview.PostEditData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Post:        post,
+		Categories:  categories,
+	}))
+}
+
+func (h *Handler) adminUpdatePost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("postID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	post, err := h.svc.Blog.UpdatePost(id, model.PostUpdate{
+		Title:        r.FormValue("title"),
+		ContentMD:    r.FormValue("content"),
+		Excerpt:      r.FormValue("excerpt"),
+		CategorySlug: r.FormValue("category_slug"),
+		Published:    r.FormValue("published") == "true",
+		Tags:         splitTags(r.FormValue("tags")),
+	})
+	if err != nil {
+		if errors.Is(err, service.ErrPostNotFound) {
+			http.Error(w, "post not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	_ = h.svc.Admin.LogPostUpdated(entry.username, post.Title, clientIP(r))
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 

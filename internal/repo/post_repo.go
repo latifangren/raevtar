@@ -103,6 +103,24 @@ func (r *PostRepo) Create(p *model.Post) error {
 	return nil
 }
 
+func (r *PostRepo) Update(p *model.Post) error {
+	_, err := r.db.Exec(`
+		UPDATE posts
+		SET category_id = ?, title = ?, content_md = ?, excerpt = ?, published = ?, updated_at = ?
+		WHERE id = ?`,
+		p.CategoryID, p.Title, p.ContentMD, p.Excerpt, p.Published, p.UpdatedAt, p.ID,
+	)
+	return err
+}
+
+func (r *PostRepo) SlugExists(slug string) (bool, error) {
+	var count int
+	if err := r.db.Get(&count, "SELECT COUNT(*) FROM posts WHERE slug = ?", slug); err != nil {
+		return false, err
+	}
+	return count > 0, nil
+}
+
 func (r *PostRepo) Delete(id int64) error {
 	_, err := r.db.Exec("DELETE FROM posts WHERE id = ?", id)
 	return err

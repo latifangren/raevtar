@@ -29,3 +29,12 @@ type PostCreate struct {
 	Published    bool     `json:"published"`
 	Tags         []string `json:"tags"` // tag names, created if not exist
 }
+
+type PostUpdate struct {
+	CategorySlug string
+	Title        string
+	ContentMD    string
+	Excerpt      string
+	Published    bool
+	Tags         []string
+}

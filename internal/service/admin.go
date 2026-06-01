@@ -107,6 +107,13 @@ func (s *AdminService) LogPostCreated(username, title, ip string) error {
 	return nil
 }
 
+func (s *AdminService) LogPostUpdated(username, title, ip string) error {
+	if err := s.repos.Audit.Insert(username, "UPDATE_POST", "updated post: "+title, ip); err != nil {
+		return fmt.Errorf("audit update post: %w", err)
+	}
+	return nil
+}
+
 func (s *AdminService) DeletePost(username string, id int64, ip string) error {
 	post, err := s.repos.Post.GetByID(id)
 	if err == nil {
