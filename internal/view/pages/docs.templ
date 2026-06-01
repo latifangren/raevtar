@@ -1,0 +1,53 @@
+package pages
+
+templ Docs(data DocsData) {
+	@page("Docs - Raevtar", data.CurrentPath, data.Categories) {
+		<section class="full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden">
+			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+				<div class="max-w-3xl">
+					<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Public docs</p>
+					<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">What this public room shows.</h1>
+					<p class="text-base md:text-lg font-bold text-retro-ink opacity-80">Raevtar publishes project notes, public-safe signal summaries, RSS, and a small read-only API surface. Operator details stay in admin.</p>
+				</div>
+			</div>
+		</section>
+		<section class="mb-12 grid gap-4 lg:grid-cols-3">
+			@docsCard("01", "Read", "Blog posts and RSS are public. Articles keep category and tag context so Hermes-written and manual notes land in one archive.", "/blog", "Open blog")
+			@docsCard("02", "Watch", "Dashboard cards show public freshness bands: online, stale, and offline. They explain last signal timing without exposing topology.", "/dashboard", "Open dashboard")
+			@docsCard("03", "Understand", "The lab page maps the platform shape: content, signals, and automation boundaries with aggregate counters only.", "/lab", "Open lab")
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
+			<div class="grid gap-0 md:grid-cols-[0.8fr_1.2fr]">
+				<div class="bg-retro-ink text-retro-cream p-6 md:p-8">
+					<p class="text-xs font-black uppercase tracking-widest text-retro-wheat mb-3">boundary</p>
+					<h2 class="text-3xl md:text-4xl font-black uppercase leading-tight mb-4">Public front, admin back room.</h2>
+					<p class="text-sm font-bold text-retro-sageLight">Public docs intentionally describe safe reading surfaces. Server operations, diagnostics, and logs belong inside admin sessions.</p>
+				</div>
+				<div class="grid gap-3 p-6 md:p-8 sm:grid-cols-2">
+					<div class="border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748]"><p class="text-xs font-black uppercase text-retro-muted mb-2">public</p><p class="text-sm font-bold text-retro-ink">Posts, categories, RSS, public status bands, public route map, aggregate lab counters.</p></div>
+					<div class="border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748]"><p class="text-xs font-black uppercase text-retro-muted mb-2">admin only</p><p class="text-sm font-bold text-retro-ink">Machine addresses, network details, credentials, setup commands, and diagnostics.</p></div>
+					<div class="border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] sm:col-span-2"><p class="text-xs font-black uppercase text-retro-muted mb-2">automation</p><p class="text-sm font-bold text-retro-ink">Hermes can publish structured notes through protected write flows. Public readers see final posts and tags, not operator controls.</p></div>
+				</div>
+			</div>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">read-only API</p>
+			<h2 class="text-2xl font-black uppercase mb-3">Safe public endpoints</h2>
+			<div class="grid gap-3 md:grid-cols-3">
+				<code class="border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-mono font-black">GET /api/v1/posts</code>
+				<code class="border-2 border-retro-ink bg-retro-sageLight p-3 text-sm font-mono font-black">GET /api/v1/categories</code>
+				<code class="border-2 border-retro-ink bg-retro-paper p-3 text-sm font-mono font-black">GET /blog/feed.xml</code>
+			</div>
+			<p class="text-sm font-bold text-retro-muted mt-4">Protected write and operator endpoints are deliberately omitted from public docs.</p>
+		</section>
+	}
+}
+
+templ docsCard(number string, title string, body string, href string, label string) {
+	<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+		<span class="inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-ink text-retro-cream font-black">{ number }</span>
+		<h2 class="text-2xl font-black uppercase mb-2">{ title }</h2>
+		<p class="text-sm font-bold text-retro-muted mb-4">{ body }</p>
+		<a href={ templ.URL(href) } class="text-sm font-black no-underline hover:bg-retro-wheat">{ label } &rarr;</a>
+	</div>
+}
