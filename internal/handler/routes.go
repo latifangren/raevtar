@@ -29,6 +29,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	r.Get("/robots.txt", h.serveStatic("robots.txt"))
 	r.Get("/favicon.svg", h.serveStatic("favicon.svg"))
+	r.Get("/uploads/{filename}", h.serveUpload)
 
 	// pages
 	r.Get("/", h.landingIndex)
@@ -63,10 +64,13 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 			r.Group(func(r chi.Router) {
 				r.Use(h.ownerOrAdminRequired)
 				r.Get("/posts", h.adminPosts)
+				r.Post("/posts/preview", h.adminPreviewPost)
 				r.Post("/posts", h.adminCreatePost)
 				r.Get("/posts/edit/{postID}", h.adminEditPost)
 				r.Post("/posts/update/{postID}", h.adminUpdatePost)
 				r.Post("/posts/delete/{postID}", h.adminDeletePost)
+				r.Get("/media", h.adminMedia)
+				r.Post("/media", h.adminUploadMedia)
 				r.Get("/servers", h.adminServers)
 				r.Get("/servers/{serverID}", h.adminServerDetail)
 				r.Post("/servers", h.adminCreateServer)

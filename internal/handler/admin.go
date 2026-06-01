@@ -12,6 +12,12 @@ import (
 	adminview "raevtar/internal/view/admin"
 )
 
+const (
+	adminPostIntentDraft   = "draft"
+	adminPostIntentPublish = "publish"
+	adminPostIntentUpdate  = "update"
+)
+
 func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 	allPosts, _, _ := h.svc.Blog.ListAllPosts(1, 9999)
 	servers, _ := h.svc.Monitor.ListServers()
@@ -132,12 +138,46 @@ func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 	posts, _, _ := h.svc.Blog.ListAllPosts(1, 9999)
 	categories, _ := h.svc.Blog.ListCategories()
+	mediaAssets, _ := h.svc.Media.ListAssets()
 	renderHTML(w, r, adminview.Posts(adminview.PostsData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
 		Posts:       posts,
 		Categories:  categories,
+		MediaAssets: mediaAssets,
 	}))
+}
+
+func (h *Handler) adminMedia(w http.ResponseWriter, r *http.Request) {
+	assets, err := h.svc.Media.ListAssets()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	renderHTML(w, r, adminview.Media(adminview.MediaData{CurrentPath: r.URL.Path, CSRFToken: csrfTokenForRequest(r), Assets: assets}))
+}
+
+func (h *Handler) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		http.Error(w, "file required", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+	_, err = h.svc.Media.Upload(service.MediaUpload{OriginalName: header.Filename, Reader: file})
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidMediaInput) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	http.Redirect(w, r, "/admin/media", http.StatusSeeOther)
 }
 
 func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
@@ -151,7 +191,9 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 	catSlug := r.FormValue("category_slug")
 	content := r.FormValue("content")
 	excerpt := r.FormValue("excerpt")
+	coverImageURL := r.FormValue("cover_image_url")
 	tags := splitTags(r.FormValue("tags"))
+	intent := r.FormValue("intent")
 
 	if title == "" || catSlug == "" || content == "" {
 		http.Error(w, "title, category_slug, and content required", http.StatusBadRequest)
@@ -159,12 +201,13 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 	}
 
 	post, err := h.svc.Blog.CreatePost(model.PostCreate{
-		Title:        title,
-		ContentMD:    content,
-		Excerpt:      excerpt,
-		CategorySlug: catSlug,
-		Published:    true,
-		Tags:         tags,
+		Title:         title,
+		ContentMD:     content,
+		Excerpt:       excerpt,
+		CoverImageURL: coverImageURL,
+		CategorySlug:  catSlug,
+		Published:     intent == adminPostIntentPublish,
+		Tags:          tags,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -173,6 +216,29 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 
 	_ = h.svc.Admin.LogPostCreated(entry.username, post.Title, clientIP(r))
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
+}
+
+func (h *Handler) adminPreviewPost(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+
+	content := r.FormValue("content")
+	if content == "" {
+		content = r.FormValue("content_md")
+	}
+	if strings.TrimSpace(content) == "" {
+		renderHTML(w, r, adminview.PostMarkdownPreview("", true))
+		return
+	}
+
+	contentHTML, err := h.svc.Blog.RenderMarkdown(content)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	renderHTML(w, r, adminview.PostMarkdownPreview(contentHTML, false))
 }
 
 func (h *Handler) adminEditPost(w http.ResponseWriter, r *http.Request) {
@@ -187,11 +253,13 @@ func (h *Handler) adminEditPost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	categories, _ := h.svc.Blog.ListCategories()
+	mediaAssets, _ := h.svc.Media.ListAssets()
 	renderHTML(w, r, adminview.PostEdit(adminview.PostEditData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
 		Post:        post,
 		Categories:  categories,
+		MediaAssets: mediaAssets,
 	}))
 }
 
@@ -206,13 +274,27 @@ func (h *Handler) adminUpdatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "invalid id", http.StatusBadRequest)
 		return
 	}
+	currentPost, err := h.svc.Blog.GetPostByID(id)
+	if err != nil {
+		http.Error(w, "post not found", http.StatusNotFound)
+		return
+	}
+	published := currentPost.Published
+	switch r.FormValue("intent") {
+	case adminPostIntentDraft:
+		published = false
+	case adminPostIntentPublish:
+		published = true
+	case adminPostIntentUpdate:
+	}
 	post, err := h.svc.Blog.UpdatePost(id, model.PostUpdate{
-		Title:        r.FormValue("title"),
-		ContentMD:    r.FormValue("content"),
-		Excerpt:      r.FormValue("excerpt"),
-		CategorySlug: r.FormValue("category_slug"),
-		Published:    r.FormValue("published") == "true",
-		Tags:         splitTags(r.FormValue("tags")),
+		Title:         r.FormValue("title"),
+		ContentMD:     r.FormValue("content"),
+		Excerpt:       r.FormValue("excerpt"),
+		CoverImageURL: r.FormValue("cover_image_url"),
+		CategorySlug:  r.FormValue("category_slug"),
+		Published:     published,
+		Tags:          splitTags(r.FormValue("tags")),
 	})
 	if err != nil {
 		if errors.Is(err, service.ErrPostNotFound) {

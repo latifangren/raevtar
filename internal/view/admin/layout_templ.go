@@ -42,7 +42,7 @@ func Shell(title string, currentPath string, csrfToken string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " — Raevtar Admin</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"/static/css/style.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"></head><body class=\"bg-retro-cream text-retro-ink font-sans min-h-screen antialiased\"><div class=\"min-h-screen flex\"><aside class=\"w-64 bg-retro-ink text-retro-cream hidden md:flex flex-col border-r-2 border-retro-ink\"><div class=\"p-6 flex items-center gap-3 border-b-2 border-retro-paper\"><div class=\"w-8 h-8 bg-retro-sage flex items-center justify-center border-2 border-retro-paper\"><span class=\"text-retro-cream font-black\">R</span></div><span class=\"text-xl font-black tracking-tight text-retro-cream\">Raevtar</span></div><nav class=\"flex-1 px-4 space-y-2 mt-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " — Raevtar Admin</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"/static/css/style.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script></head><body class=\"bg-retro-cream text-retro-ink font-sans min-h-screen antialiased\"><div class=\"min-h-screen flex\"><aside class=\"w-64 bg-retro-ink text-retro-cream hidden md:flex flex-col border-r-2 border-retro-ink\"><div class=\"p-6 flex items-center gap-3 border-b-2 border-retro-paper\"><div class=\"w-8 h-8 bg-retro-sage flex items-center justify-center border-2 border-retro-paper\"><span class=\"text-retro-cream font-black\">R</span></div><span class=\"text-xl font-black tracking-tight text-retro-cream\">Raevtar</span></div><nav class=\"flex-1 px-4 space-y-2 mt-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -51,6 +51,10 @@ func Shell(title string, currentPath string, csrfToken string) templ.Component {
 			return templ_7745c5c3_Err
 		}
 		templ_7745c5c3_Err = navLink("/admin/posts", "Posts", currentPath).Render(ctx, templ_7745c5c3_Buffer)
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = navLink("/admin/media", "Media", currentPath).Render(ctx, templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -73,7 +77,7 @@ func Shell(title string, currentPath string, csrfToken string) templ.Component {
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(csrfToken)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 34, Col: 58}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 36, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
@@ -86,7 +90,7 @@ func Shell(title string, currentPath string, csrfToken string) templ.Component {
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 45, Col: 76}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 47, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -137,7 +141,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var6 templ.SafeURL
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 107, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 109, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -150,7 +154,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 107, Col: 152}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 109, Col: 152}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -168,7 +172,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var8 templ.SafeURL
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 109, Col: 27}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 111, Col: 27}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -181,7 +185,7 @@ func navLink(href string, label string, currentPath string) templ.Component {
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 109, Col: 181}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/layout.templ`, Line: 111, Col: 181}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {

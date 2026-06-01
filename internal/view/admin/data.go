@@ -64,6 +64,7 @@ type PostsData struct {
 	CSRFToken   string
 	Posts       []model.Post
 	Categories  []model.Category
+	MediaAssets []model.MediaAsset
 }
 
 type PostEditData struct {
@@ -71,6 +72,13 @@ type PostEditData struct {
 	CSRFToken   string
 	Post        *model.Post
 	Categories  []model.Category
+	MediaAssets []model.MediaAsset
+}
+
+type MediaData struct {
+	CurrentPath string
+	CSRFToken   string
+	Assets      []model.MediaAsset
 }
 
 type ServersData struct {
@@ -251,6 +259,16 @@ func CountText(value int) string {
 
 func IDText(id int64) string {
 	return strconv.FormatInt(id, 10)
+}
+
+func BytesText(value int64) string {
+	if value < 1024 {
+		return strconv.FormatInt(value, 10) + " B"
+	}
+	if value < 1024*1024 {
+		return strconv.FormatFloat(float64(value)/1024, 'f', 1, 64) + " KB"
+	}
+	return strconv.FormatFloat(float64(value)/(1024*1024), 'f', 1, 64) + " MB"
 }
 
 func PortText(port int) string {
