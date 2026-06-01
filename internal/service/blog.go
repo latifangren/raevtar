@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -15,6 +16,8 @@ import (
 )
 
 var slugRe = regexp.MustCompile(`[^a-z0-9-]`)
+
+var ErrInvalidPostInput = errors.New("invalid post input")
 
 type BlogService struct {
 	repos    *repo.Repositories
@@ -84,6 +87,11 @@ func (s *BlogService) GetPublishedPost(slug string) (*model.Post, error) {
 }
 
 func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
+	input = cleanPostCreate(input)
+	if input.Title == "" || input.CategorySlug == "" || input.ContentMD == "" {
+		return nil, fmt.Errorf("%w: title, category_slug, and content_md required", ErrInvalidPostInput)
+	}
+
 	cat, err := s.repos.Category.GetBySlug(input.CategorySlug)
 	if err != nil {
 		return nil, fmt.Errorf("category not found: %s", input.CategorySlug)
@@ -112,6 +120,22 @@ func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
 	}
 
 	return s.GetPost(post.Slug) // reload with tags + rendered markdown
+}
+
+func cleanPostCreate(input model.PostCreate) model.PostCreate {
+	input.CategorySlug = strings.TrimSpace(input.CategorySlug)
+	input.Title = strings.TrimSpace(input.Title)
+	input.ContentMD = strings.TrimSpace(input.ContentMD)
+	input.Excerpt = strings.TrimSpace(input.Excerpt)
+	cleanTags := make([]string, 0, len(input.Tags))
+	for _, tag := range input.Tags {
+		tag = strings.TrimSpace(tag)
+		if tag != "" {
+			cleanTags = append(cleanTags, tag)
+		}
+	}
+	input.Tags = cleanTags
+	return input
 }
 
 func generateSlug(title string) string {

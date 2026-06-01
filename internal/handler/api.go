@@ -26,13 +26,12 @@ func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if input.Title == "" || input.CategorySlug == "" {
-		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "title and category_slug required"})
-		return
-	}
-
 	post, err := h.svc.Blog.CreatePost(input)
 	if err != nil {
+		if errors.Is(err, service.ErrInvalidPostInput) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
 		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
 		return
 	}
