@@ -2,6 +2,7 @@ package handler
 
 import (
 	"net/http"
+	"path/filepath"
 	"strconv"
 	"time"
 
@@ -207,6 +208,21 @@ func (h *Handler) serveStatic(filename string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
 		http.ServeFile(w, r, "./static/"+filename)
 	}
+}
+
+func (h *Handler) serveUpload(w http.ResponseWriter, r *http.Request) {
+	requested := r.PathValue("filename")
+	name := filepath.Base(requested)
+	if name == "." || name == "" || name != requested {
+		http.NotFound(w, r)
+		return
+	}
+	path, err := h.svc.Media.FilePath(name)
+	if err != nil {
+		http.NotFound(w, r)
+		return
+	}
+	http.ServeFile(w, r, path)
 }
 
 func (h *Handler) page404(w http.ResponseWriter, r *http.Request) {
