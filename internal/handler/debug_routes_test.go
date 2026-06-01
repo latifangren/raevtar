@@ -423,6 +423,29 @@ func TestPublicRoutes(t *testing.T) {
 	}
 }
 
+func TestLandingUsesTotalPublishedPostCount(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for i := 2; i <= 5; i++ {
+		_, err := app.svc.Blog.CreatePost(model.PostCreate{
+			CategorySlug: "devops",
+			Title:        fmt.Sprintf("Counted Dispatch %d", i),
+			ContentMD:    fmt.Sprintf("# Counted Dispatch %d\n\nPublished count regression fixture.", i),
+			Excerpt:      "Published count regression fixture.",
+			Published:    true,
+		})
+		if err != nil {
+			t.Fatalf("create post %d: %v", i, err)
+		}
+	}
+
+	status, body := getBody(t, app, "/", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, `>5</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span>`)
+}
+
 func TestPublicDashboardRedactsServerTopology(t *testing.T) {
 	app := newPublicTestApp(t)
 

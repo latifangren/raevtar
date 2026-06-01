@@ -5,7 +5,7 @@ import "raevtar/internal/view/components"
 templ Index(data IndexData) {
 	@page("Raevtar", data.CurrentPath, data.Categories) {
 		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
-			<div class="max-w-5xl mx-auto px-4 py-16 md:py-24">
+			<div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
 				<div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] items-center">
 					<div>
 						<div class="flex flex-wrap gap-2 mb-5">
@@ -27,7 +27,7 @@ templ Index(data IndexData) {
 						<div class="relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] rotate-1">
 							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">live stack board</p>
 							<div class="grid grid-cols-3 gap-3 text-center">
-								<div class="border-2 border-retro-ink bg-retro-sageLight p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(len(data.Posts)) }</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span></div>
+								<div class="border-2 border-retro-ink bg-retro-sageLight p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.PostCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span></div>
 								<div class="border-2 border-retro-ink bg-retro-wheat p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(len(data.Categories)) }</span><span class="text-xs font-bold uppercase text-retro-muted">topics</span></div>
 								<div class="border-2 border-retro-ink bg-retro-blush p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(len(data.Servers)) }</span><span class="text-xs font-bold uppercase text-retro-muted">nodes</span></div>
 							</div>
