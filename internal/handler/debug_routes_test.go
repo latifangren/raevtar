@@ -2,8 +2,10 @@ package handler
 
 import (
 	"bytes"
+	"encoding/base64"
 	"encoding/json"
 	"fmt"
+	"mime/multipart"
 	"net/http"
 	"net/http/httptest"
 	"net/url"
@@ -36,6 +38,7 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		AdminKey:     "admin-key",
 		AdminUser:    "admin",
 		AdminPass:    "demo-pass-123",
+		MediaDir:     filepath.Join(t.TempDir(), "uploads"),
 	}
 
 	db := repo.InitSQLite(cfg.DatabasePath)
@@ -100,6 +103,36 @@ func getBody(t *testing.T, app *publicTestApp, path string, cookie *http.Cookie)
 	app.handler.ServeHTTP(rr, req)
 
 	return rr.Code, rr.Body.String()
+}
+
+func testPNG(t *testing.T) []byte {
+	t.Helper()
+	data, err := base64.StdEncoding.DecodeString("iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAQAAAC1HAwCAAAAC0lEQVR42mP8/x8AAwMCAO+/p9sAAAAASUVORK5CYII=")
+	if err != nil {
+		t.Fatalf("decode png: %v", err)
+	}
+	return data
+}
+
+func mediaUploadRequest(t *testing.T, path, token, csrf, filename string, data []byte) *http.Request {
+	t.Helper()
+	var body bytes.Buffer
+	writer := multipart.NewWriter(&body)
+	_ = writer.WriteField("_csrf", csrf)
+	part, err := writer.CreateFormFile("file", filename)
+	if err != nil {
+		t.Fatalf("create form file: %v", err)
+	}
+	if _, err := part.Write(data); err != nil {
+		t.Fatalf("write form file: %v", err)
+	}
+	if err := writer.Close(); err != nil {
+		t.Fatalf("close multipart: %v", err)
+	}
+	req := httptest.NewRequest(http.MethodPost, path, &body)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	return req
 }
 
 func TestAdminLoginRedirectsToDashboard(t *testing.T) {
@@ -1079,7 +1112,15 @@ func TestAdminPostEditUpdatesExistingPost(t *testing.T) {
 	}
 	assertContains(t, body, "Edit post")
 	assertContains(t, body, "Hello Raevtar")
-	assertContains(t, body, `data-confirm="Update this post?"`)
+	assertContains(t, body, `data-confirm="Save post changes?"`)
+	assertContains(t, body, "Current status")
+	assertContains(t, body, `name="intent" value="draft"`)
+	assertContains(t, body, `name="intent" value="update"`)
+	assertContains(t, body, `name="intent" value="publish"`)
+	assertContains(t, body, `hx-post="/admin/posts/preview"`)
+	assertContains(t, body, `hx-target="#post-markdown-preview"`)
+	assertContains(t, body, `id="post-markdown-preview"`)
+	assertNotContains(t, body, `name="published"`)
 
 	form := url.Values{
 		"_csrf":         {entry.csrfToken},
@@ -1088,6 +1129,7 @@ func TestAdminPostEditUpdatesExistingPost(t *testing.T) {
 		"content":       {"# Updated Dispatch"},
 		"excerpt":       {"Updated excerpt"},
 		"tags":          {"new, commissioned"},
+		"intent":        {"draft"},
 	}
 	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(post.ID, 10), strings.NewReader(form.Encode()))
 	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
@@ -1113,6 +1155,321 @@ func TestAdminPostEditUpdatesExistingPost(t *testing.T) {
 	}
 	assertContains(t, body, "Updated Dispatch")
 	assertContains(t, body, "draft")
+}
+
+func TestAdminPostCreateIntentControlsPublishedState(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(64, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	status, body := getBody(t, app, "/admin/posts", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("posts status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, `name="intent" value="draft"`)
+	assertContains(t, body, `name="intent" value="publish"`)
+	assertContains(t, body, `hx-post="/admin/posts/preview"`)
+	assertContains(t, body, `hx-target="#post-markdown-preview"`)
+	assertContains(t, body, `id="post-markdown-preview"`)
+	assertNotContains(t, body, `name="published"`)
+
+	for _, tt := range []struct {
+		name      string
+		title     string
+		intent    string
+		published bool
+	}{
+		{name: "draft", title: "Admin Draft Dispatch", intent: "draft", published: false},
+		{name: "published", title: "Admin Published Dispatch", intent: "publish", published: true},
+	} {
+		t.Run(tt.name, func(t *testing.T) {
+			form := url.Values{
+				"_csrf":         {entry.csrfToken},
+				"title":         {tt.title},
+				"category_slug": {"devops"},
+				"content":       {"# " + tt.title},
+				"excerpt":       {tt.title + " excerpt"},
+				"intent":        {tt.intent},
+			}
+			req := httptest.NewRequest(http.MethodPost, "/admin/posts", strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+			rr := httptest.NewRecorder()
+			app.handler.ServeHTTP(rr, req)
+			if rr.Code != http.StatusSeeOther {
+				t.Fatalf("create status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+			}
+			post, err := app.svc.Blog.GetPost(strings.ToLower(strings.ReplaceAll(tt.title, " ", "-")))
+			if err != nil {
+				t.Fatalf("get post: %v", err)
+			}
+			if post.Published != tt.published {
+				t.Fatalf("published = %v, want %v", post.Published, tt.published)
+			}
+		})
+	}
+}
+
+func TestAdminPostPreviewRequiresSessionOwnerAdminAndCSRF(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	form := url.Values{"content": {"# Preview"}}
+	unauthReq := httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	unauthReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	unauthRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(unauthRR, unauthReq)
+	if unauthRR.Code != http.StatusSeeOther {
+		t.Fatalf("unauthenticated status = %d, want %d", unauthRR.Code, http.StatusSeeOther)
+	}
+	if got := unauthRR.Header().Get("Location"); got != "/admin/login" {
+		t.Fatalf("unauthenticated Location = %q, want /admin/login", got)
+	}
+
+	readerToken := sessions.create(66, "reader", model.RoleReadonly)
+	readerEntry, ok := sessions.get(readerToken)
+	if !ok {
+		t.Fatalf("expected reader session")
+	}
+	readerForm := url.Values{"_csrf": {readerEntry.csrfToken}, "content": {"# Preview"}}
+	readerReq := httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(readerForm.Encode()))
+	readerReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	readerReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: readerToken})
+	readerRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(readerRR, readerReq)
+	if readerRR.Code != http.StatusForbidden {
+		t.Fatalf("readonly status = %d, want %d", readerRR.Code, http.StatusForbidden)
+	}
+
+	ownerToken := sessions.create(67, "owner", model.RoleOwner)
+	missingCSRFReq := httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	missingCSRFReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	missingCSRFReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: ownerToken})
+	missingCSRFRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(missingCSRFRR, missingCSRFReq)
+	if missingCSRFRR.Code != http.StatusForbidden {
+		t.Fatalf("missing CSRF status = %d, want %d", missingCSRFRR.Code, http.StatusForbidden)
+	}
+	assertContains(t, missingCSRFRR.Body.String(), "invalid CSRF token")
+}
+
+func TestAdminPostPreviewRendersMarkdownHTML(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(68, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	form := url.Values{
+		"_csrf":   {entry.csrfToken},
+		"content": {"# Preview Title\n\n- **one**\n- two"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("preview status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	body := rr.Body.String()
+	assertContains(t, body, `id="post-markdown-preview"`)
+	assertContains(t, body, `<h1>Preview Title</h1>`)
+	assertContains(t, body, `<strong>one</strong>`)
+	assertContains(t, body, `<ul>`)
+	assertNotContains(t, body, "Write Markdown, then preview without saving.")
+
+	form.Set("content", "   ")
+	req = httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr = httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("blank preview status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	assertContains(t, rr.Body.String(), "Write Markdown, then preview without saving.")
+}
+
+func TestAdminMediaUploadStoresServesAndCanCoverPost(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(69, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	status, body := getBody(t, app, "/admin/media", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("media status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Media Library")
+	assertContains(t, body, "Upload image")
+
+	req := mediaUploadRequest(t, "/admin/media", token, entry.csrfToken, "cover.png", testPNG(t))
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("upload status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/media" {
+		t.Fatalf("upload Location = %q, want /admin/media", got)
+	}
+
+	assets, err := app.svc.Media.ListAssets()
+	if err != nil {
+		t.Fatalf("list assets: %v", err)
+	}
+	if len(assets) != 1 {
+		t.Fatalf("assets len = %d, want 1", len(assets))
+	}
+	asset := assets[0]
+	if asset.OriginalName != "cover.png" || !strings.HasPrefix(asset.URL, "/uploads/") || asset.MimeType != "image/png" {
+		t.Fatalf("asset = %+v", asset)
+	}
+
+	status, body = getBody(t, app, "/admin/media", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("media after upload status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "cover.png")
+	assertContains(t, body, asset.URL)
+	assertContains(t, body, "![cover.png]("+asset.URL+")")
+
+	status, body = getBody(t, app, asset.URL, nil)
+	if status != http.StatusOK {
+		t.Fatalf("upload serve status = %d, want %d", status, http.StatusOK)
+	}
+	if !strings.Contains(body, "PNG") {
+		t.Fatalf("served upload body missing PNG signature marker")
+	}
+
+	form := url.Values{
+		"_csrf":           {entry.csrfToken},
+		"title":           {"Covered Dispatch"},
+		"category_slug":   {"devops"},
+		"content":         {"# Covered Dispatch"},
+		"excerpt":         {"Covered excerpt"},
+		"cover_image_url": {asset.URL},
+		"intent":          {"publish"},
+	}
+	postReq := httptest.NewRequest(http.MethodPost, "/admin/posts", strings.NewReader(form.Encode()))
+	postReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	postReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr = httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, postReq)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("create covered post status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	post, err := app.svc.Blog.GetPost("covered-dispatch")
+	if err != nil {
+		t.Fatalf("get covered post: %v", err)
+	}
+	if post.CoverImageURL != asset.URL {
+		t.Fatalf("cover url = %q, want %q", post.CoverImageURL, asset.URL)
+	}
+	status, body = getBody(t, app, "/blog/covered-dispatch", nil)
+	if status != http.StatusOK {
+		t.Fatalf("covered post status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, `src="`+asset.URL+`"`)
+}
+
+func TestAdminMediaUploadRejectsNonImages(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(70, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	req := mediaUploadRequest(t, "/admin/media", token, entry.csrfToken, "not-image.png", []byte("plain text"))
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("upload status = %d, want %d; body: %s", rr.Code, http.StatusBadRequest, rr.Body.String())
+	}
+	assertContains(t, rr.Body.String(), "unsupported image content")
+}
+
+func TestAdminPostUpdateIntentTransitionsPublishedState(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(65, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	post, err := app.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Workflow Draft",
+		ContentMD:    "# Workflow Draft",
+		Published:    false,
+	})
+	if err != nil {
+		t.Fatalf("create draft: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":         {entry.csrfToken},
+		"title":         {"Workflow Draft"},
+		"category_slug": {"devops"},
+		"content":       {"# Workflow Draft Published"},
+		"intent":        {"publish"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(post.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("publish status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	updated, err := app.svc.Blog.GetPostByID(post.ID)
+	if err != nil {
+		t.Fatalf("get published post: %v", err)
+	}
+	if !updated.Published {
+		t.Fatalf("post should be published after publish intent: %+v", updated)
+	}
+
+	form.Set("content", "# Workflow Draft Edited")
+	form.Set("intent", "update")
+	req = httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(post.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr = httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("update status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	updated, err = app.svc.Blog.GetPostByID(post.ID)
+	if err != nil {
+		t.Fatalf("get updated post: %v", err)
+	}
+	if !updated.Published {
+		t.Fatalf("post should stay published after update intent: %+v", updated)
+	}
+
+	form.Set("intent", "draft")
+	req = httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(post.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr = httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("draft status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	updated, err = app.svc.Blog.GetPostByID(post.ID)
+	if err != nil {
+		t.Fatalf("get draft post: %v", err)
+	}
+	if updated.Published {
+		t.Fatalf("post should be draft after draft intent: %+v", updated)
+	}
 }
 
 func TestAdminPostUpdateMissingPostReturnsNotFound(t *testing.T) {

@@ -23,6 +23,7 @@ func newTestServices(t *testing.T) *testServices {
 		DatabasePath: dbPath,
 		Domain:       "raevtar.test",
 		AdminUser:    "admin",
+		MediaDir:     filepath.Join(t.TempDir(), "uploads"),
 	}
 
 	db := repo.InitSQLite(cfg.DatabasePath)
