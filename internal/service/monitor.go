@@ -9,6 +9,7 @@ import (
 	"errors"
 	"fmt"
 	"log/slog"
+	"math"
 	"strings"
 	"time"
 
@@ -21,6 +22,7 @@ type MonitorService struct {
 }
 
 var ErrServerNotFound = errors.New("server not found")
+var ErrInvalidMetricPayload = errors.New("invalid metric payload")
 
 func (s *MonitorService) CreateServer(name, host string, port int, tags string) (*model.Server, error) {
 	server := &model.Server{
@@ -97,6 +99,9 @@ func (s *MonitorService) RecordMetrics(serverID int64, m model.ServerMetric) err
 		}
 		return fmt.Errorf("get server: %w", err)
 	}
+	if err := validateServerMetric(m); err != nil {
+		return err
+	}
 
 	recordedAt := time.Now().UTC()
 	m.ServerID = serverID
@@ -106,6 +111,57 @@ func (s *MonitorService) RecordMetrics(serverID int64, m model.ServerMetric) err
 	}
 	if err := s.repos.Server.UpdateLastSeen(serverID, recordedAt); err != nil {
 		return fmt.Errorf("update last seen: %w", err)
+	}
+	return nil
+}
+
+func validateServerMetric(m model.ServerMetric) error {
+	checks := []struct {
+		name  string
+		value float64
+	}{
+		{name: "cpu percent", value: m.CPUPercent},
+		{name: "cpu load1", value: m.CPULoad1},
+		{name: "cpu load5", value: m.CPULoad5},
+		{name: "cpu load15", value: m.CPULoad15},
+		{name: "ram used", value: m.RAMUsedMB},
+		{name: "ram total", value: m.RAMTotalMB},
+		{name: "disk used", value: m.DiskUsedGB},
+		{name: "disk total", value: m.DiskTotalGB},
+		{name: "temperature", value: m.TemperatureC},
+	}
+	for _, check := range checks {
+		if math.IsNaN(check.value) || math.IsInf(check.value, 0) {
+			return fmt.Errorf("%w: %s must be finite", ErrInvalidMetricPayload, check.name)
+		}
+	}
+
+	if m.CPUPercent < 0 || m.CPUPercent > 100 {
+		return fmt.Errorf("%w: cpu percent out of range", ErrInvalidMetricPayload)
+	}
+	if m.CPULoad1 < 0 || m.CPULoad5 < 0 || m.CPULoad15 < 0 {
+		return fmt.Errorf("%w: cpu load cannot be negative", ErrInvalidMetricPayload)
+	}
+	if m.CPUCores < 0 {
+		return fmt.Errorf("%w: cpu cores cannot be negative", ErrInvalidMetricPayload)
+	}
+	if m.RAMUsedMB < 0 || m.RAMTotalMB < 0 {
+		return fmt.Errorf("%w: ram cannot be negative", ErrInvalidMetricPayload)
+	}
+	if m.RAMTotalMB > 0 && m.RAMUsedMB > m.RAMTotalMB {
+		return fmt.Errorf("%w: ram used cannot exceed total", ErrInvalidMetricPayload)
+	}
+	if m.DiskUsedGB < 0 || m.DiskTotalGB < 0 {
+		return fmt.Errorf("%w: disk cannot be negative", ErrInvalidMetricPayload)
+	}
+	if m.DiskTotalGB > 0 && m.DiskUsedGB > m.DiskTotalGB {
+		return fmt.Errorf("%w: disk used cannot exceed total", ErrInvalidMetricPayload)
+	}
+	if m.TemperatureAvailable && (m.TemperatureC < -50 || m.TemperatureC > 150) {
+		return fmt.Errorf("%w: temperature out of range", ErrInvalidMetricPayload)
+	}
+	if m.UptimeSeconds < 0 {
+		return fmt.Errorf("%w: uptime cannot be negative", ErrInvalidMetricPayload)
 	}
 	return nil
 }

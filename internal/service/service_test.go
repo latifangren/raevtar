@@ -1,7 +1,9 @@
 package service
 
 import (
+	"math"
 	"path/filepath"
+	"reflect"
 	"testing"
 	"time"
 
@@ -9,6 +11,31 @@ import (
 	"raevtar/internal/model"
 	"raevtar/internal/repo"
 )
+
+func setServerMetricField(t *testing.T, metric *model.ServerMetric, name string, value any) {
+	t.Helper()
+	field := reflect.ValueOf(metric).Elem().FieldByName(name)
+	if !field.IsValid() {
+		t.Fatalf("ServerMetric missing authorized field %s", name)
+	}
+	input := reflect.ValueOf(value)
+	if !input.Type().ConvertibleTo(field.Type()) {
+		t.Fatalf("ServerMetric.%s type = %s, cannot set %s", name, field.Type(), input.Type())
+	}
+	field.Set(input.Convert(field.Type()))
+}
+
+func assertServerMetricField(t *testing.T, metric model.ServerMetric, name string, want any) {
+	t.Helper()
+	field := reflect.ValueOf(metric).FieldByName(name)
+	if !field.IsValid() {
+		t.Fatalf("ServerMetric missing authorized field %s", name)
+	}
+	expected := reflect.ValueOf(want).Convert(field.Type()).Interface()
+	if got := field.Interface(); !reflect.DeepEqual(got, expected) {
+		t.Fatalf("ServerMetric.%s = %v, want %v", name, got, expected)
+	}
+}
 
 type testServices struct {
 	svc   *Service
@@ -375,5 +402,102 @@ func TestMonitorServiceRecordMetricsRequiresExistingServer(t *testing.T) {
 	}
 	if len(metrics) != 0 {
 		t.Fatalf("metrics len = %d, want 0", len(metrics))
+	}
+}
+
+func TestMonitorServiceExtendedMetricsRoundTrip(t *testing.T) {
+	state := newTestServices(t)
+	server, err := state.svc.Monitor.CreateServer("health-node", "127.0.0.1", 9100, "local")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	metric := model.ServerMetric{
+		CPUPercent:    25.5,
+		RAMUsedMB:     512,
+		RAMTotalMB:    2048,
+		DiskUsedGB:    12.5,
+		UptimeSeconds: 3600,
+		Online:        true,
+	}
+	for name, value := range map[string]any{"CPULoad1": 0.4, "CPULoad5": 0.3, "CPULoad15": 0.2, "CPUCores": int64(4), "DiskTotalGB": 32.0, "TemperatureC": 48.5, "TemperatureAvailable": true} {
+		setServerMetricField(t, &metric, name, value)
+	}
+
+	if err := state.svc.Monitor.RecordMetrics(server.ID, metric); err != nil {
+		t.Fatalf("record metrics: %v", err)
+	}
+	metrics, err := state.svc.Monitor.GetRecentMetrics(server.ID, 1)
+	if err != nil {
+		t.Fatalf("get metrics: %v", err)
+	}
+	if len(metrics) != 1 {
+		t.Fatalf("metrics len = %d, want 1", len(metrics))
+	}
+	for name, want := range map[string]any{"CPULoad1": 0.4, "CPULoad5": 0.3, "CPULoad15": 0.2, "CPUCores": int64(4), "DiskTotalGB": 32.0, "TemperatureC": 48.5, "TemperatureAvailable": true} {
+		assertServerMetricField(t, metrics[0], name, want)
+	}
+}
+
+func TestMonitorServiceRejectsInvalidMetrics(t *testing.T) {
+	state := newTestServices(t)
+	server, err := state.svc.Monitor.CreateServer("invalid-health", "127.0.0.1", 9100, "local")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	tests := []struct {
+		name   string
+		metric model.ServerMetric
+	}{
+		{name: "negative CPU", metric: model.ServerMetric{CPUPercent: -0.1, Online: true}},
+		{name: "CPU over 100", metric: model.ServerMetric{CPUPercent: 100.1, Online: true}},
+		{name: "NaN CPU", metric: model.ServerMetric{CPUPercent: math.NaN(), Online: true}},
+		{name: "infinite RAM", metric: model.ServerMetric{RAMUsedMB: math.Inf(1), Online: true}},
+		{name: "RAM used exceeds total", metric: model.ServerMetric{RAMUsedMB: 1025, RAMTotalMB: 1024, Online: true}},
+		{name: "negative RAM total", metric: model.ServerMetric{RAMTotalMB: -0.1, Online: true}},
+		{name: "negative disk", metric: model.ServerMetric{DiskUsedGB: -0.1, Online: true}},
+		{name: "disk used exceeds total", metric: model.ServerMetric{DiskUsedGB: 10.1, DiskTotalGB: 10, Online: true}},
+		{name: "available temperature too low", metric: model.ServerMetric{TemperatureC: -50.1, TemperatureAvailable: true, Online: true}},
+		{name: "available temperature too high", metric: model.ServerMetric{TemperatureC: 150.1, TemperatureAvailable: true, Online: true}},
+		{name: "negative uptime", metric: model.ServerMetric{UptimeSeconds: -1, Online: true}},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if err := state.svc.Monitor.RecordMetrics(server.ID, tt.metric); err == nil {
+				t.Fatalf("RecordMetrics(%+v) succeeded, want validation error", tt.metric)
+			}
+		})
+	}
+}
+
+func TestMonitorServiceRejectsInvalidExtendedMetrics(t *testing.T) {
+	state := newTestServices(t)
+	server, err := state.svc.Monitor.CreateServer("invalid-extended-health", "127.0.0.1", 9100, "local")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	tests := []struct {
+		name  string
+		field string
+		value any
+	}{
+		{name: "negative load", field: "CPULoad1", value: -0.1},
+		{name: "NaN load", field: "CPULoad5", value: math.NaN()},
+		{name: "infinite load", field: "CPULoad15", value: math.Inf(1)},
+		{name: "negative cores", field: "CPUCores", value: int64(-1)},
+		{name: "negative disk total", field: "DiskTotalGB", value: -0.1},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			metric := model.ServerMetric{Online: true}
+			setServerMetricField(t, &metric, tt.field, tt.value)
+			if err := state.svc.Monitor.RecordMetrics(server.ID, metric); err == nil {
+				t.Fatalf("RecordMetrics(%s=%v) succeeded, want validation error", tt.field, tt.value)
+			}
+		})
 	}
 }
