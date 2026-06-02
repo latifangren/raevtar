@@ -44,6 +44,8 @@ Monitoring server-server lokal.
 - [x] Dashboard: overview semua server (status, CPU, RAM)
 - [x] Detail page: history metrics per server
 - [x] HTMX auto-refresh dashboard (tiap 30 detik)
+- [x] Public-safe `System Health`: CPU/load/cores, RAM, disk, temperature, uptime, sample age, aggregate availability
+- [x] Extended Bash agent telemetry tanpa SSH credentials
 
 **Deliverable:** Dashboard fungsional dengan data real server.
 
@@ -59,6 +61,8 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Favicon, meta tags, Open Graph
 - [x] Custom 404 page
 - [x] Public lab page (`/lab`) untuk ringkasan agregat tanpa detail privat
+- [x] HTMX self-hosted di `/static/js/htmx.min.js`
+- [x] Inline UI handlers dipindah ke JS lokal CSP-safe
 
 **Deliverable:** Raevtar keliatan profesional.
 
@@ -82,16 +86,22 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Backup SQLite — script `cron/backup.sh` + systemd timer
 - [x] Graceful shutdown (tangkep SIGTERM/SIGINT) — `15s` timeout
 - [x] Security headers: CSP, X-Frame-Options, X-Content-Type-Options, Referrer-Policy
+- [x] CSP script tightened ke `script-src 'self'`
 - [x] Rate limiting: 60 req/min per IP
+- [x] Request body caps untuk login, API, form admin, dan upload media
+- [x] Login throttling: per `IP + username` + IP-only spray guard
+- [x] Generic internal `500` responses dengan detail di server log
 - [x] Admin panel: session-based auth (login/logout)
 - [x] Admin panel pages: manage posts, manage servers
 - [x] RBAC + multi-user (owner/admin/operator/readonly) + audit log + manage users
 - [x] Admin creds via env file (`/home/latif/raevtar/.env.production`)
 - [x] Health check: Hermes cronjob tiap 5 menit (silent if healthy)
 - [ ] Update dependencies periodik (go mod update, npm update)
+- [ ] Alerting sederhana untuk node stale/offline
+- [ ] Versioned schema migration ledger jika migration makin banyak
 - [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
 
-**Deliverable:** Platform stabil, aman exposed ke internet.
+**Deliverable:** Platform cukup stabil untuk personal deployment yang exposed ke internet, dengan hardening dasar dan boundary publik/admin jelas.
 
 ---
 

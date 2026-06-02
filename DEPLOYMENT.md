@@ -1,6 +1,6 @@
 # DEPLOYMENT — Raevtar
 
-Cara deploy Raevtar di setup postmarketOS/Linux yang dipakai di mesin ini: systemd, SQLite lokal, dan Cloudflare Tunnel.
+Cara deploy Raevtar di setup postmarketOS/Linux yang dipakai di mesin ini: systemd, SQLite lokal, dan Cloudflare Tunnel. Ini runbook operator; agent/assistant tidak boleh menjalankan restart/deploy kecuali user minta eksplisit.
 
 ## Prasyarat
 
@@ -8,7 +8,7 @@ Cara deploy Raevtar di setup postmarketOS/Linux yang dipakai di mesin ini: syste
 apk add go cloudflared
 ```
 
-Build juga butuh Node/npm untuk Tailwind CLI kalau `static/css/style.css` mau diregenerate.
+Build juga butuh Node/npm untuk Tailwind CLI kalau `static/css/style.css` mau diregenerate. HTMX sudah vendored di `/static/js/htmx.min.js`, jadi tidak butuh CDN runtime.
 
 ## Build
 
@@ -164,6 +164,8 @@ journalctl -u raevtar -f
 ```
 
 ## Update
+
+Jalankan hanya saat memang mau deploy versi baru.
 
 ```bash
 cd /home/latif/raevtar

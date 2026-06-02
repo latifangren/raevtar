@@ -8,7 +8,7 @@ Runtime: postmarketOS (aarch64) — Redmi Note 5 (whyred)
 
 ## 1. Tujuan
 
-Platform pribadi all-in-one yang jalan di HP (postmarketOS) dengan akses publik via Cloudflare Tunnel. Isinya blog rekomendasi projek GitHub, dashboard monitoring server lokal, landing page profil, dan API untuk integrasi masa depan.
+Platform pribadi all-in-one yang jalan di HP (postmarketOS) dengan akses publik via Cloudflare Tunnel. Isinya blog rekomendasi projek GitHub, dashboard monitoring server lokal, public lab, landing page profil, admin panel, dan API kecil untuk integrasi agent.
 
 ## 2. Target User
 
@@ -28,8 +28,10 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 ### 3.2 Server Dashboard
 - Daftar server lokal yang dimonitor
 - Tiap server punya: nama, host, port, tags
-- Metrics: CPU, RAM, disk, uptime, online/stale/offline
-- History metrics (tabel server_metrics)
+- Metrics: CPU %, load 1/5/15, cores, RAM, disk, temperature jika tersedia, uptime, online/stale/offline
+- History metrics (tabel `server_metrics`)
+- Public dashboard menampilkan `System Health` public-safe tanpa host/IP, port, tags privat, token, install command, atau audit log
+- Admin diagnostics tetap menyimpan endpoint, setup command, token rotation, dan metric history lengkap
 - Lightweight Bash agent di tiap server ngirim data via API tanpa SSH credentials
 - Per-server agent token bisa di-rotate dari admin panel
 
@@ -50,11 +52,19 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 
 ### 3.5 Admin Panel
 - Session login di `/admin/login`
-- Manage posts, servers, users
+- Manage posts, media, servers, users
 - RBAC role: `owner`, `admin`, `operator`, `readonly`
 - Audit log untuk login/logout dan aksi admin
 
-### 3.6 Integrasi Hermes
+### 3.6 Hardening
+- Production mode wajib punya `RAEVTAR_ADMIN_KEY` dan `RAEVTAR_ADMIN_PASS`
+- Rate limiting in-memory per IP
+- Login throttling in-memory per `IP + username` dan IP-only spray guard
+- Request body caps untuk login, API payload, admin forms, dan media upload
+- Generic `internal server error` untuk 500; detail hanya di log server
+- CSP `script-src 'self'`; HTMX disajikan dari `/static/js/htmx.min.js`
+
+### 3.7 Integrasi Hermes
 - Cronjob harian: riset projek GitHub → nulis artikel → POST ke API
 - Hermes bisa manual: "tulis ini ke blog" → curl endpoint
 - Server monitoring: agent push metrics dari tiap perangkat
@@ -87,7 +97,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 | Backend | Go + Chi | Python/FastAPI, Node/Express | Single binary, rendah RAM, build cepat |
 | Template | Templ | Jinja2, Pug, html/template | Type-safe, compile-time check |
 | CSS | Tailwind | Bootstrap, vanilla CSS | Utility-first, responsive out of box |
-| Interaksi | HTMX | Alpine.js, React, Vue | Gak perlu JS build, ringan |
+| Interaksi | Self-hosted HTMX | Alpine.js, React, Vue | Gak perlu JS build, ringan, tidak bergantung CDN runtime |
 | Database | SQLite + modernc | PostgreSQL, MySQL | Gak perlu server, pure Go |
 | Tunnel | cloudflared | ngrok, frp | DNS sendiri (raevtar.tech), systemd setup aktif |
 
@@ -96,6 +106,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - Blog bisa diakses publik via `raevtar.tech`
 - Ada artikel baru tiap hari (dari Hermes)
 - Dashboard nunjukin status semua server lokal
+- Public dashboard jelas membedakan summary aman vs diagnostics admin-only
 - API bisa dipanggil dari luar
 - Binary bisa jalan di background via service manager
 - Restart hp → service jalan otomatis

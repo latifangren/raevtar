@@ -2,7 +2,7 @@
 
 ```
 raevtar.tech — blog, dashboard, lab, API, landing page
-Single binary. Go + Templ + HTMX + SQLite.
+Single binary. Go + Templ + self-hosted HTMX + SQLite.
 ```
 
 ---
@@ -96,7 +96,7 @@ raevtar/
 │   │   ├── post.go              # Post struct — blog article
 │   │   ├── category.go          # Category struct
 │   │   ├── server.go            # Server struct — monitoring target
-│   │   ├── server_metric.go     # Metrics history (CPU, RAM, uptime)
+│   │   ├── server_metric.go     # Metrics history (CPU/load/RAM/disk/temp/uptime)
 │   │   ├── tag.go               # Normalized blog tags
 │   │   ├── user.go              # Admin users + RBAC roles
 │   │   └── audit.go             # Admin audit log
@@ -124,11 +124,13 @@ raevtar/
 │   │   ├── admin.go             # Admin panel handlers render templ views
 │   │   ├── auth.go              # API key + admin session auth
 │   │   ├── api.go               # REST API handlers (JSON)
+│   │   ├── hardening.go         # Request caps, generic 500s, login throttle
+│   │   ├── security.go          # Security headers + CSP
 │   │   └── rss.go               # RSS feed
 │   │
 │   └── view/
 │       ├── layouts/
-│       │   └── base.templ       # HTML shell: <head>, nav, footer, CSS, HTMX CDN
+│       │   └── base.templ       # HTML shell: <head>, nav, footer, CSS, self-hosted HTMX
 │       ├── pages/
 │       │   ├── index.templ       # Landing page
 │       │   ├── blog_list.templ   # Blog listing dengan filter kategori
@@ -148,8 +150,13 @@ raevtar/
 │           └── pagination.templ  # Pagination component
 │
 ├── static/
-│   └── css/
-│       └── style.css            # Tailwind output (kalo pake standalone CLI)
+│   ├── agent/
+│   │   └── raevtar-agent.sh     # Lightweight push telemetry agent
+│   ├── css/
+│   │   └── style.css            # Tailwind output
+│   └── js/
+│       ├── htmx.min.js          # Vendored HTMX
+│       └── raevtar-ui.js        # Local UI behavior, CSP-safe
 │
 ├── migrations/
 │   └── 001_init.sql             # SQL init: create tables
@@ -188,12 +195,19 @@ raevtar/
 │ id (PK)    │◄────│ id (PK)          │
 │ name       │     │ server_id (FK)   │
 │ host       │     │ cpu_percent      │
-│ port       │     │ ram_used_mb      │
-│ tags       │     │ ram_total_mb     │
-│ token_hash │     │ disk_used_gb     │
-│ last_seen  │     │ uptime_seconds   │
-│ created_at │     │ online           │
-└────────────┘     │ recorded_at      │
+│ port       │     │ cpu_load_1       │
+│ tags       │     │ cpu_load_5       │
+│ token_hash │     │ cpu_load_15      │
+│ last_seen  │     │ cpu_cores        │
+│ created_at │     │ ram_used_mb      │
+└────────────┘     │ ram_total_mb     │
+                   │ disk_used_gb     │
+                   │ disk_total_gb    │
+                   │ temperature_c    │
+                   │ temp_available   │
+                   │ uptime_seconds   │
+                   │ online           │
+                   │ recorded_at      │
                    └──────────────────┘
 
 ┌────────────┐     ┌──────────────────┐
@@ -229,10 +243,10 @@ raevtar/
 | GET | `/blog/{slug}` | blog.Detail | Single post |
 | GET | `/blog/feed.xml` | rss.Feed | RSS feed |
 | GET | `/lab` | lab.Page | Public-safe aggregate lab page |
-| GET | `/dashboard` | dashboard.Index | Server monitoring |
-| GET | `/dashboard/{serverID}` | dashboard.Detail | Detail server |
-| GET | `/dashboard/{serverID}/live` | dashboard.DetailLive | HTMX fragment detail server |
-| GET | `/admin/*` | admin.* | Admin panel session auth |
+| GET | `/dashboard` | dashboard.Index | Public-safe server monitoring + Platform System Health |
+| GET | `/dashboard/{serverID}` | dashboard.Detail | Public-safe detail server |
+| GET | `/dashboard/{serverID}/live` | dashboard.DetailLive | HTMX fragment detail server, refresh 15s |
+| GET | `/admin/*` | admin.* | Admin panel session auth; topology/setup/token area |
 | GET | `/api/v1/posts` | api.ListPosts | JSON posts |
 | POST | `/api/v1/posts` | api.CreatePost | JSON create (cron) |
 | GET | `/api/v1/categories` | api.ListCategories | JSON categories |
@@ -244,7 +258,9 @@ raevtar/
 | GET | `/docs` | public docs page | Public-safe docs untuk read-only API, route map, dan privacy boundary |
 | GET | `/lab/docs` | public docs page | Alias docs dari area lab |
 
-Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai public read-only spec dan sengaja tidak mendokumentasikan endpoint admin/server/agent.
+Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai public read-only spec dan sengaja tidak mendokumentasikan endpoint admin/server/agent setup.
+
+Public dashboard/detail boleh menampilkan resource summary yang sudah dibulatkan dan aman: CPU, load, RAM, disk, temperature, uptime, latest sample age, sample count, history window, dan availability aggregate. Host/IP, port, tags privat, agent token, install command, setup command, dan audit log tetap admin-only.
 
 ---
 
@@ -267,9 +283,23 @@ Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai pub
 
 - Setiap mesin target jalanin **script kecil** dari `/static/agent/raevtar-agent.sh`
 - Agent push metrics ke `${RAEVTAR_URL}/api/v1/servers/{id}/ping` tiap 1 menit
+- Payload mencakup CPU %, load 1/5/15, cores, RAM used/total, disk used/total, uptime, online flag, dan temperature jika sensor tersedia
 - `RAEVTAR_URL` bisa domain publik, LAN IP, hostname lokal, atau tunnel
 - Auth pakai token per server; token didapat saat register via admin/API, dan bisa di-rotate dari `/admin/servers`
 - Raevtar tidak perlu SSH user/password ke perangkat target
+
+---
+
+## Hardening Boundary
+
+- `RAEVTAR_ENV=production` menolak startup kalau admin key/password kosong.
+- API key comparison constant-time.
+- Rate limiting global in-memory: 60 request/menit per IP.
+- Admin login throttling in-memory: per `IP + username` dan IP-only spray guard.
+- Request body cap dipasang untuk login, JSON API, form admin, dan media upload.
+- Internal `500` dikembalikan sebagai `internal server error`; detail masuk log server.
+- CSP memakai `script-src 'self'`; HTMX disajikan dari `/static/js/htmx.min.js`, bukan CDN.
+- `RAEVTAR_TRUSTED_PROXY_CIDRS` hanya untuk proxy tepercaya; default mengabaikan forwarded IP header.
 
 ---
 
@@ -283,6 +313,7 @@ Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai pub
 | **ORM/Query** | `github.com/jmoiron/sqlx` | Ringan, tetap SQL mentah tanpa abstraction layer gede |
 | **Markdown** | `github.com/yuin/goldmark` | Standar, extensible |
 | **Tailwind** | Standalone CLI via `npx tailwindcss` | Scan templ files, view helper Go, and handler Go |
+| **HTMX** | Self-hosted `/static/js/htmx.min.js` | Interaktivitas ringan tanpa CDN runtime |
 | **Config** | Environment variables + `.env` | Standard 12-factor |
 
 ---

@@ -14,7 +14,7 @@
 | Database | `modernc.org/sqlite` + `github.com/jmoiron/sqlx` | Pure Go, no CGO |
 | Markdown | `github.com/yuin/goldmark` | GFM enabled |
 | CSS | Tailwind | Standalone CLI via `npx tailwindcss`; scan `internal/view/**/*.templ`, `internal/view/**/*.go`, dan handler Go |
-| Interactivity | HTMX via CDN | Gak ada JavaScript framework |
+| Interactivity | Self-hosted HTMX (`/static/js/htmx.min.js`) | Gak ada JavaScript framework, jangan balik ke CDN |
 
 ## Arsitektur Layer (WAJIB dipatuhi)
 
@@ -62,6 +62,11 @@ Handler → Service → Repo → SQLite
 - Layout base di `internal/view/layouts/base.templ`
 - Halaman di `internal/view/pages/`
 
+### Operasi
+- Jangan deploy, restart service, push, atau commit kecuali user minta eksplisit.
+- Command seperti `systemctl restart raevtar`, `git push`, dan migration destructive butuh konfirmasi jelas.
+- Public view harus tetap redacted: jangan tampilkan host/IP, port, tags privat, token, install command, setup command, atau audit log.
+
 ## Membuat Post Baru via API
 
 Endpoint: `POST /api/v1/posts`
@@ -82,6 +87,7 @@ Header: `Authorization: Bearer <RAEVTAR_ADMIN_KEY>`
 
 - Cronjob auto-post: Hermes langsung `curl` ke API localhost. Atau pake `cron/auto_post.sh` kalo mau standalone
 - Untuk nambah server monitoring: register server di admin, rotate/copy agent token, lalu jalankan `/static/agent/raevtar-agent.sh` di perangkat target dengan `RAEVTAR_URL`, `RAEVTAR_SERVER_ID`, dan `RAEVTAR_AGENT_TOKEN`
+- Agent telemetry sekarang mengirim CPU %, load 1/5/15, cores, RAM, disk, uptime, online flag, dan temperature jika sensor tersedia
 - Gw bisa manual nulis artikel: kasih gw link/topik → gw riset → gw POST ke API
 
 ## Build & Run
