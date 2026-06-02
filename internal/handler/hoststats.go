@@ -11,10 +11,11 @@ import (
 
 // HostStats holds live system metrics for the local host.
 type HostStats struct {
-	CPU  CPUStats  `json:"cpu"`
-	RAM  RAMStats  `json:"ram"`
-	Disk DiskStats `json:"disk"`
-	Temp float64   `json:"temp"`
+	CPU           CPUStats  `json:"cpu"`
+	RAM           RAMStats  `json:"ram"`
+	Disk          DiskStats `json:"disk"`
+	Temp          float64   `json:"temp"`
+	TempAvailable bool      `json:"temp_available"`
 }
 
 type CPUStats struct {
@@ -78,7 +79,7 @@ func collectHostStats() HostStats {
 	s.Disk = collectDiskStats()
 
 	// --- Temperature ---
-	s.Temp = readTemp()
+	s.Temp, s.TempAvailable = readTemp()
 
 	return s
 }
@@ -86,7 +87,7 @@ func collectHostStats() HostStats {
 func cpuCount() int {
 	data, err := os.ReadFile("/proc/cpuinfo")
 	if err != nil {
-		return 1
+		return 0
 	}
 	n := 0
 	for _, line := range strings.Split(string(data), "\n") {
@@ -95,15 +96,15 @@ func cpuCount() int {
 		}
 	}
 	if n == 0 {
-		return 1
+		return 0
 	}
 	return n
 }
 
-func readTemp() float64 {
+func readTemp() (float64, bool) {
 	entries, err := os.ReadDir("/sys/class/thermal")
 	if err != nil {
-		return 0
+		return 0, false
 	}
 	for _, e := range entries {
 		name := e.Name()
@@ -119,16 +120,18 @@ func readTemp() float64 {
 			continue
 		}
 		// Temperature is in millidegrees Celsius
-		return math.Round(val/100) / 10
+		return math.Round(val/100) / 10, true
 	}
-	return 0
+	return 0, false
 }
 
 // apiHostStats returns live system stats as JSON (for HTMX polling).
 func (h *Handler) apiHostStats(w http.ResponseWriter, r *http.Request) {
 	stats := collectHostStats()
 	w.Header().Set("Content-Type", "application/json")
-	json.NewEncoder(w).Encode(stats)
+	if err := json.NewEncoder(w).Encode(stats); err != nil {
+		logHandlerError(r, err)
+	}
 }
 
 // formatBytes converts kB to human-readable string (e.g. "7.2 GB").
