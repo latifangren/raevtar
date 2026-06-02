@@ -1,67 +1,64 @@
 # Raevtar
 
-**Personal platform** — blog rekomendasi projek GitHub, dashboard monitoring server lokal, public lab, landing page, dan REST API. Satu binary, jalan di postmarketOS (aarch64, Redmi Note 5/whyred).
+Raevtar adalah platform personal yang jalan sebagai satu binary Go: blog, public lab, dashboard monitoring server lokal, admin panel, dan REST API kecil. Target utamanya tetap sederhana: bisa hidup di postmarketOS/aarch64, hemat resource, dan cukup aman untuk dibuka lewat domain pribadi.
 
-## Status
+## Current Scope
 
-| Aspek | Status |
-|-------|--------|
-| Konsep | 8/10 |
-| Arsitektur | 8/10 |
-| Dokumentasi | 7/10 |
-| Production readiness | 5.5/10 |
+| Area | Status |
+|------|--------|
+| Blog | Markdown posts, kategori, tags, RSS, cover image, media upload |
+| Monitoring | Push-based agent telemetry, public-safe dashboard, admin diagnostics |
+| Admin | Session login, RBAC, posts/media/servers/users/audit log |
+| API | Public read endpoints + protected write/monitoring endpoints |
+| Hardening | Request caps, login throttling, CSP, generic 500s, production secret checks |
 
-## Fitur
+Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan boundary jelas antara tampilan publik dan data operator.
+
+## Features
 
 ### Blog
-- Artikel markdown, disimpan di SQLite
-- 5 kategori: AI Agent, Security, Kernel & Embedded, DevOps, Tools
-- Tags normalized (`tags` + `post_tags`) dan badge di UI
-- Admin Content Studio: save draft, publish, Markdown preview, media upload, dan cover image
-- Pagination + filter kategori
-- RSS feed di `/blog/feed.xml`
-- Auto-post via Hermes cron setiap hari
-- REST API untuk create/list posts
 
-### Server Dashboard
-- Daftar server lokal yang dimonitor
-- Metrics: CPU, RAM, uptime, online/stale/offline
-- History metrics per server
-- HTMX auto-refresh: grid tiap 30 detik, detail node tiap 15 detik
-- Lightweight Bash agent push metrics tanpa SSH credentials
-- Per-server agent token dengan rotate dari admin panel
+- Artikel Markdown disimpan di SQLite dan dirender pakai Goldmark.
+- Kategori bawaan: AI Agent, Security, Kernel & Embedded, DevOps, Tools.
+- Tags normalized (`tags` + `post_tags`) dan badge di UI.
+- Admin Content Studio: draft/publish, Markdown preview, media upload, cover image.
+- RSS feed di `/blog/feed.xml`.
+- API `POST /api/v1/posts` untuk integrasi agent seperti Hermes.
 
-### Landing Page
-- Hero section + recent posts + kategori + server status
-- Navigation menu ke semua halaman
+### Public Monitoring
 
-### Public Lab
-- Route `/lab` untuk ringkasan publik: signal, content, dan automation lab
-- Menampilkan hitungan agregat dan status band publik
-- Tidak menampilkan alamat mesin, port, tag privat, token, atau install command
-
-### REST API
-- `GET /api/v1/posts` — list posts
-- `POST /api/v1/posts` — create post (auth required)
-- `GET /api/v1/categories` — list categories
-- `GET /api/v1/servers` — list servers (auth required)
-- `GET /api/v1/servers/{id}` — server detail (auth required)
-- `POST /api/v1/servers` — register server (auth required, returns one-time `agent_token`)
-- `POST /api/v1/servers/{id}/ping` — record metrics (agent token atau admin key)
-- `GET /api/v1/hoststats` — host resource snapshot (auth required)
-- `GET /docs` — dokumentasi publik aman untuk posts, categories, RSS, dan batas redaksi admin
-- `GET /lab/docs` — alias dokumentasi publik dari area lab
+- `/dashboard` menampilkan status semua node tanpa membuka topology privat.
+- `Platform System Health` menampilkan snapshot host Raevtar: CPU load, RAM, disk, temperature jika ada.
+- Tiap node punya `System Health` public-safe: CPU %, load, cores, RAM, disk, temperature, uptime, latest sample age, sample count, history window, dan availability aggregate.
+- HTMX refresh: grid tiap 30 detik, detail node tiap 15 detik.
+- Public view tidak menampilkan host/IP, port, tags privat, token, install command, audit log, atau raw setup detail.
 
 ### Admin Panel
-- Login session di `/admin/login`
-- Manage posts, media, servers, users, dan audit log
-- Server diagnostics detail di `/admin/servers/{id}` berisi endpoint, metric history, setup command, dan activity log admin-only
-- RBAC role: `owner`, `admin`, `operator`, `readonly`
-- Install instruction agent per server, support URL publik, LAN, atau tunnel
+
+- Login session di `/admin/login`.
+- RBAC role: `owner`, `admin`, `operator`, `readonly`.
+- Manage posts, media, servers, users, dan audit log.
+- Server diagnostics di `/admin/servers/{id}` berisi endpoint, metric history, setup command, token rotation, dan activity log admin-only.
+
+### REST API
+
+| Method | Path | Scope |
+|--------|------|-------|
+| `GET` | `/api/v1/posts` | Public list posts |
+| `POST` | `/api/v1/posts` | Admin key required |
+| `GET` | `/api/v1/categories` | Public categories |
+| `GET` | `/api/v1/servers` | Admin key required |
+| `GET` | `/api/v1/servers/{id}` | Admin key required |
+| `POST` | `/api/v1/servers` | Admin key required; returns one-time `agent_token` |
+| `POST` | `/api/v1/servers/{id}/ping` | Agent token or admin key |
+| `GET` | `/api/v1/hoststats` | Admin key required |
+| `GET` | `/docs`, `/lab/docs` | Public-safe docs |
+
+Public docs sengaja hanya menjelaskan read-only surface dan privacy boundary. Endpoint admin/server setup tetap operator-only.
 
 ## Agent Monitoring
 
-Server dimonitor via push model, bukan SSH pull. Tiap perangkat jalanin agent ringan dan kirim metrics ke Raevtar:
+Monitoring pakai push model, bukan SSH pull. Tiap perangkat jalanin agent ringan dan kirim metrics ke Raevtar:
 
 ```bash
 RAEVTAR_URL=http://192.168.100.5:8080 \
@@ -70,46 +67,60 @@ RAEVTAR_AGENT_TOKEN=token-per-server \
 /usr/local/bin/raevtar-agent.sh
 ```
 
-Ambil token dan install command dari `/admin/servers`, atau dari response `POST /api/v1/servers` kalau register via API. Token cuma ditampilkan sekali saat server dibuat atau token di-rotate.
+Agent mengirim CPU percent, CPU load 1/5/15, core count, RAM used/total, disk used/total, uptime, online flag, dan temperature jika sensor tersedia. Token diambil dari `/admin/servers` atau response `POST /api/v1/servers`; token hanya ditampilkan saat create/rotate.
+
+## Hardening Notes
+
+- Production mode menolak start kalau `RAEVTAR_ADMIN_KEY` atau `RAEVTAR_ADMIN_PASS` kosong.
+- API auth pakai bearer token dengan constant-time validation.
+- Global rate limit in-memory: 60 request/menit per IP.
+- Admin login throttling in-memory: per `IP + username` dan IP-only spray guard.
+- Request body dibatasi untuk login, API payload, admin forms, dan upload media.
+- Internal server errors dikembalikan sebagai pesan generik; detail masuk log server.
+- CSP memakai `script-src 'self'`; HTMX dan UI helper disajikan dari `/static/js/`.
+- `RAEVTAR_TRUSTED_PROXY_CIDRS` opsional untuk membaca `CF-Connecting-IP` dari proxy tepercaya saja.
 
 ## Stack
 
 | Lapisan | Teknologi |
 |---------|-----------|
-| Backend | Go 1.26, chi router |
-| Templating | a-h/templ (type-safe) |
-| Frontend | HTMX + Tailwind CSS |
-| Database | SQLite (modernc.org/sqlite — no CGO) |
-| Tunnel | Cloudflare Tunnel |
-| Domain | raevtar.tech |
+| Backend | Go 1.26.3, `github.com/go-chi/chi/v5` |
+| Templates | `github.com/a-h/templ` |
+| Frontend | SSR + self-hosted HTMX + Tailwind CSS |
+| Database | SQLite via `modernc.org/sqlite` + `github.com/jmoiron/sqlx` |
+| Markdown | `github.com/yuin/goldmark` |
+| Runtime target | postmarketOS/aarch64, Cloudflare Tunnel |
 
 ## Struktur
 
-```
+```text
 raevtar/
-├── cmd/server/        # Entry point — init config, DB, router, start HTTP
+├── cmd/server/        # Entry point: config, DB, router, HTTP server
 ├── internal/
 │   ├── config/        # Env-based config loader
-│   ├── model/         # Data structs (Post, Category, Server, Metric)
-│   ├── repo/          # Database CRUD (SQLite + sqlx)
-│   ├── service/       # Business logic (blog, monitor, seed)
-│   ├── handler/       # HTTP handlers + routing (Chi)
-│   └── view/          # a-h/templ layouts, pages, components
-├── cron/
-│   └── backup.sh      # SQLite backup (daily via systemd timer)
-├── migrations/        # SQL init schema
-└── static/            # CSS assets
+│   ├── model/         # Data structs
+│   ├── repo/          # SQL queries + migration helpers
+│   ├── service/       # Business logic and validation
+│   ├── handler/       # HTTP handlers + routing
+│   └── view/          # templ layouts, pages, admin views, components
+├── cron/              # Backup/automation scripts
+├── migrations/        # Fresh SQLite schema
+├── static/            # CSS, JS, agent script, uploads/static assets
+└── docs/              # Notes and historical debugging docs
 ```
 
 ## Arsitektur Layer
 
-```
-Handler → Service → Repo → SQLite
+```text
+Handler -> Service -> Repo -> SQLite
 ```
 
-Handler gak boleh panggil repo langsung. Service gak tahu HTTP. Repo cuma query.
+- Handler parse HTTP request, set response, dan render Templ.
+- Service berisi business logic dan validasi; tidak tahu `http.Request`/`http.ResponseWriter`.
+- Repo hanya query SQL dan mapping data.
+- Model hanya struct.
 
-## Konfigurasi (Environment Variables)
+## Konfigurasi
 
 | Variable | Default | Keterangan |
 |----------|---------|------------|
@@ -117,42 +128,48 @@ Handler gak boleh panggil repo langsung. Service gak tahu HTTP. Repo cuma query.
 | `RAEVTAR_DB` | `~/.raevtar/data.db` | Path SQLite database |
 | `RAEVTAR_MEDIA_DIR` | `~/.raevtar/uploads` | Direktori upload media publik |
 | `RAEVTAR_DOMAIN` | `raevtar.tech` | Domain public |
-| `RAEVTAR_LOG_LEVEL` | `info` | debug / info / warn / error |
-| `RAEVTAR_ADMIN_KEY` | `""` | **WAJIB** untuk endpoint API auth-protected. Constant-time validated |
-| `RAEVTAR_ADMIN_USER` | `admin` | Admin panel seed username |
-| `RAEVTAR_ADMIN_PASS` | `""` | **WAJIB** untuk admin panel login |
-| `RAEVTAR_ENV` | `""` | Set ke `production` untuk strict secret check |
-| `RAEVTAR_TRUSTED_PROXY_CIDRS` | `""` | Opsional, CIDR proxy tepercaya untuk `CF-Connecting-IP` |
+| `RAEVTAR_LOG_LEVEL` | `info` | `debug`, `info`, `warn`, `error` |
+| `RAEVTAR_ADMIN_KEY` | `""` | Wajib untuk API protected |
+| `RAEVTAR_ADMIN_USER` | `admin` | Seed admin username |
+| `RAEVTAR_ADMIN_PASS` | `""` | Wajib untuk admin login |
+| `RAEVTAR_ENV` | `""` | Set `production` untuk strict secret check |
+| `RAEVTAR_TRUSTED_PROXY_CIDRS` | `""` | CIDR proxy tepercaya untuk forwarded client IP |
 
-## Quick Start
+## Build & Run
 
 ```bash
-# Build
-cd /home/latif/raevtar
+# Build production binary
 make build
 
-# Run (ganti secret-nya)
-RAEVTAR_ADMIN_KEY=your-api-key RAEVTAR_ADMIN_PASS=your-admin-pass ./raevtar
+# Run local binary
+RAEVTAR_ADMIN_KEY=dev-key RAEVTAR_ADMIN_PASS=dev-pass ./raevtar
 
-# Test
-curl http://localhost:8080/
+# Generate templ manually if needed
+go run github.com/a-h/templ/cmd/templ@v0.3.906 generate
+
+# Regenerate Tailwind manually if needed
+npx --yes tailwindcss@3.4.19 -i static/css/tailwind.src.css -o static/css/style.css --minify
 ```
 
-## Deploy (postmarketOS)
+`make build` menjalankan templ generate, Tailwind build, lalu `go build`.
+
+## Deploy Singkat
 
 ```bash
-# systemd service (setup yang dipakai project ini)
+# systemd service setup, jalankan di host operator
 sudo cp raevtar.service /etc/systemd/system/
 sudo systemctl enable --now raevtar
 
-# Backup otomatis (harian)
-# systemd-timer atau crontab:    0 3 * * * /home/latif/raevtar/cron/backup.sh
+# backup harian via systemd timer atau cron
+# 0 3 * * * /home/latif/raevtar/cron/backup.sh
 ```
+
+Runbook lengkap ada di `DEPLOYMENT.md`. Jangan restart/deploy service kecuali memang sedang melakukan operasi deploy.
 
 ## Prinsip
 
-1. **Handler → Service → Repo** — layer terpisah, gak ada campur aduk.
-2. **Satu binary** — `make build` → `./raevtar` → langsung jalan. Templ/Tailwind cuma build-time.
-3. **Backend process stateless** — persistent state di SQLite.
-4. **SSR + HTMX** — halaman dirender server, interaksi ringan tanpa JS berat.
-5. **Single domain** — blog, dashboard, API di satu tempat.
+1. Satu binary, satu runtime utama: Go.
+2. SSR dulu; HTMX hanya untuk progressive enhancement ringan.
+3. Public view boleh menampilkan ringkasan health, tapi topology dan setup tetap admin-only.
+4. SQLite cukup untuk single-user personal platform.
+5. Tambah fitur lewat layer yang benar, bukan shortcut handler langsung ke repo.
