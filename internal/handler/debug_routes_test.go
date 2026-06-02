@@ -11,6 +11,7 @@ import (
 	"net/url"
 	"os"
 	"path/filepath"
+	"reflect"
 	"strconv"
 	"strings"
 	"testing"
@@ -19,6 +20,8 @@ import (
 	"raevtar/internal/model"
 	"raevtar/internal/repo"
 	"raevtar/internal/service"
+
+	"github.com/jmoiron/sqlx"
 )
 
 var testRequestCounter int
@@ -26,6 +29,7 @@ var testRequestCounter int
 type publicTestApp struct {
 	handler  http.Handler
 	svc      *service.Service
+	db       *sqlx.DB
 	serverID int64
 }
 
@@ -74,7 +78,7 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		t.Fatalf("expected generated slug")
 	}
 
-	return &publicTestApp{handler: New(svc, cfg), svc: svc, serverID: server.ID}
+	return &publicTestApp{handler: New(svc, cfg), svc: svc, db: db, serverID: server.ID}
 }
 
 func assertContains(t *testing.T, body, want string) {
@@ -89,6 +93,19 @@ func assertNotContains(t *testing.T, body, want string) {
 	if strings.Contains(body, want) {
 		t.Fatalf("body leaked %q\nbody: %s", want, body)
 	}
+}
+
+func setMetricField(t *testing.T, metric *model.ServerMetric, name string, value any) {
+	t.Helper()
+	field := reflect.ValueOf(metric).Elem().FieldByName(name)
+	if !field.IsValid() {
+		t.Fatalf("ServerMetric missing authorized field %s", name)
+	}
+	input := reflect.ValueOf(value)
+	if !input.Type().ConvertibleTo(field.Type()) {
+		t.Fatalf("ServerMetric.%s type = %s, cannot set %s", name, field.Type(), input.Type())
+	}
+	field.Set(input.Convert(field.Type()))
 }
 
 func getBody(t *testing.T, app *publicTestApp, path string, cookie *http.Cookie) (int, string) {
@@ -532,6 +549,8 @@ func TestPublicDashboardRedactsServerTopology(t *testing.T) {
 	assertContains(t, body, "Online")
 	assertContains(t, body, "Stale")
 	assertContains(t, body, "Offline")
+	assertContains(t, body, "Platform System Health")
+	assertContains(t, body, "N/A")
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, ">9100<")
@@ -774,14 +793,13 @@ func TestPublicServerDetailLiveRendersFragmentWithPollingAndRedaction(t *testing
 	assertContains(t, body, `hx-swap="outerHTML"`)
 	assertContains(t, body, "freshness diagnosis")
 	assertContains(t, body, "last signal age")
-	assertContains(t, body, "metric detail")
-	assertContains(t, body, "Metric detail hidden on public view.")
+	assertContains(t, body, "System Health")
 	assertContains(t, body, "Panel refreshed")
 	assertContains(t, body, "Telemetry is fresh. Latest agent signal arrived recently.")
 	assertContains(t, body, "Endpoint hidden on public view.")
 	assertContains(t, body, "Use admin diagnostics for network details.")
-	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "sample count", "history window", "availability"} {
-		assertNotContains(t, body, leak)
+	for _, want := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "1h 0m"} {
+		assertContains(t, body, want)
 	}
 	assertNotContains(t, body, "<!DOCTYPE html>")
 	assertNotContains(t, body, "<html")
@@ -805,11 +823,8 @@ func TestLimitedRolesServerDetailLiveRedactsServerTopology(t *testing.T) {
 
 			assertContains(t, body, "Endpoint hidden on public view.")
 			assertContains(t, body, "No telemetry received yet. Waiting for first agent signal.")
-			assertContains(t, body, "Metric detail hidden on public view.")
-
-			for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "sample count", "history window", "availability"} {
-				assertNotContains(t, body, leak)
-			}
+			assertContains(t, body, "System Health")
+			assertContains(t, body, "N/A")
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, "port 9100")
@@ -834,20 +849,18 @@ func TestOwnerAndAdminServerDetailLiveKeepsTopologyInAdminOnly(t *testing.T) {
 			}
 
 			assertContains(t, body, "Endpoint hidden on public view.")
-			assertContains(t, body, "Metric detail hidden on public view.")
+			assertContains(t, body, "System Health")
+			assertContains(t, body, "N/A")
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, "port 9100")
 			assertNotContains(t, body, ">local<")
 			assertNotContains(t, body, `href="/admin/servers"`)
-			for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "sample count", "history window", "availability"} {
-				assertNotContains(t, body, leak)
-			}
 		})
 	}
 }
 
-func TestPublicServerDetailRedactsMetricValues(t *testing.T) {
+func TestPublicServerDetailShowsSafeMetricValues(t *testing.T) {
 	app := newPublicTestApp(t)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
 		CPUPercent:    12.5,
@@ -864,13 +877,16 @@ func TestPublicServerDetailRedactsMetricValues(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	assertContains(t, body, "Metric detail hidden on public view.")
-	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "sample count", "history window", "availability"} {
+	assertContains(t, body, "System Health")
+	for _, want := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "1h 0m"} {
+		assertContains(t, body, want)
+	}
+	for _, leak := range []string{"127.0.0.1", "127.0.0.1:9100", "port 9100", ">local<", "agent token", "raevtar-agent.sh", "POST /api/v1/servers", "install", "cron", "audit"} {
 		assertNotContains(t, body, leak)
 	}
 }
 
-func TestOwnerServerDetailKeepsMetricMarkersInAdminOnly(t *testing.T) {
+func TestOwnerServerDetailShowsSamePublicSafeMetricValues(t *testing.T) {
 	app := newPublicTestApp(t)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
 		CPUPercent:    12.5,
@@ -888,8 +904,8 @@ func TestOwnerServerDetailKeepsMetricMarkersInAdminOnly(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	for _, leak := range []string{"CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB"} {
-		assertNotContains(t, body, leak)
+	for _, want := range []string{"System Health", "CPU", "RAM", "Disk", "Uptime", "12.5%", "256.0 / 1024.0 MB", "8.5 GB", "1h 0m"} {
+		assertContains(t, body, want)
 	}
 }
 
@@ -1915,5 +1931,249 @@ func TestAdminDeleteRoutesRejectGET(t *testing.T) {
 				t.Fatalf("status = %d, want %d", rr.Code, http.StatusMethodNotAllowed)
 			}
 		})
+	}
+}
+
+func TestPublicDashboardPlatformSystemHealthFallsBackToNA(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/dashboard", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Platform System Health")
+	assertContains(t, body, "N/A")
+}
+
+func TestAPIRequestBodiesAreCapped(t *testing.T) {
+	app := newPublicTestApp(t)
+	largeValue := strings.Repeat("x", 2<<20)
+
+	tests := []struct {
+		name    string
+		path    string
+		payload string
+	}{
+		{name: "create post", path: "/api/v1/posts", payload: `{"category_slug":"devops","title":"large","content_md":"` + largeValue + `"}`},
+		{name: "create server", path: "/api/v1/servers", payload: `{"name":"large","host":"127.0.0.1","padding":"` + largeValue + `"}`},
+		{name: "record metric", path: "/api/v1/servers/1/ping", payload: `{"online":true,"padding":"` + largeValue + `"}`},
+	}
+
+	for i, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodPost, tt.path, strings.NewReader(tt.payload))
+			req.RemoteAddr = fmt.Sprintf("198.51.100.%d:1234", i+10)
+			req.Header.Set("Authorization", "Bearer admin-key")
+			req.Header.Set("Content-Type", "application/json")
+			rr := httptest.NewRecorder()
+
+			app.handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusRequestEntityTooLarge {
+				t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusRequestEntityTooLarge, rr.Body.String())
+			}
+		})
+	}
+}
+
+func TestAdminLoginRequestBodyIsCapped(t *testing.T) {
+	app := newPublicTestApp(t)
+	form := url.Values{"username": {strings.Repeat("x", 2<<20)}, "password": {"wrong-password"}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+	req.RemoteAddr = "198.51.100.30:1234"
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusRequestEntityTooLarge, rr.Body.String())
+	}
+}
+
+func TestAdminLoginThrottlesRepeatedFailuresPerIP(t *testing.T) {
+	app := newPublicTestApp(t)
+	form := url.Values{"username": {"admin"}, "password": {"wrong-password"}}
+
+	for attempt := 1; attempt <= 6; attempt++ {
+		req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+		req.RemoteAddr = "198.51.100.40:1234"
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		app.handler.ServeHTTP(rr, req)
+
+		if attempt <= 5 && rr.Code != http.StatusUnauthorized {
+			t.Fatalf("attempt %d status = %d, want %d; body: %s", attempt, rr.Code, http.StatusUnauthorized, rr.Body.String())
+		}
+		if attempt == 6 {
+			if rr.Code != http.StatusTooManyRequests {
+				t.Fatalf("attempt %d status = %d, want %d; body: %s", attempt, rr.Code, http.StatusTooManyRequests, rr.Body.String())
+			}
+			if rr.Header().Get("Retry-After") == "" {
+				t.Fatalf("attempt %d missing Retry-After header", attempt)
+			}
+		}
+	}
+}
+
+func TestAdminLoginThrottlesRotatingUsernamesPerIP(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for attempt := 1; attempt <= loginIPFailureLimit+1; attempt++ {
+		if attempt == loginIPFailureLimit/2+1 {
+			form := url.Values{"username": {"admin"}, "password": {"demo-pass-123"}}
+			req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+			req.RemoteAddr = "198.51.100.41:1234"
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			rr := httptest.NewRecorder()
+
+			app.handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusSeeOther {
+				t.Fatalf("successful login status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+			}
+		}
+
+		form := url.Values{"username": {fmt.Sprintf("spray-%d", attempt)}, "password": {"wrong-password"}}
+		req := httptest.NewRequest(http.MethodPost, "/admin/login", strings.NewReader(form.Encode()))
+		req.RemoteAddr = "198.51.100.41:1234"
+		req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+		rr := httptest.NewRecorder()
+
+		app.handler.ServeHTTP(rr, req)
+
+		if attempt <= loginIPFailureLimit && rr.Code != http.StatusUnauthorized {
+			t.Fatalf("attempt %d status = %d, want %d; body: %s", attempt, rr.Code, http.StatusUnauthorized, rr.Body.String())
+		}
+		if attempt == loginIPFailureLimit+1 {
+			if rr.Code != http.StatusTooManyRequests {
+				t.Fatalf("attempt %d status = %d, want %d; body: %s", attempt, rr.Code, http.StatusTooManyRequests, rr.Body.String())
+			}
+			if rr.Header().Get("Retry-After") == "" {
+				t.Fatalf("attempt %d missing Retry-After header", attempt)
+			}
+		}
+	}
+}
+
+func TestAdminDeleteMissingResourcesDoNotSilentlyRedirect(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(71, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+
+	for i, path := range []string{"/admin/posts/delete/999", "/admin/servers/delete/999"} {
+		t.Run(path, func(t *testing.T) {
+			form := url.Values{"_csrf": {entry.csrfToken}}
+			req := httptest.NewRequest(http.MethodPost, path, strings.NewReader(form.Encode()))
+			req.RemoteAddr = fmt.Sprintf("198.51.100.%d:1234", i+50)
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+			rr := httptest.NewRecorder()
+
+			app.handler.ServeHTTP(rr, req)
+
+			if rr.Code != http.StatusNotFound {
+				t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusNotFound, rr.Body.String())
+			}
+		})
+	}
+}
+
+func TestInternalErrorsReturnGenericResponses(t *testing.T) {
+	t.Run("HTML", func(t *testing.T) {
+		app := newPublicTestApp(t)
+		if err := app.db.Close(); err != nil {
+			t.Fatalf("close database: %v", err)
+		}
+		status, body := getBody(t, app, "/", nil)
+		if status != http.StatusInternalServerError {
+			t.Fatalf("status = %d, want %d", status, http.StatusInternalServerError)
+		}
+		assertContains(t, body, "internal server error")
+		assertNotContains(t, body, "sql: database is closed")
+	})
+
+	t.Run("JSON", func(t *testing.T) {
+		app := newPublicTestApp(t)
+		if err := app.db.Close(); err != nil {
+			t.Fatalf("close database: %v", err)
+		}
+		req := httptest.NewRequest(http.MethodGet, "/api/v1/categories", nil)
+		req.RemoteAddr = "198.51.100.61:1234"
+		rr := httptest.NewRecorder()
+		app.handler.ServeHTTP(rr, req)
+		if rr.Code != http.StatusInternalServerError {
+			t.Fatalf("status = %d, want %d", rr.Code, http.StatusInternalServerError)
+		}
+		if got := strings.TrimSpace(rr.Body.String()); got != `{"error":"internal server error"}` {
+			t.Fatalf("body = %q, want generic JSON error", got)
+		}
+	})
+}
+
+func TestBaseLayoutUsesSelfHostedHTMX(t *testing.T) {
+	content, err := os.ReadFile(filepath.Join("..", "..", "internal", "view", "layouts", "base.templ"))
+	if err != nil {
+		t.Fatalf("read base layout: %v", err)
+	}
+	body := string(content)
+	assertContains(t, body, `<script src="/static/js/htmx.min.js"></script>`)
+	assertNotContains(t, body, "unpkg.com")
+	if _, err := os.Stat(filepath.Join("..", "..", "static", "js", "htmx.min.js")); err != nil {
+		t.Fatalf("self-hosted HTMX asset missing: %v", err)
+	}
+}
+
+func TestSecurityHeadersAllowOnlySelfHostedScripts(t *testing.T) {
+	handler := WithSecurityHeaders(http.HandlerFunc(func(w http.ResponseWriter, _ *http.Request) {
+		w.WriteHeader(http.StatusNoContent)
+	}))
+	req := httptest.NewRequest(http.MethodGet, "/", nil)
+	rr := httptest.NewRecorder()
+
+	handler.ServeHTTP(rr, req)
+
+	csp := rr.Header().Get("Content-Security-Policy")
+	assertContains(t, csp, "script-src 'self'")
+	assertNotContains(t, csp, "unpkg.com")
+	assertNotContains(t, csp, "script-src 'self' 'unsafe-inline'")
+}
+
+func TestAgentMetricPayloadAcceptsExtendedNodeHealthTelemetry(t *testing.T) {
+	app := newPublicTestApp(t)
+	token, err := app.svc.Monitor.RotateAgentToken(app.serverID)
+	if err != nil {
+		t.Fatalf("rotate token: %v", err)
+	}
+	payload := []byte(`{"cpu_percent":14.5,"cpu_load_1":0.4,"cpu_load_5":0.3,"cpu_load_15":0.2,"cpu_cores":4,"ram_used_mb":512,"ram_total_mb":2048,"disk_used_gb":12,"disk_total_gb":32,"temperature_c":48.5,"temperature_available":true,"uptime_seconds":90,"online":true}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers/1/ping", bytes.NewReader(payload))
+	req.Header.Set("Authorization", "Bearer "+token)
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	metrics, err := app.svc.Monitor.GetRecentMetrics(app.serverID, 1)
+	if err != nil {
+		t.Fatalf("metrics: %v", err)
+	}
+	if len(metrics) != 1 {
+		t.Fatalf("metrics len = %d, want 1", len(metrics))
+	}
+	for name, want := range map[string]any{"CPULoad1": 0.4, "CPULoad5": 0.3, "CPULoad15": 0.2, "CPUCores": int64(4), "DiskTotalGB": 32.0, "TemperatureC": 48.5, "TemperatureAvailable": true} {
+		field := reflect.ValueOf(metrics[0]).FieldByName(name)
+		if !field.IsValid() {
+			t.Fatalf("ServerMetric missing authorized field %s", name)
+		}
+		if got := field.Interface(); !reflect.DeepEqual(got, reflect.ValueOf(want).Convert(field.Type()).Interface()) {
+			t.Fatalf("ServerMetric.%s = %v, want %v", name, got, want)
+		}
 	}
 }
