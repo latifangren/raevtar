@@ -48,8 +48,40 @@ ram_values() {
 	' /proc/meminfo
 }
 
-disk_used_gb() {
-	df -BG / 2>/dev/null | awk 'NR==2 { gsub(/G/, "", $3); print $3 + 0 }'
+cpu_load_values() {
+	if [ ! -r /proc/loadavg ]; then
+		echo "0 0 0"
+		return
+	fi
+	awk '{ printf "%.2f %.2f %.2f", $1, $2, $3 }' /proc/loadavg
+}
+
+cpu_cores() {
+	cores="$(getconf _NPROCESSORS_ONLN 2>/dev/null || true)"
+	case "${cores}" in
+		''|*[!0-9]*) cores=0 ;;
+	esac
+	if [ "${cores}" -eq 0 ] && [ -r /proc/cpuinfo ]; then
+		cores="$(awk '/^processor[[:space:]]*:/ { count++ } END { print count + 0 }' /proc/cpuinfo)"
+	fi
+	echo "${cores}"
+}
+
+disk_values() {
+	df -Pk / 2>/dev/null | awk 'NR==2 { printf "%.2f %.2f", $(NF - 3) / 1048576, $(NF - 4) / 1048576 }' || echo "0 0"
+}
+
+temperature_values() {
+	for zone in /sys/class/thermal/thermal_zone*/temp; do
+		if [ -r "${zone}" ]; then
+			temperature="$(awk '/^-?[0-9]+([.][0-9]+)?$/ { printf "%.2f", $1 / 1000 }' "${zone}")"
+			if [ -n "${temperature}" ]; then
+				echo "${temperature} true"
+				return
+			fi
+		fi
+	done
+	echo "0 false"
 }
 
 uptime_seconds() {
@@ -57,14 +89,24 @@ uptime_seconds() {
 }
 
 CPU="$(cpu_percent)"
+set -- $(cpu_load_values)
+CPU_LOAD_1="${1:-0}"
+CPU_LOAD_5="${2:-0}"
+CPU_LOAD_15="${3:-0}"
+CPU_CORES="$(cpu_cores)"
 set -- $(ram_values)
 RAM_USED="${1:-0}"
 RAM_TOTAL="${2:-0}"
-DISK_USED="$(disk_used_gb)"
+set -- $(disk_values)
+DISK_USED="${1:-0}"
+DISK_TOTAL="${2:-0}"
+set -- $(temperature_values)
+TEMPERATURE="${1:-0}"
+TEMPERATURE_AVAILABLE="${2:-false}"
 UPTIME="$(uptime_seconds)"
 
-JSON=$(printf '{"cpu_percent":%.1f,"ram_used_mb":%d,"ram_total_mb":%d,"disk_used_gb":%d,"uptime_seconds":%d,"online":true}' \
-	"${CPU:-0}" "${RAM_USED:-0}" "${RAM_TOTAL:-0}" "${DISK_USED:-0}" "${UPTIME:-0}")
+JSON=$(printf '{"cpu_percent":%.1f,"cpu_load_1":%.2f,"cpu_load_5":%.2f,"cpu_load_15":%.2f,"cpu_cores":%d,"ram_used_mb":%d,"ram_total_mb":%d,"disk_used_gb":%.2f,"disk_total_gb":%.2f,"temperature_c":%.2f,"temperature_available":%s,"uptime_seconds":%d,"online":true}' \
+	"${CPU:-0}" "${CPU_LOAD_1:-0}" "${CPU_LOAD_5:-0}" "${CPU_LOAD_15:-0}" "${CPU_CORES:-0}" "${RAM_USED:-0}" "${RAM_TOTAL:-0}" "${DISK_USED:-0}" "${DISK_TOTAL:-0}" "${TEMPERATURE:-0}" "${TEMPERATURE_AVAILABLE:-false}" "${UPTIME:-0}")
 
 curl -fsS -X POST "${RAEVTAR_URL%/}/api/v1/servers/${SERVER_ID}/ping" \
 	-H "Authorization: Bearer ${TOKEN}" \
