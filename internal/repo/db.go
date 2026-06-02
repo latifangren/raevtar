@@ -58,9 +58,16 @@ func AutoMigrate(db *sqlx.DB) {
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		server_id INTEGER NOT NULL REFERENCES servers(id),
 		cpu_percent REAL DEFAULT 0,
+		cpu_load_1 REAL DEFAULT 0,
+		cpu_load_5 REAL DEFAULT 0,
+		cpu_load_15 REAL DEFAULT 0,
+		cpu_cores INTEGER DEFAULT 0,
 		ram_used_mb REAL DEFAULT 0,
 		ram_total_mb REAL DEFAULT 0,
 		disk_used_gb REAL DEFAULT 0,
+		disk_total_gb REAL DEFAULT 0,
+		temperature_c REAL DEFAULT 0,
+		temperature_available INTEGER DEFAULT 0,
 		uptime_seconds INTEGER DEFAULT 0,
 		online INTEGER DEFAULT 1,
 		recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -128,6 +135,13 @@ func AutoMigrate(db *sqlx.DB) {
 	}
 	ensureColumn(db, "servers", "agent_token_hash", "TEXT NOT NULL DEFAULT ''")
 	ensureColumn(db, "posts", "cover_image_url", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "server_metrics", "cpu_load_1", "REAL DEFAULT 0")
+	ensureColumn(db, "server_metrics", "cpu_load_5", "REAL DEFAULT 0")
+	ensureColumn(db, "server_metrics", "cpu_load_15", "REAL DEFAULT 0")
+	ensureColumn(db, "server_metrics", "cpu_cores", "INTEGER DEFAULT 0")
+	ensureColumn(db, "server_metrics", "disk_total_gb", "REAL DEFAULT 0")
+	ensureColumn(db, "server_metrics", "temperature_c", "REAL DEFAULT 0")
+	ensureColumn(db, "server_metrics", "temperature_available", "INTEGER DEFAULT 0")
 	slog.Info("database migrated")
 }
 
