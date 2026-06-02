@@ -47,14 +47,14 @@ func Base(title string, currentPath string, categories []model.Category) templ.C
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"/static/css/style.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"alternate\" type=\"application/rss+xml\" title=\"Raevtar\" href=\"https://raevtar.tech/blog/feed.xml\"><script src=\"https://unpkg.com/htmx.org@2.0.4\"></script><meta name=\"description\" content=\"Raevtar — Personal blog, server dashboard, and automation platform running on postmarketOS\"><meta name=\"keywords\" content=\"raevtar, blog, server monitoring, postmarketOS, linux\"><meta name=\"author\" content=\"latifangren\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:site_name\" content=\"Raevtar\"><meta property=\"og:title\" content=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</title><link rel=\"preconnect\" href=\"https://fonts.googleapis.com\"><link rel=\"preconnect\" href=\"https://fonts.gstatic.com\" crossorigin><link href=\"https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap\" rel=\"stylesheet\"><link rel=\"stylesheet\" href=\"/static/css/style.css\"><link rel=\"icon\" type=\"image/svg+xml\" href=\"/static/favicon.svg\"><link rel=\"alternate\" type=\"application/rss+xml\" title=\"Raevtar\" href=\"https://raevtar.tech/blog/feed.xml\"><meta name=\"htmx-config\" content='{\"allowEval\":false,\"allowScriptTags\":false}'><script src=\"/static/js/htmx.min.js\"></script><script src=\"/static/js/raevtar-ui.js\" defer></script><meta name=\"description\" content=\"Raevtar — Personal blog, server dashboard, and automation platform running on postmarketOS\"><meta name=\"keywords\" content=\"raevtar, blog, server monitoring, postmarketOS, linux\"><meta name=\"author\" content=\"latifangren\"><meta property=\"og:type\" content=\"website\"><meta property=\"og:site_name\" content=\"Raevtar\"><meta property=\"og:title\" content=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layouts/base.templ`, Line: 27, Col: 44}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/layouts/base.templ`, Line: 29, Col: 44}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {

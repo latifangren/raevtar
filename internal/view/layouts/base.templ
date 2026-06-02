@@ -18,7 +18,9 @@ templ Base(title string, currentPath string, categories []model.Category) {
 			<link rel="stylesheet" href="/static/css/style.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 			<link rel="alternate" type="application/rss+xml" title="Raevtar" href="https://raevtar.tech/blog/feed.xml"/>
-			<script src="https://unpkg.com/htmx.org@2.0.4"></script>
+			<meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false}'/>
+			<script src="/static/js/htmx.min.js"></script>
+			<script src="/static/js/raevtar-ui.js" defer></script>
 			<meta name="description" content="Raevtar — Personal blog, server dashboard, and automation platform running on postmarketOS"/>
 			<meta name="keywords" content="raevtar, blog, server monitoring, postmarketOS, linux"/>
 			<meta name="author" content="latifangren"/>
