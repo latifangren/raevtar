@@ -1,6 +1,9 @@
 package handler
 
 import (
+	"database/sql"
+	"errors"
+	"math"
 	"net/http"
 	"path/filepath"
 	"strconv"
@@ -12,17 +15,17 @@ import (
 func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
 	posts, postCount, err := h.svc.Blog.ListPosts("", 1, 3)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	servers, err := h.svc.Monitor.ListServers()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
@@ -39,17 +42,17 @@ func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) labPage(w http.ResponseWriter, r *http.Request) {
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	_, postCount, err := h.svc.Blog.ListPosts("", 1, 1)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	servers, err := h.svc.Monitor.ListServers()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
@@ -65,12 +68,12 @@ func (h *Handler) labPage(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	_, postCount, err := h.svc.Blog.ListPosts("", 1, 1)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
@@ -90,12 +93,12 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 
 	posts, total, err := h.svc.Blog.ListPosts(cat, page, 10)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
@@ -112,12 +115,16 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
 	post, err := h.svc.Blog.GetPublishedPost(r.PathValue("slug"))
 	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
 		http.Error(w, "Post not found", http.StatusNotFound)
 		return
 	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
@@ -131,22 +138,32 @@ func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 	servers, err := h.svc.Monitor.ListServers()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
+	summaries := make([]pages.PublicServerSummary, 0, len(servers))
+	for _, server := range servers {
+		metrics, err := h.svc.Monitor.GetRecentMetrics(server.ID, 50)
+		if err != nil {
+			internalServerError(w, r, err)
+			return
+		}
+		summaries = append(summaries, pages.PublicServerSummary{Server: server, Metrics: metrics})
+	}
+	stats := collectHostStats()
 
 	renderHTML(w, r, pages.Dashboard(pages.DashboardData{
-		CurrentPath:       r.URL.Path,
-		Servers:           servers,
-		Categories:        categories,
-		CanRegisterServer: false,
-		CanViewServerInfo: false,
-		CSRFToken:         csrfTokenForRequest(r),
+		CurrentPath:     r.URL.Path,
+		Servers:         servers,
+		ServerSummaries: summaries,
+		Categories:      categories,
+		PlatformHealth:  publicHostHealth(stats),
+		RefreshedAt:     time.Now().UTC(),
 	}))
 }
 
@@ -176,34 +193,91 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 	}
 	server, err := h.svc.Monitor.GetServer(id)
 	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return pages.ServerDetailData{}, false
+		}
 		http.Error(w, "Server not found", http.StatusNotFound)
 		return pages.ServerDetailData{}, false
 	}
 	metrics, err := h.svc.Monitor.GetRecentMetrics(id, 50)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return pages.ServerDetailData{}, false
 	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return pages.ServerDetailData{}, false
 	}
 
 	return pages.ServerDetailData{
-		CurrentPath:       r.URL.Path,
-		Server:            server,
-		Metrics:           metrics,
-		Categories:        categories,
-		CanManageServer:   false,
-		CanViewServerInfo: false,
-		RefreshedAt:       time.Now().UTC(),
+		CurrentPath: r.URL.Path,
+		Server:      server,
+		Metrics:     metrics,
+		Categories:  categories,
+		RefreshedAt: time.Now().UTC(),
 	}, true
 }
 
 func itoa(n int) string { return strconv.Itoa(n) }
 
 func itoa64(n int64) string { return strconv.FormatInt(n, 10) }
+
+func publicHostHealth(stats HostStats) pages.PublicHostHealthData {
+	return pages.PublicHostHealthData{
+		CPULoad:     publicCPULoadText(stats.CPU.Load1, stats.CPU.Load5, stats.CPU.Load15, int64(stats.CPU.Cores)),
+		CPUCores:    publicCoresText(int64(stats.CPU.Cores)),
+		RAMUsage:    publicCapacityText(kbToGB(stats.RAM.Used), kbToGB(stats.RAM.Total)),
+		RAMPercent:  publicPercentText(stats.RAM.Percent, stats.RAM.Total > 0),
+		DiskUsage:   publicCapacityText(kbToGB(stats.Disk.Used), kbToGB(stats.Disk.Total)),
+		DiskPercent: publicPercentText(stats.Disk.Percent, stats.Disk.Total > 0),
+		Temperature: publicTemperatureText(stats.Temp, stats.TempAvailable),
+	}
+}
+
+func publicCPULoadText(load1, load5, load15 float64, cores int64) string {
+	if cores <= 0 {
+		return "N/A"
+	}
+	return strconv.FormatFloat(load1, 'f', 2, 64) + " / " + strconv.FormatFloat(load5, 'f', 2, 64) + " / " + strconv.FormatFloat(load15, 'f', 2, 64)
+}
+
+func publicCoresText(cores int64) string {
+	if cores <= 0 {
+		return "N/A"
+	}
+	return strconv.FormatInt(cores, 10)
+}
+
+func publicCapacityText(used, total float64) string {
+	if total <= 0 {
+		return "N/A"
+	}
+	return strconv.FormatFloat(round1(used), 'f', 1, 64) + " / " + strconv.FormatFloat(round1(total), 'f', 1, 64) + " GB"
+}
+
+func publicPercentText(percent float64, available bool) string {
+	if !available {
+		return "N/A"
+	}
+	return strconv.FormatFloat(math.Round(percent), 'f', 0, 64) + "%"
+}
+
+func publicTemperatureText(temp float64, available bool) string {
+	if !available {
+		return "N/A"
+	}
+	return strconv.FormatFloat(temp, 'f', 1, 64) + "°C"
+}
+
+func kbToGB(kb uint64) float64 {
+	return float64(kb) / 1024 / 1024
+}
+
+func round1(value float64) float64 {
+	return math.Round(value*10) / 10
+}
 
 func (h *Handler) serveStatic(filename string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
@@ -227,6 +301,10 @@ func (h *Handler) serveUpload(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) page404(w http.ResponseWriter, r *http.Request) {
-	categories, _ := h.svc.Blog.ListCategories()
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	renderHTML(w, r, pages.NotFound(pages.NotFoundData{CurrentPath: r.URL.Path, Categories: categories}))
 }

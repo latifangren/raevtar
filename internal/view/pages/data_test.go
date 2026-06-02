@@ -123,3 +123,59 @@ func TestMetricHistoryHelpers(t *testing.T) {
 		t.Fatalf("empty metric window = %q", got)
 	}
 }
+
+func TestNodeSystemHealthHelpersPreserveOldPayloadValues(t *testing.T) {
+	metric := model.ServerMetric{
+		CPUPercent:    12.5,
+		RAMUsedMB:     256,
+		RAMTotalMB:    1024,
+		DiskUsedGB:    8.5,
+		UptimeSeconds: 3600,
+	}
+
+	for name, tt := range map[string]struct {
+		got  string
+		want string
+	}{
+		"cpu load":    {got: CPULoadText(metric), want: "N/A"},
+		"cpu cores":   {got: CPUCoresText(metric), want: "N/A"},
+		"ram":         {got: RAMHealthText(metric), want: "256.0 / 1024.0 MB · 25.0%"},
+		"disk":        {got: DiskHealthText(metric), want: "8.5 GB / N/A"},
+		"temperature": {got: TemperatureText(metric), want: "N/A"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			if tt.got != tt.want {
+				t.Fatalf("text = %q, want %q", tt.got, tt.want)
+			}
+		})
+	}
+}
+
+func TestNodeSystemHealthHelpersFormatExtendedPayload(t *testing.T) {
+	metric := model.ServerMetric{
+		CPULoad1:             0,
+		CPULoad5:             0.3,
+		CPULoad15:            0.2,
+		CPUCores:             4,
+		DiskUsedGB:           8,
+		DiskTotalGB:          32,
+		TemperatureC:         48.5,
+		TemperatureAvailable: true,
+	}
+
+	for name, tt := range map[string]struct {
+		got  string
+		want string
+	}{
+		"cpu load":    {got: CPULoadText(metric), want: "0.0 / 0.3 / 0.2"},
+		"cpu cores":   {got: CPUCoresText(metric), want: "4"},
+		"disk":        {got: DiskHealthText(metric), want: "8.0 / 32.0 GB · 25.0%"},
+		"temperature": {got: TemperatureText(metric), want: "48.5°C"},
+	} {
+		t.Run(name, func(t *testing.T) {
+			if tt.got != tt.want {
+				t.Fatalf("text = %q, want %q", tt.got, tt.want)
+			}
+		})
+	}
+}

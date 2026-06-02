@@ -52,22 +52,35 @@ type DocsData struct {
 }
 
 type DashboardData struct {
-	CurrentPath       string
-	Servers           []model.Server
-	Categories        []model.Category
-	CanRegisterServer bool
-	CanViewServerInfo bool
-	CSRFToken         string
+	CurrentPath     string
+	Servers         []model.Server
+	ServerSummaries []PublicServerSummary
+	Categories      []model.Category
+	PlatformHealth  PublicHostHealthData
+	RefreshedAt     time.Time
+}
+
+type PublicHostHealthData struct {
+	CPULoad     string
+	CPUCores    string
+	RAMUsage    string
+	RAMPercent  string
+	DiskUsage   string
+	DiskPercent string
+	Temperature string
+}
+
+type PublicServerSummary struct {
+	Server  model.Server
+	Metrics []model.ServerMetric
 }
 
 type ServerDetailData struct {
-	CurrentPath       string
-	Server            *model.Server
-	Metrics           []model.ServerMetric
-	Categories        []model.Category
-	CanManageServer   bool
-	CanViewServerInfo bool
-	RefreshedAt       time.Time
+	CurrentPath string
+	Server      *model.Server
+	Metrics     []model.ServerMetric
+	Categories  []model.Category
+	RefreshedAt time.Time
 }
 
 type NotFoundData struct {
@@ -303,6 +316,59 @@ func RAMUsageText(used, total float64) string {
 		return MetricText(used) + " MB"
 	}
 	return MetricText(used) + " / " + MetricText(total) + " MB"
+}
+
+func DashboardServerSummaries(data DashboardData) []PublicServerSummary {
+	if len(data.ServerSummaries) > 0 || len(data.Servers) == 0 {
+		return data.ServerSummaries
+	}
+	summaries := make([]PublicServerSummary, 0, len(data.Servers))
+	for _, server := range data.Servers {
+		summaries = append(summaries, PublicServerSummary{Server: server})
+	}
+	return summaries
+}
+
+func CPULoadText(metric model.ServerMetric) string {
+	if metric.CPUCores <= 0 {
+		return "N/A"
+	}
+	return MetricText(metric.CPULoad1) + " / " + MetricText(metric.CPULoad5) + " / " + MetricText(metric.CPULoad15)
+}
+
+func CPUCoresText(metric model.ServerMetric) string {
+	if metric.CPUCores <= 0 {
+		return "N/A"
+	}
+	return strconv.FormatInt(metric.CPUCores, 10)
+}
+
+func ResourcePercentText(used, total float64) string {
+	if total <= 0 {
+		return "N/A"
+	}
+	return MetricText(used/total*100) + "%"
+}
+
+func RAMHealthText(metric model.ServerMetric) string {
+	if metric.RAMTotalMB <= 0 {
+		return MetricText(metric.RAMUsedMB) + " MB / N/A"
+	}
+	return RAMUsageText(metric.RAMUsedMB, metric.RAMTotalMB) + " · " + ResourcePercentText(metric.RAMUsedMB, metric.RAMTotalMB)
+}
+
+func DiskHealthText(metric model.ServerMetric) string {
+	if metric.DiskTotalGB <= 0 {
+		return MetricText(metric.DiskUsedGB) + " GB / N/A"
+	}
+	return MetricText(metric.DiskUsedGB) + " / " + MetricText(metric.DiskTotalGB) + " GB · " + ResourcePercentText(metric.DiskUsedGB, metric.DiskTotalGB)
+}
+
+func TemperatureText(metric model.ServerMetric) string {
+	if !metric.TemperatureAvailable {
+		return "N/A"
+	}
+	return MetricText(metric.TemperatureC) + "°C"
 }
 
 func PublicServerLabel(server model.Server) string {
