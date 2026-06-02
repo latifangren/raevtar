@@ -218,6 +218,9 @@ func (h *Handler) adminCSRF(next http.Handler) http.Handler {
 			next.ServeHTTP(w, r)
 			return
 		}
+		if !parseCappedForm(w, r, adminRequestBodyLimit(r)) {
+			return
+		}
 
 		entry, ok := getSessionEntry(r)
 		if !ok || entry.csrfToken == "" {
@@ -252,21 +255,31 @@ func (h *Handler) adminLogin(w http.ResponseWriter, r *http.Request) {
 		writeJSON(w, http.StatusMethodNotAllowed, map[string]string{"error": "POST required"})
 		return
 	}
+	if !parseCappedForm(w, r, loginBodyLimit) {
+		return
+	}
 
-	username := r.FormValue("username")
+	username := normalizedLoginUsername(r.FormValue("username"))
 	password := r.FormValue("password")
+	ip := clientIP(r)
 
 	if username == "" || password == "" {
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "username and password required"})
 		return
 	}
+	if loginThrottleActive(ip, username) {
+		writeLoginThrottle(w)
+		return
+	}
 
-	user, err := h.svc.Admin.Authenticate(username, password, clientIP(r))
+	user, err := h.svc.Admin.Authenticate(username, password, ip)
 	if err != nil {
 		sessions.cleanup()
+		recordLoginFailure(ip, username)
 		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "invalid credentials"})
 		return
 	}
+	clearLoginFailures(ip, username)
 
 	token := sessions.create(user.ID, user.Username, user.Role)
 
@@ -291,7 +304,7 @@ func (h *Handler) adminLogout(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if entry.username != "" {
-		_ = h.svc.Admin.LogLogout(entry.username, clientIP(r))
+		warnAfterMutation(r, "logout", h.svc.Admin.LogLogout(entry.username, clientIP(r)))
 	}
 
 	http.SetCookie(w, &http.Cookie{

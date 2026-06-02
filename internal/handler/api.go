@@ -2,6 +2,7 @@ package handler
 
 import (
 	"crypto/subtle"
+	"database/sql"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -14,14 +15,23 @@ import (
 
 func (h *Handler) apiListPosts(w http.ResponseWriter, r *http.Request) {
 	cat := r.URL.Query().Get("category")
-	posts, _, _ := h.svc.Blog.ListPosts(cat, 1, 100)
+	posts, _, err := h.svc.Blog.ListPosts(cat, 1, 100)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
 
 	writeJSON(w, http.StatusOK, posts)
 }
 
 func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
 	var input model.PostCreate
 	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
 		return
 	}
@@ -32,7 +42,7 @@ func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
-		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		internalServerJSON(w, r, err)
 		return
 	}
 
@@ -42,13 +52,14 @@ func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) apiListCategories(w http.ResponseWriter, r *http.Request) {
 	cats, err := h.svc.Blog.ListCategories()
 	if err != nil {
-		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		internalServerJSON(w, r, err)
 		return
 	}
 	writeJSON(w, http.StatusOK, cats)
 }
 
 func (h *Handler) apiCreateServer(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
 	var input struct {
 		Name string `json:"name"`
 		Host string `json:"host"`
@@ -59,10 +70,22 @@ func (h *Handler) apiCreateServer(w http.ResponseWriter, r *http.Request) {
 	ct := r.Header.Get("Content-Type")
 	if len(ct) >= 16 && ct[:16] == "application/json" {
 		if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+			if isBodyTooLarge(err) {
+				writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+				return
+			}
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
 			return
 		}
 	} else {
+		if err := r.ParseForm(); err != nil {
+			if isBodyTooLarge(err) {
+				writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+				return
+			}
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid form"})
+			return
+		}
 		input.Name = r.FormValue("name")
 		input.Host = r.FormValue("host")
 		if p, err := strconv.Atoi(r.FormValue("port")); err == nil {
@@ -80,7 +103,7 @@ func (h *Handler) apiCreateServer(w http.ResponseWriter, r *http.Request) {
 
 	s, token, err := h.svc.Monitor.CreateServerWithAgentToken(input.Name, input.Host, input.Port, input.Tags)
 	if err != nil {
-		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		internalServerJSON(w, r, err)
 		return
 	}
 	writeJSON(w, http.StatusCreated, map[string]any{
@@ -90,7 +113,11 @@ func (h *Handler) apiCreateServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) apiListServers(w http.ResponseWriter, r *http.Request) {
-	servers, _ := h.svc.Monitor.ListServers()
+	servers, err := h.svc.Monitor.ListServers()
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
 	writeJSON(w, http.StatusOK, servers)
 }
 
@@ -103,6 +130,10 @@ func (h *Handler) apiGetServer(w http.ResponseWriter, r *http.Request) {
 	}
 	server, err := h.svc.Monitor.GetServer(id)
 	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerJSON(w, r, err)
+			return
+		}
 		writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
 		return
 	}
@@ -110,6 +141,7 @@ func (h *Handler) apiGetServer(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
 	idStr := r.PathValue("serverID")
 	id, err := strconv.ParseInt(idStr, 10, 64)
 	if err != nil {
@@ -123,6 +155,10 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 
 	var m model.ServerMetric
 	if err := json.NewDecoder(r.Body).Decode(&m); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
 		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
 		return
 	}
@@ -132,7 +168,11 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusNotFound, map[string]string{"error": "server not found"})
 			return
 		}
-		writeJSON(w, http.StatusInternalServerError, map[string]string{"error": err.Error()})
+		if errors.Is(err, service.ErrInvalidMetricPayload) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		internalServerJSON(w, r, err)
 		return
 	}
 

@@ -1,6 +1,8 @@
 package service
 
 import (
+	"database/sql"
+	"errors"
 	"fmt"
 	"strconv"
 
@@ -116,10 +118,14 @@ func (s *AdminService) LogPostUpdated(username, title, ip string) error {
 
 func (s *AdminService) DeletePost(username string, id int64, ip string) error {
 	post, err := s.repos.Post.GetByID(id)
-	if err == nil {
-		if err := s.repos.Audit.Insert(username, "DELETE_POST", "deleted post: "+post.Title, ip); err != nil {
-			return fmt.Errorf("audit delete post: %w", err)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w: %w", ErrPostNotFound, err)
 		}
+		return fmt.Errorf("get post: %w", err)
+	}
+	if err := s.repos.Audit.Insert(username, "DELETE_POST", "deleted post: "+post.Title, ip); err != nil {
+		return fmt.Errorf("audit delete post: %w", err)
 	}
 	if err := s.repos.Post.Delete(id); err != nil {
 		return fmt.Errorf("delete post: %w", err)
@@ -150,6 +156,12 @@ func (s *AdminService) LogAgentTokenRotated(username, serverID, ip string) error
 }
 
 func (s *AdminService) DeleteServer(username string, id int64, idText, ip string) error {
+	if _, err := s.repos.Server.GetByID(id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w: %w", ErrServerNotFound, err)
+		}
+		return fmt.Errorf("get server: %w", err)
+	}
 	if err := s.repos.Audit.Insert(username, "DELETE_SERVER", "deleted server id: "+idText, ip); err != nil {
 		return fmt.Errorf("audit delete server: %w", err)
 	}

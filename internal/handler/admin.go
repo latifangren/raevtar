@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"database/sql"
 	"errors"
 	"math"
 	"net/http"
@@ -19,9 +20,21 @@ const (
 )
 
 func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
-	allPosts, _, _ := h.svc.Blog.ListAllPosts(1, 9999)
-	servers, _ := h.svc.Monitor.ListServers()
-	users, _ := h.svc.Admin.ListUsers()
+	allPosts, _, err := h.svc.Blog.ListAllPosts(1, 9999)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	servers, err := h.svc.Monitor.ListServers()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	users, err := h.svc.Admin.ListUsers()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	stats := collectHostStats()
 
 	onlineCount := 0
@@ -44,7 +57,11 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
-	users, _ := h.svc.Admin.ListUsers()
+	users, err := h.svc.Admin.ListUsers()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	entry, _ := getSessionEntry(r)
 
 	rows := make([]adminview.UserRow, 0, len(users))
@@ -101,7 +118,7 @@ func (h *Handler) adminCreateUser(w http.ResponseWriter, r *http.Request) {
 
 	_, err := h.svc.Admin.CreateUser(entry.role, entry.username, username, password, role, clientIP(r))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
@@ -131,14 +148,30 @@ func (h *Handler) adminDeleteUser(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminAuditLog(w http.ResponseWriter, r *http.Request) {
-	logs, _ := h.svc.Admin.ListAuditLogs(200, 0)
+	logs, err := h.svc.Admin.ListAuditLogs(200, 0)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	renderHTML(w, r, adminview.Audit(adminview.AuditData{CurrentPath: r.URL.Path, CSRFToken: csrfTokenForRequest(r), Logs: logs}))
 }
 
 func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
-	posts, _, _ := h.svc.Blog.ListAllPosts(1, 9999)
-	categories, _ := h.svc.Blog.ListCategories()
-	mediaAssets, _ := h.svc.Media.ListAssets()
+	posts, _, err := h.svc.Blog.ListAllPosts(1, 9999)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	mediaAssets, err := h.svc.Media.ListAssets()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	renderHTML(w, r, adminview.Posts(adminview.PostsData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
@@ -151,7 +184,7 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) adminMedia(w http.ResponseWriter, r *http.Request) {
 	assets, err := h.svc.Media.ListAssets()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	renderHTML(w, r, adminview.Media(adminview.MediaData{CurrentPath: r.URL.Path, CSRFToken: csrfTokenForRequest(r), Assets: assets}))
@@ -174,7 +207,7 @@ func (h *Handler) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	http.Redirect(w, r, "/admin/media", http.StatusSeeOther)
@@ -210,11 +243,11 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 		Tags:          tags,
 	})
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
-	_ = h.svc.Admin.LogPostCreated(entry.username, post.Title, clientIP(r))
+	warnAfterMutation(r, "create_post_audit", h.svc.Admin.LogPostCreated(entry.username, post.Title, clientIP(r)))
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
@@ -249,11 +282,23 @@ func (h *Handler) adminEditPost(w http.ResponseWriter, r *http.Request) {
 	}
 	post, err := h.svc.Blog.GetPostByID(id)
 	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
 		http.Error(w, "post not found", http.StatusNotFound)
 		return
 	}
-	categories, _ := h.svc.Blog.ListCategories()
-	mediaAssets, _ := h.svc.Media.ListAssets()
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	mediaAssets, err := h.svc.Media.ListAssets()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	renderHTML(w, r, adminview.PostEdit(adminview.PostEditData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
@@ -276,6 +321,10 @@ func (h *Handler) adminUpdatePost(w http.ResponseWriter, r *http.Request) {
 	}
 	currentPost, err := h.svc.Blog.GetPostByID(id)
 	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
 		http.Error(w, "post not found", http.StatusNotFound)
 		return
 	}
@@ -304,7 +353,7 @@ func (h *Handler) adminUpdatePost(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	_ = h.svc.Admin.LogPostUpdated(entry.username, post.Title, clientIP(r))
+	warnAfterMutation(r, "update_post_audit", h.svc.Admin.LogPostUpdated(entry.username, post.Title, clientIP(r)))
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
@@ -322,12 +371,23 @@ func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.svc.Admin.DeletePost(entry.username, id, clientIP(r))
+	if err := h.svc.Admin.DeletePost(entry.username, id, clientIP(r)); err != nil {
+		if errors.Is(err, service.ErrPostNotFound) {
+			http.Error(w, "post not found", http.StatusNotFound)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
 func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
-	servers, _ := h.svc.Monitor.ListServers()
+	servers, err := h.svc.Monitor.ListServers()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	serverID, token := popAgentTokenFlash(r)
 	h.renderAdminServers(w, r, servers, serverID, token)
 }
@@ -340,17 +400,21 @@ func (h *Handler) adminServerDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	server, err := h.svc.Monitor.GetServer(id)
 	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
 		http.Error(w, "server not found", http.StatusNotFound)
 		return
 	}
 	metrics, err := h.svc.Monitor.GetRecentMetrics(id, 50)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	logs, err := h.svc.Admin.ListServerAuditLogs(id, 20)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 	renderHTML(w, r, adminview.ServerDetail(adminview.ServerDetailData{
@@ -383,11 +447,11 @@ func (h *Handler) adminCreateServer(w http.ResponseWriter, r *http.Request) {
 
 	server, token, err := h.svc.Monitor.CreateServerWithAgentToken(name, host, port, tags)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
-	_ = h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, clientIP(r))
+	warnAfterMutation(r, "create_server_audit", h.svc.Admin.LogServerCreated(entry.username, name, host, portStr, clientIP(r)))
 	setAgentTokenFlash(r, server.ID, token)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
@@ -418,7 +482,7 @@ func (h *Handler) adminUpdateServer(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	_ = h.svc.Admin.LogServerUpdated(entry.username, id, server.Name, server.Host, strconv.Itoa(server.Port), clientIP(r))
+	warnAfterMutation(r, "update_server_audit", h.svc.Admin.LogServerUpdated(entry.username, id, server.Name, server.Host, strconv.Itoa(server.Port), clientIP(r)))
 	http.Redirect(w, r, "/admin/servers/"+strconv.FormatInt(id, 10), http.StatusSeeOther)
 }
 
@@ -441,10 +505,10 @@ func (h *Handler) adminRotateServerToken(w http.ResponseWriter, r *http.Request)
 			http.Error(w, "server not found", http.StatusNotFound)
 			return
 		}
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
-	_ = h.svc.Admin.LogAgentTokenRotated(entry.username, idStr, clientIP(r))
+	warnAfterMutation(r, "rotate_agent_token_audit", h.svc.Admin.LogAgentTokenRotated(entry.username, idStr, clientIP(r)))
 	setAgentTokenFlash(r, id, token)
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
@@ -463,7 +527,14 @@ func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	_ = h.svc.Admin.DeleteServer(entry.username, id, idStr, clientIP(r))
+	if err := h.svc.Admin.DeleteServer(entry.username, id, idStr, clientIP(r)); err != nil {
+		if errors.Is(err, service.ErrServerNotFound) {
+			http.Error(w, "server not found", http.StatusNotFound)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
 	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 }
 
