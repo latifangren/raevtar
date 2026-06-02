@@ -10,7 +10,7 @@ import (
 func (h *Handler) rssFeed(w http.ResponseWriter, r *http.Request) {
 	posts, _, err := h.svc.Blog.ListPosts("", 1, 20)
 	if err != nil {
-		http.Error(w, "failed to load posts", http.StatusInternalServerError)
+		internalServerError(w, r, err)
 		return
 	}
 
