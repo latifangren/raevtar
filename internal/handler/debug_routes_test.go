@@ -1903,7 +1903,7 @@ func TestAdminPagesRenderCSRFTokens(t *testing.T) {
 	app := newPublicTestApp(t)
 	token := sessions.create(47, "owner", model.RoleOwner)
 
-	for _, path := range []string{"/admin", "/admin/posts", "/admin/servers", "/admin/manage-users"} {
+	for _, path := range []string{"/admin", "/admin/posts", "/admin/servers", "/admin/manage-users", "/admin/editorial-inbox"} {
 		t.Run(path, func(t *testing.T) {
 			status, body := getBody(t, app, path, &http.Cookie{Name: sessionCookieName, Value: token})
 			if status != http.StatusOK {
@@ -1964,6 +1964,7 @@ func TestAdminManagementPagesRequireOwnerOrAdmin(t *testing.T) {
 	token := sessions.create(44, "reader", model.RoleReadonly)
 
 	for _, path := range []string{
+		"/admin/editorial-inbox",
 		"/admin/posts",
 		"/admin/servers",
 		"/admin/audit-log",
@@ -2048,6 +2049,60 @@ func TestAPIRequestBodiesAreCapped(t *testing.T) {
 			}
 		})
 	}
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox", strings.NewReader(`{"source_type":"repo","source_value":"`+largeValue+`","priority":50,"not_before":"2026-06-05T08:00:00Z","mode":"scheduled_assignment","status":"queued"}`))
+	req.RemoteAddr = "198.51.100.99:1234"
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("editorial api body cap status = %d, want %d; body: %s", rr.Code, http.StatusRequestEntityTooLarge, rr.Body.String())
+	}
+}
+
+func TestEditorialInboxAdminAndAPIFlow(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(88, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+	form := url.Values{
+		"source_type":   {"repo"},
+		"source_value":  {"https://github.com/example/repo"},
+		"category_hint": {"devops"},
+		"priority":      {"75"},
+		"not_before":    {"2026-06-05T08:00"},
+		"mode":          {model.EditorialModeScheduled},
+		"status":        {model.EditorialStatusQueued},
+		"note":          {"queue this repo first"},
+		"_csrf":         {entry.csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/editorial-inbox", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("create editorial status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	status, body := getBody(t, app, "/admin/editorial-inbox", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("editorial page status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Editorial Inbox")
+	assertContains(t, body, "https://github.com/example/repo")
+
+	apiReq := httptest.NewRequest(http.MethodGet, "/api/v1/editorial-inbox/contract", nil)
+	apiReq.Header.Set("Authorization", "Bearer admin-key")
+	apiRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(apiRR, apiReq)
+	if apiRR.Code != http.StatusOK {
+		t.Fatalf("editorial contract status = %d, want %d; body: %s", apiRR.Code, http.StatusOK, apiRR.Body.String())
+	}
+	assertContains(t, apiRR.Body.String(), `"source_of_truth":"raevtar"`)
+	assertNotContains(t, body, "/api/v1/editorial-inbox/contract")
 }
 
 func TestAdminLoginRequestBodyIsCapped(t *testing.T) {

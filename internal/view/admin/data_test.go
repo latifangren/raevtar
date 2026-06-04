@@ -55,3 +55,12 @@ func TestMetricTimelineTextDetectsTransitions(t *testing.T) {
 		t.Fatalf("oldest = %q", got)
 	}
 }
+
+func TestEditorialBadgeHelpers(t *testing.T) {
+	if got := EditorialStatusBadgeClass(model.EditorialStatusApproved); got == "" {
+		t.Fatalf("expected approved badge class")
+	}
+	if got := EditorialModeBadgeClass(model.EditorialModeScheduled); got == "" {
+		t.Fatalf("expected scheduled badge class")
+	}
+}

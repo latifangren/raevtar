@@ -74,6 +74,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Tag system (normalized: tags + post_tags + UI badges)
 - [x] RSS feed di `/blog/feed.xml` + auto-discovery `<link>` tag
 - [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
+- [x] Editorial inbox control plane buat Hermes (`/admin/editorial-inbox` + protected API contract)
 - [ ] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.

@@ -1,0 +1,150 @@
+package admin
+
+import "raevtar/internal/model"
+
+templ EditorialInbox(data EditorialInboxData) {
+	@Shell("Editorial Inbox", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			@pageHeader("Editorial Inbox", CountText(len(data.Items))+" items")
+			<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+				@metricCard("Queued", CountText(data.Counts[model.EditorialStatusQueued]), "awaiting approval", "text-retro-ink")
+				@metricCard("Approved", CountText(data.Counts[model.EditorialStatusApproved]), "ready for Hermes", "text-retro-sage")
+				@metricCard("Paused", CountText(data.Counts[model.EditorialStatusPaused]), "held by operator", "text-retro-ink")
+				@metricCard("Done", CountText(data.Counts[model.EditorialStatusDone]), "completed", "text-retro-ink")
+				@metricCard("Cancelled", CountText(data.Counts[model.EditorialStatusCancelled]), "closed without publish", "text-retro-ink")
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+							<th class="py-3 px-4 font-bold">Source</th>
+							<th class="py-3 px-4 font-bold">Mode</th>
+							<th class="py-3 px-4 font-bold">Status</th>
+							<th class="py-3 px-4 font-bold">Window</th>
+							<th class="py-3 px-4 font-bold">Priority</th>
+							<th class="py-3 px-4 font-bold">Category</th>
+						</tr>
+					</thead>
+					<tbody>
+						if len(data.Items) == 0 {
+							<tr><td colspan="6" class="py-8 text-center text-retro-muted font-bold text-sm">No editorial inbox items yet</td></tr>
+						} else {
+							for _, item := range data.Items {
+								<tr class="border-b-2 border-retro-ink align-top last:border-b-0">
+									<td class="py-3 px-4">
+										<p class="text-sm font-black text-retro-ink">{ item.SourceType }</p>
+										<p class="text-xs font-mono font-bold text-retro-muted break-all">{ item.SourceValue }</p>
+										if item.Note != "" {
+											<p class="text-xs font-bold text-retro-muted mt-1 max-w-xs">{ item.Note }</p>
+										}
+									</td>
+									<td class="py-3 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialModeBadgeClass(item.Mode) }>{ item.Mode }</span></td>
+									<td class="py-3 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialStatusBadgeClass(item.Status) }>{ item.Status }</span></td>
+									<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted">
+										<div>{ EditorialTimeText(item.NotBefore) }</div>
+										if item.Deadline != nil {
+											<div>until { EditorialTimeText(*item.Deadline) }</div>
+										}
+									</td>
+									<td class="py-3 px-4 text-sm font-black text-retro-ink">{ CountText(item.Priority) }</td>
+									<td class="py-3 px-4">
+										if item.CategoryHint != "" {
+											<span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(item.CategoryHint) }>{ item.CategoryHint }</span>
+										} else {
+											<span class="text-xs font-bold text-retro-muted">-</span>
+										}
+										<form method="POST" action={ templ.URL("/admin/editorial-inbox/update/" + IDText(item.ID)) } class="mt-3 grid gap-2" data-confirm="Update this editorial inbox item?">
+											<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+											<input type="hidden" name="source_type" value={ item.SourceType }/>
+											<input type="hidden" name="source_value" value={ item.SourceValue }/>
+											<input type="hidden" name="category_hint" value={ item.CategoryHint }/>
+											<input type="hidden" name="priority" value={ CountText(item.Priority) }/>
+											<input type="hidden" name="not_before" value={ EditorialInputValue(item.NotBefore) }/>
+											<input type="hidden" name="deadline" value={ EditorialInputValuePtr(item.Deadline) }/>
+											<input type="hidden" name="note" value={ item.Note }/>
+											<input type="hidden" name="mode" value={ item.Mode }/>
+											<select name="status" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink">
+												for _, status := range data.Statuses {
+													if status == item.Status {
+														<option value={ status } selected>{ status }</option>
+													} else {
+														<option value={ status }>{ status }</option>
+													}
+												}
+											</select>
+											<button type="submit" class="text-xs font-bold text-retro-ink hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer">Update status</button>
+										</form>
+									</td>
+								</tr>
+							}
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-4">Create inbox item</h2>
+				<form method="POST" action="/admin/editorial-inbox" class="space-y-4" data-confirm="Create this editorial inbox item?">
+					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+					<div class="grid gap-3 md:grid-cols-2">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Source type</label>
+							<input type="text" name="source_type" required value="repo" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Source value</label>
+							<input type="text" name="source_value" required placeholder="https://github.com/..." class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Mode</label>
+							<select name="mode" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								for _, mode := range data.Modes {
+									<option value={ mode }>{ mode }</option>
+								}
+							</select>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Status</label>
+							<select name="status" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								for _, status := range data.Statuses {
+									if status == model.EditorialStatusQueued {
+										<option value={ status } selected>{ status }</option>
+									} else {
+										<option value={ status }>{ status }</option>
+									}
+								}
+							</select>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Category hint</label>
+							<select name="category_hint" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								<option value="">None</option>
+								for _, category := range data.Categories {
+									<option value={ category.Slug }>{ category.Name }</option>
+								}
+							</select>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Priority</label>
+							<input type="number" name="priority" min="0" max="100" value="50" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Not before</label>
+							<input type="datetime-local" name="not_before" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Deadline</label>
+							<input type="datetime-local" name="deadline" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Editor note</label>
+						<textarea name="note" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink" placeholder="Why this matters, angle hints, or campaign notes."></textarea>
+					</div>
+					<div class="flex justify-end">
+						<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Create item</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}

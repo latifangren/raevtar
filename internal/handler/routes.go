@@ -67,7 +67,10 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 
 			r.Group(func(r chi.Router) {
 				r.Use(h.ownerOrAdminRequired)
+				r.Get("/editorial-inbox", h.adminEditorialInbox)
 				r.Get("/posts", h.adminPosts)
+				r.Post("/editorial-inbox", h.adminCreateEditorialInbox)
+				r.Post("/editorial-inbox/update/{itemID}", h.adminUpdateEditorialInbox)
 				r.Post("/posts/preview", h.adminPreviewPost)
 				r.Post("/posts", h.adminCreatePost)
 				r.Get("/posts/edit/{postID}", h.adminEditPost)
@@ -93,6 +96,11 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/posts", h.apiListPosts)
 		r.With(h.adminAuth).Post("/posts", h.apiCreatePost)
+		r.With(h.adminAuth).Get("/editorial-inbox/contract", h.apiEditorialInboxContract)
+		r.With(h.adminAuth).Get("/editorial-inbox", h.apiListEditorialInbox)
+		r.With(h.adminAuth).Post("/editorial-inbox", h.apiCreateEditorialInbox)
+		r.With(h.adminAuth).Get("/editorial-inbox/{itemID}", h.apiGetEditorialInbox)
+		r.With(h.adminAuth).Post("/editorial-inbox/{itemID}", h.apiUpdateEditorialInbox)
 
 		r.Get("/categories", h.apiListCategories)
 

@@ -346,6 +346,68 @@ func TestMonitorServiceRecordMetricsKeepsLastSeenCloseToLatestMetric(t *testing.
 	}
 }
 
+func TestEditorialInboxServiceReadyOrderingAndValidation(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+	if _, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/one",
+		Priority:    80,
+		NotBefore:   now.Add(2 * time.Hour),
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	}); err != nil {
+		t.Fatalf("create future approved: %v", err)
+	}
+	first, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:   "repo",
+		SourceValue:  "https://github.com/example/two",
+		CategoryHint: "devops",
+		Priority:     40,
+		NotBefore:    now.Add(-1 * time.Hour),
+		Mode:         model.EditorialModeOpportunistic,
+		Status:       model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create ready item: %v", err)
+	}
+	_, err = state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/three",
+		Priority:    90,
+		NotBefore:   now.Add(-1 * time.Hour),
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusPaused,
+	})
+	if err != nil {
+		t.Fatalf("create paused item: %v", err)
+	}
+	second, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "topic",
+		SourceValue: "agent telemetry",
+		Priority:    90,
+		NotBefore:   now.Add(-30 * time.Minute),
+		Mode:        model.EditorialModeCampaign,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create high priority ready item: %v", err)
+	}
+	ready, err := state.svc.Editorial.ListReadyInboxItems(now, 10)
+	if err != nil {
+		t.Fatalf("list ready: %v", err)
+	}
+	if len(ready) != 2 {
+		t.Fatalf("ready len = %d, want 2", len(ready))
+	}
+	if ready[0].ID != second.ID || ready[1].ID != first.ID {
+		t.Fatalf("ready ordering ids = [%d %d], want [%d %d]", ready[0].ID, ready[1].ID, second.ID, first.ID)
+	}
+	if _, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{}); err == nil {
+		t.Fatalf("expected invalid editorial input error")
+	}
+}
+
 func TestMonitorServiceRotatesAgentToken(t *testing.T) {
 	state := newTestServices(t)
 

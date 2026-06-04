@@ -50,6 +50,7 @@ templ Dashboard(data DashboardData) {
 			<div>
 				<h2 class="text-sm font-black uppercase text-retro-ink mb-3">Quick Actions</h2>
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+					@quickLink("/admin/editorial-inbox", "Editorial", "Control Hermes inbox")
 					@quickLink("/admin/posts", "Posts", "Manage articles")
 					@quickLink("/admin/servers", "Servers", "Add or remove")
 					@quickLink("/admin/manage-users", "Users", "Manage accounts")

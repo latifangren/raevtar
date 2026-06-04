@@ -55,3 +55,33 @@ func TestAutoMigrateAddsExtendedServerMetricColumnsToExistingDatabase(t *testing
 		}
 	}
 }
+
+func TestAutoMigrateCreatesEditorialInboxTable(t *testing.T) {
+	db := InitSQLite(filepath.Join(t.TempDir(), "editorial.db"))
+	t.Cleanup(func() { _ = db.Close() })
+
+	AutoMigrate(db)
+
+	rows, err := db.Queryx("PRAGMA table_info(editorial_inbox)")
+	if err != nil {
+		t.Fatalf("inspect editorial_inbox columns: %v", err)
+	}
+	defer rows.Close()
+	columns := map[string]bool{}
+	for rows.Next() {
+		var cid int
+		var name, columnType string
+		var notNull int
+		var defaultValue any
+		var primaryKey int
+		if err := rows.Scan(&cid, &name, &columnType, &notNull, &defaultValue, &primaryKey); err != nil {
+			t.Fatalf("scan editorial column: %v", err)
+		}
+		columns[name] = true
+	}
+	for _, name := range []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "created_at", "updated_at"} {
+		if !columns[name] {
+			t.Fatalf("editorial_inbox missing column %q", name)
+		}
+	}
+}

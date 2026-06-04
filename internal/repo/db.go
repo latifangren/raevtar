@@ -128,6 +128,25 @@ func AutoMigrate(db *sqlx.DB) {
 	CREATE INDEX IF NOT EXISTS idx_audit_logs_user ON audit_logs(user);
 	CREATE INDEX IF NOT EXISTS idx_audit_logs_action ON audit_logs(action);
 	CREATE INDEX IF NOT EXISTS idx_audit_logs_created ON audit_logs(created_at);
+
+	CREATE TABLE IF NOT EXISTS editorial_inbox (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		source_type TEXT NOT NULL,
+		source_value TEXT NOT NULL,
+		category_hint TEXT NOT NULL DEFAULT '',
+		priority INTEGER NOT NULL DEFAULT 50,
+		not_before DATETIME NOT NULL,
+		deadline DATETIME,
+		note TEXT NOT NULL DEFAULT '',
+		mode TEXT NOT NULL,
+		status TEXT NOT NULL,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_status ON editorial_inbox(status);
+	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_not_before ON editorial_inbox(not_before);
+	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_priority ON editorial_inbox(priority);
 	`
 	if _, err := db.Exec(schema); err != nil {
 		slog.Error("migration failed", "error", err)
@@ -181,25 +200,27 @@ func ensureColumn(db *sqlx.DB, table, column, definition string) {
 
 // Repositories groups all repos
 type Repositories struct {
-	Post     *PostRepo
-	Category *CategoryRepo
-	Server   *ServerRepo
-	Metric   *MetricRepo
-	Tag      *TagRepo
-	Media    *MediaRepo
-	User     *UserRepo
-	Audit    *AuditRepo
+	Post           *PostRepo
+	Category       *CategoryRepo
+	EditorialInbox *EditorialInboxRepo
+	Server         *ServerRepo
+	Metric         *MetricRepo
+	Tag            *TagRepo
+	Media          *MediaRepo
+	User           *UserRepo
+	Audit          *AuditRepo
 }
 
 func New(db *sqlx.DB) *Repositories {
 	return &Repositories{
-		Post:     &PostRepo{db: db},
-		Category: &CategoryRepo{db: db},
-		Server:   &ServerRepo{db: db},
-		Metric:   &MetricRepo{db: db},
-		Tag:      &TagRepo{db: db},
-		Media:    &MediaRepo{db: db},
-		User:     &UserRepo{db: db},
-		Audit:    &AuditRepo{db: db},
+		Post:           &PostRepo{db: db},
+		Category:       &CategoryRepo{db: db},
+		EditorialInbox: &EditorialInboxRepo{db: db},
+		Server:         &ServerRepo{db: db},
+		Metric:         &MetricRepo{db: db},
+		Tag:            &TagRepo{db: db},
+		Media:          &MediaRepo{db: db},
+		User:           &UserRepo{db: db},
+		Audit:          &AuditRepo{db: db},
 	}
 }

@@ -99,6 +99,16 @@ type ServerDetailData struct {
 	AgentURLExample string
 }
 
+type EditorialInboxData struct {
+	CurrentPath string
+	CSRFToken   string
+	Items       []model.EditorialInboxItem
+	Counts      map[string]int
+	Categories  []model.Category
+	Modes       []string
+	Statuses    []string
+}
+
 func AgentTokenStatus(server model.Server) string {
 	if server.AgentTokenHash == "" {
 		return "token missing"
@@ -478,4 +488,57 @@ func Initials(name string) string {
 		runes = runes[:2]
 	}
 	return strings.ToUpper(string(runes))
+}
+
+func EditorialStatusBadgeClass(status string) string {
+	switch status {
+	case model.EditorialStatusApproved:
+		return "bg-retro-sage text-retro-cream"
+	case model.EditorialStatusQueued:
+		return "bg-retro-wheat text-retro-ink"
+	case model.EditorialStatusPaused:
+		return "bg-retro-paper text-retro-ink"
+	case model.EditorialStatusDone:
+		return "bg-retro-ink text-retro-cream"
+	case model.EditorialStatusCancelled:
+		return "bg-retro-blush text-retro-ink"
+	default:
+		return "bg-retro-paper text-retro-ink"
+	}
+}
+
+func EditorialModeBadgeClass(mode string) string {
+	switch mode {
+	case model.EditorialModeScheduled:
+		return "bg-retro-ink text-retro-cream"
+	case model.EditorialModeOpportunistic:
+		return "bg-retro-wheat text-retro-ink"
+	case model.EditorialModeCampaign:
+		return "bg-retro-sage text-retro-cream"
+	case model.EditorialModeSeed:
+		return "bg-retro-blush text-retro-ink"
+	default:
+		return "bg-retro-paper text-retro-ink"
+	}
+}
+
+func EditorialTimeText(value time.Time) string {
+	if value.IsZero() {
+		return "-"
+	}
+	return value.Local().Format("02 Jan 2006 15:04")
+}
+
+func EditorialInputValue(value time.Time) string {
+	if value.IsZero() {
+		return ""
+	}
+	return value.Local().Format("2006-01-02T15:04")
+}
+
+func EditorialInputValuePtr(value *time.Time) string {
+	if value == nil {
+		return ""
+	}
+	return EditorialInputValue(*value)
 }

@@ -27,6 +27,7 @@ templ Shell(title string, currentPath string, csrfToken string) {
 					</div>
 					<nav class="flex-1 px-4 space-y-2 mt-4">
 						@navLink("/admin", "Dashboard", currentPath)
+						@navLink("/admin/editorial-inbox", "Editorial", currentPath)
 						@navLink("/admin/posts", "Posts", currentPath)
 						@navLink("/admin/media", "Media", currentPath)
 						@navLink("/admin/servers", "Servers", currentPath)

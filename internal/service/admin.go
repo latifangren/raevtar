@@ -170,3 +170,19 @@ func (s *AdminService) DeleteServer(username string, id int64, idText, ip string
 	}
 	return nil
 }
+
+func (s *AdminService) LogEditorialInboxCreated(username string, item *model.EditorialInboxItem, ip string) error {
+	details := "created editorial item #" + strconv.FormatInt(item.ID, 10) + " (" + item.SourceType + ": " + item.SourceValue + ")"
+	if err := s.repos.Audit.Insert(username, "CREATE_EDITORIAL_ITEM", details, ip); err != nil {
+		return fmt.Errorf("audit create editorial item: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) LogEditorialInboxUpdated(username string, item *model.EditorialInboxItem, ip string) error {
+	details := "updated editorial item #" + strconv.FormatInt(item.ID, 10) + " status=" + item.Status + " mode=" + item.Mode
+	if err := s.repos.Audit.Insert(username, "UPDATE_EDITORIAL_ITEM", details, ip); err != nil {
+		return fmt.Errorf("audit update editorial item: %w", err)
+	}
+	return nil
+}
