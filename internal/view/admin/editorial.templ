@@ -75,7 +75,11 @@ templ EditorialInbox(data EditorialInboxData) {
 										</div>
 										<p class="mt-1 text-xs font-mono font-bold text-retro-muted break-all">{ item.SourceValue }</p>
 										<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-retro-muted">
-											<span>priority { CountText(item.Priority) }</span>
+											if item.SourceType == "repo" {
+												<span>repo inbox</span>
+											} else {
+												<span>{ item.SourceType } inbox</span>
+											}
 											<span>attempts { CountText(item.AttemptCount) }</span>
 											if item.PublishedPostID != nil {
 												<span class="font-mono text-retro-ink">post #{ IDText(*item.PublishedPostID) }</span>
@@ -129,37 +133,48 @@ templ EditorialInbox(data EditorialInboxData) {
 										}
 									</td>
 									<td class="py-3 px-4 min-w-[260px]">
-										<form method="POST" action={ templ.URL("/admin/editorial-inbox/update/" + IDText(item.ID)) } class="grid gap-2" data-confirm="Update this editorial inbox item?">
-											<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
-											<input type="hidden" name="source_type" value={ item.SourceType }/>
-											<input type="hidden" name="source_value" value={ item.SourceValue }/>
-											<input type="hidden" name="category_hint" value={ item.CategoryHint }/>
-											<input type="hidden" name="priority" value={ CountText(item.Priority) }/>
-											<input type="hidden" name="not_before" value={ EditorialInputValue(item.NotBefore) }/>
-											<input type="hidden" name="deadline" value={ EditorialInputValuePtr(item.Deadline) }/>
-											<input type="hidden" name="note" value={ item.Note }/>
-											<input type="hidden" name="mode" value={ item.Mode }/>
-											<div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
-												<div class="space-y-2">
-													<select name="status" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink">
-													for _, status := range data.Statuses {
-														if status == item.Status {
+										if EditorialItemMutable(item) {
+											<form method="POST" action={ templ.URL("/admin/editorial-inbox/update/" + IDText(item.ID)) } class="grid gap-2" data-confirm="Update this editorial inbox item?">
+												<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+												<input type="hidden" name="source_type" value={ item.SourceType }/>
+												<input type="hidden" name="source_value" value={ item.SourceValue }/>
+												<input type="hidden" name="category_hint" value={ item.CategoryHint }/>
+												<input type="hidden" name="priority" value={ CountText(item.Priority) }/>
+												<input type="hidden" name="not_before" value={ EditorialInputValue(item.NotBefore) }/>
+												<input type="hidden" name="deadline" value={ EditorialInputValuePtr(item.Deadline) }/>
+												<input type="hidden" name="note" value={ item.Note }/>
+												<input type="hidden" name="mode" value={ item.Mode }/>
+												<div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
+													<div class="space-y-2">
+														<select name="status" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink">
+														for _, status := range data.Statuses {
+															if status == item.Status {
 																<option value={ status } selected>{ status }</option>
-													} else {
-														<option value={ status }>{ status }</option>
-													}
-													}
-													</select>
-													<input type="number" name="published_post_id" min="1" value={ EditorialIDValuePtr(item.PublishedPostID) } placeholder="post id" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
-													<input type="text" name="failure_note" value={ item.FailureNote } placeholder="failure note" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
+															} else {
+																<option value={ status }>{ status }</option>
+															}
+														}
+														</select>
+														<input type="number" name="published_post_id" min="1" value={ EditorialIDValuePtr(item.PublishedPostID) } placeholder="post id" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
+														<input type="text" name="failure_note" value={ item.FailureNote } placeholder="failure note" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
+													</div>
+													<button type="submit" class="text-xs font-bold text-retro-ink hover:bg-retro-wheat px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap">Update</button>
 												</div>
-												<button type="submit" class="text-xs font-bold text-retro-ink hover:bg-retro-wheat px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap">Update</button>
+												<details class="border-2 border-retro-ink bg-retro-cream px-2 py-1.5">
+													<summary class="cursor-pointer text-[11px] font-black uppercase text-retro-muted">Failure meta</summary>
+													<textarea name="failure_meta" rows="2" class="mt-2 w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-mono font-bold text-retro-ink" placeholder="failure meta">{ item.FailureMeta }</textarea>
+												</details>
+											</form>
+											<form method="POST" action={ templ.URL("/admin/editorial-inbox/delete/" + IDText(item.ID)) } class="mt-2" data-confirm="Delete this editorial inbox item?">
+												<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+												<button type="submit" class="text-xs font-bold text-retro-ink hover:bg-retro-blush px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap">Delete</button>
+											</form>
+										} else {
+											<div class="border-2 border-retro-ink bg-retro-cream px-3 py-2">
+												<p class="text-[10px] font-black uppercase text-retro-muted">Locked</p>
+												<p class="mt-1 text-xs font-bold text-retro-ink">{ EditorialItemLockedReason(item) }</p>
 											</div>
-											<details class="border-2 border-retro-ink bg-retro-cream px-2 py-1.5">
-												<summary class="cursor-pointer text-[11px] font-black uppercase text-retro-muted">Failure meta</summary>
-												<textarea name="failure_meta" rows="2" class="mt-2 w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-mono font-bold text-retro-ink" placeholder="failure meta">{ item.FailureMeta }</textarea>
-											</details>
-										</form>
+										}
 									</td>
 								</tr>
 							}
@@ -173,7 +188,7 @@ templ EditorialInbox(data EditorialInboxData) {
 						<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
 							<div>
 								<h2 class="text-sm font-black uppercase text-retro-ink">Create inbox item</h2>
-								<p class="mt-1 text-xs font-bold text-retro-muted">Open when you need to queue a new source. Existing fields and submit flow stay unchanged.</p>
+								<p class="mt-1 text-xs font-bold text-retro-muted">Kasih repo, tema, atau catatan singkat. Hermes ambil dari inbox dulu sebelum autonomous.</p>
 							</div>
 							<span class="inline-flex items-center self-start border-2 border-retro-ink bg-retro-cream px-2.5 py-1 text-[11px] font-black uppercase text-retro-muted">Show form</span>
 						</div>
@@ -183,32 +198,8 @@ templ EditorialInbox(data EditorialInboxData) {
 							<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
 							<div class="grid gap-3 md:grid-cols-2">
 								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Source type</label>
-									<input type="text" name="source_type" required value="repo" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Source value</label>
-									<input type="text" name="source_value" required placeholder="https://github.com/..." class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Mode</label>
-									<select name="mode" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink">
-										for _, mode := range data.Modes {
-											<option value={ mode }>{ mode }</option>
-										}
-									</select>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Status</label>
-									<select name="status" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink">
-										for _, status := range data.Statuses {
-											if status == model.EditorialStatusQueued {
-												<option value={ status } selected>{ status }</option>
-											} else {
-												<option value={ status }>{ status }</option>
-											}
-										}
-									</select>
+									<label class="block text-sm font-bold text-retro-muted mb-1">Repo / link / tema</label>
+									<input type="text" name="source_value" required placeholder="https://github.com/... atau tema project" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
 								</div>
 								<div>
 									<label class="block text-sm font-bold text-retro-muted mb-1">Category hint</label>
@@ -219,34 +210,10 @@ templ EditorialInbox(data EditorialInboxData) {
 										}
 									</select>
 								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Priority</label>
-									<input type="number" name="priority" min="0" max="100" value="50" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Not before</label>
-									<input type="datetime-local" name="not_before" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Deadline</label>
-									<input type="datetime-local" name="deadline" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Published post ID</label>
-									<input type="number" name="published_post_id" min="1" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
-								</div>
-								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Failure note</label>
-									<input type="text" name="failure_note" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Short operator-facing failure note"/>
-								</div>
 							</div>
 							<div>
 								<label class="block text-sm font-bold text-retro-muted mb-1">Editor note</label>
-								<textarea name="note" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Why this matters, angle hints, or campaign notes."></textarea>
-							</div>
-							<div>
-								<label class="block text-sm font-bold text-retro-muted mb-1">Failure meta</label>
-								<textarea name="failure_meta" rows="3" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-mono font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder='Raw failure details, JSON, or trace hint.'></textarea>
+								<textarea name="note" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Kasih angle, judul project, atau kenapa ini penting."></textarea>
 							</div>
 							<div class="flex justify-end">
 								<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Create item</button>

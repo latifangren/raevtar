@@ -2073,13 +2073,8 @@ func TestEditorialInboxAdminAndAPIFlow(t *testing.T) {
 		t.Fatalf("expected session")
 	}
 	form := url.Values{
-		"source_type":   {"repo"},
 		"source_value":  {"https://github.com/example/repo"},
 		"category_hint": {"devops"},
-		"priority":      {"75"},
-		"not_before":    {"2026-06-05T08:00"},
-		"mode":          {model.EditorialModeScheduled},
-		"status":        {model.EditorialStatusQueued},
 		"note":          {"queue this repo first"},
 		"_csrf":         {entry.csrfToken},
 	}
@@ -2116,7 +2111,7 @@ func TestEditorialInboxAdminAndAPIFlow(t *testing.T) {
 	if listRR.Code != http.StatusOK {
 		t.Fatalf("editorial list status = %d, want %d; body: %s", listRR.Code, http.StatusOK, listRR.Body.String())
 	}
-	assertContains(t, listRR.Body.String(), `"status":"queued"`)
+	assertContains(t, listRR.Body.String(), `"status":"approved"`)
 }
 
 func TestEditorialInboxClaimCompleteAndFailAPIFlow(t *testing.T) {
@@ -2193,6 +2188,7 @@ func TestEditorialInboxClaimCompleteAndFailAPIFlow(t *testing.T) {
 	}
 	assertContains(t, contractRR.Body.String(), `"claim_endpoint":"/api/v1/editorial-inbox/claim"`)
 	assertContains(t, contractRR.Body.String(), `"lease_ttl":"30m"`)
+	assertContains(t, contractRR.Body.String(), `"single_running":"new claim blocked while any running item still has active lease"`)
 }
 
 func TestEditorialInboxPhase4SummaryAndAdminRendering(t *testing.T) {
@@ -2239,6 +2235,78 @@ func TestEditorialInboxPhase4SummaryAndAdminRendering(t *testing.T) {
 	assertContains(t, body, "Overdue")
 	assertContains(t, body, "Fairness")
 	assertContains(t, body, "Publish analytics")
+}
+
+func TestAdminEditorialInboxDeleteAndLockedRendering(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(90, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+	createForm := url.Values{
+		"source_value":  {"https://github.com/example/delete-me"},
+		"category_hint": {"devops"},
+		"note":          {"delete before first run"},
+		"_csrf":         {entry.csrfToken},
+	}
+	createReq := httptest.NewRequest(http.MethodPost, "/admin/editorial-inbox", strings.NewReader(createForm.Encode()))
+	createReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	createReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	createRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(createRR, createReq)
+	if createRR.Code != http.StatusSeeOther {
+		t.Fatalf("create mutable status = %d, want %d; body: %s", createRR.Code, http.StatusSeeOther, createRR.Body.String())
+	}
+	status, body := getBody(t, app, "/admin/editorial-inbox", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("editorial page status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "/admin/editorial-inbox/delete/")
+	items, err := app.svc.Editorial.ListInboxItems(service.EditorialInboxListFilter{})
+	if err != nil {
+		t.Fatalf("list items: %v", err)
+	}
+	var mutableID int64
+	for _, item := range items {
+		if item.SourceValue == "https://github.com/example/delete-me" {
+			mutableID = item.ID
+			break
+		}
+	}
+	if mutableID == 0 {
+		t.Fatalf("expected mutable item id")
+	}
+	deleteForm := url.Values{"_csrf": {entry.csrfToken}}
+	deleteReq := httptest.NewRequest(http.MethodPost, "/admin/editorial-inbox/delete/"+strconv.FormatInt(mutableID, 10), strings.NewReader(deleteForm.Encode()))
+	deleteReq.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	deleteReq.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	deleteRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(deleteRR, deleteReq)
+	if deleteRR.Code != http.StatusSeeOther {
+		t.Fatalf("delete status = %d, want %d; body: %s", deleteRR.Code, http.StatusSeeOther, deleteRR.Body.String())
+	}
+	lockedCreateReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox", strings.NewReader(`{"source_type":"repo","source_value":"https://github.com/example/locked-ui","priority":80,"not_before":"2025-06-05T08:00:00Z","mode":"scheduled_assignment","status":"approved"}`))
+	lockedCreateReq.Header.Set("Authorization", "Bearer admin-key")
+	lockedCreateReq.Header.Set("Content-Type", "application/json")
+	lockedCreateRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(lockedCreateRR, lockedCreateReq)
+	if lockedCreateRR.Code != http.StatusCreated {
+		t.Fatalf("create locked status = %d, want %d; body: %s", lockedCreateRR.Code, http.StatusCreated, lockedCreateRR.Body.String())
+	}
+	claimReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/claim", strings.NewReader(`{"worker":"hermes-cron"}`))
+	claimReq.Header.Set("Authorization", "Bearer admin-key")
+	claimReq.Header.Set("Content-Type", "application/json")
+	claimRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(claimRR, claimReq)
+	if claimRR.Code != http.StatusOK {
+		t.Fatalf("claim status = %d, want %d; body: %s", claimRR.Code, http.StatusOK, claimRR.Body.String())
+	}
+	status, body = getBody(t, app, "/admin/editorial-inbox", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("editorial page status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Locked after first execution attempt")
 }
 
 func TestAdminLoginRequestBodyIsCapped(t *testing.T) {

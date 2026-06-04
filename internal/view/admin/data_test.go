@@ -81,3 +81,17 @@ func TestEditorialPhase4Helpers(t *testing.T) {
 		t.Fatalf("duration text = %q, want 1h 35m", got)
 	}
 }
+
+func TestEditorialItemMutabilityHelpers(t *testing.T) {
+	mutable := model.EditorialInboxItem{Status: model.EditorialStatusApproved, AttemptCount: 0}
+	if !EditorialItemMutable(mutable) {
+		t.Fatalf("expected approved item with zero attempts to be mutable")
+	}
+	locked := model.EditorialInboxItem{Status: model.EditorialStatusApproved, AttemptCount: 1}
+	if EditorialItemMutable(locked) {
+		t.Fatalf("expected attempted item to be locked")
+	}
+	if got := EditorialItemLockedReason(locked); got != "Locked after first execution attempt" {
+		t.Fatalf("locked reason = %q", got)
+	}
+}

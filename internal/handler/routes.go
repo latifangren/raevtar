@@ -71,6 +71,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Get("/posts", h.adminPosts)
 				r.Post("/editorial-inbox", h.adminCreateEditorialInbox)
 				r.Post("/editorial-inbox/update/{itemID}", h.adminUpdateEditorialInbox)
+				r.Post("/editorial-inbox/delete/{itemID}", h.adminDeleteEditorialInbox)
 				r.Post("/posts/preview", h.adminPreviewPost)
 				r.Post("/posts", h.adminCreatePost)
 				r.Get("/posts/edit/{postID}", h.adminEditPost)

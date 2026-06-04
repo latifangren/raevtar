@@ -19,6 +19,7 @@ var ErrInvalidEditorialInboxInput = errors.New("invalid editorial inbox input")
 var ErrEditorialInboxNotFound = errors.New("editorial inbox item not found")
 var ErrEditorialInboxNoClaimableItem = errors.New("no claimable editorial inbox item")
 var ErrEditorialInboxInvalidClaim = errors.New("invalid editorial inbox claim")
+var ErrEditorialInboxImmutable = errors.New("editorial inbox item can no longer be edited or deleted")
 
 const editorialInboxLeaseTTL = 30 * time.Minute
 const editorialFairnessGapThreshold = 3
@@ -89,6 +90,9 @@ func (s *EditorialInboxService) UpdateInboxItem(id int64, input model.EditorialI
 		}
 		return nil, fmt.Errorf("get editorial inbox item: %w", err)
 	}
+	if !editorialInboxItemMutable(existing) {
+		return nil, ErrEditorialInboxImmutable
+	}
 	item, err := s.buildInboxItem(id, input.SourceType, input.SourceValue, input.CategoryHint, input.Priority, input.NotBefore, input.Deadline, input.Note, input.Mode, input.Status, input.PublishedPostID, input.FailureNote, input.FailureMeta)
 	if err != nil {
 		return nil, err
@@ -100,6 +104,23 @@ func (s *EditorialInboxService) UpdateInboxItem(id int64, input model.EditorialI
 		return nil, fmt.Errorf("update editorial inbox item: %w", err)
 	}
 	return s.GetInboxItem(id)
+}
+
+func (s *EditorialInboxService) DeleteInboxItem(id int64) (*model.EditorialInboxItem, error) {
+	existing, err := s.repos.EditorialInbox.GetByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %w", ErrEditorialInboxNotFound, err)
+		}
+		return nil, fmt.Errorf("get editorial inbox item: %w", err)
+	}
+	if !editorialInboxItemMutable(existing) {
+		return nil, ErrEditorialInboxImmutable
+	}
+	if err := s.repos.EditorialInbox.Delete(id); err != nil {
+		return nil, fmt.Errorf("delete editorial inbox item: %w", err)
+	}
+	return existing, nil
 }
 
 func (s *EditorialInboxService) ClaimNextInboxItem(worker string, now time.Time) (*model.EditorialInboxClaimResult, error) {
@@ -452,6 +473,21 @@ func editorialRetryBackoff(attemptCount int) time.Duration {
 		return time.Hour
 	default:
 		return 6 * time.Hour
+	}
+}
+
+func editorialInboxItemMutable(item *model.EditorialInboxItem) bool {
+	if item == nil {
+		return false
+	}
+	if item.AttemptCount > 0 {
+		return false
+	}
+	switch item.Status {
+	case model.EditorialStatusQueued, model.EditorialStatusApproved, model.EditorialStatusPaused, model.EditorialStatusCancelled:
+		return true
+	default:
+		return false
 	}
 }
 

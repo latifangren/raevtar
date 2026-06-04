@@ -132,6 +132,11 @@ func (r *EditorialInboxRepo) Update(item *model.EditorialInboxItem) error {
 	return err
 }
 
+func (r *EditorialInboxRepo) Delete(id int64) error {
+	_, err := r.db.Exec(`DELETE FROM editorial_inbox WHERE id = ?`, id)
+	return err
+}
+
 func (r *EditorialInboxRepo) ClaimNextReady(params EditorialInboxClaimParams) (*model.EditorialInboxItem, error) {
 	tx, err := r.db.Beginx()
 	if err != nil {
@@ -142,6 +147,19 @@ func (r *EditorialInboxRepo) ClaimNextReady(params EditorialInboxClaimParams) (*
 			_ = tx.Rollback()
 		}
 	}()
+
+	var liveRunningCount int
+	if err = tx.Get(&liveRunningCount, `
+		SELECT COUNT(*) FROM editorial_inbox
+		WHERE status = ? AND lease_expires_at IS NOT NULL AND lease_expires_at > ?`, model.EditorialStatusRunning, params.Now.UTC()); err != nil {
+		return nil, err
+	}
+	if liveRunningCount > 0 {
+		if commitErr := tx.Commit(); commitErr != nil {
+			return nil, commitErr
+		}
+		return nil, nil
+	}
 
 	var item model.EditorialInboxItem
 	err = tx.Get(&item, `

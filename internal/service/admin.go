@@ -186,3 +186,11 @@ func (s *AdminService) LogEditorialInboxUpdated(username string, item *model.Edi
 	}
 	return nil
 }
+
+func (s *AdminService) LogEditorialInboxDeleted(username string, item *model.EditorialInboxItem, ip string) error {
+	details := "deleted editorial item #" + strconv.FormatInt(item.ID, 10) + " (" + item.SourceType + ": " + item.SourceValue + ")"
+	if err := s.repos.Audit.Insert(username, "DELETE_EDITORIAL_ITEM", details, ip); err != nil {
+		return fmt.Errorf("audit delete editorial item: %w", err)
+	}
+	return nil
+}

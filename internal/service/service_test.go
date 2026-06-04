@@ -536,6 +536,86 @@ func TestEditorialInboxServiceClaimCompleteAndRetryFlow(t *testing.T) {
 	}
 }
 
+func TestEditorialInboxServiceMutabilityAndDeleteRules(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+	item, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/mutable",
+		Priority:    50,
+		NotBefore:   now,
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create mutable item: %v", err)
+	}
+	updated, err := state.svc.Editorial.UpdateInboxItem(item.ID, model.EditorialInboxUpdate{
+		SourceType:   item.SourceType,
+		SourceValue:  item.SourceValue,
+		CategoryHint: item.CategoryHint,
+		Priority:     item.Priority,
+		NotBefore:    item.NotBefore,
+		Deadline:     item.Deadline,
+		Note:         "updated before first execution",
+		Mode:         item.Mode,
+		Status:       model.EditorialStatusPaused,
+	})
+	if err != nil {
+		t.Fatalf("update mutable item: %v", err)
+	}
+	if updated.Status != model.EditorialStatusPaused {
+		t.Fatalf("updated status = %q, want paused", updated.Status)
+	}
+	deleted, err := state.svc.Editorial.DeleteInboxItem(item.ID)
+	if err != nil {
+		t.Fatalf("delete mutable item: %v", err)
+	}
+	if deleted.ID != item.ID {
+		t.Fatalf("deleted id = %d, want %d", deleted.ID, item.ID)
+	}
+	locked, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/locked",
+		Priority:    50,
+		NotBefore:   now.Add(-5 * time.Minute),
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create locked item: %v", err)
+	}
+	claim, err := state.svc.Editorial.ClaimNextInboxItem("worker-lock", now)
+	if err != nil {
+		t.Fatalf("claim locked item: %v", err)
+	}
+	if claim.Item.ID != locked.ID {
+		t.Fatalf("claimed id = %d, want %d", claim.Item.ID, locked.ID)
+	}
+	if _, err := state.svc.Editorial.UpdateInboxItem(locked.ID, model.EditorialInboxUpdate{
+		SourceType:   locked.SourceType,
+		SourceValue:  locked.SourceValue,
+		CategoryHint: locked.CategoryHint,
+		Priority:     locked.Priority,
+		NotBefore:    locked.NotBefore,
+		Deadline:     locked.Deadline,
+		Note:         locked.Note,
+		Mode:         locked.Mode,
+		Status:       model.EditorialStatusRunning,
+	}); !errors.Is(err, ErrEditorialInboxImmutable) {
+		t.Fatalf("update locked err = %v, want ErrEditorialInboxImmutable", err)
+	}
+	if _, err := state.svc.Editorial.DeleteInboxItem(locked.ID); !errors.Is(err, ErrEditorialInboxImmutable) {
+		t.Fatalf("delete locked err = %v, want ErrEditorialInboxImmutable", err)
+	}
+	if _, err := state.svc.Editorial.FailInboxItemClaim(locked.ID, claim.ClaimToken, "retry later", `{}`, true, now); err != nil {
+		t.Fatalf("retry locked item: %v", err)
+	}
+	if _, err := state.svc.Editorial.DeleteInboxItem(locked.ID); !errors.Is(err, ErrEditorialInboxImmutable) {
+		t.Fatalf("delete retried locked err = %v, want ErrEditorialInboxImmutable", err)
+	}
+}
+
 func TestEditorialInboxServicePhase4FairnessOverdueAndSummary(t *testing.T) {
 	state := newTestServices(t)
 	now := time.Now().UTC().Truncate(time.Minute)

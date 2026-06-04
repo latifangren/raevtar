@@ -586,3 +586,25 @@ func EditorialDurationText(duration time.Duration) string {
 	}
 	return AgeText(duration)
 }
+
+func EditorialItemMutable(item model.EditorialInboxItem) bool {
+	if item.AttemptCount > 0 {
+		return false
+	}
+	switch item.Status {
+	case model.EditorialStatusQueued, model.EditorialStatusApproved, model.EditorialStatusPaused, model.EditorialStatusCancelled:
+		return true
+	default:
+		return false
+	}
+}
+
+func EditorialItemLockedReason(item model.EditorialInboxItem) string {
+	if EditorialItemMutable(item) {
+		return ""
+	}
+	if item.AttemptCount > 0 {
+		return "Locked after first execution attempt"
+	}
+	return "Locked by item status"
+}

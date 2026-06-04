@@ -93,6 +93,10 @@ func (h *Handler) adminUpdateEditorialInbox(w http.ResponseWriter, r *http.Reque
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		if errors.Is(err, service.ErrEditorialInboxImmutable) {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
 		if errors.Is(err, service.ErrEditorialInboxNotFound) {
 			http.Error(w, "item not found", http.StatusNotFound)
 			return
@@ -101,6 +105,34 @@ func (h *Handler) adminUpdateEditorialInbox(w http.ResponseWriter, r *http.Reque
 		return
 	}
 	warnAfterMutation(r, "update_editorial_audit", h.svc.Admin.LogEditorialInboxUpdated(entry.username, item, clientIP(r)))
+	http.Redirect(w, r, "/admin/editorial-inbox", http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteEditorialInbox(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	item, err := h.svc.Editorial.DeleteInboxItem(id)
+	if err != nil {
+		if errors.Is(err, service.ErrEditorialInboxImmutable) {
+			http.Error(w, err.Error(), http.StatusConflict)
+			return
+		}
+		if errors.Is(err, service.ErrEditorialInboxNotFound) {
+			http.Error(w, "item not found", http.StatusNotFound)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
+	warnAfterMutation(r, "delete_editorial_audit", h.svc.Admin.LogEditorialInboxDeleted(entry.username, item, clientIP(r)))
 	http.Redirect(w, r, "/admin/editorial-inbox", http.StatusSeeOther)
 }
 
@@ -121,6 +153,7 @@ func (h *Handler) apiEditorialInboxContract(w http.ResponseWriter, r *http.Reque
 			"fail_endpoint":     "/api/v1/editorial-inbox/{itemID}/fail",
 			"summary_endpoint":  "/api/v1/editorial-inbox/summary",
 			"lease_ttl":         "30m",
+			"single_running":    "new claim blocked while any running item still has active lease",
 			"retry_schedule":    []string{"attempt 1 => 15m", "attempt 2 => 1h", "attempt 3+ => 6h"},
 			"fairness_policy":   "after 3 consecutive non-urgent claims, next claim opens one autonomous gap",
 			"overdue_priority":  "overdue items outrank non-overdue ready items",
@@ -326,24 +359,37 @@ func (h *Handler) apiFailEditorialInboxClaim(w http.ResponseWriter, r *http.Requ
 }
 
 func editorialInboxCreateFromForm(r *http.Request) (model.EditorialInboxCreate, error) {
-	notBefore, deadline, err := editorialTimesFromForm(r)
+	now := time.Now().UTC().Truncate(time.Minute)
+	notBefore, deadline, err := editorialTimesFromFormWithDefaults(r, now)
 	if err != nil {
 		return model.EditorialInboxCreate{}, err
 	}
-	priority, err := strconv.Atoi(strings.TrimSpace(r.FormValue("priority")))
+	priority, err := editorialPriorityFromForm(r, 50)
 	if err != nil {
-		return model.EditorialInboxCreate{}, errors.New("priority must be a number")
+		return model.EditorialInboxCreate{}, err
+	}
+	sourceType := strings.TrimSpace(r.FormValue("source_type"))
+	if sourceType == "" {
+		sourceType = "repo"
+	}
+	mode := strings.TrimSpace(r.FormValue("mode"))
+	if mode == "" {
+		mode = model.EditorialModeScheduled
+	}
+	status := strings.TrimSpace(r.FormValue("status"))
+	if status == "" {
+		status = model.EditorialStatusApproved
 	}
 	return model.EditorialInboxCreate{
-		SourceType:      r.FormValue("source_type"),
+		SourceType:      sourceType,
 		SourceValue:     r.FormValue("source_value"),
 		CategoryHint:    r.FormValue("category_hint"),
 		Priority:        priority,
 		NotBefore:       notBefore,
 		Deadline:        deadline,
 		Note:            r.FormValue("note"),
-		Mode:            r.FormValue("mode"),
-		Status:          r.FormValue("status"),
+		Mode:            mode,
+		Status:          status,
 		PublishedPostID: editorialPostIDFromForm(r),
 		FailureNote:     r.FormValue("failure_note"),
 		FailureMeta:     r.FormValue("failure_meta"),
@@ -351,13 +397,13 @@ func editorialInboxCreateFromForm(r *http.Request) (model.EditorialInboxCreate, 
 }
 
 func editorialInboxUpdateFromForm(r *http.Request) (model.EditorialInboxUpdate, error) {
-	notBefore, deadline, err := editorialTimesFromForm(r)
+	notBefore, deadline, err := editorialTimesFromFormWithDefaults(r, time.Time{})
 	if err != nil {
 		return model.EditorialInboxUpdate{}, err
 	}
-	priority, err := strconv.Atoi(strings.TrimSpace(r.FormValue("priority")))
+	priority, err := editorialPriorityFromForm(r, -1)
 	if err != nil {
-		return model.EditorialInboxUpdate{}, errors.New("priority must be a number")
+		return model.EditorialInboxUpdate{}, err
 	}
 	return model.EditorialInboxUpdate{
 		SourceType:      r.FormValue("source_type"),
@@ -375,6 +421,18 @@ func editorialInboxUpdateFromForm(r *http.Request) (model.EditorialInboxUpdate, 
 	}, nil
 }
 
+func editorialPriorityFromForm(r *http.Request, defaultValue int) (int, error) {
+	value := strings.TrimSpace(r.FormValue("priority"))
+	if value == "" && defaultValue >= 0 {
+		return defaultValue, nil
+	}
+	priority, err := strconv.Atoi(value)
+	if err != nil {
+		return 0, errors.New("priority must be a number")
+	}
+	return priority, nil
+}
+
 func editorialPostIDFromForm(r *http.Request) *int64 {
 	value := strings.TrimSpace(r.FormValue("published_post_id"))
 	if value == "" {
@@ -387,10 +445,21 @@ func editorialPostIDFromForm(r *http.Request) *int64 {
 	return &id
 }
 
-func editorialTimesFromForm(r *http.Request) (time.Time, *time.Time, error) {
+func editorialTimesFromFormWithDefaults(r *http.Request, defaultNotBefore time.Time) (time.Time, *time.Time, error) {
 	notBeforeText := strings.TrimSpace(r.FormValue("not_before"))
 	if notBeforeText == "" {
-		return time.Time{}, nil, errors.New("not_before required")
+		if defaultNotBefore.IsZero() {
+			return time.Time{}, nil, errors.New("not_before required")
+		}
+		deadlineText := strings.TrimSpace(r.FormValue("deadline"))
+		if deadlineText == "" {
+			return defaultNotBefore, nil, nil
+		}
+		deadline, err := time.Parse("2006-01-02T15:04", deadlineText)
+		if err != nil {
+			return time.Time{}, nil, errors.New("invalid deadline")
+		}
+		return defaultNotBefore, &deadline, nil
 	}
 	notBefore, err := time.Parse("2006-01-02T15:04", notBeforeText)
 	if err != nil {
