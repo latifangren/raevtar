@@ -108,7 +108,14 @@ func (h *Handler) apiEditorialInboxContract(w http.ResponseWriter, r *http.Reque
 			"not_before_lte": "now",
 			"order":          []string{"priority desc", "deadline asc nulls last", "created_at asc"},
 		},
-		"fields": []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta"},
+		"lease": map[string]any{
+			"claim_endpoint":    "/api/v1/editorial-inbox/claim",
+			"complete_endpoint": "/api/v1/editorial-inbox/{itemID}/complete",
+			"fail_endpoint":     "/api/v1/editorial-inbox/{itemID}/fail",
+			"lease_ttl":         "30m",
+			"retry_schedule":    []string{"attempt 1 => 15m", "attempt 2 => 1h", "attempt 3+ => 6h"},
+		},
+		"fields": []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta", "claimed_by", "claimed_at", "lease_expires_at", "attempt_count"},
 	})
 }
 
@@ -188,6 +195,105 @@ func (h *Handler) apiUpdateEditorialInbox(w http.ResponseWriter, r *http.Request
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidEditorialInboxInput) {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, service.ErrEditorialInboxNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, item)
+}
+
+func (h *Handler) apiClaimEditorialInbox(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	var input model.EditorialInboxClaimRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	result, err := h.svc.Editorial.ClaimNextInboxItem(input.Worker, time.Now().UTC())
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidEditorialInboxInput) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, service.ErrEditorialInboxNoClaimableItem) {
+			w.WriteHeader(http.StatusNoContent)
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, result)
+}
+
+func (h *Handler) apiCompleteEditorialInboxClaim(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	id, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.EditorialInboxCompleteRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Editorial.CompleteInboxItemClaim(id, input.ClaimToken, input.PublishedPostID)
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidEditorialInboxInput) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, service.ErrEditorialInboxInvalidClaim) {
+			writeJSON(w, http.StatusConflict, map[string]string{"error": "invalid claim"})
+			return
+		}
+		if errors.Is(err, service.ErrEditorialInboxNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "not found"})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, item)
+}
+
+func (h *Handler) apiFailEditorialInboxClaim(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	id, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.EditorialInboxFailRequest
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Editorial.FailInboxItemClaim(id, input.ClaimToken, input.FailureNote, input.FailureMeta, input.Retryable, time.Now().UTC())
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidEditorialInboxInput) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, service.ErrEditorialInboxInvalidClaim) {
+			writeJSON(w, http.StatusConflict, map[string]string{"error": "invalid claim"})
 			return
 		}
 		if errors.Is(err, service.ErrEditorialInboxNotFound) {

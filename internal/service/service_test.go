@@ -1,6 +1,7 @@
 package service
 
 import (
+	"errors"
 	"math"
 	"path/filepath"
 	"reflect"
@@ -437,6 +438,101 @@ func TestEditorialInboxServiceReadyOrderingAndValidation(t *testing.T) {
 		Status:       model.EditorialStatusDone,
 	}); err == nil {
 		t.Fatalf("expected done item without published_post_id to fail")
+	}
+}
+
+func TestEditorialInboxServiceClaimCompleteAndRetryFlow(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+	item, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/phase3",
+		Priority:    70,
+		NotBefore:   now.Add(-10 * time.Minute),
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create item: %v", err)
+	}
+	claim, err := state.svc.Editorial.ClaimNextInboxItem("hermes-cron", now)
+	if err != nil {
+		t.Fatalf("claim item: %v", err)
+	}
+	if claim.Item.ID != item.ID {
+		t.Fatalf("claimed item id = %d, want %d", claim.Item.ID, item.ID)
+	}
+	if claim.Item.Status != model.EditorialStatusRunning {
+		t.Fatalf("claimed status = %q, want running", claim.Item.Status)
+	}
+	if claim.Item.AttemptCount != 1 {
+		t.Fatalf("attempt_count = %d, want 1", claim.Item.AttemptCount)
+	}
+	if _, err := state.svc.Editorial.ClaimNextInboxItem("hermes-cron", now); !errors.Is(err, ErrEditorialInboxNoClaimableItem) {
+		t.Fatalf("second claim err = %v, want ErrEditorialInboxNoClaimableItem", err)
+	}
+	failed, err := state.svc.Editorial.FailInboxItemClaim(item.ID, claim.ClaimToken, "publish timeout", `{"status":504}`, true, now)
+	if err != nil {
+		t.Fatalf("retryable fail: %v", err)
+	}
+	if failed.Status != model.EditorialStatusApproved {
+		t.Fatalf("retryable status = %q, want approved", failed.Status)
+	}
+	if !failed.NotBefore.After(now) {
+		t.Fatalf("retryable not_before = %s, want future", failed.NotBefore)
+	}
+	claim2, err := state.svc.Editorial.ClaimNextInboxItem("hermes-cron", failed.NotBefore)
+	if err != nil {
+		t.Fatalf("reclaim item: %v", err)
+	}
+	postID := int64(77)
+	done, err := state.svc.Editorial.CompleteInboxItemClaim(item.ID, claim2.ClaimToken, postID)
+	if err != nil {
+		t.Fatalf("complete claim: %v", err)
+	}
+	if done.Status != model.EditorialStatusDone {
+		t.Fatalf("done status = %q, want done", done.Status)
+	}
+	if done.PublishedPostID == nil || *done.PublishedPostID != postID {
+		t.Fatalf("published_post_id = %v, want %d", done.PublishedPostID, postID)
+	}
+	if done.ClaimedBy != "" || done.LeaseExpiresAt != nil {
+		t.Fatalf("done claim metadata not cleared: %+v", done)
+	}
+	if _, err := state.svc.Editorial.CompleteInboxItemClaim(item.ID, claim2.ClaimToken, postID); !errors.Is(err, ErrEditorialInboxInvalidClaim) {
+		t.Fatalf("repeat complete err = %v, want ErrEditorialInboxInvalidClaim", err)
+	}
+	stale, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "topic",
+		SourceValue: "stale lock",
+		Priority:    80,
+		NotBefore:   now.Add(-5 * time.Minute),
+		Mode:        model.EditorialModeCampaign,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create stale item: %v", err)
+	}
+	firstClaim, err := state.svc.Editorial.ClaimNextInboxItem("worker-a", now)
+	if err != nil {
+		t.Fatalf("claim stale item: %v", err)
+	}
+	if firstClaim.Item.ID != stale.ID {
+		t.Fatalf("stale claim id = %d, want %d", firstClaim.Item.ID, stale.ID)
+	}
+	reclaimed, err := state.svc.Editorial.ClaimNextInboxItem("worker-b", now.Add(editorialInboxLeaseTTL+time.Minute))
+	if err != nil {
+		t.Fatalf("reclaim after lease expiry: %v", err)
+	}
+	if reclaimed.Item.ID != stale.ID {
+		t.Fatalf("reclaimed id = %d, want %d", reclaimed.Item.ID, stale.ID)
+	}
+	terminal, err := state.svc.Editorial.FailInboxItemClaim(stale.ID, reclaimed.ClaimToken, "bad source", `{"retryable":false}`, false, now.Add(editorialInboxLeaseTTL+2*time.Minute))
+	if err != nil {
+		t.Fatalf("terminal fail: %v", err)
+	}
+	if terminal.Status != model.EditorialStatusFailed {
+		t.Fatalf("terminal status = %q, want failed", terminal.Status)
 	}
 }
 

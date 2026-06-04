@@ -2115,6 +2115,82 @@ func TestEditorialInboxAdminAndAPIFlow(t *testing.T) {
 	assertContains(t, listRR.Body.String(), `"status":"queued"`)
 }
 
+func TestEditorialInboxClaimCompleteAndFailAPIFlow(t *testing.T) {
+	app := newPublicTestApp(t)
+	createReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox", strings.NewReader(`{"source_type":"repo","source_value":"https://github.com/example/claim","priority":90,"not_before":"2025-06-05T08:00:00Z","mode":"scheduled_assignment","status":"approved"}`))
+	createReq.RemoteAddr = "198.51.100.90:1234"
+	createReq.Header.Set("Authorization", "Bearer admin-key")
+	createReq.Header.Set("Content-Type", "application/json")
+	createRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(createRR, createReq)
+	if createRR.Code != http.StatusCreated {
+		t.Fatalf("create status = %d, want %d; body: %s", createRR.Code, http.StatusCreated, createRR.Body.String())
+	}
+	var created model.EditorialInboxItem
+	if err := json.Unmarshal(createRR.Body.Bytes(), &created); err != nil {
+		t.Fatalf("decode created item: %v", err)
+	}
+	claimReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/claim", strings.NewReader(`{"worker":"hermes-cron"}`))
+	claimReq.RemoteAddr = "198.51.100.91:1234"
+	claimReq.Header.Set("Authorization", "Bearer admin-key")
+	claimReq.Header.Set("Content-Type", "application/json")
+	claimRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(claimRR, claimReq)
+	if claimRR.Code != http.StatusOK {
+		t.Fatalf("claim status = %d, want %d; body: %s", claimRR.Code, http.StatusOK, claimRR.Body.String())
+	}
+	var claim model.EditorialInboxClaimResult
+	if err := json.Unmarshal(claimRR.Body.Bytes(), &claim); err != nil {
+		t.Fatalf("decode claim result: %v", err)
+	}
+	if claim.Item == nil || claim.Item.ID != created.ID {
+		t.Fatalf("claimed item = %+v, want id %d", claim.Item, created.ID)
+	}
+	if claim.ClaimToken == "" {
+		t.Fatalf("expected claim token")
+	}
+	secondClaimReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/claim", strings.NewReader(`{"worker":"hermes-cron"}`))
+	secondClaimReq.RemoteAddr = "198.51.100.92:1234"
+	secondClaimReq.Header.Set("Authorization", "Bearer admin-key")
+	secondClaimReq.Header.Set("Content-Type", "application/json")
+	secondClaimRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(secondClaimRR, secondClaimReq)
+	if secondClaimRR.Code != http.StatusNoContent {
+		t.Fatalf("second claim status = %d, want %d; body: %s", secondClaimRR.Code, http.StatusNoContent, secondClaimRR.Body.String())
+	}
+	badCompleteReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/"+strconv.FormatInt(created.ID, 10)+"/complete", strings.NewReader(`{"claim_token":"wrong","published_post_id":11}`))
+	badCompleteReq.RemoteAddr = "198.51.100.93:1234"
+	badCompleteReq.Header.Set("Authorization", "Bearer admin-key")
+	badCompleteReq.Header.Set("Content-Type", "application/json")
+	badCompleteRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(badCompleteRR, badCompleteReq)
+	if badCompleteRR.Code != http.StatusConflict {
+		t.Fatalf("bad complete status = %d, want %d; body: %s", badCompleteRR.Code, http.StatusConflict, badCompleteRR.Body.String())
+	}
+	goodFailReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/"+strconv.FormatInt(created.ID, 10)+"/fail", strings.NewReader(`{"claim_token":"`+claim.ClaimToken+`","failure_note":"publish timeout","failure_meta":"{\"status\":504}","retryable":true}`))
+	goodFailReq.RemoteAddr = "198.51.100.94:1234"
+	goodFailReq.Header.Set("Authorization", "Bearer admin-key")
+	goodFailReq.Header.Set("Content-Type", "application/json")
+	goodFailRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(goodFailRR, goodFailReq)
+	if goodFailRR.Code != http.StatusOK {
+		t.Fatalf("fail status = %d, want %d; body: %s", goodFailRR.Code, http.StatusOK, goodFailRR.Body.String())
+	}
+	assertContains(t, goodFailRR.Body.String(), `"status":"approved"`)
+	assertContains(t, claimRR.Body.String(), `"claim_token":"`)
+	assertContains(t, claimRR.Body.String(), `"attempt_count":1`)
+	contractReq := httptest.NewRequest(http.MethodGet, "/api/v1/editorial-inbox/contract", nil)
+	contractReq.RemoteAddr = "198.51.100.95:1234"
+	contractReq.Header.Set("Authorization", "Bearer admin-key")
+	contractRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(contractRR, contractReq)
+	if contractRR.Code != http.StatusOK {
+		t.Fatalf("contract status = %d, want %d; body: %s", contractRR.Code, http.StatusOK, contractRR.Body.String())
+	}
+	assertContains(t, contractRR.Body.String(), `"claim_endpoint":"/api/v1/editorial-inbox/claim"`)
+	assertContains(t, contractRR.Body.String(), `"lease_ttl":"30m"`)
+}
+
 func TestAdminLoginRequestBodyIsCapped(t *testing.T) {
 	app := newPublicTestApp(t)
 	form := url.Values{"username": {strings.Repeat("x", 2<<20)}, "password": {"wrong-password"}}

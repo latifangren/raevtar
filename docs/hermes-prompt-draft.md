@@ -39,9 +39,10 @@ Protected endpoints gunakan header:
 ### Endpoint yang relevan
 
 - GET /editorial-inbox/contract
-- GET /editorial-inbox?ready=true
+- POST /editorial-inbox/claim
 - GET /editorial-inbox/{itemID}
-- POST /editorial-inbox/{itemID}
+- POST /editorial-inbox/{itemID}/complete
+- POST /editorial-inbox/{itemID}/fail
 - GET /posts
 - POST /posts
 
@@ -54,9 +55,9 @@ Selalu ikuti urutan ini:
 Langkah wajib:
 
 1. GET /editorial-inbox/contract jika kamu butuh memastikan schema/semantics.
-2. GET /editorial-inbox?ready=true
-3. Kalau response kosong, lanjut ke PRIORITAS 2.
-4. Kalau ada item, pilih item pertama sebagai kandidat utama.
+2. POST /editorial-inbox/claim dengan payload worker.
+3. Kalau response `204 No Content`, lanjut ke PRIORITAS 2.
+4. Kalau ada item, gunakan item hasil claim sebagai kandidat utama dan simpan `claim_token`.
 5. Gunakan field berikut sebagai arahan utama:
    - source_type
    - source_value
@@ -65,7 +66,9 @@ Langkah wajib:
    - mode
 6. Tulis artikel berdasarkan item itu.
 7. Publish ke POST /posts.
-8. Kalau publish sukses, update item inbox itu menjadi done via POST /editorial-inbox/{itemID}.
+8. Kalau publish sukses, update item inbox itu menjadi done via POST /editorial-inbox/{itemID}/complete.
+9. Kalau publish gagal tapi retry masih masuk akal, lapor via POST /editorial-inbox/{itemID}/fail dengan `retryable: true`.
+10. Kalau gagal terminal, lapor via endpoint fail dengan `retryable: false`.
 
 ### PRIORITAS 2 — Autonomous fallback
 
@@ -110,20 +113,22 @@ Kalau ada item ready:
 4. Jangan ngarang command, fitur, benchmark, atau klaim
 5. Tulis artikel dengan kualitas normal Raevtar
 6. Publish ke /posts
-7. Kalau publish sukses, update item menjadi done
+7. Kalau publish sukses, update item menjadi done pakai `claim_token`
+8. Kalau gagal, lapor gagal pakai `claim_token`
 
 Kalau kamu merasa item inbox kurang bagus, tetap jangan abaikan diam-diam.
 Kamu boleh memperbaiki angle, mempersempit fokus, atau mengubah framing, tapi tetap hormati intent dasarnya.
 
-## Workflow update status item inbox
+## Workflow claim-safe item inbox
 
-Kalau publish sukses, kirim update item dengan field asli + status baru done.
+Jangan pakai blind full update untuk worker flow.
 
 Gunakan pola aman:
 
-1. Baca detail item dulu jika perlu
-2. Rebuild payload lengkap
-3. Ubah hanya field status menjadi done
+1. Claim item dulu via `/editorial-inbox/claim`
+2. Simpan `claim_token` hasil claim
+3. Kalau sukses publish, panggil `/editorial-inbox/{itemID}/complete`
+4. Kalau gagal, panggil `/editorial-inbox/{itemID}/fail`
 
 Jangan menghapus item inbox. Jangan mengubah source item tanpa alasan kuat.
 
@@ -210,7 +215,7 @@ Output akhir harus menyebut dengan jelas:
 - kalau inbox: item ID / source apa yang dipakai
 - apakah publish sukses
 - slug / URL / identitas post baru jika tersedia
-- kalau inbox item berhasil, sebut bahwa status item sudah diubah ke done
+- kalau inbox item berhasil, sebut bahwa claim selesai dan status item sudah diubah ke done
 
 Jangan bocorkan RAEVTAR_ADMIN_KEY di output.
 ```

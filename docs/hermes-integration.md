@@ -74,8 +74,11 @@ Phase 1 control plane sekarang hidup di:
 - Protected API contract: `GET /api/v1/editorial-inbox/contract`
 - Protected list endpoint: `GET /api/v1/editorial-inbox`
 - Protected create endpoint: `POST /api/v1/editorial-inbox`
+- Protected claim endpoint: `POST /api/v1/editorial-inbox/claim`
 - Protected detail endpoint: `GET /api/v1/editorial-inbox/{itemID}`
 - Protected update endpoint: `POST /api/v1/editorial-inbox/{itemID}`
+- Protected complete endpoint: `POST /api/v1/editorial-inbox/{itemID}/complete`
+- Protected fail endpoint: `POST /api/v1/editorial-inbox/{itemID}/fail`
 
 Semua endpoint di atas pakai **admin key** seperti protected API lain di Raevtar.
 
@@ -109,6 +112,8 @@ Inbox item menyimpan field berikut:
 - `queued`
 - `approved`
 - `paused`
+- `running`
+- `failed`
 - `done`
 - `cancelled`
 
@@ -150,23 +155,33 @@ Tujuannya bukan untuk tiap run selalu wajib memanggil contract, tapi untuk memas
 - status apa saja yang valid
 - bagaimana Raevtar mendefinisikan item “ready”
 
-### Step 2 — Ambil candidate inbox
+### Step 2 — Claim candidate inbox secara aman
 
-Hermes ambil list item yang ready:
+Hermes claim satu item yang ready:
 
 ```text
-GET /api/v1/editorial-inbox?ready=true
+POST /api/v1/editorial-inbox/claim
 Authorization: Bearer <RAEVTAR_ADMIN_KEY>
+Content-Type: application/json
 ```
 
-Kalau hasilnya kosong:
+Payload:
+
+```json
+{
+  "worker": "hermes-cron"
+}
+```
+
+Kalau hasilnya `204 No Content`:
 
 - Hermes masuk mode autonomous seperti flow yang sekarang
 
 Kalau hasilnya ada:
 
-- ambil item pertama sebagai kandidat utama
-- optionally baca detail item by ID kalau butuh konteks tambahan
+- item langsung masuk status `running`
+- response berisi `item` + `claim_token`
+- claim ini punya lease TTL server-side 30 menit
 
 ### Step 3 — Generate article dari item inbox
 
@@ -187,22 +202,49 @@ POST /api/v1/posts
 Authorization: Bearer <RAEVTAR_ADMIN_KEY>
 ```
 
-### Step 5 — Mark item selesai
+### Step 5 — Mark item selesai / gagal
 
 Kalau publish sukses, Hermes update item inbox:
 
 ```text
-POST /api/v1/editorial-inbox/{itemID}
+POST /api/v1/editorial-inbox/{itemID}/complete
 Authorization: Bearer <RAEVTAR_ADMIN_KEY>
 Content-Type: application/json
 ```
 
-Payload update bisa mempertahankan field lama dan hanya mengganti status ke `done`.
+Payload:
 
-Kalau kamu belum mau bikin Hermes mengirim payload update penuh, workaround paling sederhana nanti adalah:
+```json
+{
+  "claim_token": "<opaque-token>",
+  "published_post_id": 123
+}
+```
 
-- Hermes baca detail item dulu
-- Hermes kirim ulang field existing + `status: done`
+Kalau publish gagal, Hermes lapor gagal secara eksplisit:
+
+```text
+POST /api/v1/editorial-inbox/{itemID}/fail
+Authorization: Bearer <RAEVTAR_ADMIN_KEY>
+Content-Type: application/json
+```
+
+Payload retryable:
+
+```json
+{
+  "claim_token": "<opaque-token>",
+  "failure_note": "publish API 500",
+  "failure_meta": "{\"status\":500}",
+  "retryable": true
+}
+```
+
+Semantics:
+
+- `retryable: true` → item kembali ke `approved` dengan backoff server-side via `not_before`
+- `retryable: false` → item pindah ke `failed`
+- stale lease dipulihkan otomatis setelah expiry; belum ada fairness/escalation/analytics di fase ini
 
 ---
 

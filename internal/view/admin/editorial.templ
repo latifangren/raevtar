@@ -23,13 +23,14 @@ templ EditorialInbox(data EditorialInboxData) {
 							<th class="py-3 px-4 font-bold">Mode</th>
 							<th class="py-3 px-4 font-bold">Status</th>
 							<th class="py-3 px-4 font-bold">Window</th>
+							<th class="py-3 px-4 font-bold">Lease</th>
 							<th class="py-3 px-4 font-bold">Priority</th>
 							<th class="py-3 px-4 font-bold">Category</th>
 						</tr>
 					</thead>
 					<tbody>
 						if len(data.Items) == 0 {
-							<tr><td colspan="6" class="py-8 text-center text-retro-muted font-bold text-sm">No editorial inbox items yet</td></tr>
+							<tr><td colspan="7" class="py-8 text-center text-retro-muted font-bold text-sm">No editorial inbox items yet</td></tr>
 						} else {
 							for _, item := range data.Items {
 								<tr class="border-b-2 border-retro-ink align-top last:border-b-0">
@@ -56,6 +57,18 @@ templ EditorialInbox(data EditorialInboxData) {
 										if item.Deadline != nil {
 											<div>until { EditorialTimeText(*item.Deadline) }</div>
 										}
+									</td>
+									<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted">
+										if item.ClaimedBy != "" {
+											<div>by { item.ClaimedBy }</div>
+										}
+										if item.ClaimedAt != nil {
+											<div>claimed { EditorialTimeText(*item.ClaimedAt) }</div>
+										}
+										if item.LeaseExpiresAt != nil {
+											<div>lease until { EditorialTimeText(*item.LeaseExpiresAt) }</div>
+										}
+										<div>attempts { CountText(item.AttemptCount) }</div>
 									</td>
 									<td class="py-3 px-4 text-sm font-black text-retro-ink">{ CountText(item.Priority) }</td>
 									<td class="py-3 px-4">

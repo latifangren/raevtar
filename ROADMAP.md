@@ -75,8 +75,8 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] RSS feed di `/blog/feed.xml` + auto-discovery `<link>` tag
 - [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
 - [x] Editorial inbox control plane buat Hermes (`/admin/editorial-inbox` + protected API contract)
-- [ ] Editorial inbox Phase 2: lifecycle eksekusi (`running`, `failed`, `published_post_id`, failure metadata)
-- [ ] Editorial inbox Phase 3: claim/lock/retry flow buat hindari double-processing antar run Hermes
+- [x] Editorial inbox Phase 2: lifecycle eksekusi (`running`, `failed`, `published_post_id`, failure metadata)
+- [x] Editorial inbox Phase 3: claim/lock/retry flow buat hindari double-processing antar run Hermes
 - [ ] Editorial inbox Phase 4: fairness policy, overdue escalation, dan analytics hasil publish
 - [ ] Read-time tracker di artikel
 

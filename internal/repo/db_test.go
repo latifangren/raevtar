@@ -79,7 +79,7 @@ func TestAutoMigrateCreatesEditorialInboxTable(t *testing.T) {
 		}
 		columns[name] = true
 	}
-	for _, name := range []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta", "created_at", "updated_at"} {
+	for _, name := range []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta", "claimed_by", "claim_token_hash", "claimed_at", "lease_expires_at", "attempt_count", "created_at", "updated_at"} {
 		if !columns[name] {
 			t.Fatalf("editorial_inbox missing column %q", name)
 		}

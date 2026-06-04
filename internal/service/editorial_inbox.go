@@ -1,7 +1,10 @@
 package service
 
 import (
+	"crypto/rand"
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"strings"
@@ -13,6 +16,10 @@ import (
 
 var ErrInvalidEditorialInboxInput = errors.New("invalid editorial inbox input")
 var ErrEditorialInboxNotFound = errors.New("editorial inbox item not found")
+var ErrEditorialInboxNoClaimableItem = errors.New("no claimable editorial inbox item")
+var ErrEditorialInboxInvalidClaim = errors.New("invalid editorial inbox claim")
+
+const editorialInboxLeaseTTL = 30 * time.Minute
 
 type EditorialInboxListFilter struct {
 	Status string
@@ -71,7 +78,7 @@ func (s *EditorialInboxService) GetInboxItem(id int64) (*model.EditorialInboxIte
 }
 
 func (s *EditorialInboxService) UpdateInboxItem(id int64, input model.EditorialInboxUpdate) (*model.EditorialInboxItem, error) {
-	_, err := s.repos.EditorialInbox.GetByID(id)
+	existing, err := s.repos.EditorialInbox.GetByID(id)
 	if err != nil {
 		if errors.Is(err, sql.ErrNoRows) {
 			return nil, fmt.Errorf("%w: %w", ErrEditorialInboxNotFound, err)
@@ -82,9 +89,95 @@ func (s *EditorialInboxService) UpdateInboxItem(id int64, input model.EditorialI
 	if err != nil {
 		return nil, err
 	}
+	item.AttemptCount = existing.AttemptCount
 	item.UpdatedAt = time.Now().UTC()
 	if err := s.repos.EditorialInbox.Update(item); err != nil {
 		return nil, fmt.Errorf("update editorial inbox item: %w", err)
+	}
+	return s.GetInboxItem(id)
+}
+
+func (s *EditorialInboxService) ClaimNextInboxItem(worker string, now time.Time) (*model.EditorialInboxClaimResult, error) {
+	worker = strings.TrimSpace(worker)
+	if worker == "" {
+		return nil, fmt.Errorf("%w: worker required", ErrInvalidEditorialInboxInput)
+	}
+	claimToken, claimTokenHash, err := newEditorialClaimToken()
+	if err != nil {
+		return nil, fmt.Errorf("create editorial claim token: %w", err)
+	}
+	item, err := s.repos.EditorialInbox.ClaimNextReady(repo.EditorialInboxClaimParams{
+		Worker:         worker,
+		ClaimTokenHash: claimTokenHash,
+		Now:            now.UTC(),
+		LeaseExpiresAt: now.UTC().Add(editorialInboxLeaseTTL),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("claim editorial inbox item: %w", err)
+	}
+	if item == nil {
+		return nil, ErrEditorialInboxNoClaimableItem
+	}
+	return &model.EditorialInboxClaimResult{Item: item, ClaimToken: claimToken}, nil
+}
+
+func (s *EditorialInboxService) CompleteInboxItemClaim(id int64, claimToken string, publishedPostID int64) (*model.EditorialInboxItem, error) {
+	claimToken = strings.TrimSpace(claimToken)
+	if claimToken == "" {
+		return nil, fmt.Errorf("%w: claim_token required", ErrInvalidEditorialInboxInput)
+	}
+	if publishedPostID <= 0 {
+		return nil, fmt.Errorf("%w: published_post_id must be positive", ErrInvalidEditorialInboxInput)
+	}
+	ok, err := s.repos.EditorialInbox.CompleteClaim(repo.EditorialInboxCompletionParams{
+		ID:              id,
+		ClaimTokenHash:  editorialClaimTokenHash(claimToken),
+		PublishedPostID: publishedPostID,
+		Now:             time.Now().UTC(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("complete editorial inbox claim: %w", err)
+	}
+	if !ok {
+		return nil, ErrEditorialInboxInvalidClaim
+	}
+	return s.GetInboxItem(id)
+}
+
+func (s *EditorialInboxService) FailInboxItemClaim(id int64, claimToken, failureNote, failureMeta string, retryable bool, now time.Time) (*model.EditorialInboxItem, error) {
+	claimToken = strings.TrimSpace(claimToken)
+	failureNote = strings.TrimSpace(failureNote)
+	failureMeta = strings.TrimSpace(failureMeta)
+	if claimToken == "" {
+		return nil, fmt.Errorf("%w: claim_token required", ErrInvalidEditorialInboxInput)
+	}
+	if failureNote == "" {
+		return nil, fmt.Errorf("%w: failure_note required", ErrInvalidEditorialInboxInput)
+	}
+	status := model.EditorialStatusFailed
+	notBefore := now.UTC()
+	if retryable {
+		item, err := s.GetInboxItem(id)
+		if err != nil {
+			return nil, err
+		}
+		status = model.EditorialStatusApproved
+		notBefore = now.UTC().Add(editorialRetryBackoff(item.AttemptCount))
+	}
+	ok, err := s.repos.EditorialInbox.FailClaim(repo.EditorialInboxFailureParams{
+		ID:             id,
+		ClaimTokenHash: editorialClaimTokenHash(claimToken),
+		Status:         status,
+		NotBefore:      notBefore,
+		FailureNote:    failureNote,
+		FailureMeta:    failureMeta,
+		Now:            now.UTC(),
+	})
+	if err != nil {
+		return nil, fmt.Errorf("fail editorial inbox claim: %w", err)
+	}
+	if !ok {
+		return nil, ErrEditorialInboxInvalidClaim
 	}
 	return s.GetInboxItem(id)
 }
@@ -145,6 +238,17 @@ func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue
 	if status != model.EditorialStatusDone {
 		publishedPostID = nil
 	}
+	claimedBy := ""
+	var claimedAt *time.Time
+	var leaseExpiresAt *time.Time
+	claimTokenHash := ""
+	attemptCount := 0
+	if status != model.EditorialStatusRunning {
+		claimedBy = ""
+		claimedAt = nil
+		leaseExpiresAt = nil
+		claimTokenHash = ""
+	}
 	if status != model.EditorialStatusFailed {
 		failureNote = ""
 		failureMeta = ""
@@ -168,5 +272,35 @@ func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue
 		PublishedPostID: publishedPostID,
 		FailureNote:     failureNote,
 		FailureMeta:     failureMeta,
+		ClaimedBy:       claimedBy,
+		ClaimTokenHash:  claimTokenHash,
+		ClaimedAt:       claimedAt,
+		LeaseExpiresAt:  leaseExpiresAt,
+		AttemptCount:    attemptCount,
 	}, nil
+}
+
+func editorialRetryBackoff(attemptCount int) time.Duration {
+	switch {
+	case attemptCount <= 1:
+		return 15 * time.Minute
+	case attemptCount == 2:
+		return time.Hour
+	default:
+		return 6 * time.Hour
+	}
+}
+
+func newEditorialClaimToken() (string, string, error) {
+	b := make([]byte, 32)
+	if _, err := rand.Read(b); err != nil {
+		return "", "", err
+	}
+	token := hex.EncodeToString(b)
+	return token, editorialClaimTokenHash(token), nil
+}
+
+func editorialClaimTokenHash(token string) string {
+	sum := sha256.Sum256([]byte(token))
+	return hex.EncodeToString(sum[:])
 }

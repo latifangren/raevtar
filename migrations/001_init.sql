@@ -123,6 +123,11 @@ CREATE TABLE IF NOT EXISTS editorial_inbox (
     published_post_id INTEGER,
     failure_note TEXT NOT NULL DEFAULT '',
     failure_meta TEXT NOT NULL DEFAULT '',
+    claimed_by TEXT NOT NULL DEFAULT '',
+    claim_token_hash TEXT NOT NULL DEFAULT '',
+    claimed_at DATETIME,
+    lease_expires_at DATETIME,
+    attempt_count INTEGER NOT NULL DEFAULT 0,
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

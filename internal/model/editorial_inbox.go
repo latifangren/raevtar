@@ -33,6 +33,11 @@ type EditorialInboxItem struct {
 	PublishedPostID *int64     `db:"published_post_id" json:"published_post_id,omitempty"`
 	FailureNote     string     `db:"failure_note" json:"failure_note,omitempty"`
 	FailureMeta     string     `db:"failure_meta" json:"failure_meta,omitempty"`
+	ClaimedBy       string     `db:"claimed_by" json:"claimed_by,omitempty"`
+	ClaimTokenHash  string     `db:"claim_token_hash" json:"-"`
+	ClaimedAt       *time.Time `db:"claimed_at" json:"claimed_at,omitempty"`
+	LeaseExpiresAt  *time.Time `db:"lease_expires_at" json:"lease_expires_at,omitempty"`
+	AttemptCount    int        `db:"attempt_count" json:"attempt_count"`
 	CreatedAt       time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt       time.Time  `db:"updated_at" json:"updated_at"`
 }
@@ -65,6 +70,27 @@ type EditorialInboxUpdate struct {
 	PublishedPostID *int64     `json:"published_post_id"`
 	FailureNote     string     `json:"failure_note"`
 	FailureMeta     string     `json:"failure_meta"`
+}
+
+type EditorialInboxClaimRequest struct {
+	Worker string `json:"worker"`
+}
+
+type EditorialInboxClaimResult struct {
+	Item       *EditorialInboxItem `json:"item"`
+	ClaimToken string              `json:"claim_token"`
+}
+
+type EditorialInboxCompleteRequest struct {
+	ClaimToken      string `json:"claim_token"`
+	PublishedPostID int64  `json:"published_post_id"`
+}
+
+type EditorialInboxFailRequest struct {
+	ClaimToken  string `json:"claim_token"`
+	FailureNote string `json:"failure_note"`
+	FailureMeta string `json:"failure_meta"`
+	Retryable   bool   `json:"retryable"`
 }
 
 func ValidEditorialModes() []string {

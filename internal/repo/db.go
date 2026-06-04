@@ -143,6 +143,11 @@ func AutoMigrate(db *sqlx.DB) {
 		published_post_id INTEGER,
 		failure_note TEXT NOT NULL DEFAULT '',
 		failure_meta TEXT NOT NULL DEFAULT '',
+		claimed_by TEXT NOT NULL DEFAULT '',
+		claim_token_hash TEXT NOT NULL DEFAULT '',
+		claimed_at DATETIME,
+		lease_expires_at DATETIME,
+		attempt_count INTEGER NOT NULL DEFAULT 0,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
@@ -167,6 +172,11 @@ func AutoMigrate(db *sqlx.DB) {
 	ensureColumn(db, "editorial_inbox", "published_post_id", "INTEGER")
 	ensureColumn(db, "editorial_inbox", "failure_note", "TEXT NOT NULL DEFAULT ''")
 	ensureColumn(db, "editorial_inbox", "failure_meta", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "editorial_inbox", "claimed_by", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "editorial_inbox", "claim_token_hash", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "editorial_inbox", "claimed_at", "DATETIME")
+	ensureColumn(db, "editorial_inbox", "lease_expires_at", "DATETIME")
+	ensureColumn(db, "editorial_inbox", "attempt_count", "INTEGER NOT NULL DEFAULT 0")
 	slog.Info("database migrated")
 }
 
