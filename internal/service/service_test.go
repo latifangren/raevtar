@@ -536,6 +536,103 @@ func TestEditorialInboxServiceClaimCompleteAndRetryFlow(t *testing.T) {
 	}
 }
 
+func TestEditorialInboxServicePhase4FairnessOverdueAndSummary(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+	overdueDeadline := now.Add(-30 * time.Minute)
+	overdue, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/overdue",
+		Priority:    10,
+		NotBefore:   now.Add(-2 * time.Hour),
+		Deadline:    &overdueDeadline,
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create overdue item: %v", err)
+	}
+	highPriority, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "topic",
+		SourceValue: "non overdue high priority",
+		Priority:    95,
+		NotBefore:   now.Add(-1 * time.Hour),
+		Mode:        model.EditorialModeOpportunistic,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create high priority item: %v", err)
+	}
+	claim, err := state.svc.Editorial.ClaimNextInboxItem("worker-overdue", now)
+	if err != nil {
+		t.Fatalf("claim overdue item: %v", err)
+	}
+	if claim.Item.ID != overdue.ID {
+		t.Fatalf("claimed id = %d, want overdue id %d over high-priority id %d", claim.Item.ID, overdue.ID, highPriority.ID)
+	}
+	completed, err := state.svc.Editorial.CompleteInboxItemClaim(overdue.ID, claim.ClaimToken, 101)
+	if err != nil {
+		t.Fatalf("complete overdue item: %v", err)
+	}
+	if completed.CompletedAt == nil {
+		t.Fatalf("completed_at should be set")
+	}
+	for i := 0; i < 4; i++ {
+		_, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+			SourceType:  "topic",
+			SourceValue: "fairness-seed-" + time.Now().UTC().Add(time.Duration(i)*time.Second).Format(time.RFC3339Nano),
+			Priority:    20,
+			NotBefore:   now.Add(-10 * time.Minute),
+			Mode:        model.EditorialModeSeed,
+			Status:      model.EditorialStatusApproved,
+		})
+		if err != nil {
+			t.Fatalf("create fairness item %d: %v", i, err)
+		}
+		fairClaim, err := state.svc.Editorial.ClaimNextInboxItem("fairness-worker", now.Add(time.Duration(i+1)*time.Minute))
+		if i == 3 {
+			if !errors.Is(err, ErrEditorialInboxNoClaimableItem) {
+				t.Fatalf("fairness gate err = %v, want ErrEditorialInboxNoClaimableItem", err)
+			}
+			break
+		}
+		if err != nil {
+			t.Fatalf("claim fairness item %d: %v", i, err)
+		}
+		if _, err := state.svc.Editorial.FailInboxItemClaim(fairClaim.Item.ID, fairClaim.ClaimToken, "skip to keep queue moving", `{"retryable":false}`, false, now.Add(time.Duration(i+1)*time.Minute)); err != nil {
+			t.Fatalf("terminal fail fairness item %d: %v", i, err)
+		}
+	}
+	summary, err := state.svc.Editorial.GetInboxSummary(now.Add(10 * time.Minute))
+	if err != nil {
+		t.Fatalf("get summary: %v", err)
+	}
+	if summary.Fairness.NonUrgentClaimStreak != 0 {
+		t.Fatalf("fairness streak = %d, want reset to 0 after autonomous gap", summary.Fairness.NonUrgentClaimStreak)
+	}
+	if !summary.Fairness.AutonomousGapOpened {
+		t.Fatalf("expected autonomous gap opened")
+	}
+	if summary.Analytics.DoneCount < 1 {
+		t.Fatalf("done count = %d, want at least 1", summary.Analytics.DoneCount)
+	}
+	if summary.Analytics.FailedCount < 1 {
+		t.Fatalf("failed count = %d, want at least 1", summary.Analytics.FailedCount)
+	}
+	if summary.Analytics.CompletedWithPostCount != 1 {
+		t.Fatalf("completed with post count = %d, want 1", summary.Analytics.CompletedWithPostCount)
+	}
+	if summary.Overdue.ApprovedCount != 0 {
+		t.Fatalf("approved overdue count = %d, want 0 after completion", summary.Overdue.ApprovedCount)
+	}
+	if summary.Overdue.CompletedCount < 1 {
+		t.Fatalf("completed overdue count = %d, want at least 1", summary.Overdue.CompletedCount)
+	}
+	if len(summary.Analytics.ByMode) == 0 {
+		t.Fatalf("expected analytics by mode")
+	}
+}
+
 func TestMonitorServiceRotatesAgentToken(t *testing.T) {
 	state := newTestServices(t)
 

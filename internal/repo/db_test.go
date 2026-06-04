@@ -84,4 +84,30 @@ func TestAutoMigrateCreatesEditorialInboxTable(t *testing.T) {
 			t.Fatalf("editorial_inbox missing column %q", name)
 		}
 	}
+	if !columns["completed_at"] {
+		t.Fatalf("editorial_inbox missing column %q", "completed_at")
+	}
+
+	policyRows, err := db.Queryx("PRAGMA table_info(editorial_policy_state)")
+	if err != nil {
+		t.Fatalf("inspect editorial_policy_state columns: %v", err)
+	}
+	defer policyRows.Close()
+	policyColumns := map[string]bool{}
+	for policyRows.Next() {
+		var cid int
+		var name, columnType string
+		var notNull int
+		var defaultValue any
+		var primaryKey int
+		if err := policyRows.Scan(&cid, &name, &columnType, &notNull, &defaultValue, &primaryKey); err != nil {
+			t.Fatalf("scan policy column: %v", err)
+		}
+		policyColumns[name] = true
+	}
+	for _, name := range []string{"name", "value", "updated_at"} {
+		if !policyColumns[name] {
+			t.Fatalf("editorial_policy_state missing column %q", name)
+		}
+	}
 }

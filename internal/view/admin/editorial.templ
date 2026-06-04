@@ -15,6 +15,13 @@ templ EditorialInbox(data EditorialInboxData) {
 				@metricCard("Done", CountText(data.Counts[model.EditorialStatusDone]), "completed", "text-retro-ink")
 				@metricCard("Cancelled", CountText(data.Counts[model.EditorialStatusCancelled]), "closed without publish", "text-retro-ink")
 			</div>
+			if data.Summary != nil {
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+					@metricCard("Overdue", CountText(data.Summary.Overdue.ApprovedCount+data.Summary.Overdue.RunningCount), "approved + running overdue", "text-retro-ink")
+					@metricCard("Fairness", CountText(data.Summary.Fairness.NonUrgentClaimStreak), EditorialFairnessStateText(data.Summary.Fairness.NonUrgentClaimStreak, data.Summary.Fairness.AutonomousGapOpened), "text-retro-ink")
+					@metricCard("Publish analytics", CountText(data.Summary.Analytics.DoneCount), "done publishes tracked", "text-retro-ink")
+				</div>
+			}
 			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
 				<table class="w-full text-left">
 					<thead>
@@ -56,6 +63,7 @@ templ EditorialInbox(data EditorialInboxData) {
 										<div>{ EditorialTimeText(item.NotBefore) }</div>
 										if item.Deadline != nil {
 											<div>until { EditorialTimeText(*item.Deadline) }</div>
+											<span class={ "inline-block mt-1 text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink", EditorialEscalationBadgeClass(item.Deadline, item.Status, data.Now) }>{ EditorialEscalationText(item.Deadline, item.Status, data.Now) }</span>
 										}
 									</td>
 									<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted">

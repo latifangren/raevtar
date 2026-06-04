@@ -14,6 +14,7 @@ import (
 type EditorialInboxRepo struct{ db *sqlx.DB }
 
 type EditorialInboxClaimParams struct {
+	ItemID         int64
 	Worker         string
 	ClaimTokenHash string
 	Now            time.Time
@@ -46,11 +47,25 @@ type EditorialInboxFilter struct {
 	Offset int
 }
 
+type EditorialModeCountRow struct {
+	Mode  string `db:"mode"`
+	Count int    `db:"count"`
+}
+
+type EditorialAnalyticsRow struct {
+	DoneCount               int   `db:"done_count"`
+	FailedCount             int   `db:"failed_count"`
+	CompletedWithPostCount  int   `db:"completed_with_post_count"`
+	AverageQueueWaitSeconds int64 `db:"average_queue_wait_seconds"`
+	AverageReadyWaitSeconds int64 `db:"average_ready_wait_seconds"`
+	OverdueCompletedCount   int   `db:"overdue_completed_count"`
+}
+
 func (r *EditorialInboxRepo) Create(item *model.EditorialInboxItem) error {
 	result, err := r.db.Exec(`
 		INSERT INTO editorial_inbox (
-			source_type, source_value, category_hint, priority, not_before, deadline, note, mode, status, published_post_id, failure_note, failure_meta, claimed_by, claim_token_hash, claimed_at, lease_expires_at, attempt_count, created_at, updated_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			source_type, source_value, category_hint, priority, not_before, deadline, note, mode, status, published_post_id, failure_note, failure_meta, claimed_by, claim_token_hash, claimed_at, lease_expires_at, attempt_count, completed_at, created_at, updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		item.SourceType,
 		item.SourceValue,
 		item.CategoryHint,
@@ -68,6 +83,7 @@ func (r *EditorialInboxRepo) Create(item *model.EditorialInboxItem) error {
 		item.ClaimedAt,
 		item.LeaseExpiresAt,
 		item.AttemptCount,
+		item.CompletedAt,
 		item.CreatedAt.UTC(),
 		item.UpdatedAt.UTC(),
 	)
@@ -90,7 +106,7 @@ func (r *EditorialInboxRepo) GetByID(id int64) (*model.EditorialInboxItem, error
 func (r *EditorialInboxRepo) Update(item *model.EditorialInboxItem) error {
 	_, err := r.db.Exec(`
 		UPDATE editorial_inbox
-		SET source_type = ?, source_value = ?, category_hint = ?, priority = ?, not_before = ?, deadline = ?, note = ?, mode = ?, status = ?, published_post_id = ?, failure_note = ?, failure_meta = ?, claimed_by = ?, claim_token_hash = ?, claimed_at = ?, lease_expires_at = ?, attempt_count = ?, updated_at = ?
+		SET source_type = ?, source_value = ?, category_hint = ?, priority = ?, not_before = ?, deadline = ?, note = ?, mode = ?, status = ?, published_post_id = ?, failure_note = ?, failure_meta = ?, claimed_by = ?, claim_token_hash = ?, claimed_at = ?, lease_expires_at = ?, attempt_count = ?, completed_at = ?, updated_at = ?
 		WHERE id = ?`,
 		item.SourceType,
 		item.SourceValue,
@@ -109,6 +125,7 @@ func (r *EditorialInboxRepo) Update(item *model.EditorialInboxItem) error {
 		item.ClaimedAt,
 		item.LeaseExpiresAt,
 		item.AttemptCount,
+		item.CompletedAt,
 		item.UpdatedAt.UTC(),
 		item.ID,
 	)
@@ -159,7 +176,7 @@ func (r *EditorialInboxRepo) ClaimNextReady(params EditorialInboxClaimParams) (*
 		params.Now.UTC(),
 		params.LeaseExpiresAt.UTC(),
 		params.Now.UTC(),
-		item.ID,
+		coalesceClaimItemID(params.ItemID, item.ID),
 		model.EditorialStatusApproved,
 		params.Now.UTC(),
 		model.EditorialStatusRunning,
@@ -178,7 +195,7 @@ func (r *EditorialInboxRepo) ClaimNextReady(params EditorialInboxClaimParams) (*
 		}
 		return nil, nil
 	}
-	if err := tx.Get(&item, `SELECT * FROM editorial_inbox WHERE id = ?`, item.ID); err != nil {
+	if err := tx.Get(&item, `SELECT * FROM editorial_inbox WHERE id = ?`, coalesceClaimItemID(params.ItemID, item.ID)); err != nil {
 		return nil, err
 	}
 	if err := tx.Commit(); err != nil {
@@ -190,10 +207,11 @@ func (r *EditorialInboxRepo) ClaimNextReady(params EditorialInboxClaimParams) (*
 func (r *EditorialInboxRepo) CompleteClaim(params EditorialInboxCompletionParams) (bool, error) {
 	result, err := r.db.Exec(`
 		UPDATE editorial_inbox
-		SET status = ?, published_post_id = ?, claimed_by = '', claim_token_hash = '', claimed_at = NULL, lease_expires_at = NULL, updated_at = ?
+		SET status = ?, published_post_id = ?, claimed_by = '', claim_token_hash = '', claimed_at = NULL, lease_expires_at = NULL, completed_at = ?, updated_at = ?
 		WHERE id = ? AND status = ? AND claim_token_hash = ?`,
 		model.EditorialStatusDone,
 		params.PublishedPostID,
+		params.Now.UTC(),
 		params.Now.UTC(),
 		params.ID,
 		model.EditorialStatusRunning,
@@ -209,10 +227,17 @@ func (r *EditorialInboxRepo) CompleteClaim(params EditorialInboxCompletionParams
 	return rows > 0, nil
 }
 
+func coalesceClaimItemID(explicitID, fallbackID int64) int64 {
+	if explicitID > 0 {
+		return explicitID
+	}
+	return fallbackID
+}
+
 func (r *EditorialInboxRepo) FailClaim(params EditorialInboxFailureParams) (bool, error) {
 	result, err := r.db.Exec(`
 		UPDATE editorial_inbox
-		SET status = ?, not_before = ?, failure_note = ?, failure_meta = ?, published_post_id = NULL, claimed_by = '', claim_token_hash = '', claimed_at = NULL, lease_expires_at = NULL, updated_at = ?
+		SET status = ?, not_before = ?, failure_note = ?, failure_meta = ?, published_post_id = NULL, claimed_by = '', claim_token_hash = '', claimed_at = NULL, lease_expires_at = NULL, completed_at = NULL, updated_at = ?
 		WHERE id = ? AND status = ? AND claim_token_hash = ?`,
 		params.Status,
 		params.NotBefore.UTC(),
@@ -288,4 +313,63 @@ func (r *EditorialInboxRepo) CountByStatus() (map[string]int, error) {
 		counts[status] = count
 	}
 	return counts, rows.Err()
+}
+
+func (r *EditorialInboxRepo) GetPolicyState(name string) (int, error) {
+	var value int
+	err := r.db.Get(&value, `SELECT value FROM editorial_policy_state WHERE name = ?`, name)
+	if err != nil {
+		if err == sql.ErrNoRows {
+			return 0, nil
+		}
+		return 0, err
+	}
+	return value, nil
+}
+
+func (r *EditorialInboxRepo) SetPolicyState(name string, value int, now time.Time) error {
+	_, err := r.db.Exec(`
+		INSERT INTO editorial_policy_state (name, value, updated_at)
+		VALUES (?, ?, ?)
+		ON CONFLICT(name) DO UPDATE SET value = excluded.value, updated_at = excluded.updated_at`,
+		name,
+		value,
+		now.UTC(),
+	)
+	return err
+}
+
+func (r *EditorialInboxRepo) CountOverdue(now time.Time) (model.EditorialOverdueSummary, error) {
+	var summary model.EditorialOverdueSummary
+	if err := r.db.Get(&summary, `
+		SELECT
+			COALESCE(SUM(CASE WHEN status = 'approved' AND deadline IS NOT NULL AND deadline < ? THEN 1 ELSE 0 END), 0) AS approved_count,
+			COALESCE(SUM(CASE WHEN status = 'running' AND deadline IS NOT NULL AND deadline < ? THEN 1 ELSE 0 END), 0) AS running_count,
+			COALESCE(SUM(CASE WHEN status = 'done' AND deadline IS NOT NULL AND completed_at IS NOT NULL AND completed_at > deadline THEN 1 ELSE 0 END), 0) AS completed_count
+		FROM editorial_inbox`, now.UTC(), now.UTC()); err != nil {
+		return model.EditorialOverdueSummary{}, err
+	}
+	return summary, nil
+}
+
+func (r *EditorialInboxRepo) GetAnalytics() (EditorialAnalyticsRow, error) {
+	var row EditorialAnalyticsRow
+	err := r.db.Get(&row, `
+		SELECT
+			COALESCE(SUM(CASE WHEN status = 'done' THEN 1 ELSE 0 END), 0) AS done_count,
+			COALESCE(SUM(CASE WHEN status = 'failed' THEN 1 ELSE 0 END), 0) AS failed_count,
+			COALESCE(SUM(CASE WHEN status = 'done' AND published_post_id IS NOT NULL THEN 1 ELSE 0 END), 0) AS completed_with_post_count,
+			COALESCE(CAST(AVG(CASE WHEN status = 'done' AND completed_at IS NOT NULL THEN (julianday(completed_at) - julianday(created_at)) * 86400 END) AS INTEGER), 0) AS average_queue_wait_seconds,
+			COALESCE(CAST(AVG(CASE WHEN status = 'done' AND completed_at IS NOT NULL THEN (julianday(completed_at) - julianday(not_before)) * 86400 END) AS INTEGER), 0) AS average_ready_wait_seconds,
+			COALESCE(SUM(CASE WHEN status = 'done' AND deadline IS NOT NULL AND completed_at IS NOT NULL AND completed_at > deadline THEN 1 ELSE 0 END), 0) AS overdue_completed_count
+		FROM editorial_inbox`)
+	return row, err
+}
+
+func (r *EditorialInboxRepo) CountDoneByMode() ([]EditorialModeCountRow, error) {
+	rows := []EditorialModeCountRow{}
+	if err := r.db.Select(&rows, `SELECT mode, COUNT(*) AS count FROM editorial_inbox WHERE status = ? GROUP BY mode ORDER BY mode ASC`, model.EditorialStatusDone); err != nil {
+		return nil, err
+	}
+	return rows, nil
 }

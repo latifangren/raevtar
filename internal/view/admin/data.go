@@ -102,8 +102,10 @@ type ServerDetailData struct {
 type EditorialInboxData struct {
 	CurrentPath string
 	CSRFToken   string
+	Now         time.Time
 	Items       []model.EditorialInboxItem
 	Counts      map[string]int
+	Summary     *model.EditorialInboxSummary
 	Categories  []model.Category
 	Modes       []string
 	Statuses    []string
@@ -552,4 +554,35 @@ func EditorialIDValuePtr(value *int64) string {
 		return ""
 	}
 	return IDText(*value)
+}
+
+func EditorialEscalationText(deadline *time.Time, status string, now time.Time) string {
+	if deadline == nil {
+		return "On track"
+	}
+	if deadline.Before(now) && (status == model.EditorialStatusApproved || status == model.EditorialStatusRunning || status == model.EditorialStatusDone) {
+		return "Overdue"
+	}
+	return "On track"
+}
+
+func EditorialEscalationBadgeClass(deadline *time.Time, status string, now time.Time) string {
+	if EditorialEscalationText(deadline, status, now) == "Overdue" {
+		return "bg-retro-blush text-retro-ink"
+	}
+	return "bg-retro-paper text-retro-muted"
+}
+
+func EditorialFairnessStateText(streak int, opened bool) string {
+	if opened {
+		return "Autonomous slot open next claim"
+	}
+	return "Non-urgent streak " + CountText(streak)
+}
+
+func EditorialDurationText(duration time.Duration) string {
+	if duration < 0 {
+		duration = 0
+	}
+	return AgeText(duration)
 }

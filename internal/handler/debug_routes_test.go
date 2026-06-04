@@ -36,6 +36,10 @@ type publicTestApp struct {
 func newPublicTestApp(t *testing.T) *publicTestApp {
 	t.Helper()
 
+	limiter.mu.Lock()
+	limiter.requests = make(map[string]*bucketEntry)
+	limiter.mu.Unlock()
+
 	dbPath := filepath.Join(t.TempDir(), "raevtar_test.db")
 	cfg := &config.Config{
 		DatabasePath: dbPath,
@@ -2189,6 +2193,52 @@ func TestEditorialInboxClaimCompleteAndFailAPIFlow(t *testing.T) {
 	}
 	assertContains(t, contractRR.Body.String(), `"claim_endpoint":"/api/v1/editorial-inbox/claim"`)
 	assertContains(t, contractRR.Body.String(), `"lease_ttl":"30m"`)
+}
+
+func TestEditorialInboxPhase4SummaryAndAdminRendering(t *testing.T) {
+	app := newPublicTestApp(t)
+	token := sessions.create(89, "owner", model.RoleOwner)
+	entry, ok := sessions.get(token)
+	if !ok {
+		t.Fatalf("expected session")
+	}
+	form := url.Values{
+		"source_type":   {"repo"},
+		"source_value":  {"https://github.com/example/overdue-phase4"},
+		"category_hint": {"devops"},
+		"priority":      {"40"},
+		"not_before":    {"2025-06-05T08:00"},
+		"deadline":      {"2025-06-05T09:00"},
+		"mode":          {model.EditorialModeScheduled},
+		"status":        {model.EditorialStatusApproved},
+		"note":          {"phase 4 overdue test"},
+		"_csrf":         {entry.csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/editorial-inbox", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: token})
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("create overdue item status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	summaryReq := httptest.NewRequest(http.MethodGet, "/api/v1/editorial-inbox/summary", nil)
+	summaryReq.Header.Set("Authorization", "Bearer admin-key")
+	summaryRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(summaryRR, summaryReq)
+	if summaryRR.Code != http.StatusOK {
+		t.Fatalf("summary status = %d, want %d; body: %s", summaryRR.Code, http.StatusOK, summaryRR.Body.String())
+	}
+	assertContains(t, summaryRR.Body.String(), `"fairness"`)
+	assertContains(t, summaryRR.Body.String(), `"overdue"`)
+	assertContains(t, summaryRR.Body.String(), `"analytics"`)
+	status, body := getBody(t, app, "/admin/editorial-inbox", &http.Cookie{Name: sessionCookieName, Value: token})
+	if status != http.StatusOK {
+		t.Fatalf("editorial page status = %d, want %d", status, http.StatusOK)
+	}
+	assertContains(t, body, "Overdue")
+	assertContains(t, body, "Fairness")
+	assertContains(t, body, "Publish analytics")
 }
 
 func TestAdminLoginRequestBodyIsCapped(t *testing.T) {

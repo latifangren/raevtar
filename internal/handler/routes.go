@@ -97,6 +97,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		r.Get("/posts", h.apiListPosts)
 		r.With(h.adminAuth).Post("/posts", h.apiCreatePost)
 		r.With(h.adminAuth).Get("/editorial-inbox/contract", h.apiEditorialInboxContract)
+		r.With(h.adminAuth).Get("/editorial-inbox/summary", h.apiEditorialInboxSummary)
 		r.With(h.adminAuth).Get("/editorial-inbox", h.apiListEditorialInbox)
 		r.With(h.adminAuth).Post("/editorial-inbox", h.apiCreateEditorialInbox)
 		r.With(h.adminAuth).Post("/editorial-inbox/claim", h.apiClaimEditorialInbox)

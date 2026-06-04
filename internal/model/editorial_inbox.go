@@ -38,8 +38,41 @@ type EditorialInboxItem struct {
 	ClaimedAt       *time.Time `db:"claimed_at" json:"claimed_at,omitempty"`
 	LeaseExpiresAt  *time.Time `db:"lease_expires_at" json:"lease_expires_at,omitempty"`
 	AttemptCount    int        `db:"attempt_count" json:"attempt_count"`
+	CompletedAt     *time.Time `db:"completed_at" json:"completed_at,omitempty"`
 	CreatedAt       time.Time  `db:"created_at" json:"created_at"`
 	UpdatedAt       time.Time  `db:"updated_at" json:"updated_at"`
+}
+
+type EditorialFairnessSummary struct {
+	NonUrgentClaimStreak   int  `json:"non_urgent_claim_streak"`
+	AutonomousGapThreshold int  `json:"autonomous_gap_threshold"`
+	AutonomousGapOpened    bool `json:"autonomous_gap_opened"`
+}
+
+type EditorialOverdueSummary struct {
+	ApprovedCount  int `db:"approved_count" json:"approved_count"`
+	RunningCount   int `db:"running_count" json:"running_count"`
+	CompletedCount int `db:"completed_count" json:"completed_count"`
+}
+
+type EditorialModeAnalytics struct {
+	Mode  string `json:"mode"`
+	Count int    `json:"count"`
+}
+
+type EditorialPublishAnalytics struct {
+	DoneCount               int                      `json:"done_count"`
+	FailedCount             int                      `json:"failed_count"`
+	CompletedWithPostCount  int                      `json:"completed_with_post_count"`
+	AverageQueueWaitSeconds int64                    `json:"average_queue_wait_seconds"`
+	AverageReadyWaitSeconds int64                    `json:"average_ready_wait_seconds"`
+	ByMode                  []EditorialModeAnalytics `json:"by_mode"`
+}
+
+type EditorialInboxSummary struct {
+	Fairness  EditorialFairnessSummary  `json:"fairness"`
+	Overdue   EditorialOverdueSummary   `json:"overdue"`
+	Analytics EditorialPublishAnalytics `json:"analytics"`
 }
 
 type EditorialInboxCreate struct {

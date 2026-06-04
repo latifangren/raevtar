@@ -64,3 +64,20 @@ func TestEditorialBadgeHelpers(t *testing.T) {
 		t.Fatalf("expected scheduled badge class")
 	}
 }
+
+func TestEditorialPhase4Helpers(t *testing.T) {
+	now := time.Date(2026, 6, 5, 12, 0, 0, 0, time.UTC)
+	overdue := now.Add(-45 * time.Minute)
+	if got := EditorialEscalationText(&overdue, model.EditorialStatusApproved, now); got != "Overdue" {
+		t.Fatalf("escalation text = %q, want Overdue", got)
+	}
+	if got := EditorialEscalationBadgeClass(&overdue, model.EditorialStatusApproved, now); got == "" {
+		t.Fatalf("expected overdue escalation badge class")
+	}
+	if got := EditorialFairnessStateText(3, true); got != "Autonomous slot open next claim" {
+		t.Fatalf("fairness state text = %q", got)
+	}
+	if got := EditorialDurationText(95 * time.Minute); got != "1h 35m" {
+		t.Fatalf("duration text = %q, want 1h 35m", got)
+	}
+}

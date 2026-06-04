@@ -77,7 +77,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Editorial inbox control plane buat Hermes (`/admin/editorial-inbox` + protected API contract)
 - [x] Editorial inbox Phase 2: lifecycle eksekusi (`running`, `failed`, `published_post_id`, failure metadata)
 - [x] Editorial inbox Phase 3: claim/lock/retry flow buat hindari double-processing antar run Hermes
-- [ ] Editorial inbox Phase 4: fairness policy, overdue escalation, dan analytics hasil publish
+- [x] Editorial inbox Phase 4: fairness policy, overdue escalation, dan analytics hasil publish
 - [ ] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.

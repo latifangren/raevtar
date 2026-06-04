@@ -148,8 +148,15 @@ func AutoMigrate(db *sqlx.DB) {
 		claimed_at DATETIME,
 		lease_expires_at DATETIME,
 		attempt_count INTEGER NOT NULL DEFAULT 0,
+		completed_at DATETIME,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE TABLE IF NOT EXISTS editorial_policy_state (
+		name TEXT PRIMARY KEY,
+		value INTEGER NOT NULL DEFAULT 0,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
 	);
 
 	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_status ON editorial_inbox(status);
@@ -177,6 +184,7 @@ func AutoMigrate(db *sqlx.DB) {
 	ensureColumn(db, "editorial_inbox", "claimed_at", "DATETIME")
 	ensureColumn(db, "editorial_inbox", "lease_expires_at", "DATETIME")
 	ensureColumn(db, "editorial_inbox", "attempt_count", "INTEGER NOT NULL DEFAULT 0")
+	ensureColumn(db, "editorial_inbox", "completed_at", "DATETIME")
 	slog.Info("database migrated")
 }
 

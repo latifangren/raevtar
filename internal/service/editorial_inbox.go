@@ -7,6 +7,7 @@ import (
 	"encoding/hex"
 	"errors"
 	"fmt"
+	"slices"
 	"strings"
 	"time"
 
@@ -20,6 +21,9 @@ var ErrEditorialInboxNoClaimableItem = errors.New("no claimable editorial inbox 
 var ErrEditorialInboxInvalidClaim = errors.New("invalid editorial inbox claim")
 
 const editorialInboxLeaseTTL = 30 * time.Minute
+const editorialFairnessGapThreshold = 3
+const editorialPolicyStateNonUrgentClaimStreak = "non_urgent_claim_streak"
+const editorialPolicyStateAutonomousGapOpened = "autonomous_gap_opened"
 
 type EditorialInboxListFilter struct {
 	Status string
@@ -90,6 +94,7 @@ func (s *EditorialInboxService) UpdateInboxItem(id int64, input model.EditorialI
 		return nil, err
 	}
 	item.AttemptCount = existing.AttemptCount
+	item.CompletedAt = existing.CompletedAt
 	item.UpdatedAt = time.Now().UTC()
 	if err := s.repos.EditorialInbox.Update(item); err != nil {
 		return nil, fmt.Errorf("update editorial inbox item: %w", err)
@@ -102,21 +107,68 @@ func (s *EditorialInboxService) ClaimNextInboxItem(worker string, now time.Time)
 	if worker == "" {
 		return nil, fmt.Errorf("%w: worker required", ErrInvalidEditorialInboxInput)
 	}
+	policyNow := now.UTC()
+	ready, err := s.listClaimCandidates(policyNow, 100)
+	if err != nil {
+		return nil, err
+	}
+	if len(ready) == 0 {
+		return nil, ErrEditorialInboxNoClaimableItem
+	}
+	urgentExists := false
+	for _, candidate := range ready {
+		if isEditorialOverdue(candidate, policyNow) || isStaleRunningClaim(candidate, policyNow) {
+			urgentExists = true
+			break
+		}
+	}
+	if !urgentExists {
+		streak, err := s.repos.EditorialInbox.GetPolicyState(editorialPolicyStateNonUrgentClaimStreak)
+		if err != nil {
+			return nil, fmt.Errorf("get fairness streak: %w", err)
+		}
+		if streak >= editorialFairnessGapThreshold {
+			if err := s.repos.EditorialInbox.SetPolicyState(editorialPolicyStateNonUrgentClaimStreak, 0, policyNow); err != nil {
+				return nil, fmt.Errorf("reset fairness streak: %w", err)
+			}
+			if err := s.repos.EditorialInbox.SetPolicyState(editorialPolicyStateAutonomousGapOpened, 1, policyNow); err != nil {
+				return nil, fmt.Errorf("set autonomous gap flag: %w", err)
+			}
+			return nil, ErrEditorialInboxNoClaimableItem
+		}
+	}
+	if err := s.repos.EditorialInbox.SetPolicyState(editorialPolicyStateAutonomousGapOpened, 0, policyNow); err != nil {
+		return nil, fmt.Errorf("clear autonomous gap flag: %w", err)
+	}
 	claimToken, claimTokenHash, err := newEditorialClaimToken()
 	if err != nil {
 		return nil, fmt.Errorf("create editorial claim token: %w", err)
 	}
 	item, err := s.repos.EditorialInbox.ClaimNextReady(repo.EditorialInboxClaimParams{
+		ItemID:         ready[0].ID,
 		Worker:         worker,
 		ClaimTokenHash: claimTokenHash,
-		Now:            now.UTC(),
-		LeaseExpiresAt: now.UTC().Add(editorialInboxLeaseTTL),
+		Now:            policyNow,
+		LeaseExpiresAt: policyNow.Add(editorialInboxLeaseTTL),
 	})
 	if err != nil {
 		return nil, fmt.Errorf("claim editorial inbox item: %w", err)
 	}
 	if item == nil {
 		return nil, ErrEditorialInboxNoClaimableItem
+	}
+	if isEditorialOverdue(*item, policyNow) || isStaleRunningClaim(*item, policyNow) {
+		if err := s.repos.EditorialInbox.SetPolicyState(editorialPolicyStateNonUrgentClaimStreak, 0, policyNow); err != nil {
+			return nil, fmt.Errorf("reset fairness streak after urgent claim: %w", err)
+		}
+	} else {
+		streak, err := s.repos.EditorialInbox.GetPolicyState(editorialPolicyStateNonUrgentClaimStreak)
+		if err != nil {
+			return nil, fmt.Errorf("get fairness streak after claim: %w", err)
+		}
+		if err := s.repos.EditorialInbox.SetPolicyState(editorialPolicyStateNonUrgentClaimStreak, streak+1, policyNow); err != nil {
+			return nil, fmt.Errorf("increment fairness streak: %w", err)
+		}
 	}
 	return &model.EditorialInboxClaimResult{Item: item, ClaimToken: claimToken}, nil
 }
@@ -191,7 +243,26 @@ func (s *EditorialInboxService) ListReadyInboxItems(now time.Time, limit int) ([
 	if err != nil {
 		return nil, fmt.Errorf("list ready editorial inbox items: %w", err)
 	}
+	sortReadyItems(items, now.UTC())
 	return items, nil
+}
+
+func (s *EditorialInboxService) listClaimCandidates(now time.Time, limit int) ([]model.EditorialInboxItem, error) {
+	items, err := s.repos.EditorialInbox.List(repo.EditorialInboxFilter{Now: now.UTC(), Limit: 0})
+	if err != nil {
+		return nil, fmt.Errorf("list editorial claim candidates: %w", err)
+	}
+	out := make([]model.EditorialInboxItem, 0, len(items))
+	for _, item := range items {
+		if (item.Status == model.EditorialStatusApproved && !item.NotBefore.After(now)) || (item.Status == model.EditorialStatusRunning && item.LeaseExpiresAt != nil && !item.LeaseExpiresAt.After(now)) {
+			out = append(out, item)
+		}
+	}
+	sortReadyItems(out, now)
+	if limit > 0 && len(out) > limit {
+		out = out[:limit]
+	}
+	return out, nil
 }
 
 func (s *EditorialInboxService) CountInboxStatuses() (map[string]int, error) {
@@ -200,6 +271,49 @@ func (s *EditorialInboxService) CountInboxStatuses() (map[string]int, error) {
 		return nil, fmt.Errorf("count editorial inbox statuses: %w", err)
 	}
 	return counts, nil
+}
+
+func (s *EditorialInboxService) GetInboxSummary(now time.Time) (*model.EditorialInboxSummary, error) {
+	fairnessStreak, err := s.repos.EditorialInbox.GetPolicyState(editorialPolicyStateNonUrgentClaimStreak)
+	if err != nil {
+		return nil, fmt.Errorf("get fairness streak: %w", err)
+	}
+	autonomousGapOpened, err := s.repos.EditorialInbox.GetPolicyState(editorialPolicyStateAutonomousGapOpened)
+	if err != nil {
+		return nil, fmt.Errorf("get autonomous gap flag: %w", err)
+	}
+	overdue, err := s.repos.EditorialInbox.CountOverdue(now.UTC())
+	if err != nil {
+		return nil, fmt.Errorf("count overdue editorial inbox items: %w", err)
+	}
+	analyticsRow, err := s.repos.EditorialInbox.GetAnalytics()
+	if err != nil {
+		return nil, fmt.Errorf("get editorial analytics: %w", err)
+	}
+	byModeRows, err := s.repos.EditorialInbox.CountDoneByMode()
+	if err != nil {
+		return nil, fmt.Errorf("get editorial analytics by mode: %w", err)
+	}
+	byMode := make([]model.EditorialModeAnalytics, 0, len(byModeRows))
+	for _, row := range byModeRows {
+		byMode = append(byMode, model.EditorialModeAnalytics{Mode: row.Mode, Count: row.Count})
+	}
+	return &model.EditorialInboxSummary{
+		Fairness: model.EditorialFairnessSummary{
+			NonUrgentClaimStreak:   fairnessStreak,
+			AutonomousGapThreshold: editorialFairnessGapThreshold,
+			AutonomousGapOpened:    autonomousGapOpened > 0,
+		},
+		Overdue: overdue,
+		Analytics: model.EditorialPublishAnalytics{
+			DoneCount:               analyticsRow.DoneCount,
+			FailedCount:             analyticsRow.FailedCount,
+			CompletedWithPostCount:  analyticsRow.CompletedWithPostCount,
+			AverageQueueWaitSeconds: analyticsRow.AverageQueueWaitSeconds,
+			AverageReadyWaitSeconds: analyticsRow.AverageReadyWaitSeconds,
+			ByMode:                  byMode,
+		},
+	}, nil
 }
 
 func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue, categoryHint string, priority int, notBefore time.Time, deadline *time.Time, note, mode, status string, publishedPostID *int64, failureNote, failureMeta string) (*model.EditorialInboxItem, error) {
@@ -241,6 +355,7 @@ func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue
 	claimedBy := ""
 	var claimedAt *time.Time
 	var leaseExpiresAt *time.Time
+	var completedAt *time.Time
 	claimTokenHash := ""
 	attemptCount := 0
 	if status != model.EditorialStatusRunning {
@@ -252,6 +367,9 @@ func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue
 	if status != model.EditorialStatusFailed {
 		failureNote = ""
 		failureMeta = ""
+	}
+	if status != model.EditorialStatusDone {
+		completedAt = nil
 	}
 	if categoryHint != "" {
 		if _, err := s.repos.Category.GetBySlug(categoryHint); err != nil {
@@ -277,7 +395,53 @@ func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue
 		ClaimedAt:       claimedAt,
 		LeaseExpiresAt:  leaseExpiresAt,
 		AttemptCount:    attemptCount,
+		CompletedAt:     completedAt,
 	}, nil
+}
+
+func isEditorialOverdue(item model.EditorialInboxItem, now time.Time) bool {
+	return item.Deadline != nil && item.Deadline.Before(now) && (item.Status == model.EditorialStatusApproved || item.Status == model.EditorialStatusRunning || item.Status == model.EditorialStatusDone)
+}
+
+func isStaleRunningClaim(item model.EditorialInboxItem, now time.Time) bool {
+	return item.Status == model.EditorialStatusRunning && item.LeaseExpiresAt != nil && !item.LeaseExpiresAt.After(now)
+}
+
+func sortReadyItems(items []model.EditorialInboxItem, now time.Time) {
+	slices.SortFunc(items, func(a, b model.EditorialInboxItem) int {
+		aOverdue := isEditorialOverdue(a, now)
+		bOverdue := isEditorialOverdue(b, now)
+		if aOverdue != bOverdue {
+			if aOverdue {
+				return -1
+			}
+			return 1
+		}
+		if a.Priority != b.Priority {
+			return b.Priority - a.Priority
+		}
+		if a.Deadline == nil && b.Deadline != nil {
+			return 1
+		}
+		if a.Deadline != nil && b.Deadline == nil {
+			return -1
+		}
+		if a.Deadline != nil && b.Deadline != nil {
+			if a.Deadline.Before(*b.Deadline) {
+				return -1
+			}
+			if b.Deadline.Before(*a.Deadline) {
+				return 1
+			}
+		}
+		if a.CreatedAt.Before(b.CreatedAt) {
+			return -1
+		}
+		if b.CreatedAt.Before(a.CreatedAt) {
+			return 1
+		}
+		return 0
+	})
 }
 
 func editorialRetryBackoff(attemptCount int) time.Duration {

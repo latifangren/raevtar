@@ -24,6 +24,11 @@ func (h *Handler) adminEditorialInbox(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	summary, err := h.svc.Editorial.GetInboxSummary(time.Now().UTC())
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
 		internalServerError(w, r, err)
@@ -32,8 +37,10 @@ func (h *Handler) adminEditorialInbox(w http.ResponseWriter, r *http.Request) {
 	renderHTML(w, r, adminview.EditorialInbox(adminview.EditorialInboxData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
+		Now:         time.Now().UTC(),
 		Items:       items,
 		Counts:      counts,
+		Summary:     summary,
 		Categories:  categories,
 		Modes:       model.ValidEditorialModes(),
 		Statuses:    model.ValidEditorialStatuses(),
@@ -112,11 +119,23 @@ func (h *Handler) apiEditorialInboxContract(w http.ResponseWriter, r *http.Reque
 			"claim_endpoint":    "/api/v1/editorial-inbox/claim",
 			"complete_endpoint": "/api/v1/editorial-inbox/{itemID}/complete",
 			"fail_endpoint":     "/api/v1/editorial-inbox/{itemID}/fail",
+			"summary_endpoint":  "/api/v1/editorial-inbox/summary",
 			"lease_ttl":         "30m",
 			"retry_schedule":    []string{"attempt 1 => 15m", "attempt 2 => 1h", "attempt 3+ => 6h"},
+			"fairness_policy":   "after 3 consecutive non-urgent claims, next claim opens one autonomous gap",
+			"overdue_priority":  "overdue items outrank non-overdue ready items",
 		},
-		"fields": []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta", "claimed_by", "claimed_at", "lease_expires_at", "attempt_count"},
+		"fields": []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta", "claimed_by", "claimed_at", "lease_expires_at", "attempt_count", "completed_at"},
 	})
+}
+
+func (h *Handler) apiEditorialInboxSummary(w http.ResponseWriter, r *http.Request) {
+	summary, err := h.svc.Editorial.GetInboxSummary(time.Now().UTC())
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, summary)
 }
 
 func (h *Handler) apiListEditorialInbox(w http.ResponseWriter, r *http.Request) {
