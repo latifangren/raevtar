@@ -100,6 +100,26 @@ Inbox item menyimpan field berikut:
 | `mode` | mode niat editorial |
 | `status` | status lifecycle item |
 
+### Intake operator yang dipakai sekarang
+
+Di admin UI, operator **tidak perlu lagi** mengisi semua field teknis di atas saat create item baru.
+
+Flow intake yang sekarang sengaja dipersingkat jadi:
+
+- `source_value` — repo/link/tema/project source
+- `category_hint` — opsional
+- `note` — opsional, buat angle/judul proyek/catatan editor
+
+Sisanya diisi default oleh server untuk flow admin biasa:
+
+- `source_type = repo`
+- `priority = 50`
+- `not_before = now`
+- `mode = scheduled_assignment`
+- `status = approved`
+
+Artinya: kalau operator masukin repo atau tema lalu menjalankan tick Hermes, item itu **langsung eligible** buat diambil tanpa langkah approval tambahan.
+
 ### Mode yang tersedia
 
 - `scheduled_assignment`
@@ -182,6 +202,15 @@ Kalau hasilnya ada:
 - item langsung masuk status `running`
 - response berisi `item` + `claim_token`
 - claim ini punya lease TTL server-side 30 menit
+- **tidak boleh ada 2 item `running` aktif sekaligus**
+
+Kalau masih ada item lain dengan lease `running` yang masih aktif:
+
+- claim baru akan diblok
+- response tetap `204 No Content`
+- Hermes tidak boleh mulai ngerjain item kedua sampai item pertama selesai, gagal, atau lease-nya kadaluarsa
+
+Ini sengaja dibuat supaya satu tick / satu worker tidak bikin dua publish flow jalan paralel tanpa kontrol.
 
 ### Step 3 — Generate article dari item inbox
 
@@ -244,7 +273,15 @@ Semantics:
 
 - `retryable: true` → item kembali ke `approved` dengan backoff server-side via `not_before`
 - `retryable: false` → item pindah ke `failed`
-- stale lease dipulihkan otomatis setelah expiry; belum ada fairness/escalation/analytics di fase ini
+- stale lease dipulihkan otomatis setelah expiry
+- item yang pernah dieksekusi akan mempertahankan `attempt_count`
+- item yang sudah pernah di-claim tidak lagi dianggap mutable dari admin intake flow biasa
+
+Backoff yang dipakai sekarang:
+
+- attempt 1 → `15m`
+- attempt 2 → `1h`
+- attempt 3+ → `6h`
 
 ---
 
@@ -276,17 +313,15 @@ tick cron
 
 ```json
 {
-  "source_type": "repo",
   "source_value": "https://github.com/zed-industries/zed",
   "category_hint": "tools",
-  "priority": 80,
-  "not_before": "2026-06-06T08:00:00Z",
-  "deadline": "2026-06-07T23:00:00Z",
-  "note": "Bahas angle editor cepat buat workflow developer Linux.",
-  "mode": "scheduled_assignment",
-  "status": "approved"
+  "note": "Bahas angle editor cepat buat workflow developer Linux."
 }
 ```
+
+Untuk **admin UI**, payload mental model yang benar memang sesederhana itu. Server akan mengisi default field internal.
+
+Untuk **API machine-to-machine**, payload eksplisit penuh tetap boleh dipakai kalau memang butuh kontrol detail.
 
 ### Contoh response contract
 
@@ -320,6 +355,14 @@ Contoh shape ringkas:
   }
 }
 ```
+
+Contract aktual sekarang juga mengekspose lease policy seperti:
+
+- `lease_ttl = 30m`
+- retry schedule
+- fairness policy
+- overdue priority
+- **single-running gate**: claim baru diblok selama masih ada `running` item dengan lease aktif
 
 ### Contoh update item ke `done`
 
@@ -366,16 +409,26 @@ Ini bikin admin panel lebih enak:
 - `queued` = ide masuk, belum dilepas
 - `approved` = siap dibaca Hermes
 
-### 2. Jangan hapus item, terminalkan statusnya
+### 2. Item yang belum pernah dieksekusi masih boleh diubah atau dihapus
 
-Lebih baik pakai:
+Flow yang sekarang dipakai:
+
+- item dengan `attempt_count == 0` masih boleh **edit** dan **delete**
+- begitu item pernah di-claim sekali saja, item dianggap **locked after first execution attempt**
+
+Jadi delete memang ada, tapi cuma aman dipakai sebelum Hermes mulai kerja.
+
+### 3. Jangan pakai edit/delete untuk item yang sudah pernah dijalankan
+
+Kalau item sudah pernah dieksekusi, perlakukan lifecycle-nya lewat status/runtime flow:
 
 - `done`
 - `cancelled`
+- `failed`
 
-daripada delete. Audit trail jadi tetap utuh.
+daripada mencoba “reset manual” item dari admin intake. Audit trail dan attempt history jadi tetap utuh.
 
-### 3. Gunakan `not_before` untuk fleksibilitas waktu
+### 4. Gunakan `not_before` untuk fleksibilitas waktu bila memang perlu
 
 Kalau kamu mau item dikerjakan di slot tertentu, tidak perlu hardcode slot Hermes di admin.
 Cukup set:
@@ -386,32 +439,41 @@ Cukup set:
 
 Hermes tetap akan menyesuaikan dengan cadence cron yang sudah ada.
 
-### 4. Jangan overload satu tick dengan banyak item
+### 5. Jangan overload satu tick dengan banyak item
 
 Untuk fase awal, satu tick sebaiknya fokus ke satu keputusan publish. Ini bikin debugging dan observability jauh lebih gampang.
 
+Dan itu sekarang memang enforced juga oleh control plane:
+
+- satu item `running` aktif dulu
+- item berikutnya baru bisa diambil setelah yang current selesai/fail/stale
+
 ---
 
-## Batasan Phase 1 Saat Ini
+## Status Implementasi Saat Ini
 
 Yang **sudah ada** sekarang:
 
 - source of truth editorial inbox
 - admin UI untuk operator
 - protected machine-readable contract
-- protected API create/list/detail/update
+- protected API create/list/detail/update/claim/complete/fail/summary
 - ready-ordering semantics di service
+- Hermes-facing claim lease TTL
+- retry backoff server-side
+- fairness policy antara queue lane dan autonomous lane
+- overdue-first priority
+- publish analytics summary
+- single active running item guard
+- admin-side edit/delete guard untuk item yang belum pernah dieksekusi
+- simplified admin intake flow dengan default server-side
 
-Yang **belum** dikerjakan di fase ini:
+Yang **belum** tetap masuk area lanjutan:
 
-- Hermes otomatis claim/lease item
-- status `running` / `failed` / retry backoff
+- Hermes-side implementation yang benar-benar mengonsumsi contract ini secara otomatis
 - batch merge beberapa item jadi satu artikel
-- fairness policy antara queue dan autonomous lane
-- overdue escalation logic
-- auto-link item inbox ke post ID hasil publish
-
-Semua itu bisa ditambahkan nanti, tapi tidak perlu untuk integrasi awal.
+- anti-repeat repo/category policy lintas run
+- richer editorial heuristics di sisi Hermes prompt/runtime
 
 ---
 
@@ -419,25 +481,15 @@ Semua itu bisa ditambahkan nanti, tapi tidak perlu untuk integrasi awal.
 
 Kalau integrasi awal ini sudah berjalan, langkah berikutnya yang paling masuk akal:
 
-### Phase 2 — Hermes consumption contract refinement
+### Phase 2 — Hermes consumption runtime refinement
 
-Tambahkan flow yang lebih nyaman buat Hermes, misalnya endpoint khusus seperti:
+Sekarang claim contract dasarnya sudah ada. Fase berikutnya lebih ke menyambungkan Hermes runtime agar:
 
-- `GET /api/v1/editorial-inbox?ready=true&limit=1`
+- claim item saat tick jalan
+- fallback ke autonomous saat `204 No Content`
+- complete/fail item secara konsisten
 
-atau nantinya endpoint claim khusus jika memang diperlukan.
-
-### Phase 3 — Execution lifecycle
-
-Tambahkan status seperti:
-
-- `running`
-- `failed`
-- `published`
-
-plus metadata hasil run.
-
-### Phase 4 — Editorial intelligence
+### Phase 3 — Richer editorial policy
 
 Tambahkan policy seperti:
 
