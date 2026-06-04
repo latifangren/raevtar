@@ -18,7 +18,7 @@ templ Index(data IndexData) {
 						<p class="text-sm md:text-base text-retro-ink font-bold mb-8 opacity-75 max-w-xl">Single Go binary running on postmarketOS (whyred), serving blog notes, live monitor cards, API docs, and automation hooks from one small machine.</p>
 						<div class="flex flex-wrap gap-4">
 							<a href="/blog" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Read the Blog &rarr;</a>
-							<a href="/dashboard" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Open Dashboard</a>
+							<a href="/dashboard" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Open Status</a>
 							<a href="/docs" class="inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Read API Docs</a>
 						</div>
 					</div>
@@ -65,7 +65,7 @@ templ Index(data IndexData) {
 				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">02 Signals</p>
 				<h2 class="text-xl font-black uppercase mb-2">Monitor Grid</h2>
 				<p class="text-sm font-bold text-retro-muted mb-4">Server health gets compact cards with public-safe status summaries and direct drill-down links.</p>
-				<a href="/dashboard" class="text-sm font-black no-underline hover:bg-retro-paper">Open dashboard &rarr;</a>
+				<a href="/dashboard" class="text-sm font-black no-underline hover:bg-retro-paper">Open status &rarr;</a>
 			</div>
 			<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">03 Hooks</p>
@@ -95,7 +95,7 @@ templ Index(data IndexData) {
 					<div class="border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-6">
 						<p class="text-xs font-black uppercase text-retro-muted mb-2">Monitor nodes</p>
 						<p class="text-4xl font-black text-retro-ink">{ PortText(len(data.Servers)) }</p>
-						<p class="text-sm font-bold text-retro-muted">registered nodes visible from dashboard.</p>
+						<p class="text-sm font-bold text-retro-muted">registered nodes visible from the public status board.</p>
 					</div>
 					<div class="border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:col-span-2">
 						<p class="text-xs font-black uppercase text-retro-muted mb-2">Single domain map</p>
@@ -121,7 +121,7 @@ templ Index(data IndexData) {
 		} else {
 			<section class="mb-12 text-center py-12">
 				<p class="text-retro-muted font-bold">No posts yet.</p>
-				<p class="text-sm text-retro-muted mt-2">Check the <a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">dashboard</a> or start publishing via the API.</p>
+					<p class="text-sm text-retro-muted mt-2">Check the <a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">status board</a> or start publishing via the API.</p>
 			</section>
 		}
 		<section id="lab" class="mb-12 scroll-mt-24">
@@ -141,7 +141,7 @@ templ Index(data IndexData) {
 				<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-4">
 					<span class="inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-ink text-retro-cream font-black">02</span>
 					<h3 class="font-black uppercase mb-2">Signal Lab</h3>
-					<p class="text-sm font-bold text-retro-muted">Local hosts ping Raevtar, and the dashboard redraws itself through HTMX refreshes.</p>
+					<p class="text-sm font-bold text-retro-muted">Local hosts ping Raevtar, and the status board redraws itself through HTMX refreshes.</p>
 				</div>
 				<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 					<span class="inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-blush text-retro-ink font-black">03</span>

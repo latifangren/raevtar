@@ -33,11 +33,15 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 
 	// pages
 	r.Get("/", h.landingIndex)
+	r.Get("/about", h.aboutPage)
 	r.Get("/blog", h.blogList)
 	r.Get("/blog/{slug}", h.blogDetail)
+	r.Get("/contact", h.contactPage)
 	r.Get("/lab", h.labPage)
 	r.Get("/docs", h.docsPage)
 	r.Get("/lab/docs", h.docsPage)
+	r.Get("/projects", h.projectsPage)
+	r.Get("/topics", h.topicsPage)
 	r.Get("/dashboard", h.dashboardIndex)
 	r.Get("/dashboard/{serverID}/live", h.dashboardDetailLive)
 	r.Get("/dashboard/{serverID}", h.dashboardDetail)

@@ -39,6 +39,33 @@ func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *Handler) aboutPage(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	_, postCount, err := h.svc.Blog.ListPosts("", 1, 1)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	servers, err := h.svc.Monitor.ListServers()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+
+	renderHTML(w, r, pages.About(pages.AboutData{
+		CurrentPath:   r.URL.Path,
+		Categories:    categories,
+		PostCount:     postCount,
+		CategoryCount: len(categories),
+		ServerCount:   len(servers),
+		Domain:        h.cfg.Domain,
+	}))
+}
+
 func (h *Handler) labPage(w http.ResponseWriter, r *http.Request) {
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
@@ -78,6 +105,65 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	renderHTML(w, r, pages.Docs(pages.DocsData{
+		CurrentPath: r.URL.Path,
+		Categories:  categories,
+		PostCount:   postCount,
+	}))
+}
+
+func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	_, postCount, err := h.svc.Blog.ListPosts("", 1, 1)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	servers, err := h.svc.Monitor.ListServers()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+
+	renderHTML(w, r, pages.Projects(pages.ProjectsData{
+		CurrentPath:   r.URL.Path,
+		Categories:    categories,
+		PostCount:     postCount,
+		CategoryCount: len(categories),
+		ServerCount:   len(servers),
+	}))
+}
+
+func (h *Handler) contactPage(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+
+	renderHTML(w, r, pages.Contact(pages.ContactData{
+		CurrentPath: r.URL.Path,
+		Categories:  categories,
+		Domain:      h.cfg.Domain,
+	}))
+}
+
+func (h *Handler) topicsPage(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	_, postCount, err := h.svc.Blog.ListPosts("", 1, 1)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+
+	renderHTML(w, r, pages.Topics(pages.TopicsData{
 		CurrentPath: r.URL.Path,
 		Categories:  categories,
 		PostCount:   postCount,

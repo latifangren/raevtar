@@ -22,6 +22,15 @@ type IndexData struct {
 	Domain      string
 }
 
+type AboutData struct {
+	CurrentPath   string
+	Categories    []model.Category
+	PostCount     int
+	CategoryCount int
+	ServerCount   int
+	Domain        string
+}
+
 type BlogListData struct {
 	CurrentPath string
 	Posts       []model.Post
@@ -46,6 +55,26 @@ type LabData struct {
 }
 
 type DocsData struct {
+	CurrentPath string
+	Categories  []model.Category
+	PostCount   int
+}
+
+type ProjectsData struct {
+	CurrentPath   string
+	Categories    []model.Category
+	PostCount     int
+	CategoryCount int
+	ServerCount   int
+}
+
+type ContactData struct {
+	CurrentPath string
+	Categories  []model.Category
+	Domain      string
+}
+
+type TopicsData struct {
 	CurrentPath string
 	Categories  []model.Category
 	PostCount   int

@@ -2,8 +2,12 @@ package pages
 
 templ ServerDetail(data ServerDetailData) {
 	@page(data.Server.Name + " — Raevtar", data.CurrentPath, data.Categories) {
-		<div class="mb-6">
-			<a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">&larr; Kembali</a>
+		<div class="mb-6 flex flex-wrap items-center gap-4 text-sm font-bold text-retro-muted">
+			<a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">&larr; Back to status</a>
+			<span>&middot;</span>
+			<a href="/docs" class="no-underline hover:bg-retro-wheat">visibility rules</a>
+			<span>&middot;</span>
+			<a href="/projects" class="no-underline hover:bg-retro-wheat">project lanes</a>
 		</div>
 		@ServerDetailLive(data)
 	}

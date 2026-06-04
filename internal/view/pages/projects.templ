@@ -1,0 +1,81 @@
+package pages
+
+templ Projects(data ProjectsData) {
+	@page("Projects — Raevtar", data.CurrentPath, data.Categories) {
+		<section class="full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden">
+			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
+					<div>
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Projects</p>
+						<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Three public lanes, one small machine.</h1>
+						<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">This is the public workbench view of Raevtar: writing lane, signal lane, and automation lane stitched together so readers can move around the platform without bumping into operator-only tooling.</p>
+						<div class="flex flex-wrap gap-2 mt-4 max-w-xl">
+							<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-blush">about</a>
+							<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink no-underline hover:bg-retro-paper">docs</a>
+							<a href="/dashboard" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink no-underline hover:bg-retro-paper">status</a>
+						</div>
+					</div>
+					<div class="relative">
+						<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-retro-ink bg-retro-blush shadow-[4px_4px_0px_0px_#2D3748]"></div>
+						<div class="relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] -rotate-1">
+							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">public board</p>
+							<div class="grid grid-cols-3 gap-3 text-center">
+								<div class="border-2 border-retro-ink bg-retro-paper p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.PostCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span></div>
+								<div class="border-2 border-retro-ink bg-retro-sageLight p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.ServerCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">nodes</span></div>
+								<div class="border-2 border-retro-ink bg-retro-wheat p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.CategoryCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">topics</span></div>
+							</div>
+							<p class="text-sm font-bold text-retro-muted mt-4">Same public surface, three ways in.</p>
+						</div>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="mb-12 grid gap-4 lg:grid-cols-3">
+			<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">01 lane</p>
+				<h2 class="text-2xl font-black uppercase mb-3">Publishing System</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">{ PortText(data.PostCount) } published notes move through a category-backed archive, so field logs and longer essays stay in one public trail instead of splitting across separate project pages.</p>
+				<div class="grid gap-2 mb-4">
+					<a href="/blog" class="border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-black no-underline hover:bg-retro-paper">Open blog &rarr;</a>
+					<a href="/topics" class="border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat">Browse topics &rarr;</a>
+				</div>
+				<p class="text-xs font-bold uppercase tracking-widest text-retro-muted">Best for: notes, categories, archive paths.</p>
+			</div>
+			<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] lg:translate-y-4">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">02 lane</p>
+				<h2 class="text-2xl font-black uppercase mb-3">Signal Board</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">{ PortText(data.ServerCount) } registered nodes feed the public status board through safe summaries, freshness windows, and redacted drill-down pages that keep topology offstage.</p>
+				<div class="grid gap-2 mb-4">
+					<a href="/dashboard" class="border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat">Open status &rarr;</a>
+					<a href="/docs" class="border-2 border-retro-ink bg-retro-sageLight p-3 text-sm font-black no-underline hover:bg-retro-paper">Read visibility rules &rarr;</a>
+				</div>
+				<p class="text-xs font-bold uppercase tracking-widest text-retro-muted">Best for: live pulse, safe telemetry, freshness checks.</p>
+			</div>
+			<div class="bg-retro-blush border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">03 lane</p>
+				<h2 class="text-2xl font-black uppercase mb-3">Automation Surface</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">{ PortText(data.CategoryCount) } seeded topics help automated publishing stay organized and readable, while public docs explain what automation touches without turning this page into an operator handbook.</p>
+				<div class="grid gap-2 mb-4">
+					<a href="/docs" class="border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat">Read docs &rarr;</a>
+					<a href="/about" class="border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-black no-underline hover:bg-retro-paper">Why it exists &rarr;</a>
+				</div>
+				<p class="text-xs font-bold uppercase tracking-widest text-retro-muted">Best for: boundaries, API shape, public-safe automation context.</p>
+			</div>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
+			<div class="grid gap-0 lg:grid-cols-[0.8fr_1.2fr]">
+				<div class="bg-retro-ink text-retro-cream p-6 md:p-8">
+					<p class="text-xs font-black uppercase tracking-widest text-retro-wheat mb-3">route map</p>
+					<h2 class="text-3xl md:text-4xl font-black uppercase leading-tight mb-4">Move sideways, not only downward.</h2>
+					<p class="text-sm font-bold text-retro-sageLight">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p>
+				</div>
+				<div class="grid gap-3 p-6 md:p-8 sm:grid-cols-2">
+					<a href="/about" class="border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">about</p><p class="text-sm font-bold text-retro-ink">Personal framing, stack choices, and public/private split.</p></a>
+					<a href="/topics" class="border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">topics</p><p class="text-sm font-bold text-retro-ink">Category index for finding writing by subject, not chronology.</p></a>
+					<a href="/docs" class="border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">docs</p><p class="text-sm font-bold text-retro-ink">Read-only route list and boundary notes for public readers.</p></a>
+					<a href="/contact" class="border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">contact</p><p class="text-sm font-bold text-retro-ink">Where to start if you need context before reaching elsewhere.</p></a>
+				</div>
+			</div>
+		</section>
+	}
+}

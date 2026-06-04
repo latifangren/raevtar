@@ -1,0 +1,41 @@
+package pages
+
+templ Contact(data ContactData) {
+	@page("Contact — Raevtar", data.CurrentPath, data.Categories) {
+		<section class="full-width bg-retro-paper border-b-2 border-retro-ink mb-12 overflow-hidden">
+			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Contact</p>
+				<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Raevtar keeps contact intentionally lightweight.</h1>
+				<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">Best first contact here is context, not a form. Start with the public writing, route docs, and status board on { data.Domain }, then carry that shared context wherever conversation continues off-site.</p>
+				<p class="text-sm font-bold text-retro-muted mt-4 max-w-xl">This page stays light on purpose: public pages explain enough to orient readers, while operator-only channels and diagnostics stay outside the public UI.</p>
+			</div>
+		</section>
+		<section class="mb-12 grid gap-4 md:grid-cols-3">
+			<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-2xl font-black uppercase mb-3">Read the docs</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">Public API boundaries, monitoring visibility, and privacy rules are documented in one place before anyone needs deeper context.</p>
+				<a href="/docs" class="text-sm font-black no-underline hover:bg-retro-paper">Read the docs &rarr;</a>
+			</div>
+			<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-2xl font-black uppercase mb-3">Browse topics</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">Category-backed browsing is quickest when you want to see what kinds of notes, projects, and recurring interests already live here.</p>
+				<a href="/topics" class="text-sm font-black no-underline hover:bg-retro-wheat">Open topics &rarr;</a>
+			</div>
+			<div class="bg-retro-blush border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-2xl font-black uppercase mb-3">Check status</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">Use the public status board for service visibility instead of expecting operator-only diagnostics or private host detail.</p>
+				<a href="/dashboard" class="text-sm font-black no-underline hover:bg-retro-paper">Open status &rarr;</a>
+			</div>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">start points</p>
+			<h2 class="text-2xl font-black uppercase mb-4">Best route depends on what you need.</h2>
+			<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+				<a href="/about" class="border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">About for motive and stack &rarr;</a>
+				<a href="/projects" class="border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Projects for public lanes &rarr;</a>
+				<a href="/topics" class="border-2 border-retro-ink bg-retro-paper p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-wheat">Topics for writing trails &rarr;</a>
+				<a href="/docs" class="border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Docs for route boundaries &rarr;</a>
+			</div>
+		</section>
+	}
+}

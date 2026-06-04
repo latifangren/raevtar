@@ -1,0 +1,66 @@
+package pages
+
+templ About(data AboutData) {
+	@page("About — Raevtar", data.CurrentPath, data.Categories) {
+		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
+			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
+					<div>
+						<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">About Raevtar</p>
+						<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Single binary, public-safe by design.</h1>
+						<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">Raevtar is the personal platform I keep close at hand for writing notes, watching machines, and wiring light automation together in one Go binary while drawing a hard line between public signals and operator-only detail.</p>
+						<div class="flex flex-wrap gap-2 mt-4 max-w-xl">
+							<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">projects</a>
+							<a href="/topics" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">topics</a>
+							<a href="/dashboard" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink no-underline hover:bg-retro-paper">status</a>
+						</div>
+					</div>
+					<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748]">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">platform counters</p>
+						<div class="grid grid-cols-3 gap-3 text-center">
+							<div class="border-2 border-retro-ink bg-retro-wheat p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.PostCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span></div>
+							<div class="border-2 border-retro-ink bg-retro-sageLight p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.CategoryCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">topics</span></div>
+							<div class="border-2 border-retro-ink bg-retro-blush p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.ServerCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">signals</span></div>
+						</div>
+						<p class="text-sm font-bold text-retro-muted mt-4">Public surface anchored at { data.Domain }.</p>
+					</div>
+				</div>
+			</div>
+		</section>
+		<section class="mb-12 grid gap-4 md:grid-cols-3">
+			<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">01</p>
+				<h2 class="text-2xl font-black uppercase mb-2">Writing</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">Project notes, field logs, and tagged posts stay readable from the public archive instead of getting buried in private scratchpads.</p>
+				<a href="/topics" class="text-sm font-black no-underline hover:bg-retro-wheat">Browse topics &rarr;</a>
+			</div>
+			<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">02</p>
+				<h2 class="text-2xl font-black uppercase mb-2">Status</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">Public monitoring shows freshness windows and safe telemetry summaries without exposing topology, host details, or setup trails.</p>
+				<a href="/dashboard" class="text-sm font-black no-underline hover:bg-retro-paper">Open status &rarr;</a>
+			</div>
+			<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">03</p>
+				<h2 class="text-2xl font-black uppercase mb-2">Automation</h2>
+				<p class="text-sm font-bold text-retro-muted mb-4">Read-only docs stay public, while write actions remain behind admin auth and protected API flows. Readers get the map, not the keys.</p>
+				<a href="/docs" class="text-sm font-black no-underline hover:bg-retro-wheat">Read docs &rarr;</a>
+			</div>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
+			<div class="grid gap-0 md:grid-cols-[0.9fr_1.1fr]">
+				<div class="bg-retro-ink text-retro-cream p-6 md:p-8">
+					<p class="text-xs font-black uppercase tracking-widest text-retro-wheat mb-3">working style</p>
+					<h2 class="text-3xl md:text-4xl font-black uppercase leading-tight mb-4">Built like small lab notebook, not SaaS brochure.</h2>
+					<p class="text-sm font-bold text-retro-sageLight">Raevtar stays personal on purpose: small enough to run on one machine, public enough to share notes and health signals, strict enough to keep operator detail backstage.</p>
+				</div>
+				<div class="grid gap-3 p-6 md:p-8 sm:grid-cols-2">
+					<a href="/projects" class="border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">projects</p><p class="text-sm font-bold text-retro-ink">See how writing, status, and automation break into public lanes.</p></a>
+					<a href="/topics" class="border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">topics</p><p class="text-sm font-bold text-retro-ink">Follow category trails straight into public posts.</p></a>
+					<a href="/docs" class="border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">docs</p><p class="text-sm font-bold text-retro-ink">Read what public routes show and what stays deliberately omitted.</p></a>
+					<a href="/contact" class="border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all"><p class="text-xs font-black uppercase text-retro-muted mb-2">contact</p><p class="text-sm font-bold text-retro-ink">Use public pages as first context before any operator-only channel.</p></a>
+				</div>
+			</div>
+		</section>
+	}
+}

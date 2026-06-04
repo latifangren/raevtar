@@ -1,0 +1,36 @@
+package pages
+
+templ Topics(data TopicsData) {
+	@page("Topics — Raevtar", data.CurrentPath, data.Categories) {
+		<section class="full-width bg-retro-sageLight border-b-2 border-retro-ink mb-12 overflow-hidden">
+			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Topics</p>
+				<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Browse the archive by category.</h1>
+				<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p>
+				<p class="text-sm font-bold text-retro-muted mt-4">{ PortText(data.PostCount) } published posts across { PortText(len(data.Categories)) } topics.</p>
+				<div class="flex flex-wrap gap-2 mt-3 max-w-xl">
+					<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">projects</a>
+					<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">docs</a>
+				</div>
+			</div>
+		</section>
+		<section class="mb-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+			for _, category := range data.Categories {
+				<a href={ templ.URL("/blog?category=" + category.Slug) } class="block bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline">
+					<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">topic</p>
+					<h2 class="text-2xl font-black uppercase text-retro-ink mb-2">{ category.Name }</h2>
+					<p class="text-sm font-bold text-retro-muted mb-4">{ category.Description }</p>
+					<span class="text-sm font-black text-retro-ink">Open posts &rarr;</span>
+				</a>
+			}
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">next stops</p>
+			<div class="grid gap-3 md:grid-cols-3">
+				<a href="/projects" class="border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">See how topics fit inside public project lanes &rarr;</a>
+				<a href="/about" class="border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Read why public writing sits next to monitoring &rarr;</a>
+				<a href="/contact" class="border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Use topic context before reaching elsewhere &rarr;</a>
+			</div>
+		</section>
+	}
+}

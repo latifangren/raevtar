@@ -1,12 +1,17 @@
 package pages
 
 templ Dashboard(data DashboardData) {
-	@page("Dashboard — Raevtar", data.CurrentPath, data.Categories) {
+	@page("Status — Raevtar", data.CurrentPath, data.Categories) {
 		<div class="grid gap-4 md:grid-cols-[1fr_auto] md:items-end mb-6">
 			<div>
 				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Monitor Grid</p>
-				<h1 class="text-3xl md:text-5xl font-black uppercase leading-none">Server Dashboard</h1>
+				<h1 class="text-3xl md:text-5xl font-black uppercase leading-none">Server Status</h1>
 				<p class="text-sm font-bold text-retro-muted mt-2">Public-safe signal board showing status windows, last signal age, and drill-down history without private topology.</p>
+				<div class="flex flex-wrap gap-2 mt-3 max-w-2xl">
+					<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">projects</a>
+					<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">docs</a>
+					<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink no-underline hover:bg-retro-paper">about</a>
+				</div>
 			</div>
 		</div>
 		<section class="mb-6 bg-retro-ink text-retro-cream border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
@@ -49,6 +54,15 @@ templ Dashboard(data DashboardData) {
 						<p class="text-xs font-bold text-retro-muted">No signal inside 15m, or no first signal has arrived.</p>
 					</div>
 				</div>
+			</div>
+		</section>
+		<section class="mb-6 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">related public routes</p>
+			<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+				<a href="/projects" class="border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Projects explains how status fits platform-wide &rarr;</a>
+				<a href="/docs" class="border-2 border-retro-ink bg-retro-paper p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-wheat">Docs lists what public status does and does not show &rarr;</a>
+				<a href="/lab" class="border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Lab shows aggregate signal room context &rarr;</a>
+				<a href="/contact" class="border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Contact points readers toward public context first &rarr;</a>
 			</div>
 		</section>
 		if len(data.Servers) == 0 {

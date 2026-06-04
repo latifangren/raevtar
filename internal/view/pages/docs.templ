@@ -7,13 +7,18 @@ templ Docs(data DocsData) {
 				<div class="max-w-3xl">
 					<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Public docs</p>
 					<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">What this public room shows.</h1>
-					<p class="text-base md:text-lg font-bold text-retro-ink opacity-80">Raevtar publishes project notes, public-safe signal summaries, RSS, and a small read-only API surface. Operator details stay in admin.</p>
+					<p class="text-base md:text-lg font-bold text-retro-ink opacity-80">Raevtar publishes project notes, public-safe signal summaries, RSS, and a small read-only API surface. Enough to understand shape and intent; not enough to walk into the operator room.</p>
+					<div class="flex flex-wrap gap-2 mt-4">
+						<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-sageLight">about</a>
+						<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">projects</a>
+						<a href="/dashboard" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink no-underline hover:bg-retro-paper">status</a>
+					</div>
 				</div>
 			</div>
 		</section>
 		<section class="mb-12 grid gap-4 lg:grid-cols-3">
 			@docsCard("01", "Read", "Blog posts and RSS are public. Articles keep category and tag context so Hermes-written and manual notes land in one archive.", "/blog", "Open blog")
-			@docsCard("02", "Watch", "Dashboard cards show public freshness bands: online, stale, and offline. They explain last signal timing without exposing topology.", "/dashboard", "Open dashboard")
+			@docsCard("02", "Watch", "Status cards show public freshness bands: online, stale, and offline. They explain last signal timing without exposing topology.", "/dashboard", "Open status")
 			@docsCard("03", "Understand", "The lab page maps the platform shape: content, signals, and automation boundaries with aggregate counters only.", "/lab", "Open lab")
 		</section>
 		<section class="mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
@@ -39,6 +44,15 @@ templ Docs(data DocsData) {
 				<code class="border-2 border-retro-ink bg-retro-paper p-3 text-sm font-mono font-black">GET /blog/feed.xml</code>
 			</div>
 			<p class="text-sm font-bold text-retro-muted mt-4">Protected write and operator endpoints are deliberately omitted from public docs.</p>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">related public pages</p>
+			<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+				<a href="/about" class="border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">About explains why boundary stays strict &rarr;</a>
+				<a href="/projects" class="border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Projects maps public lanes and handoffs &rarr;</a>
+				<a href="/topics" class="border-2 border-retro-ink bg-retro-paper p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-wheat">Topics drops into writing archive filters &rarr;</a>
+				<a href="/contact" class="border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Contact shows best first context routes &rarr;</a>
+			</div>
 		</section>
 	}
 }

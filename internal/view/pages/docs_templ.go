@@ -41,7 +41,7 @@ func Docs(data DocsData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><div class=\"max-w-3xl\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Public docs</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">What this public room shows.</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80\">Raevtar publishes project notes, public-safe signal summaries, RSS, and a small read-only API surface. Operator details stay in admin.</p></div></div></section><section class=\"mb-12 grid gap-4 lg:grid-cols-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><div class=\"max-w-3xl\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Public docs</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">What this public room shows.</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80\">Raevtar publishes project notes, public-safe signal summaries, RSS, and a small read-only API surface. Enough to understand shape and intent; not enough to walk into the operator room.</p><div class=\"flex flex-wrap gap-2 mt-4\"><a href=\"/about\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-sageLight\">about</a> <a href=\"/projects\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper\">projects</a> <a href=\"/dashboard\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink no-underline hover:bg-retro-paper\">status</a></div></div></div></section><section class=\"mb-12 grid gap-4 lg:grid-cols-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -49,7 +49,7 @@ func Docs(data DocsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = docsCard("02", "Watch", "Dashboard cards show public freshness bands: online, stale, and offline. They explain last signal timing without exposing topology.", "/dashboard", "Open dashboard").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = docsCard("02", "Watch", "Status cards show public freshness bands: online, stale, and offline. They explain last signal timing without exposing topology.", "/dashboard", "Open status").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -57,7 +57,7 @@ func Docs(data DocsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 md:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">boundary</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Public front, admin back room.</h2><p class=\"text-sm font-bold text-retro-sageLight\">Public docs intentionally describe safe reading surfaces. Server operations, diagnostics, and logs belong inside admin sessions.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><div class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">public</p><p class=\"text-sm font-bold text-retro-ink\">Posts, categories, RSS, public status bands, public route map, aggregate lab counters.</p></div><div class=\"border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">admin only</p><p class=\"text-sm font-bold text-retro-ink\">Machine addresses, network details, credentials, setup commands, and diagnostics.</p></div><div class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] sm:col-span-2\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">automation</p><p class=\"text-sm font-bold text-retro-ink\">Hermes can publish structured notes through protected write flows. Public readers see final posts and tags, not operator controls.</p></div></div></div></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">read-only API</p><h2 class=\"text-2xl font-black uppercase mb-3\">Safe public endpoints</h2><div class=\"grid gap-3 md:grid-cols-3\"><code class=\"border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-mono font-black\">GET /api/v1/posts</code> <code class=\"border-2 border-retro-ink bg-retro-sageLight p-3 text-sm font-mono font-black\">GET /api/v1/categories</code> <code class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-mono font-black\">GET /blog/feed.xml</code></div><p class=\"text-sm font-bold text-retro-muted mt-4\">Protected write and operator endpoints are deliberately omitted from public docs.</p></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 md:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">boundary</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Public front, admin back room.</h2><p class=\"text-sm font-bold text-retro-sageLight\">Public docs intentionally describe safe reading surfaces. Server operations, diagnostics, and logs belong inside admin sessions.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><div class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">public</p><p class=\"text-sm font-bold text-retro-ink\">Posts, categories, RSS, public status bands, public route map, aggregate lab counters.</p></div><div class=\"border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">admin only</p><p class=\"text-sm font-bold text-retro-ink\">Machine addresses, network details, credentials, setup commands, and diagnostics.</p></div><div class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] sm:col-span-2\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">automation</p><p class=\"text-sm font-bold text-retro-ink\">Hermes can publish structured notes through protected write flows. Public readers see final posts and tags, not operator controls.</p></div></div></div></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">read-only API</p><h2 class=\"text-2xl font-black uppercase mb-3\">Safe public endpoints</h2><div class=\"grid gap-3 md:grid-cols-3\"><code class=\"border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-mono font-black\">GET /api/v1/posts</code> <code class=\"border-2 border-retro-ink bg-retro-sageLight p-3 text-sm font-mono font-black\">GET /api/v1/categories</code> <code class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-mono font-black\">GET /blog/feed.xml</code></div><p class=\"text-sm font-bold text-retro-muted mt-4\">Protected write and operator endpoints are deliberately omitted from public docs.</p></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">related public pages</p><div class=\"grid gap-3 md:grid-cols-2 xl:grid-cols-4\"><a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">About explains why boundary stays strict &rarr;</a> <a href=\"/projects\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">Projects maps public lanes and handoffs &rarr;</a> <a href=\"/topics\" class=\"border-2 border-retro-ink bg-retro-paper p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-wheat\">Topics drops into writing archive filters &rarr;</a> <a href=\"/contact\" class=\"border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">Contact shows best first context routes &rarr;</a></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -99,7 +99,7 @@ func docsCard(number string, title string, body string, href string, label strin
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(number)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 48, Col: 146}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 62, Col: 146}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -112,7 +112,7 @@ func docsCard(number string, title string, body string, href string, label strin
 		var templ_7745c5c3_Var5 string
 		templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 49, Col: 56}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 63, Col: 56}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 		if templ_7745c5c3_Err != nil {
@@ -125,7 +125,7 @@ func docsCard(number string, title string, body string, href string, label strin
 		var templ_7745c5c3_Var6 string
 		templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(body)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 50, Col: 59}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 64, Col: 59}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 		if templ_7745c5c3_Err != nil {
@@ -138,7 +138,7 @@ func docsCard(number string, title string, body string, href string, label strin
 		var templ_7745c5c3_Var7 templ.SafeURL
 		templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL(href))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 51, Col: 27}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 65, Col: 27}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 		if templ_7745c5c3_Err != nil {
@@ -151,7 +151,7 @@ func docsCard(number string, title string, body string, href string, label strin
 		var templ_7745c5c3_Var8 string
 		templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 51, Col: 98}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/docs.templ`, Line: 65, Col: 98}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 		if templ_7745c5c3_Err != nil {
