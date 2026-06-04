@@ -31,7 +31,7 @@ func NewEditorialInboxService(repos *repo.Repositories) *EditorialInboxService {
 }
 
 func (s *EditorialInboxService) CreateInboxItem(input model.EditorialInboxCreate) (*model.EditorialInboxItem, error) {
-	item, err := s.buildInboxItem(0, input.SourceType, input.SourceValue, input.CategoryHint, input.Priority, input.NotBefore, input.Deadline, input.Note, input.Mode, input.Status)
+	item, err := s.buildInboxItem(0, input.SourceType, input.SourceValue, input.CategoryHint, input.Priority, input.NotBefore, input.Deadline, input.Note, input.Mode, input.Status, input.PublishedPostID, input.FailureNote, input.FailureMeta)
 	if err != nil {
 		return nil, err
 	}
@@ -78,7 +78,7 @@ func (s *EditorialInboxService) UpdateInboxItem(id int64, input model.EditorialI
 		}
 		return nil, fmt.Errorf("get editorial inbox item: %w", err)
 	}
-	item, err := s.buildInboxItem(id, input.SourceType, input.SourceValue, input.CategoryHint, input.Priority, input.NotBefore, input.Deadline, input.Note, input.Mode, input.Status)
+	item, err := s.buildInboxItem(id, input.SourceType, input.SourceValue, input.CategoryHint, input.Priority, input.NotBefore, input.Deadline, input.Note, input.Mode, input.Status, input.PublishedPostID, input.FailureNote, input.FailureMeta)
 	if err != nil {
 		return nil, err
 	}
@@ -109,13 +109,15 @@ func (s *EditorialInboxService) CountInboxStatuses() (map[string]int, error) {
 	return counts, nil
 }
 
-func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue, categoryHint string, priority int, notBefore time.Time, deadline *time.Time, note, mode, status string) (*model.EditorialInboxItem, error) {
+func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue, categoryHint string, priority int, notBefore time.Time, deadline *time.Time, note, mode, status string, publishedPostID *int64, failureNote, failureMeta string) (*model.EditorialInboxItem, error) {
 	sourceType = strings.TrimSpace(sourceType)
 	sourceValue = strings.TrimSpace(sourceValue)
 	categoryHint = strings.TrimSpace(categoryHint)
 	note = strings.TrimSpace(note)
 	mode = strings.TrimSpace(mode)
 	status = strings.TrimSpace(status)
+	failureNote = strings.TrimSpace(failureNote)
+	failureMeta = strings.TrimSpace(failureMeta)
 	if sourceType == "" || sourceValue == "" {
 		return nil, fmt.Errorf("%w: source_type and source_value required", ErrInvalidEditorialInboxInput)
 	}
@@ -134,21 +136,37 @@ func (s *EditorialInboxService) buildInboxItem(id int64, sourceType, sourceValue
 	if !model.IsValidEditorialStatus(status) {
 		return nil, fmt.Errorf("%w: invalid status", ErrInvalidEditorialInboxInput)
 	}
+	if publishedPostID != nil && *publishedPostID <= 0 {
+		return nil, fmt.Errorf("%w: published_post_id must be positive", ErrInvalidEditorialInboxInput)
+	}
+	if status == model.EditorialStatusDone && publishedPostID == nil {
+		return nil, fmt.Errorf("%w: published_post_id required when status is done", ErrInvalidEditorialInboxInput)
+	}
+	if status != model.EditorialStatusDone {
+		publishedPostID = nil
+	}
+	if status != model.EditorialStatusFailed {
+		failureNote = ""
+		failureMeta = ""
+	}
 	if categoryHint != "" {
 		if _, err := s.repos.Category.GetBySlug(categoryHint); err != nil {
 			return nil, fmt.Errorf("%w: invalid category_hint", ErrInvalidEditorialInboxInput)
 		}
 	}
 	return &model.EditorialInboxItem{
-		ID:           id,
-		SourceType:   sourceType,
-		SourceValue:  sourceValue,
-		CategoryHint: categoryHint,
-		Priority:     priority,
-		NotBefore:    notBefore.UTC(),
-		Deadline:     deadline,
-		Note:         note,
-		Mode:         mode,
-		Status:       status,
+		ID:              id,
+		SourceType:      sourceType,
+		SourceValue:     sourceValue,
+		CategoryHint:    categoryHint,
+		Priority:        priority,
+		NotBefore:       notBefore.UTC(),
+		Deadline:        deadline,
+		Note:            note,
+		Mode:            mode,
+		Status:          status,
+		PublishedPostID: publishedPostID,
+		FailureNote:     failureNote,
+		FailureMeta:     failureMeta,
 	}, nil
 }

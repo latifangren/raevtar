@@ -120,6 +120,9 @@ CREATE TABLE IF NOT EXISTS editorial_inbox (
     note TEXT NOT NULL DEFAULT '',
     mode TEXT NOT NULL,
     status TEXT NOT NULL,
+    published_post_id INTEGER,
+    failure_note TEXT NOT NULL DEFAULT '',
+    failure_meta TEXT NOT NULL DEFAULT '',
     created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );

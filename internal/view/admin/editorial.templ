@@ -6,10 +6,12 @@ templ EditorialInbox(data EditorialInboxData) {
 	@Shell("Editorial Inbox", data.CurrentPath, data.CSRFToken) {
 		<div class="space-y-6">
 			@pageHeader("Editorial Inbox", CountText(len(data.Items))+" items")
-			<div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+			<div class="grid grid-cols-2 md:grid-cols-7 gap-4">
 				@metricCard("Queued", CountText(data.Counts[model.EditorialStatusQueued]), "awaiting approval", "text-retro-ink")
 				@metricCard("Approved", CountText(data.Counts[model.EditorialStatusApproved]), "ready for Hermes", "text-retro-sage")
 				@metricCard("Paused", CountText(data.Counts[model.EditorialStatusPaused]), "held by operator", "text-retro-ink")
+				@metricCard("Running", CountText(data.Counts[model.EditorialStatusRunning]), "Hermes in progress", "text-retro-ink")
+				@metricCard("Failed", CountText(data.Counts[model.EditorialStatusFailed]), "needs operator check", "text-retro-ink")
 				@metricCard("Done", CountText(data.Counts[model.EditorialStatusDone]), "completed", "text-retro-ink")
 				@metricCard("Cancelled", CountText(data.Counts[model.EditorialStatusCancelled]), "closed without publish", "text-retro-ink")
 			</div>
@@ -34,8 +36,17 @@ templ EditorialInbox(data EditorialInboxData) {
 									<td class="py-3 px-4">
 										<p class="text-sm font-black text-retro-ink">{ item.SourceType }</p>
 										<p class="text-xs font-mono font-bold text-retro-muted break-all">{ item.SourceValue }</p>
+										if item.PublishedPostID != nil {
+											<p class="text-xs font-mono font-bold text-retro-ink mt-1">post #{ IDText(*item.PublishedPostID) }</p>
+										}
 										if item.Note != "" {
 											<p class="text-xs font-bold text-retro-muted mt-1 max-w-xs">{ item.Note }</p>
+										}
+										if item.FailureNote != "" {
+											<p class="text-xs font-bold text-retro-ink mt-1 max-w-xs">failure: { item.FailureNote }</p>
+										}
+										if item.FailureMeta != "" {
+											<p class="text-xs font-mono font-bold text-retro-muted mt-1 max-w-xs break-all">{ item.FailureMeta }</p>
 										}
 									</td>
 									<td class="py-3 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialModeBadgeClass(item.Mode) }>{ item.Mode }</span></td>
@@ -60,12 +71,15 @@ templ EditorialInbox(data EditorialInboxData) {
 											<input type="hidden" name="category_hint" value={ item.CategoryHint }/>
 											<input type="hidden" name="priority" value={ CountText(item.Priority) }/>
 											<input type="hidden" name="not_before" value={ EditorialInputValue(item.NotBefore) }/>
-											<input type="hidden" name="deadline" value={ EditorialInputValuePtr(item.Deadline) }/>
-											<input type="hidden" name="note" value={ item.Note }/>
-											<input type="hidden" name="mode" value={ item.Mode }/>
-											<select name="status" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink">
-												for _, status := range data.Statuses {
-													if status == item.Status {
+										<input type="hidden" name="deadline" value={ EditorialInputValuePtr(item.Deadline) }/>
+										<input type="hidden" name="note" value={ item.Note }/>
+										<input type="hidden" name="mode" value={ item.Mode }/>
+										<input type="number" name="published_post_id" min="1" value={ EditorialIDValuePtr(item.PublishedPostID) } placeholder="post id" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
+										<input type="text" name="failure_note" value={ item.FailureNote } placeholder="failure note" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
+										<textarea name="failure_meta" rows="2" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-mono font-bold text-retro-ink" placeholder="failure meta">{ item.FailureMeta }</textarea>
+										<select name="status" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink">
+											for _, status := range data.Statuses {
+												if status == item.Status {
 														<option value={ status } selected>{ status }</option>
 													} else {
 														<option value={ status }>{ status }</option>
@@ -135,10 +149,22 @@ templ EditorialInbox(data EditorialInboxData) {
 							<label class="block text-sm font-bold text-retro-muted mb-1">Deadline</label>
 							<input type="datetime-local" name="deadline" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
 						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Published post ID</label>
+							<input type="number" name="published_post_id" min="1" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Failure note</label>
+							<input type="text" name="failure_note" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink" placeholder="Short operator-facing failure note"/>
+						</div>
 					</div>
 					<div>
 						<label class="block text-sm font-bold text-retro-muted mb-1">Editor note</label>
 						<textarea name="note" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink" placeholder="Why this matters, angle hints, or campaign notes."></textarea>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Failure meta</label>
+						<textarea name="failure_meta" rows="3" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-mono font-bold text-retro-ink" placeholder='Raw failure details, JSON, or trace hint.'></textarea>
 					</div>
 					<div class="flex justify-end">
 						<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Create item</button>

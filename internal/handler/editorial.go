@@ -108,7 +108,7 @@ func (h *Handler) apiEditorialInboxContract(w http.ResponseWriter, r *http.Reque
 			"not_before_lte": "now",
 			"order":          []string{"priority desc", "deadline asc nulls last", "created_at asc"},
 		},
-		"fields": []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status"},
+		"fields": []string{"source_type", "source_value", "category_hint", "priority", "not_before", "deadline", "note", "mode", "status", "published_post_id", "failure_note", "failure_meta"},
 	})
 }
 
@@ -210,15 +210,18 @@ func editorialInboxCreateFromForm(r *http.Request) (model.EditorialInboxCreate, 
 		return model.EditorialInboxCreate{}, errors.New("priority must be a number")
 	}
 	return model.EditorialInboxCreate{
-		SourceType:   r.FormValue("source_type"),
-		SourceValue:  r.FormValue("source_value"),
-		CategoryHint: r.FormValue("category_hint"),
-		Priority:     priority,
-		NotBefore:    notBefore,
-		Deadline:     deadline,
-		Note:         r.FormValue("note"),
-		Mode:         r.FormValue("mode"),
-		Status:       r.FormValue("status"),
+		SourceType:      r.FormValue("source_type"),
+		SourceValue:     r.FormValue("source_value"),
+		CategoryHint:    r.FormValue("category_hint"),
+		Priority:        priority,
+		NotBefore:       notBefore,
+		Deadline:        deadline,
+		Note:            r.FormValue("note"),
+		Mode:            r.FormValue("mode"),
+		Status:          r.FormValue("status"),
+		PublishedPostID: editorialPostIDFromForm(r),
+		FailureNote:     r.FormValue("failure_note"),
+		FailureMeta:     r.FormValue("failure_meta"),
 	}, nil
 }
 
@@ -232,16 +235,31 @@ func editorialInboxUpdateFromForm(r *http.Request) (model.EditorialInboxUpdate, 
 		return model.EditorialInboxUpdate{}, errors.New("priority must be a number")
 	}
 	return model.EditorialInboxUpdate{
-		SourceType:   r.FormValue("source_type"),
-		SourceValue:  r.FormValue("source_value"),
-		CategoryHint: r.FormValue("category_hint"),
-		Priority:     priority,
-		NotBefore:    notBefore,
-		Deadline:     deadline,
-		Note:         r.FormValue("note"),
-		Mode:         r.FormValue("mode"),
-		Status:       r.FormValue("status"),
+		SourceType:      r.FormValue("source_type"),
+		SourceValue:     r.FormValue("source_value"),
+		CategoryHint:    r.FormValue("category_hint"),
+		Priority:        priority,
+		NotBefore:       notBefore,
+		Deadline:        deadline,
+		Note:            r.FormValue("note"),
+		Mode:            r.FormValue("mode"),
+		Status:          r.FormValue("status"),
+		PublishedPostID: editorialPostIDFromForm(r),
+		FailureNote:     r.FormValue("failure_note"),
+		FailureMeta:     r.FormValue("failure_meta"),
 	}, nil
+}
+
+func editorialPostIDFromForm(r *http.Request) *int64 {
+	value := strings.TrimSpace(r.FormValue("published_post_id"))
+	if value == "" {
+		return nil
+	}
+	id, err := strconv.ParseInt(value, 10, 64)
+	if err != nil {
+		return nil
+	}
+	return &id
 }
 
 func editorialTimesFromForm(r *http.Request) (time.Time, *time.Time, error) {

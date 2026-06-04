@@ -24,8 +24,8 @@ type EditorialInboxFilter struct {
 func (r *EditorialInboxRepo) Create(item *model.EditorialInboxItem) error {
 	result, err := r.db.Exec(`
 		INSERT INTO editorial_inbox (
-			source_type, source_value, category_hint, priority, not_before, deadline, note, mode, status, created_at, updated_at
-		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			source_type, source_value, category_hint, priority, not_before, deadline, note, mode, status, published_post_id, failure_note, failure_meta, created_at, updated_at
+		) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 		item.SourceType,
 		item.SourceValue,
 		item.CategoryHint,
@@ -35,6 +35,9 @@ func (r *EditorialInboxRepo) Create(item *model.EditorialInboxItem) error {
 		item.Note,
 		item.Mode,
 		item.Status,
+		item.PublishedPostID,
+		item.FailureNote,
+		item.FailureMeta,
 		item.CreatedAt.UTC(),
 		item.UpdatedAt.UTC(),
 	)
@@ -57,7 +60,7 @@ func (r *EditorialInboxRepo) GetByID(id int64) (*model.EditorialInboxItem, error
 func (r *EditorialInboxRepo) Update(item *model.EditorialInboxItem) error {
 	_, err := r.db.Exec(`
 		UPDATE editorial_inbox
-		SET source_type = ?, source_value = ?, category_hint = ?, priority = ?, not_before = ?, deadline = ?, note = ?, mode = ?, status = ?, updated_at = ?
+		SET source_type = ?, source_value = ?, category_hint = ?, priority = ?, not_before = ?, deadline = ?, note = ?, mode = ?, status = ?, published_post_id = ?, failure_note = ?, failure_meta = ?, updated_at = ?
 		WHERE id = ?`,
 		item.SourceType,
 		item.SourceValue,
@@ -68,6 +71,9 @@ func (r *EditorialInboxRepo) Update(item *model.EditorialInboxItem) error {
 		item.Note,
 		item.Mode,
 		item.Status,
+		item.PublishedPostID,
+		item.FailureNote,
+		item.FailureMeta,
 		item.UpdatedAt.UTC(),
 		item.ID,
 	)

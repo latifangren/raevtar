@@ -498,10 +498,14 @@ func EditorialStatusBadgeClass(status string) string {
 		return "bg-retro-wheat text-retro-ink"
 	case model.EditorialStatusPaused:
 		return "bg-retro-paper text-retro-ink"
-	case model.EditorialStatusDone:
+	case model.EditorialStatusRunning:
 		return "bg-retro-ink text-retro-cream"
-	case model.EditorialStatusCancelled:
+	case model.EditorialStatusFailed:
 		return "bg-retro-blush text-retro-ink"
+	case model.EditorialStatusDone:
+		return "bg-retro-sage text-retro-cream"
+	case model.EditorialStatusCancelled:
+		return "bg-retro-paper text-retro-muted"
 	default:
 		return "bg-retro-paper text-retro-ink"
 	}
@@ -541,4 +545,11 @@ func EditorialInputValuePtr(value *time.Time) string {
 		return ""
 	}
 	return EditorialInputValue(*value)
+}
+
+func EditorialIDValuePtr(value *int64) string {
+	if value == nil {
+		return ""
+	}
+	return IDText(*value)
 }

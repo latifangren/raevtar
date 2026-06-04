@@ -406,6 +406,38 @@ func TestEditorialInboxServiceReadyOrderingAndValidation(t *testing.T) {
 	if _, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{}); err == nil {
 		t.Fatalf("expected invalid editorial input error")
 	}
+	postID := int64(42)
+	updated, err := state.svc.Editorial.UpdateInboxItem(second.ID, model.EditorialInboxUpdate{
+		SourceType:      second.SourceType,
+		SourceValue:     second.SourceValue,
+		CategoryHint:    second.CategoryHint,
+		Priority:        second.Priority,
+		NotBefore:       second.NotBefore,
+		Deadline:        second.Deadline,
+		Note:            second.Note,
+		Mode:            second.Mode,
+		Status:          model.EditorialStatusDone,
+		PublishedPostID: &postID,
+	})
+	if err != nil {
+		t.Fatalf("update done item: %v", err)
+	}
+	if updated.PublishedPostID == nil || *updated.PublishedPostID != postID {
+		t.Fatalf("published post id = %v, want %d", updated.PublishedPostID, postID)
+	}
+	if _, err := state.svc.Editorial.UpdateInboxItem(first.ID, model.EditorialInboxUpdate{
+		SourceType:   first.SourceType,
+		SourceValue:  first.SourceValue,
+		CategoryHint: first.CategoryHint,
+		Priority:     first.Priority,
+		NotBefore:    first.NotBefore,
+		Deadline:     first.Deadline,
+		Note:         first.Note,
+		Mode:         first.Mode,
+		Status:       model.EditorialStatusDone,
+	}); err == nil {
+		t.Fatalf("expected done item without published_post_id to fail")
+	}
 }
 
 func TestMonitorServiceRotatesAgentToken(t *testing.T) {

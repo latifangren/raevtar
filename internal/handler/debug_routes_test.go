@@ -2102,7 +2102,17 @@ func TestEditorialInboxAdminAndAPIFlow(t *testing.T) {
 		t.Fatalf("editorial contract status = %d, want %d; body: %s", apiRR.Code, http.StatusOK, apiRR.Body.String())
 	}
 	assertContains(t, apiRR.Body.String(), `"source_of_truth":"raevtar"`)
+	assertContains(t, apiRR.Body.String(), `"published_post_id"`)
 	assertNotContains(t, body, "/api/v1/editorial-inbox/contract")
+
+	listReq := httptest.NewRequest(http.MethodGet, "/api/v1/editorial-inbox", nil)
+	listReq.Header.Set("Authorization", "Bearer admin-key")
+	listRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(listRR, listReq)
+	if listRR.Code != http.StatusOK {
+		t.Fatalf("editorial list status = %d, want %d; body: %s", listRR.Code, http.StatusOK, listRR.Body.String())
+	}
+	assertContains(t, listRR.Body.String(), `"status":"queued"`)
 }
 
 func TestAdminLoginRequestBodyIsCapped(t *testing.T) {
