@@ -5,10 +5,13 @@ templ Contact(data ContactData) {
 		<section class="full-width bg-retro-paper border-b-2 border-retro-ink mb-12 overflow-hidden">
 			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
 				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Contact</p>
-				<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Raevtar keeps contact intentionally lightweight.</h1>
-				<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">Best first contact here is context, not a form. Start with the public writing, route docs, and status board on { data.Domain }, then carry that shared context wherever conversation continues off-site.</p>
-				<p class="text-sm font-bold text-retro-muted mt-4 max-w-xl">This page stays light on purpose: public pages explain enough to orient readers, while operator-only channels and diagnostics stay outside the public UI.</p>
+				<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Page.Title }</h1>
+				<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Page.Summary }</p>
+				<p class="text-sm font-bold text-retro-muted mt-4 max-w-xl">Public starting point anchored at { data.Domain }, with operator-only channels and diagnostics deliberately kept outside public UI.</p>
 			</div>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+			<div class="prose text-retro-ink max-w-none">@templ.Raw(data.Page.ContentHTML)</div>
 		</section>
 		<section class="mb-12 grid gap-4 md:grid-cols-3">
 			<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">

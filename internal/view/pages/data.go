@@ -29,6 +29,7 @@ type AboutData struct {
 	CategoryCount int
 	ServerCount   int
 	Domain        string
+	Page          *model.PageContent
 }
 
 type BlogListData struct {
@@ -66,12 +67,21 @@ type ProjectsData struct {
 	PostCount     int
 	CategoryCount int
 	ServerCount   int
+	Projects      []model.Project
+	ProjectCount  int
+}
+
+type ProjectDetailData struct {
+	CurrentPath string
+	Project     *model.Project
+	Categories  []model.Category
 }
 
 type ContactData struct {
 	CurrentPath string
 	Categories  []model.Category
 	Domain      string
+	Page        *model.PageContent
 }
 
 type TopicsData struct {

@@ -11,6 +11,8 @@ type Service struct {
 	repos     *repo.Repositories
 	Cfg       *config.Config
 	Blog      *BlogService
+	Projects  *ProjectService
+	Pages     *PageContentService
 	Editorial *EditorialInboxService
 	Media     *MediaService
 	Monitor   *MonitorService
@@ -22,6 +24,8 @@ func New(repos *repo.Repositories, cfg *config.Config) *Service {
 		repos:     repos,
 		Cfg:       cfg,
 		Blog:      NewBlogService(repos),
+		Projects:  NewProjectService(repos),
+		Pages:     NewPageContentService(repos),
 		Editorial: NewEditorialInboxService(repos),
 		Media:     NewMediaService(repos, cfg.MediaDir),
 		Monitor:   &MonitorService{repos: repos},

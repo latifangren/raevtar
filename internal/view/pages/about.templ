@@ -7,8 +7,8 @@ templ About(data AboutData) {
 				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
 					<div>
 						<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">About Raevtar</p>
-						<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Single binary, public-safe by design.</h1>
-						<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">Raevtar is the personal platform I keep close at hand for writing notes, watching machines, and wiring light automation together in one Go binary while drawing a hard line between public signals and operator-only detail.</p>
+						<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Page.Title }</h1>
+						<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Page.Summary }</p>
 						<div class="flex flex-wrap gap-2 mt-4 max-w-xl">
 							<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">projects</a>
 							<a href="/topics" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">topics</a>
@@ -26,6 +26,9 @@ templ About(data AboutData) {
 					</div>
 				</div>
 			</div>
+		</section>
+		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+			<div class="prose text-retro-ink max-w-none">@templ.Raw(data.Page.ContentHTML)</div>
 		</section>
 		<section class="mb-12 grid gap-4 md:grid-cols-3">
 			<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">

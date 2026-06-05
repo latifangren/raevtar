@@ -5,6 +5,7 @@ import (
 	"math"
 	"path/filepath"
 	"reflect"
+	"strings"
 	"testing"
 	"time"
 
@@ -232,6 +233,78 @@ func TestBlogServiceListAllPostsIncludesDrafts(t *testing.T) {
 	}
 	if total != 2 || len(posts) != 2 {
 		t.Fatalf("posts total=%d len=%d, want 2/2", total, len(posts))
+	}
+}
+
+func TestProjectServiceCreateAndUpdateProject(t *testing.T) {
+	state := newTestServices(t)
+
+	project, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Raevtar Project",
+		ContentMD: "# Raevtar Project\n\nBuild log.",
+		Excerpt:   "Initial excerpt",
+		Published: true,
+		Tags:      []string{"oss", " infra "},
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+	if project.Slug != "raevtar-project" {
+		t.Fatalf("project slug = %q, want raevtar-project", project.Slug)
+	}
+	if len(project.Tags) != 2 {
+		t.Fatalf("project tags len = %d, want 2", len(project.Tags))
+	}
+
+	updated, err := state.svc.Projects.UpdateProject(project.ID, model.ProjectUpdate{
+		Title:     "Raevtar Project Updated",
+		ContentMD: "# Updated",
+		Excerpt:   "Updated excerpt",
+		Published: false,
+		Tags:      []string{"lab"},
+	})
+	if err != nil {
+		t.Fatalf("update project: %v", err)
+	}
+	if updated.Slug != project.Slug {
+		t.Fatalf("updated slug = %q, want preserved %q", updated.Slug, project.Slug)
+	}
+	if updated.Title != "Raevtar Project Updated" || updated.Excerpt != "Updated excerpt" || updated.Published {
+		t.Fatalf("updated project mismatch: %+v", updated)
+	}
+	if len(updated.Tags) != 1 || updated.Tags[0].Name != "lab" {
+		t.Fatalf("updated tags = %+v, want lab", updated.Tags)
+	}
+	if _, err := state.svc.Projects.GetPublishedProject(project.Slug); err == nil {
+		t.Fatalf("published lookup should hide draft project")
+	}
+}
+
+func TestPageContentServiceUpdateAndRender(t *testing.T) {
+	state := newTestServices(t)
+
+	about, err := state.svc.Pages.GetPage(model.PageKeyAbout)
+	if err != nil {
+		t.Fatalf("get about page: %v", err)
+	}
+	if about.Title == "" || about.ContentHTML == "" {
+		t.Fatalf("expected seeded about page content, got %+v", about)
+	}
+
+	updated, err := state.svc.Pages.UpdatePage(model.PageContent{
+		Key:       model.PageKeyContact,
+		Title:     "Reach out carefully",
+		Summary:   "Summary first",
+		ContentMD: "# Contact\n\nUpdated body.",
+	})
+	if err != nil {
+		t.Fatalf("update contact page: %v", err)
+	}
+	if updated.Title != "Reach out carefully" || updated.Summary != "Summary first" {
+		t.Fatalf("updated page mismatch: %+v", updated)
+	}
+	if updated.ContentHTML == "" || !strings.Contains(updated.ContentHTML, "Updated body") {
+		t.Fatalf("expected rendered html, got %q", updated.ContentHTML)
 	}
 }
 

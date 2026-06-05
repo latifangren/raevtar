@@ -43,6 +43,18 @@ func AutoMigrate(db *sqlx.DB) {
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
 
+	CREATE TABLE IF NOT EXISTS projects (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title TEXT NOT NULL,
+		slug TEXT UNIQUE NOT NULL,
+		content_md TEXT NOT NULL DEFAULT '',
+		excerpt TEXT NOT NULL DEFAULT '',
+		published INTEGER DEFAULT 1,
+		cover_image_url TEXT NOT NULL DEFAULT '',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
 	CREATE TABLE IF NOT EXISTS servers (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
 		name TEXT UNIQUE NOT NULL,
@@ -76,6 +88,8 @@ func AutoMigrate(db *sqlx.DB) {
 	CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category_id);
 	CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 	CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published);
+	CREATE INDEX IF NOT EXISTS idx_projects_slug ON projects(slug);
+	CREATE INDEX IF NOT EXISTS idx_projects_published ON projects(published);
 	CREATE INDEX IF NOT EXISTS idx_metrics_server ON server_metrics(server_id);
 
 	CREATE TABLE IF NOT EXISTS tags (
@@ -91,8 +105,24 @@ func AutoMigrate(db *sqlx.DB) {
 		PRIMARY KEY (post_id, tag_id)
 	);
 
+	CREATE TABLE IF NOT EXISTS project_tags (
+		project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+		tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+		PRIMARY KEY (project_id, tag_id)
+	);
+
 	CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);
 	CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
+	CREATE INDEX IF NOT EXISTS idx_project_tags_project ON project_tags(project_id);
+	CREATE INDEX IF NOT EXISTS idx_project_tags_tag ON project_tags(tag_id);
+
+	CREATE TABLE IF NOT EXISTS page_contents (
+		key TEXT PRIMARY KEY,
+		title TEXT NOT NULL DEFAULT '',
+		summary TEXT NOT NULL DEFAULT '',
+		content_md TEXT NOT NULL DEFAULT '',
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
 
 	CREATE TABLE IF NOT EXISTS media_assets (
 		id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -225,6 +255,8 @@ func ensureColumn(db *sqlx.DB, table, column, definition string) {
 // Repositories groups all repos
 type Repositories struct {
 	Post           *PostRepo
+	Project        *ProjectRepo
+	PageContent    *PageContentRepo
 	Category       *CategoryRepo
 	EditorialInbox *EditorialInboxRepo
 	Server         *ServerRepo
@@ -238,6 +270,8 @@ type Repositories struct {
 func New(db *sqlx.DB) *Repositories {
 	return &Repositories{
 		Post:           &PostRepo{db: db},
+		Project:        &ProjectRepo{db: db},
+		PageContent:    &PageContentRepo{db: db},
 		Category:       &CategoryRepo{db: db},
 		EditorialInbox: &EditorialInboxRepo{db: db},
 		Server:         &ServerRepo{db: db},

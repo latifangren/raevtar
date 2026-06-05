@@ -133,6 +133,44 @@ func (s *AdminService) DeletePost(username string, id int64, ip string) error {
 	return nil
 }
 
+func (s *AdminService) LogProjectCreated(username, title, ip string) error {
+	if err := s.repos.Audit.Insert(username, "CREATE_PROJECT", "created project: "+title, ip); err != nil {
+		return fmt.Errorf("audit create project: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) LogProjectUpdated(username, title, ip string) error {
+	if err := s.repos.Audit.Insert(username, "UPDATE_PROJECT", "updated project: "+title, ip); err != nil {
+		return fmt.Errorf("audit update project: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) DeleteProject(username string, id int64, ip string) error {
+	project, err := s.repos.Project.GetByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w: %w", ErrProjectNotFound, err)
+		}
+		return fmt.Errorf("get project: %w", err)
+	}
+	if err := s.repos.Audit.Insert(username, "DELETE_PROJECT", "deleted project: "+project.Title, ip); err != nil {
+		return fmt.Errorf("audit delete project: %w", err)
+	}
+	if err := s.repos.Project.Delete(id); err != nil {
+		return fmt.Errorf("delete project: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) LogPageUpdated(username string, page *model.PageContent, ip string) error {
+	if err := s.repos.Audit.Insert(username, "UPDATE_PAGE_CONTENT", "updated page: "+page.Key, ip); err != nil {
+		return fmt.Errorf("audit update page: %w", err)
+	}
+	return nil
+}
+
 func (s *AdminService) LogServerCreated(username, name, host, port, ip string) error {
 	if err := s.repos.Audit.Insert(username, "CREATE_SERVER", "created server: "+name+" ("+host+":"+port+")", ip); err != nil {
 		return fmt.Errorf("audit create server: %w", err)

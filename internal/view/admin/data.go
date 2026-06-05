@@ -75,6 +75,32 @@ type PostEditData struct {
 	MediaAssets []model.MediaAsset
 }
 
+type ProjectsData struct {
+	CurrentPath string
+	CSRFToken   string
+	Projects    []model.Project
+	MediaAssets []model.MediaAsset
+}
+
+type ProjectEditData struct {
+	CurrentPath string
+	CSRFToken   string
+	Project     *model.Project
+	MediaAssets []model.MediaAsset
+}
+
+type PagesData struct {
+	CurrentPath string
+	CSRFToken   string
+	Pages       []model.PageContent
+}
+
+type PageEditData struct {
+	CurrentPath string
+	CSRFToken   string
+	Page        *model.PageContent
+}
+
 type MediaData struct {
 	CurrentPath string
 	CSRFToken   string

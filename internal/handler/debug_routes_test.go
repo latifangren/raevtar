@@ -73,6 +73,17 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		t.Fatalf("create post: %v", err)
 	}
 
+	project, err := svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Whyred Watchtower",
+		ContentMD: "# Whyred Watchtower\n\nProject page baseline route test.",
+		Excerpt:   "Project baseline route test.",
+		Published: true,
+		Tags:      []string{"oss"},
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
 	server, err := svc.Monitor.CreateServer("whyred", "127.0.0.1", 9100, "local")
 	if err != nil {
 		t.Fatalf("create server: %v", err)
@@ -80,6 +91,9 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 
 	if post.Slug == "" {
 		t.Fatalf("expected generated slug")
+	}
+	if project.Slug == "" {
+		t.Fatalf("expected generated project slug")
 	}
 
 	return &publicTestApp{handler: New(svc, cfg), svc: svc, db: db, serverID: server.ID}
@@ -321,6 +335,7 @@ func TestPublicRoutes(t *testing.T) {
 			wantContains: []string{
 				"About Raevtar",
 				"Single binary, public-safe by design.",
+				"Raevtar is personal platform for writing notes",
 				"raevtar.test",
 				"topics",
 				"signals",
@@ -336,12 +351,27 @@ func TestPublicRoutes(t *testing.T) {
 			wantContains: []string{
 				"Projects",
 				"Three public lanes, one small machine.",
+				"Build log archive",
+				"Whyred Watchtower",
+				`href="/projects/whyred-watchtower"`,
 				"Publishing System",
 				"Signal Board",
 				"Automation Surface",
 				"Move sideways, not only downward.",
 				`href="/about"`,
 				`href="/topics"`,
+			},
+		},
+		{
+			name:           "project detail",
+			path:           "/projects/whyred-watchtower",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "text/html",
+			wantContains: []string{
+				"Project entry",
+				"Whyred Watchtower",
+				"Project page baseline route test.",
+				"Back to projects",
 			},
 		},
 		{
@@ -366,6 +396,7 @@ func TestPublicRoutes(t *testing.T) {
 			wantContains: []string{
 				"Contact",
 				"Raevtar keeps contact intentionally lightweight.",
+				"Best first contact here is context, not a form.",
 				"raevtar.test",
 				"Read the docs",
 				"Best route depends on what you need.",

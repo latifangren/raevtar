@@ -382,6 +382,210 @@ func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
 	http.Redirect(w, r, "/admin/posts", http.StatusSeeOther)
 }
 
+func (h *Handler) adminProjects(w http.ResponseWriter, r *http.Request) {
+	projects, _, err := h.svc.Projects.ListAllProjects(1, 9999)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	mediaAssets, err := h.svc.Media.ListAssets()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, adminview.Projects(adminview.ProjectsData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Projects:    projects,
+		MediaAssets: mediaAssets,
+	}))
+}
+
+func (h *Handler) adminCreateProject(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	intent := r.FormValue("intent")
+	project, err := h.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:         r.FormValue("title"),
+		ContentMD:     r.FormValue("content"),
+		Excerpt:       r.FormValue("excerpt"),
+		CoverImageURL: r.FormValue("cover_image_url"),
+		Published:     intent == adminPostIntentPublish,
+		Tags:          splitTags(r.FormValue("tags")),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	warnAfterMutation(r, "create_project_audit", h.svc.Admin.LogProjectCreated(entry.username, project.Title, clientIP(r)))
+	http.Redirect(w, r, "/admin/projects", http.StatusSeeOther)
+}
+
+func (h *Handler) adminPreviewProject(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	content := r.FormValue("content")
+	if strings.TrimSpace(content) == "" {
+		renderHTML(w, r, adminview.PostMarkdownPreview("", true))
+		return
+	}
+	contentHTML, err := h.svc.Projects.RenderMarkdown(content)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	renderHTML(w, r, adminview.PostMarkdownPreview(contentHTML, false))
+}
+
+func (h *Handler) adminEditProject(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	project, err := h.svc.Projects.GetProjectByID(id)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
+		http.Error(w, "project not found", http.StatusNotFound)
+		return
+	}
+	mediaAssets, err := h.svc.Media.ListAssets()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, adminview.ProjectEdit(adminview.ProjectEditData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Project:     project,
+		MediaAssets: mediaAssets,
+	}))
+}
+
+func (h *Handler) adminUpdateProject(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	currentProject, err := h.svc.Projects.GetProjectByID(id)
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
+		http.Error(w, "project not found", http.StatusNotFound)
+		return
+	}
+	published := currentProject.Published
+	switch r.FormValue("intent") {
+	case adminPostIntentDraft:
+		published = false
+	case adminPostIntentPublish:
+		published = true
+	case adminPostIntentUpdate:
+	}
+	project, err := h.svc.Projects.UpdateProject(id, model.ProjectUpdate{
+		Title:         r.FormValue("title"),
+		ContentMD:     r.FormValue("content"),
+		Excerpt:       r.FormValue("excerpt"),
+		CoverImageURL: r.FormValue("cover_image_url"),
+		Published:     published,
+		Tags:          splitTags(r.FormValue("tags")),
+	})
+	if err != nil {
+		if errors.Is(err, service.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusNotFound)
+			return
+		}
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	warnAfterMutation(r, "update_project_audit", h.svc.Admin.LogProjectUpdated(entry.username, project.Title, clientIP(r)))
+	http.Redirect(w, r, "/admin/projects", http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteProject(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	if err := h.svc.Admin.DeleteProject(entry.username, id, clientIP(r)); err != nil {
+		if errors.Is(err, service.ErrProjectNotFound) {
+			http.Error(w, "project not found", http.StatusNotFound)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects", http.StatusSeeOther)
+}
+
+func (h *Handler) adminPages(w http.ResponseWriter, r *http.Request) {
+	pagesData, err := h.svc.Pages.ListPages()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, adminview.Pages(adminview.PagesData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Pages:       pagesData,
+	}))
+}
+
+func (h *Handler) adminEditPage(w http.ResponseWriter, r *http.Request) {
+	page, err := h.svc.Pages.GetPage(r.PathValue("pageKey"))
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, adminview.PageEdit(adminview.PageEditData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Page:        page,
+	}))
+}
+
+func (h *Handler) adminUpdatePage(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	page, err := h.svc.Pages.UpdatePage(model.PageContent{
+		Key:       r.PathValue("pageKey"),
+		Title:     r.FormValue("title"),
+		Summary:   r.FormValue("summary"),
+		ContentMD: r.FormValue("content"),
+	})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	warnAfterMutation(r, "update_page_audit", h.svc.Admin.LogPageUpdated(entry.username, page, clientIP(r)))
+	http.Redirect(w, r, "/admin/pages", http.StatusSeeOther)
+}
+
 func (h *Handler) adminServers(w http.ResponseWriter, r *http.Request) {
 	servers, err := h.svc.Monitor.ListServers()
 	if err != nil {

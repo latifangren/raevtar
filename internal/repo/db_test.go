@@ -111,3 +111,43 @@ func TestAutoMigrateCreatesEditorialInboxTable(t *testing.T) {
 		}
 	}
 }
+
+func TestAutoMigrateCreatesProjectsAndPageContentsTables(t *testing.T) {
+	db := InitSQLite(filepath.Join(t.TempDir(), "content.db"))
+	t.Cleanup(func() { _ = db.Close() })
+
+	AutoMigrate(db)
+
+	for _, table := range []struct {
+		name    string
+		columns []string
+	}{
+		{name: "projects", columns: []string{"id", "title", "slug", "content_md", "excerpt", "published", "cover_image_url", "created_at", "updated_at"}},
+		{name: "page_contents", columns: []string{"key", "title", "summary", "content_md", "updated_at"}},
+		{name: "project_tags", columns: []string{"project_id", "tag_id"}},
+	} {
+		rows, err := db.Queryx("PRAGMA table_info(" + table.name + ")")
+		if err != nil {
+			t.Fatalf("inspect %s columns: %v", table.name, err)
+		}
+		columns := map[string]bool{}
+		for rows.Next() {
+			var cid int
+			var name, columnType string
+			var notNull int
+			var defaultValue any
+			var primaryKey int
+			if err := rows.Scan(&cid, &name, &columnType, &notNull, &defaultValue, &primaryKey); err != nil {
+				_ = rows.Close()
+				t.Fatalf("scan %s column: %v", table.name, err)
+			}
+			columns[name] = true
+		}
+		_ = rows.Close()
+		for _, name := range table.columns {
+			if !columns[name] {
+				t.Fatalf("%s missing column %q", table.name, name)
+			}
+		}
+	}
+}

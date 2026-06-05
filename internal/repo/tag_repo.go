@@ -59,6 +59,51 @@ func (r *TagRepo) GetByPostIDs(postIDs []int64) (map[int64][]model.Tag, error) {
 	return result, rows.Err()
 }
 
+func (r *TagRepo) GetByProjectID(projectID int64) ([]model.Tag, error) {
+	var tags []model.Tag
+	err := r.db.Select(&tags, `
+		SELECT t.* FROM tags t
+		JOIN project_tags pt ON pt.tag_id = t.id
+		WHERE pt.project_id = ?
+		ORDER BY t.name`, projectID)
+	return tags, err
+}
+
+func (r *TagRepo) GetByProjectIDs(projectIDs []int64) (map[int64][]model.Tag, error) {
+	if len(projectIDs) == 0 {
+		return map[int64][]model.Tag{}, nil
+	}
+
+	placeholders := make([]string, len(projectIDs))
+	args := make([]interface{}, len(projectIDs))
+	for i, id := range projectIDs {
+		placeholders[i] = "?"
+		args[i] = id
+	}
+
+	rows, err := r.db.Query(`
+		SELECT pt.project_id, t.id, t.name, t.slug, t.created_at
+		FROM project_tags pt
+		JOIN tags t ON t.id = pt.tag_id
+		WHERE pt.project_id IN (`+strings.Join(placeholders, ",")+`)
+		ORDER BY t.name`, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	result := make(map[int64][]model.Tag)
+	for rows.Next() {
+		var projectID int64
+		var t model.Tag
+		if err := rows.Scan(&projectID, &t.ID, &t.Name, &t.Slug, &t.CreatedAt); err != nil {
+			return nil, err
+		}
+		result[projectID] = append(result[projectID], t)
+	}
+	return result, rows.Err()
+}
+
 // Ensure creates a tag if it doesn't exist, returns existing one if it does.
 func (r *TagRepo) Ensure(name string) (*model.Tag, error) {
 	slug := makeSlug(name)
@@ -123,6 +168,48 @@ func (r *TagRepo) SetTags(postID int64, tagNames []string) error {
 		if _, err := tx.Exec(
 			"INSERT INTO post_tags (post_id, tag_id) VALUES (?, ?) ON CONFLICT DO NOTHING",
 			postID, tagID,
+		); err != nil {
+			return err
+		}
+	}
+
+	return tx.Commit()
+}
+
+func (r *TagRepo) SetProjectTags(projectID int64, tagNames []string) error {
+	tx, err := r.db.Beginx()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback()
+
+	if _, err := tx.Exec("DELETE FROM project_tags WHERE project_id = ?", projectID); err != nil {
+		return err
+	}
+
+	for _, name := range tagNames {
+		name = strings.TrimSpace(name)
+		if name == "" {
+			continue
+		}
+		slug := makeSlug(name)
+		if slug == "" {
+			continue
+		}
+		_, err := tx.Exec(
+			"INSERT INTO tags (name, slug) VALUES (?, ?) ON CONFLICT(slug) DO NOTHING",
+			name, slug,
+		)
+		if err != nil {
+			return err
+		}
+		var tagID int64
+		if err := tx.Get(&tagID, "SELECT id FROM tags WHERE slug = ?", slug); err != nil {
+			return err
+		}
+		if _, err := tx.Exec(
+			"INSERT INTO project_tags (project_id, tag_id) VALUES (?, ?) ON CONFLICT DO NOTHING",
+			projectID, tagID,
 		); err != nil {
 			return err
 		}

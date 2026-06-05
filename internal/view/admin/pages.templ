@@ -52,6 +52,8 @@ templ Dashboard(data DashboardData) {
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 					@quickLink("/admin/editorial-inbox", "Editorial", "Control Hermes inbox")
 					@quickLink("/admin/posts", "Posts", "Manage articles")
+					@quickLink("/admin/projects", "Projects", "Manage project postings")
+					@quickLink("/admin/pages", "Pages", "Edit About and Contact")
 					@quickLink("/admin/servers", "Servers", "Add or remove")
 					@quickLink("/admin/manage-users", "Users", "Manage accounts")
 					@quickLink("/admin/audit-log", "Audit", "View activity log")
@@ -358,6 +360,202 @@ templ PostEdit(data PostEditData) {
 						<button type="submit" name="intent" value="draft" class="px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Save Draft</button>
 						<button type="submit" name="intent" value="update" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Update</button>
 						<button type="submit" name="intent" value="publish" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Publish</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ Projects(data ProjectsData) {
+	@Shell("Manage Projects", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			@pageHeader("Manage Projects", CountText(len(data.Projects))+" total")
+			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+							<th class="py-3 px-4 font-bold">Title</th>
+							<th class="py-3 px-4 font-bold">Status</th>
+							<th class="py-3 px-4 font-bold">Date</th>
+							<th class="py-3 px-4"></th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, project := range data.Projects {
+							<tr class="border-b-2 border-retro-ink last:border-b-0">
+								<td class="py-3 px-4 text-sm font-bold text-retro-ink max-w-[300px] truncate">{ project.Title }</td>
+								<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted">
+									if project.Published {
+										<span>published</span>
+									} else {
+										<span>draft</span>
+									}
+								</td>
+								<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ project.CreatedAt.Format("2006-01-02") }</td>
+								<td class="py-3 px-4 text-right">
+									<a href={ templ.URL("/admin/projects/edit/" + IDText(project.ID)) } class="text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline">Edit</a>
+									<form method="POST" action={ templ.URL("/admin/projects/delete/" + IDText(project.ID)) } class="inline" data-confirm="Delete this project? This cannot be undone.">
+										<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+										<button type="submit" class="text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer">✕</button>
+									</form>
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<h2 class="text-sm font-black uppercase text-retro-ink mb-4">Create New Project</h2>
+				<form method="POST" action="/admin/projects" class="space-y-4" data-confirm="Save this project?">
+					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
+						<input type="text" name="title" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Project title"/>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Content (Markdown)</label>
+						<textarea name="content" rows="15" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Write project details in Markdown..."></textarea>
+					</div>
+					<div class="grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<p class="text-xs font-black uppercase text-retro-muted">Server preview</p>
+							<p class="text-xs font-bold text-retro-ink mt-1">Preview project Markdown using same public renderer path.</p>
+							<button type="button" hx-post="/admin/projects/preview" hx-include="closest form" hx-target="#post-markdown-preview" hx-swap="outerHTML" class="mt-3 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-black text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer">Preview Markdown</button>
+						</div>
+						@PostMarkdownPreview("", true)
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Excerpt</label>
+						<input type="text" name="excerpt" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Short project summary"/>
+					</div>
+					@coverImageSelect("", data.MediaAssets)
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Tags</label>
+						<input type="text" name="tags" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="oss, infrastructure"/>
+					</div>
+					<div class="flex flex-wrap justify-end gap-2">
+						<button type="submit" name="intent" value="draft" class="px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Save Draft</button>
+						<button type="submit" name="intent" value="publish" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Publish Project</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ ProjectEdit(data ProjectEditData) {
+	@Shell("Edit Project", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<a href="/admin/projects" class="text-xs font-bold no-underline hover:bg-retro-wheat">&larr; Projects</a>
+					<h1 class="text-xl font-black uppercase text-retro-ink mt-1">Edit project</h1>
+				</div>
+				<span class="text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono">slug: { data.Project.Slug }</span>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<form method="POST" action={ templ.URL("/admin/projects/update/" + IDText(data.Project.ID)) } class="space-y-4" data-confirm="Save project changes?">
+					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
+						<input type="text" name="title" value={ data.Project.Title } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Content (Markdown)</label>
+						<textarea name="content" rows="18" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono">{ data.Project.ContentMD }</textarea>
+					</div>
+					<div class="grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<p class="text-xs font-black uppercase text-retro-muted">Server preview</p>
+							<p class="text-xs font-bold text-retro-ink mt-1">Preview unsaved Markdown using same renderer as public project pages.</p>
+							<button type="button" hx-post="/admin/projects/preview" hx-include="closest form" hx-target="#post-markdown-preview" hx-swap="outerHTML" class="mt-3 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-black text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Preview Markdown</button>
+						</div>
+						@PostMarkdownPreview(data.Project.ContentHTML, false)
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Excerpt</label>
+						<input type="text" name="excerpt" value={ data.Project.Excerpt } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					</div>
+					@coverImageSelect(data.Project.CoverImageURL, data.MediaAssets)
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Tags</label>
+						<input type="text" name="tags" value={ TagsInput(data.Project.Tags) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					</div>
+					<div class="flex items-start justify-between gap-3 border-2 border-retro-ink bg-retro-cream px-4 py-3">
+						<div>
+							<p class="text-xs font-black uppercase text-retro-muted">Current status</p>
+							if data.Project.Published {
+								<p class="text-sm font-mono font-black text-retro-ink">Published</p>
+							} else {
+								<p class="text-sm font-mono font-black text-retro-ink">Draft</p>
+							}
+						</div>
+						<p class="max-w-md text-xs font-bold text-retro-muted">Use Update to keep status, or Draft/Publish to change it.</p>
+					</div>
+					<div class="flex flex-wrap justify-end gap-2">
+						<a href="/admin/projects" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline">Cancel</a>
+						<button type="submit" name="intent" value="draft" class="px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Save Draft</button>
+						<button type="submit" name="intent" value="update" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Update</button>
+						<button type="submit" name="intent" value="publish" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Publish</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ Pages(data PagesData) {
+	@Shell("Manage Pages", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			@pageHeader("Manage Pages", CountText(len(data.Pages))+" editable pages")
+			<div class="grid gap-4 md:grid-cols-2">
+				for _, page := range data.Pages {
+					<article class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] space-y-3">
+						<div class="flex items-start justify-between gap-3">
+							<div>
+								<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">{ page.Key }</p>
+								<h2 class="text-2xl font-black uppercase text-retro-ink">{ page.Title }</h2>
+							</div>
+							<a href={ templ.URL("/admin/pages/edit/" + page.Key) } class="text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline">Edit</a>
+						</div>
+						<p class="text-sm font-bold text-retro-muted">{ page.Summary }</p>
+						<p class="text-xs font-mono font-bold text-retro-muted">updated { page.UpdatedAt.Format("2006-01-02 15:04") }</p>
+					</article>
+				}
+			</div>
+		</div>
+	}
+}
+
+templ PageEdit(data PageEditData) {
+	@Shell("Edit Page", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<a href="/admin/pages" class="text-xs font-bold no-underline hover:bg-retro-wheat">&larr; Pages</a>
+					<h1 class="text-xl font-black uppercase text-retro-ink mt-1">Edit { data.Page.Key } page</h1>
+				</div>
+				<span class="text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono">key: { data.Page.Key }</span>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<form method="POST" action={ templ.URL("/admin/pages/update/" + data.Page.Key) } class="space-y-4" data-confirm="Save page changes?">
+					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Hero title</label>
+						<input type="text" name="title" value={ data.Page.Title } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Summary</label>
+						<input type="text" name="summary" value={ data.Page.Summary } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Body (Markdown)</label>
+						<textarea name="content" rows="18" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono">{ data.Page.ContentMD }</textarea>
+					</div>
+					<div class="flex justify-end gap-2">
+						<a href="/admin/pages" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline">Cancel</a>
+						<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Save Page</button>
 					</div>
 				</form>
 			</div>

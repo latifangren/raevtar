@@ -79,7 +79,7 @@ func Nav(categories []model.Category, currentPath string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var6 = []any{navClass(currentPath == "/projects")}
+		var templ_7745c5c3_Var6 = []any{navClass(isProjectsPath(currentPath))}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var6...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -217,6 +217,10 @@ func Nav(categories []model.Category, currentPath string) templ.Component {
 
 func isDashboardPath(path string) bool {
 	return len(path) >= len("/dashboard") && path[:len("/dashboard")] == "/dashboard"
+}
+
+func isProjectsPath(path string) bool {
+	return len(path) >= len("/projects") && path[:len("/projects")] == "/projects"
 }
 
 func navClass(active bool) string {

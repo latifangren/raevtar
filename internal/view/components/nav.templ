@@ -7,7 +7,7 @@ templ Nav(categories []model.Category, currentPath string) {
 		<a href="/" class="text-lg sm:text-xl font-black text-retro-sageLight hover:text-retro-wheat no-underline">raevtar</a>
 		<a href="/about" class={ navClass(currentPath == "/about") }>about</a>
 		<a href="/blog" class={ navClass(currentPath == "/blog") }>blog</a>
-		<a href="/projects" class={ navClass(currentPath == "/projects") }>projects</a>
+		<a href="/projects" class={ navClass(isProjectsPath(currentPath)) }>projects</a>
 		<a href="/topics" class={ navClass(currentPath == "/topics") }>topics</a>
 		<a href="/lab" class={ navClass(currentPath == "/lab") }>lab</a>
 		<a href="/docs" class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
@@ -18,6 +18,10 @@ templ Nav(categories []model.Category, currentPath string) {
 
 func isDashboardPath(path string) bool {
 	return len(path) >= len("/dashboard") && path[:len("/dashboard")] == "/dashboard"
+}
+
+func isProjectsPath(path string) bool {
+	return len(path) >= len("/projects") && path[:len("/projects")] == "/projects"
 }
 
 func navClass(active bool) string {

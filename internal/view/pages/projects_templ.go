@@ -8,6 +8,8 @@ package pages
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
+import "raevtar/internal/view/components"
+
 func Projects(data ProjectsData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -48,7 +50,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 23, Col: 147}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 25, Col: 146}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -61,7 +63,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 24, Col: 153}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 26, Col: 152}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -72,22 +74,22 @@ func Projects(data ProjectsData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
-			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.CategoryCount))
+			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ProjectCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 25, Col: 151}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 27, Col: 149}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"text-xs font-bold uppercase text-retro-muted\">topics</span></div></div><p class=\"text-sm font-bold text-retro-muted mt-4\">Same public surface, three ways in.</p></div></div></div></div></section><section class=\"mb-12 grid gap-4 lg:grid-cols-3\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">01 lane</p><h2 class=\"text-2xl font-black uppercase mb-3\">Publishing System</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"text-xs font-bold uppercase text-retro-muted\">projects</span></div></div><p class=\"text-sm font-bold text-retro-muted mt-4\">Same public surface, three ways in.</p></div></div></div></div></section><section class=\"mb-12 grid gap-4 lg:grid-cols-3\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">01 lane</p><h2 class=\"text-2xl font-black uppercase mb-3\">Publishing System</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 37, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 39, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -100,7 +102,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 47, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 49, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -113,13 +115,38 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.CategoryCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 57, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 59, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " seeded topics help automated publishing stay organized and readable, while public docs explain what automation touches without turning this page into an operator handbook.</p><div class=\"grid gap-2 mb-4\"><a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat\">Read docs &rarr;</a> <a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-black no-underline hover:bg-retro-paper\">Why it exists &rarr;</a></div><p class=\"text-xs font-bold uppercase tracking-widest text-retro-muted\">Best for: boundaries, API shape, public-safe automation context.</p></div></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">route map</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Move sideways, not only downward.</h2><p class=\"text-sm font-bold text-retro-sageLight\">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">about</p><p class=\"text-sm font-bold text-retro-ink\">Personal framing, stack choices, and public/private split.</p></a> <a href=\"/topics\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">topics</p><p class=\"text-sm font-bold text-retro-ink\">Category index for finding writing by subject, not chronology.</p></a> <a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">docs</p><p class=\"text-sm font-bold text-retro-ink\">Read-only route list and boundary notes for public readers.</p></a> <a href=\"/contact\" class=\"border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">contact</p><p class=\"text-sm font-bold text-retro-ink\">Where to start if you need context before reaching elsewhere.</p></a></div></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, " seeded topics help automated publishing stay organized and readable, while public docs explain what automation touches without turning this page into an operator handbook.</p><div class=\"grid gap-2 mb-4\"><a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-paper p-3 text-sm font-black no-underline hover:bg-retro-wheat\">Read docs &rarr;</a> <a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-black no-underline hover:bg-retro-paper\">Why it exists &rarr;</a></div><p class=\"text-xs font-bold uppercase tracking-widest text-retro-muted\">Best for: boundaries, API shape, public-safe automation context.</p></div></section><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-5\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Project postings</p><h2 class=\"text-3xl font-black uppercase text-retro-ink\">Build log archive</h2></div><span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink\">Projects</span></div>")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(data.Projects) == 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">Belum ada project posting.</p></div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			} else {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<div class=\"grid gap-4\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, project := range data.Projects {
+					templ_7745c5c3_Err = components.ProjectCard(project).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">route map</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Move sideways, not only downward.</h2><p class=\"text-sm font-bold text-retro-sageLight\">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">about</p><p class=\"text-sm font-bold text-retro-ink\">Personal framing, stack choices, and public/private split.</p></a> <a href=\"/topics\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">topics</p><p class=\"text-sm font-bold text-retro-ink\">Category index for finding writing by subject, not chronology.</p></a> <a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">docs</p><p class=\"text-sm font-bold text-retro-ink\">Read-only route list and boundary notes for public readers.</p></a> <a href=\"/contact\" class=\"border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">contact</p><p class=\"text-sm font-bold text-retro-ink\">Where to start if you need context before reaching elsewhere.</p></a></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

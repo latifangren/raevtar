@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"time"
 
+	"raevtar/internal/model"
 	"raevtar/internal/view/pages"
 )
 
@@ -55,6 +56,11 @@ func (h *Handler) aboutPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	page, err := h.svc.Pages.GetPage(model.PageKeyAbout)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 
 	renderHTML(w, r, pages.About(pages.AboutData{
 		CurrentPath:   r.URL.Path,
@@ -63,6 +69,7 @@ func (h *Handler) aboutPage(w http.ResponseWriter, r *http.Request) {
 		CategoryCount: len(categories),
 		ServerCount:   len(servers),
 		Domain:        h.cfg.Domain,
+		Page:          page,
 	}))
 }
 
@@ -127,6 +134,11 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	projects, projectCount, err := h.svc.Projects.ListProjects(1, 12)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 
 	renderHTML(w, r, pages.Projects(pages.ProjectsData{
 		CurrentPath:   r.URL.Path,
@@ -134,6 +146,30 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		PostCount:     postCount,
 		CategoryCount: len(categories),
 		ServerCount:   len(servers),
+		Projects:      projects,
+		ProjectCount:  projectCount,
+	}))
+}
+
+func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
+	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
+		http.Error(w, "Project not found", http.StatusNotFound)
+		return
+	}
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, pages.ProjectDetail(pages.ProjectDetailData{
+		CurrentPath: r.URL.Path,
+		Project:     project,
+		Categories:  categories,
 	}))
 }
 
@@ -143,11 +179,17 @@ func (h *Handler) contactPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	page, err := h.svc.Pages.GetPage(model.PageKeyContact)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 
 	renderHTML(w, r, pages.Contact(pages.ContactData{
 		CurrentPath: r.URL.Path,
 		Categories:  categories,
 		Domain:      h.cfg.Domain,
+		Page:        page,
 	}))
 }
 
