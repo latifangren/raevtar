@@ -14,12 +14,13 @@ const (
 )
 
 type IndexData struct {
-	CurrentPath string
-	Posts       []model.Post
-	PostCount   int
-	Servers     []model.Server
-	Categories  []model.Category
-	Domain      string
+	CurrentPath      string
+	Posts            []model.Post
+	PostCount        int
+	Servers          []model.Server
+	Categories       []model.Category
+	FeaturedProjects []model.Project
+	Domain           string
 }
 
 type AboutData struct {
@@ -63,14 +64,17 @@ type DocsData struct {
 }
 
 type ProjectsData struct {
-	CurrentPath   string
-	Categories    []model.Category
-	PostCount     int
-	CategoryCount int
-	ServerCount   int
-	Projects      []model.Project
-	ProjectCount  int
-	FeaturedCount int
+	CurrentPath         string
+	Categories          []model.Category
+	PostCount           int
+	CategoryCount       int
+	ServerCount         int
+	Projects            []model.Project
+	TotalProjectCount   int
+	VisibleProjectCount int
+	FeaturedCount       int
+	CurrentFeaturedOnly bool
+	CurrentSort         string
 }
 
 type ProjectDetailData struct {

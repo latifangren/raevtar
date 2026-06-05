@@ -68,6 +68,85 @@ func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusCreated, post)
 }
 
+func (h *Handler) apiCreateProject(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	var input model.ProjectCreate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+
+	project, err := h.svc.Projects.CreateProject(input)
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidProjectInput) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	writeJSON(w, http.StatusCreated, project)
+}
+
+func (h *Handler) apiUpdateProject(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	id, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+
+	var input model.ProjectUpdate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+
+	project, err := h.svc.Projects.UpdateProject(id, input)
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidProjectInput) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		if errors.Is(err, service.ErrProjectNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "project not found"})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, project)
+}
+
+func (h *Handler) apiDeleteProject(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+
+	if err := h.svc.Projects.DeleteProject(id); err != nil {
+		if errors.Is(err, service.ErrProjectNotFound) {
+			writeJSON(w, http.StatusNotFound, map[string]string{"error": "project not found"})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
 func (h *Handler) apiListCategories(w http.ResponseWriter, r *http.Request) {
 	cats, err := h.svc.Blog.ListCategories()
 	if err != nil {

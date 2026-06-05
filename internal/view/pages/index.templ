@@ -124,6 +124,22 @@ templ Index(data IndexData) {
 					<p class="text-sm text-retro-muted mt-2">Check the <a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">status board</a> or start publishing via the API.</p>
 			</section>
 		}
+		if len(data.FeaturedProjects) > 0 {
+			<section class="mb-12">
+				<div class="flex items-center justify-between mb-4 gap-4">
+					<div>
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Featured builds</p>
+						<h2 class="text-lg font-black uppercase">Featured Projects</h2>
+					</div>
+					<a href="/projects?featured=true" class="text-sm font-bold no-underline hover:bg-retro-wheat">View featured lane &rarr;</a>
+				</div>
+				<div class="grid gap-5">
+					for _, project := range data.FeaturedProjects {
+						@components.ProjectCard(project)
+					}
+				</div>
+			</section>
+		}
 		<section id="lab" class="mb-12 scroll-mt-24">
 			<div class="flex flex-wrap items-end justify-between gap-4 mb-4">
 				<div>

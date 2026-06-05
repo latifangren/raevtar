@@ -359,6 +359,37 @@ func TestProjectServiceRejectsInvalidSort(t *testing.T) {
 	}
 }
 
+func TestProjectServiceDeleteProjectAndMissingUpdate(t *testing.T) {
+	state := newTestServices(t)
+
+	project, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Delete Me",
+		ContentMD: "# Delete Me",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	if err := state.svc.Projects.DeleteProject(project.ID); err != nil {
+		t.Fatalf("delete project: %v", err)
+	}
+	if _, err := state.svc.Projects.GetProjectByID(project.ID); err == nil {
+		t.Fatalf("expected deleted project lookup to fail")
+	}
+
+	_, err = state.svc.Projects.UpdateProject(9999, model.ProjectUpdate{
+		Title:     "Missing",
+		ContentMD: "# Missing",
+	})
+	if err == nil {
+		t.Fatalf("expected missing project update to fail")
+	}
+	if !errors.Is(err, ErrProjectNotFound) {
+		t.Fatalf("err = %v, want ErrProjectNotFound", err)
+	}
+}
+
 func TestPageContentServiceUpdateAndRender(t *testing.T) {
 	state := newTestServices(t)
 

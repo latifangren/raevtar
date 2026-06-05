@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"path/filepath"
 	"strconv"
+	"strings"
 	"time"
 
 	"raevtar/internal/model"
@@ -30,14 +31,20 @@ func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	featuredProjects, _, err := h.svc.Projects.ListProjects(1, 3, service.ProjectListOptions{FeaturedOnly: true})
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 
 	renderHTML(w, r, pages.Index(pages.IndexData{
-		CurrentPath: r.URL.Path,
-		Posts:       posts,
-		PostCount:   postCount,
-		Servers:     servers,
-		Categories:  categories,
-		Domain:      h.cfg.Domain,
+		CurrentPath:      r.URL.Path,
+		Posts:            posts,
+		PostCount:        postCount,
+		Servers:          servers,
+		Categories:       categories,
+		FeaturedProjects: featuredProjects,
+		Domain:           h.cfg.Domain,
 	}))
 }
 
@@ -126,6 +133,10 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
+	featuredOnly := strings.EqualFold(r.URL.Query().Get("featured"), "true")
+	sort := r.URL.Query().Get("sort")
+	listOpts := service.ProjectListOptions{FeaturedOnly: featuredOnly, Sort: sort}
+
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
 		internalServerError(w, r, err)
@@ -141,27 +152,38 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	projects, projectCount, err := h.svc.Projects.ListProjects(1, 12, service.ProjectListOptions{})
+	projects, visibleCount, err := h.svc.Projects.ListProjects(1, 12, listOpts)
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidProjectSort) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
+	_, totalProjectCount, err := h.svc.Projects.ListProjects(1, 1, service.ProjectListOptions{})
 	if err != nil {
 		internalServerError(w, r, err)
 		return
 	}
-	featuredProjects, featuredCount, err := h.svc.Projects.ListProjects(1, 3, service.ProjectListOptions{FeaturedOnly: true})
+	_, featuredCount, err := h.svc.Projects.ListProjects(1, 1, service.ProjectListOptions{FeaturedOnly: true})
 	if err != nil {
 		internalServerError(w, r, err)
 		return
 	}
-	_ = featuredProjects
 
 	renderHTML(w, r, pages.Projects(pages.ProjectsData{
-		CurrentPath:   r.URL.Path,
-		Categories:    categories,
-		PostCount:     postCount,
-		CategoryCount: len(categories),
-		ServerCount:   len(servers),
-		Projects:      projects,
-		ProjectCount:  projectCount,
-		FeaturedCount: featuredCount,
+		CurrentPath:         r.URL.Path,
+		Categories:          categories,
+		PostCount:           postCount,
+		CategoryCount:       len(categories),
+		ServerCount:         len(servers),
+		Projects:            projects,
+		TotalProjectCount:   totalProjectCount,
+		VisibleProjectCount: visibleCount,
+		FeaturedCount:       featuredCount,
+		CurrentFeaturedOnly: featuredOnly,
+		CurrentSort:         sort,
 	}))
 }
 

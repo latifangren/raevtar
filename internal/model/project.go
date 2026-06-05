@@ -31,12 +31,12 @@ type ProjectCreate struct {
 }
 
 type ProjectUpdate struct {
-	Title         string
-	ContentMD     string
-	Excerpt       string
-	CoverImageURL string
-	Published     bool
-	Featured      bool
-	SortOrder     int
-	Tags          []string
+	Title         string   `json:"title"`
+	ContentMD     string   `json:"content_md"`
+	Excerpt       string   `json:"excerpt"`
+	CoverImageURL string   `json:"cover_image_url"`
+	Published     bool     `json:"published"`
+	Featured      bool     `json:"featured"`
+	SortOrder     int      `json:"sort_order"`
+	Tags          []string `json:"tags"`
 }

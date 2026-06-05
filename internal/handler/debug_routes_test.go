@@ -311,6 +311,9 @@ func TestPublicRoutes(t *testing.T) {
 				"Read the Blog",
 				"Open Status",
 				"Platform Showcase",
+				"Featured Projects",
+				"Whyred Watchtower",
+				`href="/projects?featured=true"`,
 				"about",
 				"projects",
 				"topics",
@@ -354,6 +357,9 @@ func TestPublicRoutes(t *testing.T) {
 				"Projects",
 				"Three public lanes, one small machine.",
 				"Build log archive",
+				"Sort archive",
+				"Featured only",
+				"Reset filters",
 				"featured lane",
 				"Whyred Watchtower",
 				`href="/projects/whyred-watchtower"`,
@@ -644,6 +650,166 @@ func TestAPIListProjectsSupportsFeaturedFilterAndRejectsInvalidSort(t *testing.T
 		t.Fatalf("bad sort status = %d, want %d; body: %s", badRR.Code, http.StatusBadRequest, badRR.Body.String())
 	}
 	assertContains(t, badRR.Body.String(), "invalid project sort")
+}
+
+func TestAPIProjectWriteEndpointsRequireAdminKey(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	for _, tt := range []struct {
+		method string
+		path   string
+	}{
+		{method: http.MethodPost, path: "/api/v1/projects"},
+		{method: http.MethodPut, path: "/api/v1/projects/1"},
+		{method: http.MethodDelete, path: "/api/v1/projects/1"},
+	} {
+		t.Run(tt.method+" "+tt.path, func(t *testing.T) {
+			req := httptest.NewRequest(tt.method, tt.path, strings.NewReader(`{}`))
+			req.Header.Set("Content-Type", "application/json")
+			rr := httptest.NewRecorder()
+			app.handler.ServeHTTP(rr, req)
+			if rr.Code != http.StatusUnauthorized {
+				t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusUnauthorized, rr.Body.String())
+			}
+		})
+	}
+}
+
+func TestAPIProjectCreateUpdateDeleteFlow(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	createReq := httptest.NewRequest(http.MethodPost, "/api/v1/projects", strings.NewReader(`{"title":"API Project","content_md":"# API Project","excerpt":"Created by API","published":true,"featured":true,"sort_order":4,"tags":["api"," automation "]}`))
+	createReq.Header.Set("Authorization", "Bearer admin-key")
+	createReq.Header.Set("Content-Type", "application/json")
+	createRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(createRR, createReq)
+	if createRR.Code != http.StatusCreated {
+		t.Fatalf("create status = %d, want %d; body: %s", createRR.Code, http.StatusCreated, createRR.Body.String())
+	}
+	var created model.Project
+	if err := json.NewDecoder(createRR.Body).Decode(&created); err != nil {
+		t.Fatalf("decode created project: %v", err)
+	}
+	if created.ID == 0 || created.Slug != "api-project" || !created.Featured || created.SortOrder != 4 {
+		t.Fatalf("created project mismatch: %+v", created)
+	}
+	if len(created.Tags) != 2 {
+		t.Fatalf("created tags = %+v, want 2", created.Tags)
+	}
+
+	updateReq := httptest.NewRequest(http.MethodPut, "/api/v1/projects/"+strconv.FormatInt(created.ID, 10), strings.NewReader(`{"title":"API Project Updated","content_md":"# API Updated","excerpt":"Updated by API","published":false,"featured":false,"sort_order":-5,"tags":["updated"]}`))
+	updateReq.Header.Set("Authorization", "Bearer admin-key")
+	updateReq.Header.Set("Content-Type", "application/json")
+	updateRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(updateRR, updateReq)
+	if updateRR.Code != http.StatusOK {
+		t.Fatalf("update status = %d, want %d; body: %s", updateRR.Code, http.StatusOK, updateRR.Body.String())
+	}
+	var updated model.Project
+	if err := json.NewDecoder(updateRR.Body).Decode(&updated); err != nil {
+		t.Fatalf("decode updated project: %v", err)
+	}
+	if updated.Slug != created.Slug || updated.Title != "API Project Updated" || updated.Published || updated.Featured || updated.SortOrder != 0 {
+		t.Fatalf("updated project mismatch: %+v", updated)
+	}
+
+	deleteReq := httptest.NewRequest(http.MethodDelete, "/api/v1/projects/"+strconv.FormatInt(created.ID, 10), nil)
+	deleteReq.Header.Set("Authorization", "Bearer admin-key")
+	deleteRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(deleteRR, deleteReq)
+	if deleteRR.Code != http.StatusOK {
+		t.Fatalf("delete status = %d, want %d; body: %s", deleteRR.Code, http.StatusOK, deleteRR.Body.String())
+	}
+	assertContains(t, deleteRR.Body.String(), `"status":"ok"`)
+
+	listReq := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
+	listRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(listRR, listReq)
+	if listRR.Code != http.StatusOK {
+		t.Fatalf("list status = %d, want %d", listRR.Code, http.StatusOK)
+	}
+	var projects []model.Project
+	if err := json.NewDecoder(listRR.Body).Decode(&projects); err != nil {
+		t.Fatalf("decode projects: %v", err)
+	}
+	for _, project := range projects {
+		if project.ID == created.ID {
+			t.Fatalf("deleted project still visible: %+v", project)
+		}
+	}
+}
+
+func TestAPIProjectWriteValidationAndNotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	badCreateReq := httptest.NewRequest(http.MethodPost, "/api/v1/projects", strings.NewReader(`{"title":"No Body"}`))
+	badCreateReq.Header.Set("Authorization", "Bearer admin-key")
+	badCreateReq.Header.Set("Content-Type", "application/json")
+	badCreateRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(badCreateRR, badCreateReq)
+	if badCreateRR.Code != http.StatusBadRequest {
+		t.Fatalf("bad create status = %d, want %d; body: %s", badCreateRR.Code, http.StatusBadRequest, badCreateRR.Body.String())
+	}
+
+	badIDReq := httptest.NewRequest(http.MethodPut, "/api/v1/projects/not-a-number", strings.NewReader(`{"title":"x","content_md":"# x"}`))
+	badIDReq.Header.Set("Authorization", "Bearer admin-key")
+	badIDReq.Header.Set("Content-Type", "application/json")
+	badIDRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(badIDRR, badIDReq)
+	if badIDRR.Code != http.StatusBadRequest {
+		t.Fatalf("bad id status = %d, want %d; body: %s", badIDRR.Code, http.StatusBadRequest, badIDRR.Body.String())
+	}
+
+	notFoundReq := httptest.NewRequest(http.MethodDelete, "/api/v1/projects/9999", nil)
+	notFoundReq.Header.Set("Authorization", "Bearer admin-key")
+	notFoundRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(notFoundRR, notFoundReq)
+	if notFoundRR.Code != http.StatusNotFound {
+		t.Fatalf("delete missing status = %d, want %d; body: %s", notFoundRR.Code, http.StatusNotFound, notFoundRR.Body.String())
+	}
+}
+
+func TestProjectsPageSupportsFeaturedFilterAndSortQuery(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	_, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Old Featured",
+		ContentMD: "# Old Featured",
+		Excerpt:   "old featured project",
+		Published: true,
+		Featured:  true,
+		SortOrder: 5,
+	})
+	if err != nil {
+		t.Fatalf("create old featured project: %v", err)
+	}
+	_, err = app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Normal Project",
+		ContentMD: "# Normal Project",
+		Excerpt:   "normal project",
+		Published: true,
+		Featured:  false,
+		SortOrder: 8,
+	})
+	if err != nil {
+		t.Fatalf("create normal project: %v", err)
+	}
+
+	status, body := getBody(t, app, "/projects?featured=true&sort=oldest", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, `name="featured" value="true" checked`)
+	assertContains(t, body, `<option value="oldest" selected>Oldest first</option>`)
+	assertContains(t, body, "Old Featured")
+	assertContains(t, body, "Whyred Watchtower")
+	assertNotContains(t, body, "Normal Project")
+
+	badStatus, badBody := getBody(t, app, "/projects?sort=sideways", nil)
+	if badStatus != http.StatusBadRequest {
+		t.Fatalf("bad sort status = %d, want %d; body: %s", badStatus, http.StatusBadRequest, badBody)
+	}
+	assertContains(t, badBody, "invalid project sort")
 }
 
 func TestUIPolishSourceHooks(t *testing.T) {
@@ -2161,13 +2327,19 @@ func TestAPIRequestBodiesAreCapped(t *testing.T) {
 		payload string
 	}{
 		{name: "create post", path: "/api/v1/posts", payload: `{"category_slug":"devops","title":"large","content_md":"` + largeValue + `"}`},
+		{name: "create project", path: "/api/v1/projects", payload: `{"title":"large","content_md":"` + largeValue + `"}`},
+		{name: "update project", path: "/api/v1/projects/1", payload: `{"title":"large","content_md":"` + largeValue + `"}`},
 		{name: "create server", path: "/api/v1/servers", payload: `{"name":"large","host":"127.0.0.1","padding":"` + largeValue + `"}`},
 		{name: "record metric", path: "/api/v1/servers/1/ping", payload: `{"online":true,"padding":"` + largeValue + `"}`},
 	}
 
 	for i, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
-			req := httptest.NewRequest(http.MethodPost, tt.path, strings.NewReader(tt.payload))
+			method := http.MethodPost
+			if tt.name == "update project" {
+				method = http.MethodPut
+			}
+			req := httptest.NewRequest(method, tt.path, strings.NewReader(tt.payload))
 			req.RemoteAddr = fmt.Sprintf("198.51.100.%d:1234", i+10)
 			req.Header.Set("Authorization", "Bearer admin-key")
 			req.Header.Set("Content-Type", "application/json")

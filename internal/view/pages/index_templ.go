@@ -133,7 +133,27 @@ func Index(data IndexData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " <section id=\"lab\" class=\"mb-12 scroll-mt-24\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-4\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Lab</p><h2 class=\"text-3xl font-black uppercase\">Public lab bench</h2></div><a href=\"/lab\" class=\"text-sm font-black no-underline hover:bg-retro-wheat\">Open full lab &rarr;</a></div><div class=\"grid gap-4 md:grid-cols-3\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-sage text-retro-cream font-black\">01</span><h3 class=\"font-black uppercase mb-2\">Content Lab</h3><p class=\"text-sm font-bold text-retro-muted\">Commissioned and automated notes land in the same blog index with tags intact.</p></div><div class=\"bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-4\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-ink text-retro-cream font-black\">02</span><h3 class=\"font-black uppercase mb-2\">Signal Lab</h3><p class=\"text-sm font-bold text-retro-muted\">Local hosts ping Raevtar, and the status board redraws itself through HTMX refreshes.</p></div><div class=\"bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-blush text-retro-ink font-black\">03</span><h3 class=\"font-black uppercase mb-2\">Automation Lab</h3><p class=\"text-sm font-bold text-retro-muted\">A full public lab page maps the automation surface without exposing private setup details.</p></div></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, " ")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			if len(data.FeaturedProjects) > 0 {
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<section class=\"mb-12\"><div class=\"flex items-center justify-between mb-4 gap-4\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Featured builds</p><h2 class=\"text-lg font-black uppercase\">Featured Projects</h2></div><a href=\"/projects?featured=true\" class=\"text-sm font-bold no-underline hover:bg-retro-wheat\">View featured lane &rarr;</a></div><div class=\"grid gap-5\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				for _, project := range data.FeaturedProjects {
+					templ_7745c5c3_Err = components.ProjectCard(project).Render(ctx, templ_7745c5c3_Buffer)
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div></section>")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, " <section id=\"lab\" class=\"mb-12 scroll-mt-24\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-4\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Lab</p><h2 class=\"text-3xl font-black uppercase\">Public lab bench</h2></div><a href=\"/lab\" class=\"text-sm font-black no-underline hover:bg-retro-wheat\">Open full lab &rarr;</a></div><div class=\"grid gap-4 md:grid-cols-3\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-sage text-retro-cream font-black\">01</span><h3 class=\"font-black uppercase mb-2\">Content Lab</h3><p class=\"text-sm font-bold text-retro-muted\">Commissioned and automated notes land in the same blog index with tags intact.</p></div><div class=\"bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] md:translate-y-4\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-ink text-retro-cream font-black\">02</span><h3 class=\"font-black uppercase mb-2\">Signal Lab</h3><p class=\"text-sm font-bold text-retro-muted\">Local hosts ping Raevtar, and the status board redraws itself through HTMX refreshes.</p></div><div class=\"bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><span class=\"inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-retro-ink bg-retro-blush text-retro-ink font-black\">03</span><h3 class=\"font-black uppercase mb-2\">Automation Lab</h3><p class=\"text-sm font-bold text-retro-muted\">A full public lab page maps the automation surface without exposing private setup details.</p></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

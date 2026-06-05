@@ -24,7 +24,7 @@ templ Projects(data ProjectsData) {
 						<div class="grid grid-cols-3 gap-3 text-center">
 							<div class="border-2 border-retro-ink bg-retro-paper p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.PostCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span></div>
 							<div class="border-2 border-retro-ink bg-retro-sageLight p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.ServerCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">nodes</span></div>
-							<div class="border-2 border-retro-ink bg-retro-wheat p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.ProjectCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">projects</span></div>
+							<div class="border-2 border-retro-ink bg-retro-wheat p-3"><span class="block text-3xl font-black text-retro-ink">{ PortText(data.TotalProjectCount) }</span><span class="text-xs font-bold uppercase text-retro-muted">projects</span></div>
 						</div>
 						<p class="text-sm font-bold text-retro-muted mt-4">Same public surface, three ways in.</p>
 					</div>
@@ -76,13 +76,33 @@ templ Projects(data ProjectsData) {
 					if data.FeaturedCount > 0 {
 						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">{ PortText(data.FeaturedCount) } featured lane</span>
 					}
-					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ PortText(data.ProjectCount) } public entries</span>
+					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ PortText(data.VisibleProjectCount) } visible entries</span>
+					if data.VisibleProjectCount != data.TotalProjectCount {
+						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink">{ PortText(data.TotalProjectCount) } total public entries</span>
+					}
 				</div>
 			</div>
+			<form method="get" action="/projects" class="mb-5 grid gap-4 border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:grid-cols-[1fr_auto_auto] md:items-end">
+				<div>
+					<label for="sort" class="block text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Sort archive</label>
+					<select id="sort" name="sort" class="w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink">
+						<option value="newest" if data.CurrentSort == "" || data.CurrentSort == "newest" { selected }>Newest first</option>
+						<option value="oldest" if data.CurrentSort == "oldest" { selected }>Oldest first</option>
+					</select>
+				</div>
+				<label class="inline-flex items-center gap-3 border-2 border-retro-ink bg-retro-blush px-4 py-2 text-sm font-black uppercase tracking-wide text-retro-ink">
+					<input type="checkbox" name="featured" value="true" checked?={ data.CurrentFeaturedOnly } class="h-4 w-4 accent-retro-ink"/>
+					Featured only
+				</label>
+				<div class="flex flex-wrap gap-3">
+					<button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Apply view</button>
+					<a href="/projects" class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Reset filters</a>
+				</div>
+			</form>
 			if len(data.Projects) == 0 {
 				<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
 					<p class="text-xl font-black uppercase text-retro-ink mb-2">Belum ada project posting.</p>
-					<p class="text-sm font-bold text-retro-muted max-w-xl mx-auto">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page.</p>
+					<p class="text-sm font-bold text-retro-muted max-w-xl mx-auto">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page. Kalau filter aktif, reset dulu buat lihat arsip lengkap.</p>
 				</div>
 			} else {
 				<div class="grid gap-5 xl:grid-cols-2">

@@ -201,6 +201,19 @@ func (s *ProjectService) UpdateProject(id int64, input model.ProjectUpdate) (*mo
 	return s.GetProjectByID(project.ID)
 }
 
+func (s *ProjectService) DeleteProject(id int64) error {
+	if _, err := s.repos.Project.GetByID(id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w: %w", ErrProjectNotFound, err)
+		}
+		return fmt.Errorf("get project: %w", err)
+	}
+	if err := s.repos.Project.Delete(id); err != nil {
+		return fmt.Errorf("delete project: %w", err)
+	}
+	return nil
+}
+
 func (s *ProjectService) RenderMarkdown(content string) (string, error) {
 	var buf strings.Builder
 	if err := s.markdown.Convert([]byte(content), &buf); err != nil {
