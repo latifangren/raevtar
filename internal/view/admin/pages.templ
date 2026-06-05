@@ -377,6 +377,7 @@ templ Projects(data ProjectsData) {
 						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
 							<th class="py-3 px-4 font-bold">Title</th>
 							<th class="py-3 px-4 font-bold">Status</th>
+							<th class="py-3 px-4 font-bold">Order</th>
 							<th class="py-3 px-4 font-bold">Date</th>
 							<th class="py-3 px-4"></th>
 						</tr>
@@ -384,16 +385,27 @@ templ Projects(data ProjectsData) {
 					<tbody>
 						for _, project := range data.Projects {
 							<tr class="border-b-2 border-retro-ink last:border-b-0">
-								<td class="py-3 px-4 text-sm font-bold text-retro-ink max-w-[300px] truncate">{ project.Title }</td>
-								<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted">
-									if project.Published {
-										<span>published</span>
-									} else {
-										<span>draft</span>
-									}
+								<td class="py-3 px-4 max-w-[320px]">
+									<div class="space-y-1">
+										<p class="text-sm font-bold text-retro-ink truncate">{ project.Title }</p>
+										<p class="text-xs font-bold text-retro-muted truncate">{ project.Excerpt }</p>
+									</div>
 								</td>
-								<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ project.CreatedAt.Format("2006-01-02") }</td>
-								<td class="py-3 px-4 text-right">
+							<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted">
+								<div class="flex flex-wrap gap-2">
+									if project.Published {
+										<span class="inline-flex px-2 py-1 border-2 border-retro-ink bg-retro-sageLight text-retro-ink uppercase tracking-wide">published</span>
+									} else {
+										<span class="inline-flex px-2 py-1 border-2 border-retro-ink bg-retro-wheat text-retro-ink uppercase tracking-wide">draft</span>
+									}
+									if project.Featured {
+										<span class="inline-flex px-2 py-1 border-2 border-retro-ink bg-retro-blush text-retro-ink uppercase tracking-wide">featured</span>
+									}
+								</div>
+							</td>
+							<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">#{ PortText(project.SortOrder) }</td>
+							<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ project.CreatedAt.Format("2006-01-02") }</td>
+							<td class="py-3 px-4 text-right">
 									<a href={ templ.URL("/admin/projects/edit/" + IDText(project.ID)) } class="text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline">Edit</a>
 									<form method="POST" action={ templ.URL("/admin/projects/delete/" + IDText(project.ID)) } class="inline" data-confirm="Delete this project? This cannot be undone.">
 										<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
@@ -406,12 +418,24 @@ templ Projects(data ProjectsData) {
 				</table>
 			</div>
 			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
-				<h2 class="text-sm font-black uppercase text-retro-ink mb-4">Create New Project</h2>
+				<div class="flex flex-wrap items-start justify-between gap-3 mb-5">
+					<div>
+						<h2 class="text-sm font-black uppercase text-retro-ink mb-1">Create New Project</h2>
+						<p class="text-sm font-bold text-retro-muted max-w-2xl">Ship cleaner public cards by giving each project a tight title, short excerpt, optional cover image, and tags that map how readers should enter detail view.</p>
+					</div>
+					<span class="text-xs font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight px-3 py-1 text-retro-ink">public-facing</span>
+				</div>
 				<form method="POST" action="/admin/projects" class="space-y-4" data-confirm="Save this project?">
 					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
-						<input type="text" name="title" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Project title"/>
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(16rem,0.8fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
+							<input type="text" name="title" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Project title"/>
+						</div>
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Card rhythm</p>
+							<p class="text-xs font-bold leading-5 text-retro-ink">Keep title scan-friendly. Card list now gives more room to excerpt and metadata, so short punchy copy works best.</p>
+						</div>
 					</div>
 					<div>
 						<label class="block text-sm font-bold text-retro-muted mb-1">Content (Markdown)</label>
@@ -425,15 +449,35 @@ templ Projects(data ProjectsData) {
 						</div>
 						@PostMarkdownPreview("", true)
 					</div>
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Excerpt</label>
-						<input type="text" name="excerpt" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Short project summary"/>
+					<div class="grid gap-4 lg:grid-cols-2">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Excerpt</label>
+							<input type="text" name="excerpt" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Short project summary"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Used on public archive cards and detail page intro.</p>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Tags</label>
+							<input type="text" name="tags" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="oss, infrastructure"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Comma-separated badges for project cards and detail metadata.</p>
+						</div>
+					</div>
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Sort order</label>
+							<input type="number" name="sort_order" min="0" value="0" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Lower number shows earlier once featured lane is applied.</p>
+						</div>
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<label class="flex items-start gap-3 cursor-pointer">
+								<input type="checkbox" name="featured" class="mt-1 h-4 w-4 accent-retro-ink"/>
+								<span>
+									<span class="block text-sm font-black uppercase text-retro-ink">Featured lane</span>
+									<span class="block text-xs font-bold leading-5 text-retro-muted mt-1">Featured projects rise above normal archive order and get public badge treatment.</span>
+								</span>
+							</label>
+						</div>
 					</div>
 					@coverImageSelect("", data.MediaAssets)
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Tags</label>
-						<input type="text" name="tags" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="oss, infrastructure"/>
-					</div>
 					<div class="flex flex-wrap justify-end gap-2">
 						<button type="submit" name="intent" value="draft" class="px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Save Draft</button>
 						<button type="submit" name="intent" value="publish" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Publish Project</button>
@@ -457,9 +501,15 @@ templ ProjectEdit(data ProjectEditData) {
 			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
 				<form method="POST" action={ templ.URL("/admin/projects/update/" + IDText(data.Project.ID)) } class="space-y-4" data-confirm="Save project changes?">
 					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
-						<input type="text" name="title" value={ data.Project.Title } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(16rem,0.8fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Title</label>
+							<input type="text" name="title" value={ data.Project.Title } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Public surface</p>
+							<p class="text-xs font-bold leading-5 text-retro-ink">Changes here affect project archive card, hero summary, and detail metadata in one pass.</p>
+						</div>
 					</div>
 					<div>
 						<label class="block text-sm font-bold text-retro-muted mb-1">Content (Markdown)</label>
@@ -473,15 +523,39 @@ templ ProjectEdit(data ProjectEditData) {
 						</div>
 						@PostMarkdownPreview(data.Project.ContentHTML, false)
 					</div>
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Excerpt</label>
-						<input type="text" name="excerpt" value={ data.Project.Excerpt } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					<div class="grid gap-4 lg:grid-cols-2">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Excerpt</label>
+							<input type="text" name="excerpt" value={ data.Project.Excerpt } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Keep this sharp. It now carries more visual weight on both archive and detail views.</p>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Tags</label>
+							<input type="text" name="tags" value={ TagsInput(data.Project.Tags) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Shown as badges in hero brief and archive cards.</p>
+						</div>
+					</div>
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Sort order</label>
+							<input type="number" name="sort_order" min="0" value={ PortText(data.Project.SortOrder) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Lower number shows earlier once featured lane is applied.</p>
+						</div>
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<label class="flex items-start gap-3 cursor-pointer">
+								if data.Project.Featured {
+									<input type="checkbox" name="featured" checked class="mt-1 h-4 w-4 accent-retro-ink"/>
+								} else {
+									<input type="checkbox" name="featured" class="mt-1 h-4 w-4 accent-retro-ink"/>
+								}
+								<span>
+									<span class="block text-sm font-black uppercase text-retro-ink">Featured lane</span>
+									<span class="block text-xs font-bold leading-5 text-retro-muted mt-1">Featured projects rise above normal archive order and get public badge treatment.</span>
+								</span>
+							</label>
+						</div>
 					</div>
 					@coverImageSelect(data.Project.CoverImageURL, data.MediaAssets)
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Tags</label>
-						<input type="text" name="tags" value={ TagsInput(data.Project.Tags) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
-					</div>
 					<div class="flex items-start justify-between gap-3 border-2 border-retro-ink bg-retro-cream px-4 py-3">
 						<div>
 							<p class="text-xs font-black uppercase text-retro-muted">Current status</p>
@@ -491,7 +565,12 @@ templ ProjectEdit(data ProjectEditData) {
 								<p class="text-sm font-mono font-black text-retro-ink">Draft</p>
 							}
 						</div>
-						<p class="max-w-md text-xs font-bold text-retro-muted">Use Update to keep status, or Draft/Publish to change it.</p>
+						<div class="space-y-1 text-right">
+							<p class="max-w-md text-xs font-bold text-retro-muted">Use Update to keep status, or Draft/Publish to change it.</p>
+							if data.Project.Featured {
+								<p class="text-xs font-black uppercase tracking-widest text-retro-ink">featured lane active · order #{ PortText(data.Project.SortOrder) }</p>
+							}
+						</div>
 					</div>
 					<div class="flex flex-wrap justify-end gap-2">
 						<a href="/admin/projects" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline">Cancel</a>
@@ -509,9 +588,19 @@ templ Pages(data PagesData) {
 	@Shell("Manage Pages", data.CurrentPath, data.CSRFToken) {
 		<div class="space-y-6">
 			@pageHeader("Manage Pages", CountText(len(data.Pages))+" editable pages")
+			<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+				<div class="flex flex-wrap items-start justify-between gap-3">
+					<div>
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Public copy control</p>
+						<h2 class="text-xl font-black uppercase text-retro-ink mb-2">About and Contact stay SSR-first.</h2>
+						<p class="text-sm font-bold text-retro-ink max-w-3xl">Use these editors for hero title, supporting summary, and Markdown body. Public pages keep retro framing from shared templates; this screen only shapes the content hierarchy inside that shell.</p>
+					</div>
+					<span class="text-xs font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper px-3 py-1 text-retro-ink">copy + structure</span>
+				</div>
+			</div>
 			<div class="grid gap-4 md:grid-cols-2">
 				for _, page := range data.Pages {
-					<article class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] space-y-3">
+					<article class="rv-card-lift bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] space-y-4 transition-all">
 						<div class="flex items-start justify-between gap-3">
 							<div>
 								<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">{ page.Key }</p>
@@ -520,7 +609,20 @@ templ Pages(data PagesData) {
 							<a href={ templ.URL("/admin/pages/edit/" + page.Key) } class="text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline">Edit</a>
 						</div>
 						<p class="text-sm font-bold text-retro-muted">{ page.Summary }</p>
-						<p class="text-xs font-mono font-bold text-retro-muted">updated { page.UpdatedAt.Format("2006-01-02 15:04") }</p>
+						<div class="grid gap-2 sm:grid-cols-2">
+							<div class="border-2 border-retro-ink bg-retro-cream px-3 py-3">
+								<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Summary role</p>
+								<p class="text-sm font-bold text-retro-ink">Hero support copy</p>
+							</div>
+							<div class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">
+								<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Last update</p>
+								<p class="text-sm font-mono font-bold text-retro-ink">{ page.UpdatedAt.Format("2006-01-02 15:04") }</p>
+							</div>
+						</div>
+						<div class="flex items-center justify-between gap-3 border-t-2 border-retro-ink pt-3">
+							<p class="text-xs font-bold uppercase tracking-wider text-retro-muted">Shared page shell stays intact.</p>
+							<a href={ templ.URL("/admin/pages/edit/" + page.Key) } class="inline-flex items-center gap-1 text-sm font-black no-underline border-2 border-retro-ink bg-retro-ink px-3 py-2 text-retro-cream shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Open editor &rarr;</a>
+						</div>
 					</article>
 				}
 			</div>
@@ -541,17 +643,25 @@ templ PageEdit(data PageEditData) {
 			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
 				<form method="POST" action={ templ.URL("/admin/pages/update/" + data.Page.Key) } class="space-y-4" data-confirm="Save page changes?">
 					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Hero title</label>
-						<input type="text" name="title" value={ data.Page.Title } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Hero title</label>
+							<input type="text" name="title" value={ data.Page.Title } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						@editorNoteCard("Page role", "This editor changes copy only. Shared retro hero, navigation, and layout framing still come from public templates.", "bg-retro-cream")
 					</div>
-					<div>
-						<label class="block text-sm font-bold text-retro-muted mb-1">Summary</label>
-						<input type="text" name="summary" value={ data.Page.Summary } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Summary</label>
+							<input type="text" name="summary" value={ data.Page.Summary } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<p class="text-xs font-bold text-retro-muted mt-2">Appears as supporting text beneath hero title on public page.</p>
+						</div>
+						@editorNoteCard("Current page", data.Page.Key+" page content is rendered server-side and published immediately after save.", "bg-retro-sageLight")
 					</div>
 					<div>
 						<label class="block text-sm font-bold text-retro-muted mb-1">Body (Markdown)</label>
 						<textarea name="content" rows="18" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono">{ data.Page.ContentMD }</textarea>
+						<p class="text-xs font-bold text-retro-muted mt-2">Use headings, lists, and links normally. Renderer matches public Markdown path used elsewhere in site.</p>
 					</div>
 					<div class="flex justify-end gap-2">
 						<a href="/admin/pages" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline">Cancel</a>
@@ -732,6 +842,13 @@ templ pageHeader(title string, count string) {
 			<h1 class="text-xl font-black uppercase text-retro-ink mt-1">{ title }</h1>
 		</div>
 		<span class="text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono">{ count }</span>
+	</div>
+}
+
+templ editorNoteCard(title string, body string, toneClass string) {
+	<div class={ "border-2 border-retro-ink px-4 py-3", toneClass }>
+		<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">{ title }</p>
+		<p class="text-xs font-bold leading-5 text-retro-ink">{ body }</p>
 	</div>
 }
 

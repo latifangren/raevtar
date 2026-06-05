@@ -7,7 +7,7 @@ templ Docs(data DocsData) {
 				<div class="max-w-3xl">
 					<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Public docs</p>
 					<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">What this public room shows.</h1>
-					<p class="text-base md:text-lg font-bold text-retro-ink opacity-80">Raevtar publishes project notes, public-safe signal summaries, RSS, and a small read-only API surface. Enough to understand shape and intent; not enough to walk into the operator room.</p>
+			<p class="text-base md:text-lg font-bold text-retro-ink opacity-80">Raevtar publishes project notes, public-safe signal summaries, RSS, and small read-only API surface. Enough to understand shape and intent; not enough to walk into operator room.</p>
 					<div class="flex flex-wrap gap-2 mt-4">
 						<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-sageLight">about</a>
 						<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">projects</a>
@@ -38,12 +38,13 @@ templ Docs(data DocsData) {
 		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
 			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">read-only API</p>
 			<h2 class="text-2xl font-black uppercase mb-3">Safe public endpoints</h2>
-			<div class="grid gap-3 md:grid-cols-3">
+			<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
 				<code class="border-2 border-retro-ink bg-retro-wheat p-3 text-sm font-mono font-black">GET /api/v1/posts</code>
+				<code class="border-2 border-retro-ink bg-retro-blush p-3 text-sm font-mono font-black">GET /api/v1/projects</code>
 				<code class="border-2 border-retro-ink bg-retro-sageLight p-3 text-sm font-mono font-black">GET /api/v1/categories</code>
 				<code class="border-2 border-retro-ink bg-retro-paper p-3 text-sm font-mono font-black">GET /blog/feed.xml</code>
 			</div>
-			<p class="text-sm font-bold text-retro-muted mt-4">Protected write and operator endpoints are deliberately omitted from public docs.</p>
+			<p class="text-sm font-bold text-retro-muted mt-4">Projects endpoint returns published build logs with featured flag, sort order, timestamps, and public tags. Protected write and operator endpoints stay omitted from public docs.</p>
 		</section>
 		<section class="mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
 			<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">related public pages</p>

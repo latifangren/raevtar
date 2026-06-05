@@ -50,6 +50,8 @@ func AutoMigrate(db *sqlx.DB) {
 		content_md TEXT NOT NULL DEFAULT '',
 		excerpt TEXT NOT NULL DEFAULT '',
 		published INTEGER DEFAULT 1,
+		featured INTEGER NOT NULL DEFAULT 0,
+		sort_order INTEGER NOT NULL DEFAULT 0,
 		cover_image_url TEXT NOT NULL DEFAULT '',
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
@@ -199,6 +201,10 @@ func AutoMigrate(db *sqlx.DB) {
 	}
 	ensureColumn(db, "servers", "agent_token_hash", "TEXT NOT NULL DEFAULT ''")
 	ensureColumn(db, "posts", "cover_image_url", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "projects", "featured", "INTEGER NOT NULL DEFAULT 0")
+	ensureColumn(db, "projects", "sort_order", "INTEGER NOT NULL DEFAULT 0")
+	ensureIndex(db, "idx_projects_featured", "CREATE INDEX IF NOT EXISTS idx_projects_featured ON projects(featured)")
+	ensureIndex(db, "idx_projects_sort_order", "CREATE INDEX IF NOT EXISTS idx_projects_sort_order ON projects(sort_order)")
 	ensureColumn(db, "server_metrics", "cpu_load_1", "REAL DEFAULT 0")
 	ensureColumn(db, "server_metrics", "cpu_load_5", "REAL DEFAULT 0")
 	ensureColumn(db, "server_metrics", "cpu_load_15", "REAL DEFAULT 0")
@@ -248,6 +254,13 @@ func ensureColumn(db *sqlx.DB, table, column, definition string) {
 	query := fmt.Sprintf("ALTER TABLE %s ADD COLUMN %s %s", table, column, definition)
 	if _, err := db.Exec(query); err != nil {
 		slog.Error("column migration failed", "table", table, "column", column, "error", err)
+		panic(err)
+	}
+}
+
+func ensureIndex(db *sqlx.DB, name, statement string) {
+	if _, err := db.Exec(statement); err != nil {
+		slog.Error("index migration failed", "index", name, "error", err)
 		panic(err)
 	}
 }

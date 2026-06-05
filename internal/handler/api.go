@@ -24,6 +24,25 @@ func (h *Handler) apiListPosts(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, posts)
 }
 
+func (h *Handler) apiListProjects(w http.ResponseWriter, r *http.Request) {
+	featuredOnly := strings.EqualFold(r.URL.Query().Get("featured"), "true")
+	sort := r.URL.Query().Get("sort")
+	projects, _, err := h.svc.Projects.ListProjects(1, 100, service.ProjectListOptions{
+		FeaturedOnly: featuredOnly,
+		Sort:         sort,
+	})
+	if err != nil {
+		if errors.Is(err, service.ErrInvalidProjectSort) {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, projects)
+}
+
 func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
 	capRequestBody(w, r, apiBodyLimit)
 	var input model.PostCreate

@@ -383,7 +383,7 @@ func (h *Handler) adminDeletePost(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminProjects(w http.ResponseWriter, r *http.Request) {
-	projects, _, err := h.svc.Projects.ListAllProjects(1, 9999)
+	projects, _, err := h.svc.Projects.ListAllProjects(1, 9999, service.ProjectListOptions{})
 	if err != nil {
 		internalServerError(w, r, err)
 		return
@@ -414,6 +414,8 @@ func (h *Handler) adminCreateProject(w http.ResponseWriter, r *http.Request) {
 		Excerpt:       r.FormValue("excerpt"),
 		CoverImageURL: r.FormValue("cover_image_url"),
 		Published:     intent == adminPostIntentPublish,
+		Featured:      r.FormValue("featured") == "on",
+		SortOrder:     parseSortOrder(r.FormValue("sort_order")),
 		Tags:          splitTags(r.FormValue("tags")),
 	})
 	if err != nil {
@@ -504,6 +506,8 @@ func (h *Handler) adminUpdateProject(w http.ResponseWriter, r *http.Request) {
 		Excerpt:       r.FormValue("excerpt"),
 		CoverImageURL: r.FormValue("cover_image_url"),
 		Published:     published,
+		Featured:      r.FormValue("featured") == "on",
+		SortOrder:     parseSortOrder(r.FormValue("sort_order")),
 		Tags:          splitTags(r.FormValue("tags")),
 	})
 	if err != nil {
@@ -796,4 +800,12 @@ func splitTags(tags string) []string {
 		}
 	}
 	return out
+}
+
+func parseSortOrder(value string) int {
+	n, err := strconv.Atoi(strings.TrimSpace(value))
+	if err != nil || n < 0 {
+		return 0
+	}
+	return n
 }

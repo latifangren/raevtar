@@ -56,9 +56,10 @@ type LabData struct {
 }
 
 type DocsData struct {
-	CurrentPath string
-	Categories  []model.Category
-	PostCount   int
+	CurrentPath  string
+	Categories   []model.Category
+	PostCount    int
+	ProjectCount int
 }
 
 type ProjectsData struct {
@@ -69,6 +70,7 @@ type ProjectsData struct {
 	ServerCount   int
 	Projects      []model.Project
 	ProjectCount  int
+	FeaturedCount int
 }
 
 type ProjectDetailData struct {

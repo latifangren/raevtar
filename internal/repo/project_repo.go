@@ -8,14 +8,25 @@ import (
 
 type ProjectRepo struct{ db *sqlx.DB }
 
-func (r *ProjectRepo) List(publishedOnly bool, limit, offset int) ([]model.Project, error) {
+type ProjectListOptions struct {
+	PublishedOnly bool
+	FeaturedOnly  bool
+	Sort          string
+	Limit         int
+	Offset        int
+}
+
+func (r *ProjectRepo) List(opts ProjectListOptions) ([]model.Project, error) {
 	query := `SELECT * FROM projects WHERE 1=1`
-	args := make([]interface{}, 0, 2)
-	if publishedOnly {
+	args := make([]interface{}, 0, 4)
+	if opts.PublishedOnly {
 		query += " AND published = 1"
 	}
-	query += " ORDER BY created_at DESC LIMIT ? OFFSET ?"
-	args = append(args, limit, offset)
+	if opts.FeaturedOnly {
+		query += " AND featured = 1"
+	}
+	query += " ORDER BY " + projectOrderClause(opts.Sort) + " LIMIT ? OFFSET ?"
+	args = append(args, opts.Limit, opts.Offset)
 
 	var projects []model.Project
 	if err := r.db.Select(&projects, query, args...); err != nil {
@@ -36,6 +47,17 @@ func (r *ProjectRepo) List(publishedOnly bool, limit, offset int) ([]model.Proje
 	}
 
 	return projects, nil
+}
+
+func projectOrderClause(sort string) string {
+	switch sort {
+	case "oldest":
+		return "featured DESC, sort_order ASC, created_at ASC, id ASC"
+	case "newest", "":
+		fallthrough
+	default:
+		return "featured DESC, sort_order ASC, created_at DESC, id DESC"
+	}
 }
 
 func (r *ProjectRepo) GetBySlug(slug string) (*model.Project, error) {
@@ -66,9 +88,9 @@ func (r *ProjectRepo) GetByID(id int64) (*model.Project, error) {
 
 func (r *ProjectRepo) Create(project *model.Project) error {
 	result, err := r.db.Exec(`
-		INSERT INTO projects (title, slug, content_md, excerpt, cover_image_url, published)
-		VALUES (?, ?, ?, ?, ?, ?)`,
-		project.Title, project.Slug, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published,
+		INSERT INTO projects (title, slug, content_md, excerpt, cover_image_url, published, featured, sort_order)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		project.Title, project.Slug, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.Featured, project.SortOrder,
 	)
 	if err != nil {
 		return err
@@ -81,9 +103,9 @@ func (r *ProjectRepo) Create(project *model.Project) error {
 func (r *ProjectRepo) Update(project *model.Project) error {
 	_, err := r.db.Exec(`
 		UPDATE projects
-		SET title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, updated_at = ?
+		SET title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, featured = ?, sort_order = ?, updated_at = ?
 		WHERE id = ?`,
-		project.Title, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.UpdatedAt, project.ID,
+		project.Title, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.Featured, project.SortOrder, project.UpdatedAt, project.ID,
 	)
 	return err
 }
@@ -101,11 +123,14 @@ func (r *ProjectRepo) Delete(id int64) error {
 	return err
 }
 
-func (r *ProjectRepo) Count(publishedOnly bool) (int, error) {
+func (r *ProjectRepo) Count(publishedOnly bool, featuredOnly bool) (int, error) {
 	var count int
-	query := `SELECT COUNT(*) FROM projects`
+	query := `SELECT COUNT(*) FROM projects WHERE 1=1`
 	if publishedOnly {
-		query += ` WHERE published = 1`
+		query += ` AND published = 1`
+	}
+	if featuredOnly {
+		query += ` AND featured = 1`
 	}
 	return count, r.db.Get(&count, query)
 }

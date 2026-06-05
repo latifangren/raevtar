@@ -11,6 +11,8 @@ type Project struct {
 	Excerpt       string    `db:"excerpt" json:"excerpt"`
 	CoverImageURL string    `db:"cover_image_url" json:"cover_image_url,omitempty"`
 	Published     bool      `db:"published" json:"published"`
+	Featured      bool      `db:"featured" json:"featured"`
+	SortOrder     int       `db:"sort_order" json:"sort_order"`
 	CreatedAt     time.Time `db:"created_at" json:"created_at"`
 	UpdatedAt     time.Time `db:"updated_at" json:"updated_at"`
 
@@ -23,6 +25,8 @@ type ProjectCreate struct {
 	Excerpt       string   `json:"excerpt"`
 	CoverImageURL string   `json:"cover_image_url"`
 	Published     bool     `json:"published"`
+	Featured      bool     `json:"featured"`
+	SortOrder     int      `json:"sort_order"`
 	Tags          []string `json:"tags"`
 }
 
@@ -32,5 +36,7 @@ type ProjectUpdate struct {
 	Excerpt       string
 	CoverImageURL string
 	Published     bool
+	Featured      bool
+	SortOrder     int
 	Tags          []string
 }

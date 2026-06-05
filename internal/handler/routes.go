@@ -106,6 +106,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	// API v1
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/posts", h.apiListPosts)
+		r.Get("/projects", h.apiListProjects)
 		r.With(h.adminAuth).Post("/posts", h.apiCreatePost)
 		r.With(h.adminAuth).Get("/editorial-inbox/contract", h.apiEditorialInboxContract)
 		r.With(h.adminAuth).Get("/editorial-inbox/summary", h.apiEditorialInboxSummary)

@@ -10,6 +10,7 @@ import (
 	"time"
 
 	"raevtar/internal/model"
+	"raevtar/internal/service"
 	"raevtar/internal/view/pages"
 )
 
@@ -110,11 +111,17 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	_, projectCount, err := h.svc.Projects.ListProjects(1, 1, service.ProjectListOptions{})
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 
 	renderHTML(w, r, pages.Docs(pages.DocsData{
-		CurrentPath: r.URL.Path,
-		Categories:  categories,
-		PostCount:   postCount,
+		CurrentPath:  r.URL.Path,
+		Categories:   categories,
+		PostCount:    postCount,
+		ProjectCount: projectCount,
 	}))
 }
 
@@ -134,11 +141,17 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	projects, projectCount, err := h.svc.Projects.ListProjects(1, 12)
+	projects, projectCount, err := h.svc.Projects.ListProjects(1, 12, service.ProjectListOptions{})
 	if err != nil {
 		internalServerError(w, r, err)
 		return
 	}
+	featuredProjects, featuredCount, err := h.svc.Projects.ListProjects(1, 3, service.ProjectListOptions{FeaturedOnly: true})
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	_ = featuredProjects
 
 	renderHTML(w, r, pages.Projects(pages.ProjectsData{
 		CurrentPath:   r.URL.Path,
@@ -148,6 +161,7 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		ServerCount:   len(servers),
 		Projects:      projects,
 		ProjectCount:  projectCount,
+		FeaturedCount: featuredCount,
 	}))
 }
 

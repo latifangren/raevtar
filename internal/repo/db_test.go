@@ -122,7 +122,7 @@ func TestAutoMigrateCreatesProjectsAndPageContentsTables(t *testing.T) {
 		name    string
 		columns []string
 	}{
-		{name: "projects", columns: []string{"id", "title", "slug", "content_md", "excerpt", "published", "cover_image_url", "created_at", "updated_at"}},
+		{name: "projects", columns: []string{"id", "title", "slug", "content_md", "excerpt", "published", "featured", "sort_order", "cover_image_url", "created_at", "updated_at"}},
 		{name: "page_contents", columns: []string{"key", "title", "summary", "content_md", "updated_at"}},
 		{name: "project_tags", columns: []string{"project_id", "tag_id"}},
 	} {
@@ -148,6 +148,57 @@ func TestAutoMigrateCreatesProjectsAndPageContentsTables(t *testing.T) {
 			if !columns[name] {
 				t.Fatalf("%s missing column %q", table.name, name)
 			}
+		}
+	}
+}
+
+func TestAutoMigrateAddsProjectOrderingColumnsToExistingDatabase(t *testing.T) {
+	db := InitSQLite(filepath.Join(t.TempDir(), "legacy_projects.db"))
+	t.Cleanup(func() { _ = db.Close() })
+
+	_, err := db.Exec(`
+		CREATE TABLE projects (
+			id INTEGER PRIMARY KEY AUTOINCREMENT,
+			title TEXT NOT NULL,
+			slug TEXT UNIQUE NOT NULL,
+			content_md TEXT NOT NULL DEFAULT '',
+			excerpt TEXT NOT NULL DEFAULT '',
+			published INTEGER DEFAULT 1,
+			cover_image_url TEXT NOT NULL DEFAULT '',
+			created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+			updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		)`)
+	if err != nil {
+		t.Fatalf("create legacy projects: %v", err)
+	}
+
+	AutoMigrate(db)
+
+	rows, err := db.Queryx("PRAGMA table_info(projects)")
+	if err != nil {
+		t.Fatalf("inspect project columns: %v", err)
+	}
+	defer rows.Close()
+
+	columns := make(map[string]bool)
+	for rows.Next() {
+		var cid int
+		var name, columnType string
+		var notNull int
+		var defaultValue any
+		var primaryKey int
+		if err := rows.Scan(&cid, &name, &columnType, &notNull, &defaultValue, &primaryKey); err != nil {
+			t.Fatalf("scan project column: %v", err)
+		}
+		columns[name] = true
+	}
+	if err := rows.Err(); err != nil {
+		t.Fatalf("iterate project columns: %v", err)
+	}
+
+	for _, name := range []string{"featured", "sort_order"} {
+		if !columns[name] {
+			t.Fatalf("projects missing additive migration column %q", name)
 		}
 	}
 }

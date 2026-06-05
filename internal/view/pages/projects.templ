@@ -69,15 +69,23 @@ templ Projects(data ProjectsData) {
 				<div>
 					<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Project postings</p>
 					<h2 class="text-3xl font-black uppercase text-retro-ink">Build log archive</h2>
+					<p class="text-sm font-bold text-retro-muted mt-2 max-w-2xl">Public-facing project notes stay compact in list view, then expand into full write-ups with Markdown body, tags, and cover imagery on detail pages.</p>
 				</div>
-				<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">Projects</span>
+				<div class="flex flex-wrap gap-2">
+					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">Projects</span>
+					if data.FeaturedCount > 0 {
+						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">{ PortText(data.FeaturedCount) } featured lane</span>
+					}
+					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ PortText(data.ProjectCount) } public entries</span>
+				</div>
 			</div>
 			if len(data.Projects) == 0 {
 				<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-retro-muted font-bold">Belum ada project posting.</p>
+					<p class="text-xl font-black uppercase text-retro-ink mb-2">Belum ada project posting.</p>
+					<p class="text-sm font-bold text-retro-muted max-w-xl mx-auto">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page.</p>
 				</div>
 			} else {
-				<div class="grid gap-4">
+				<div class="grid gap-5 xl:grid-cols-2">
 					for _, project := range data.Projects {
 						@components.ProjectCard(project)
 					}

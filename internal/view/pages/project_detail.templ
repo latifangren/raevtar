@@ -12,27 +12,66 @@ templ ProjectDetail(data ProjectDetailData) {
 						<div>
 							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Project entry</p>
 							<h1 class="text-4xl md:text-6xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Project.Title }</h1>
-							<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Project.Excerpt }</p>
+							<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl mb-5">{ data.Project.Excerpt }</p>
+							<div class="flex flex-wrap gap-2 max-w-2xl">
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">Public write-up</span>
+								if data.Project.Featured {
+									<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">Featured build</span>
+								}
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">Markdown body</span>
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">{ len(data.Project.Tags) } tags linked</span>
+							</div>
 						</div>
 						<aside class="relative">
 							<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-retro-ink bg-retro-sageLight shadow-[4px_4px_0px_0px_#2D3748]"></div>
 							<div class="relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] -rotate-1">
 								<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">Project brief</p>
-								<div class="flex items-center gap-2 mb-4 flex-wrap">
-									<span class="text-xs font-bold text-retro-muted">{ data.Project.CreatedAt.Format("Jan 2, 2006") }</span>
-									<span class="text-xs font-bold text-retro-muted">{ ReadMinutes(data.Project.ContentMD) } min read</span>
+								<div class="grid gap-3 sm:grid-cols-2 mb-4">
+									<div class="border-2 border-retro-ink bg-retro-paper px-3 py-3">
+										<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Published</p>
+										<p class="text-sm font-black text-retro-ink">{ data.Project.CreatedAt.Format("Jan 2, 2006") }</p>
+									</div>
+								<div class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">
+									<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Format</p>
+									if data.Project.Featured {
+										<p class="text-sm font-black text-retro-ink">Featured build</p>
+									} else {
+										<p class="text-sm font-black text-retro-ink">Long-form note</p>
+									}
 								</div>
-								@components.TagBadges(data.Project.Tags)
+								</div>
+								<div class="flex flex-wrap gap-2 mb-4">
+									@components.TagBadges(data.Project.Tags)
+								</div>
+								<p class="text-xs font-bold leading-5 text-retro-muted">Same SSR renderer as public writing pages, tuned for project logs with optional cover image and tag context.</p>
 							</div>
 						</aside>
 					</div>
 				</div>
 			</header>
-			<div class="max-w-4xl mx-auto bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
-				if data.Project.CoverImageURL != "" {
-					<img src={ data.Project.CoverImageURL } alt={ data.Project.Title } class="w-full max-h-[460px] object-cover border-2 border-retro-ink bg-retro-cream mb-6"/>
-				}
-				<div class="prose text-retro-ink max-w-none">@templ.Raw(data.Project.ContentHTML)</div>
+			<div class="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(18rem,0.28fr)]">
+				<div class="bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+					if data.Project.CoverImageURL != "" {
+						<img src={ data.Project.CoverImageURL } alt={ data.Project.Title } class="w-full max-h-[460px] object-cover border-2 border-retro-ink bg-retro-cream mb-6"/>
+					}
+					<div class="prose text-retro-ink max-w-none">@templ.Raw(data.Project.ContentHTML)</div>
+				</div>
+				<aside class="space-y-4">
+					<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Reading lane</p>
+						<div class="space-y-3 text-sm font-bold text-retro-ink">
+							<p class="border-2 border-retro-ink bg-retro-cream px-3 py-3">Start with excerpt above, then skim badges for topic shape before diving into full body.</p>
+							<p class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">Every section below is rendered server-side. No client-side editor shell required on public view.</p>
+						</div>
+					</div>
+					<div class="bg-retro-blush border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Move next</p>
+						<div class="grid gap-2">
+							<a href="/projects" class="border-2 border-retro-ink bg-retro-paper px-3 py-3 text-sm font-black no-underline hover:bg-retro-wheat">Back to archive &rarr;</a>
+							<a href="/about" class="border-2 border-retro-ink bg-retro-wheat px-3 py-3 text-sm font-black no-underline hover:bg-retro-paper">Read platform framing &rarr;</a>
+						</div>
+					</div>
+				</aside>
 			</div>
 		</article>
 	}

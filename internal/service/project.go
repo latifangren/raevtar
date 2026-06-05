@@ -16,6 +16,12 @@ import (
 
 var ErrInvalidProjectInput = errors.New("invalid project input")
 var ErrProjectNotFound = errors.New("project not found")
+var ErrInvalidProjectSort = errors.New("invalid project sort")
+
+type ProjectListOptions struct {
+	FeaturedOnly bool
+	Sort         string
+}
 
 type ProjectService struct {
 	repos    *repo.Repositories
@@ -32,38 +38,58 @@ func NewProjectService(repos *repo.Repositories) *ProjectService {
 	return &ProjectService{repos: repos, markdown: md}
 }
 
-func (s *ProjectService) ListProjects(page, pageSize int) ([]model.Project, int, error) {
+func (s *ProjectService) ListProjects(page, pageSize int, opts ProjectListOptions) ([]model.Project, int, error) {
 	if pageSize <= 0 {
 		pageSize = 10
 	}
 	if page < 1 {
 		page = 1
 	}
+	opts, err := normalizeProjectListOptions(opts)
+	if err != nil {
+		return nil, 0, err
+	}
 	offset := (page - 1) * pageSize
-	total, err := s.repos.Project.Count(true)
+	total, err := s.repos.Project.Count(true, opts.FeaturedOnly)
 	if err != nil {
 		return nil, 0, fmt.Errorf("count projects: %w", err)
 	}
-	projects, err := s.repos.Project.List(true, pageSize, offset)
+	projects, err := s.repos.Project.List(repo.ProjectListOptions{
+		PublishedOnly: true,
+		FeaturedOnly:  opts.FeaturedOnly,
+		Sort:          opts.Sort,
+		Limit:         pageSize,
+		Offset:        offset,
+	})
 	if err != nil {
 		return nil, 0, fmt.Errorf("list projects: %w", err)
 	}
 	return projects, total, nil
 }
 
-func (s *ProjectService) ListAllProjects(page, pageSize int) ([]model.Project, int, error) {
+func (s *ProjectService) ListAllProjects(page, pageSize int, opts ProjectListOptions) ([]model.Project, int, error) {
 	if pageSize <= 0 {
 		pageSize = 10
 	}
 	if page < 1 {
 		page = 1
 	}
+	opts, err := normalizeProjectListOptions(opts)
+	if err != nil {
+		return nil, 0, err
+	}
 	offset := (page - 1) * pageSize
-	total, err := s.repos.Project.Count(false)
+	total, err := s.repos.Project.Count(false, opts.FeaturedOnly)
 	if err != nil {
 		return nil, 0, fmt.Errorf("count projects: %w", err)
 	}
-	projects, err := s.repos.Project.List(false, pageSize, offset)
+	projects, err := s.repos.Project.List(repo.ProjectListOptions{
+		PublishedOnly: false,
+		FeaturedOnly:  opts.FeaturedOnly,
+		Sort:          opts.Sort,
+		Limit:         pageSize,
+		Offset:        offset,
+	})
 	if err != nil {
 		return nil, 0, fmt.Errorf("list projects: %w", err)
 	}
@@ -116,6 +142,8 @@ func (s *ProjectService) CreateProject(input model.ProjectCreate) (*model.Projec
 		Excerpt:       input.Excerpt,
 		CoverImageURL: input.CoverImageURL,
 		Published:     input.Published,
+		Featured:      input.Featured,
+		SortOrder:     normalizeProjectSortOrder(input.SortOrder),
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
 	}
@@ -161,6 +189,8 @@ func (s *ProjectService) UpdateProject(id int64, input model.ProjectUpdate) (*mo
 	project.Excerpt = input.Excerpt
 	project.CoverImageURL = input.CoverImageURL
 	project.Published = input.Published
+	project.Featured = input.Featured
+	project.SortOrder = normalizeProjectSortOrder(input.SortOrder)
 	project.UpdatedAt = time.Now()
 	if err := s.repos.Project.Update(project); err != nil {
 		return nil, fmt.Errorf("update project: %w", err)
@@ -192,7 +222,26 @@ func cleanProjectCreate(input model.ProjectCreate) model.ProjectCreate {
 		}
 	}
 	input.Tags = cleanTags
+	input.SortOrder = normalizeProjectSortOrder(input.SortOrder)
 	return input
+}
+
+func normalizeProjectSortOrder(sortOrder int) int {
+	if sortOrder < 0 {
+		return 0
+	}
+	return sortOrder
+}
+
+func normalizeProjectListOptions(opts ProjectListOptions) (ProjectListOptions, error) {
+	sort := strings.TrimSpace(strings.ToLower(opts.Sort))
+	switch sort {
+	case "", "newest", "oldest":
+		opts.Sort = sort
+		return opts, nil
+	default:
+		return ProjectListOptions{}, fmt.Errorf("%w: %s", ErrInvalidProjectSort, sort)
+	}
 }
 
 func (s *ProjectService) uniqueSlug(title string) (string, error) {

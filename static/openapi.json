@@ -2,7 +2,7 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Raevtar Public API",
-    "description": "Public read-only API for published posts and categories. Operator and monitoring endpoints are intentionally omitted from this public spec.",
+    "description": "Public read-only API for published posts, projects, and categories. Operator and monitoring endpoints are intentionally omitted from this public spec.",
     "version": "1.0.0",
     "contact": {
       "name": "latifangren",
@@ -37,6 +37,44 @@
                 }
               }
             }
+          }
+        }
+      }
+    },
+    "/api/v1/projects": {
+      "get": {
+        "summary": "List published projects",
+        "description": "Returns published projects only. Default order is featured first, then manual sort order, then newest first.",
+        "parameters": [
+          {
+            "name": "featured",
+            "in": "query",
+            "description": "Optional filter to return featured projects only when set to true",
+            "required": false,
+            "schema": { "type": "boolean" }
+          },
+          {
+            "name": "sort",
+            "in": "query",
+            "description": "Optional ordering override. Supported values: newest, oldest",
+            "required": false,
+            "schema": { "type": "string", "enum": ["newest", "oldest"] }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published projects",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/Project" }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Invalid query parameter"
           }
         }
       }
@@ -76,6 +114,26 @@
           "updated_at": { "type": "string", "format": "date-time" },
           "category_name": { "type": "string" },
           "category_slug": { "type": "string" },
+          "tags": {
+            "type": "array",
+            "items": { "$ref": "#/components/schemas/Tag" }
+          }
+        }
+      },
+      "Project": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "content_md": { "type": "string" },
+          "excerpt": { "type": "string" },
+          "cover_image_url": { "type": "string" },
+          "published": { "type": "boolean" },
+          "featured": { "type": "boolean" },
+          "sort_order": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" },
           "tags": {
             "type": "array",
             "items": { "$ref": "#/components/schemas/Tag" }

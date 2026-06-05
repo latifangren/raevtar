@@ -78,6 +78,8 @@ func newPublicTestApp(t *testing.T) *publicTestApp {
 		ContentMD: "# Whyred Watchtower\n\nProject page baseline route test.",
 		Excerpt:   "Project baseline route test.",
 		Published: true,
+		Featured:  true,
+		SortOrder: 1,
 		Tags:      []string{"oss"},
 	})
 	if err != nil {
@@ -352,6 +354,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Projects",
 				"Three public lanes, one small machine.",
 				"Build log archive",
+				"featured lane",
 				"Whyred Watchtower",
 				`href="/projects/whyred-watchtower"`,
 				"Publishing System",
@@ -371,6 +374,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Project entry",
 				"Whyred Watchtower",
 				"Project page baseline route test.",
+				"Featured build",
 				"Back to projects",
 			},
 		},
@@ -424,6 +428,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Public docs",
 				"Public front, admin back room",
 				"GET /api/v1/posts",
+				"GET /api/v1/projects",
 				"GET /api/v1/categories",
 				"related public pages",
 				`href="/projects"`,
@@ -548,6 +553,97 @@ func TestPublicRoutes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestAPIListProjectsReturnsPublishedProjectsOnly(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	_, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Draft Project",
+		ContentMD: "# Draft",
+		Excerpt:   "hidden draft",
+		Published: false,
+		Featured:  true,
+		SortOrder: 0,
+	})
+	if err != nil {
+		t.Fatalf("create draft project: %v", err)
+	}
+	_, err = app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Later Project",
+		ContentMD: "# Later",
+		Excerpt:   "later project",
+		Published: true,
+		Featured:  false,
+		SortOrder: 9,
+	})
+	if err != nil {
+		t.Fatalf("create later project: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/projects", nil)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var projects []model.Project
+	if err := json.NewDecoder(rr.Body).Decode(&projects); err != nil {
+		t.Fatalf("decode projects: %v", err)
+	}
+	if len(projects) != 2 {
+		t.Fatalf("projects len = %d, want 2", len(projects))
+	}
+	if projects[0].Title != "Whyred Watchtower" || !projects[0].Featured {
+		t.Fatalf("first project = %+v, want featured whyred", projects[0])
+	}
+	if projects[1].Title != "Later Project" {
+		t.Fatalf("second project = %+v, want Later Project", projects[1])
+	}
+	for _, project := range projects {
+		if project.Title == "Draft Project" {
+			t.Fatalf("draft project leaked in api response")
+		}
+	}
+}
+
+func TestAPIListProjectsSupportsFeaturedFilterAndRejectsInvalidSort(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	_, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Normal Project",
+		ContentMD: "# Normal",
+		Excerpt:   "normal project",
+		Published: true,
+		Featured:  false,
+		SortOrder: 3,
+	})
+	if err != nil {
+		t.Fatalf("create normal project: %v", err)
+	}
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/projects?featured=true", nil)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var projects []model.Project
+	if err := json.NewDecoder(rr.Body).Decode(&projects); err != nil {
+		t.Fatalf("decode featured projects: %v", err)
+	}
+	if len(projects) != 1 || projects[0].Title != "Whyred Watchtower" {
+		t.Fatalf("featured projects = %+v, want only Whyred Watchtower", projects)
+	}
+
+	badReq := httptest.NewRequest(http.MethodGet, "/api/v1/projects?sort=sideways", nil)
+	badRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(badRR, badReq)
+	if badRR.Code != http.StatusBadRequest {
+		t.Fatalf("bad sort status = %d, want %d; body: %s", badRR.Code, http.StatusBadRequest, badRR.Body.String())
+	}
+	assertContains(t, badRR.Body.String(), "invalid project sort")
 }
 
 func TestUIPolishSourceHooks(t *testing.T) {

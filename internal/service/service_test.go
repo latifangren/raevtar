@@ -244,6 +244,8 @@ func TestProjectServiceCreateAndUpdateProject(t *testing.T) {
 		ContentMD: "# Raevtar Project\n\nBuild log.",
 		Excerpt:   "Initial excerpt",
 		Published: true,
+		Featured:  true,
+		SortOrder: 3,
 		Tags:      []string{"oss", " infra "},
 	})
 	if err != nil {
@@ -255,12 +257,17 @@ func TestProjectServiceCreateAndUpdateProject(t *testing.T) {
 	if len(project.Tags) != 2 {
 		t.Fatalf("project tags len = %d, want 2", len(project.Tags))
 	}
+	if !project.Featured || project.SortOrder != 3 {
+		t.Fatalf("project featured/sort = %v/%d, want true/3", project.Featured, project.SortOrder)
+	}
 
 	updated, err := state.svc.Projects.UpdateProject(project.ID, model.ProjectUpdate{
 		Title:     "Raevtar Project Updated",
 		ContentMD: "# Updated",
 		Excerpt:   "Updated excerpt",
 		Published: false,
+		Featured:  false,
+		SortOrder: -9,
 		Tags:      []string{"lab"},
 	})
 	if err != nil {
@@ -272,11 +279,83 @@ func TestProjectServiceCreateAndUpdateProject(t *testing.T) {
 	if updated.Title != "Raevtar Project Updated" || updated.Excerpt != "Updated excerpt" || updated.Published {
 		t.Fatalf("updated project mismatch: %+v", updated)
 	}
+	if updated.Featured || updated.SortOrder != 0 {
+		t.Fatalf("updated featured/sort = %v/%d, want false/0", updated.Featured, updated.SortOrder)
+	}
 	if len(updated.Tags) != 1 || updated.Tags[0].Name != "lab" {
 		t.Fatalf("updated tags = %+v, want lab", updated.Tags)
 	}
 	if _, err := state.svc.Projects.GetPublishedProject(project.Slug); err == nil {
 		t.Fatalf("published lookup should hide draft project")
+	}
+}
+
+func TestProjectServiceListProjectsOrdersFeaturedThenSortOrder(t *testing.T) {
+	state := newTestServices(t)
+
+	create := func(title string, featured bool, sortOrder int, published bool) {
+		t.Helper()
+		_, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+			Title:     title,
+			ContentMD: "# " + title,
+			Excerpt:   title + " excerpt",
+			Published: published,
+			Featured:  featured,
+			SortOrder: sortOrder,
+		})
+		if err != nil {
+			t.Fatalf("create project %s: %v", title, err)
+		}
+	}
+
+	create("Later Normal", false, 9, true)
+	create("Featured Second", true, 2, true)
+	create("Featured First", true, 1, true)
+	create("Draft Hidden", true, 0, false)
+
+	projects, total, err := state.svc.Projects.ListProjects(1, 10, ProjectListOptions{})
+	if err != nil {
+		t.Fatalf("list projects: %v", err)
+	}
+	if total != 3 {
+		t.Fatalf("total = %d, want 3", total)
+	}
+	if len(projects) != 3 {
+		t.Fatalf("len = %d, want 3", len(projects))
+	}
+	if projects[0].Title != "Featured First" || projects[1].Title != "Featured Second" || projects[2].Title != "Later Normal" {
+		t.Fatalf("unexpected order: %#v", []string{projects[0].Title, projects[1].Title, projects[2].Title})
+	}
+
+	featuredOnly, featuredTotal, err := state.svc.Projects.ListProjects(1, 10, ProjectListOptions{FeaturedOnly: true})
+	if err != nil {
+		t.Fatalf("list featured projects: %v", err)
+	}
+	if featuredTotal != 2 || len(featuredOnly) != 2 {
+		t.Fatalf("featured total/len = %d/%d, want 2/2", featuredTotal, len(featuredOnly))
+	}
+	if featuredOnly[0].Title != "Featured First" || featuredOnly[1].Title != "Featured Second" {
+		t.Fatalf("unexpected featured order: %#v", []string{featuredOnly[0].Title, featuredOnly[1].Title})
+	}
+
+	adminProjects, adminTotal, err := state.svc.Projects.ListAllProjects(1, 10, ProjectListOptions{})
+	if err != nil {
+		t.Fatalf("list all projects: %v", err)
+	}
+	if adminTotal != 4 || len(adminProjects) != 4 {
+		t.Fatalf("admin total/len = %d/%d, want 4/4", adminTotal, len(adminProjects))
+	}
+}
+
+func TestProjectServiceRejectsInvalidSort(t *testing.T) {
+	state := newTestServices(t)
+
+	_, _, err := state.svc.Projects.ListProjects(1, 10, ProjectListOptions{Sort: "random"})
+	if err == nil {
+		t.Fatalf("expected invalid sort error")
+	}
+	if !errors.Is(err, ErrInvalidProjectSort) {
+		t.Fatalf("err = %v, want ErrInvalidProjectSort", err)
 	}
 }
 
