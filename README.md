@@ -25,6 +25,14 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 - RSS feed di `/blog/feed.xml`.
 - API `POST /api/v1/posts` untuk integrasi agent seperti Hermes.
 
+### Projects
+
+- Project entries disimpan sebagai content type terpisah dari blog posts.
+- Public archive ada di `/projects` dengan featured lane, sort order, dan detail page per slug.
+- Homepage bisa menampilkan featured published projects sebagai preview lane.
+- Admin panel bisa mengatur `featured` dan `sort_order` untuk menentukan urutan publik.
+- Protected API sekarang mendukung create, update, dan delete project entries untuk workflow operator/agent.
+
 ### Public Monitoring
 
 - `/dashboard` menampilkan status semua node tanpa membuka topology privat.
@@ -46,6 +54,10 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 |--------|------|-------|
 | `GET` | `/api/v1/posts` | Public list posts |
 | `POST` | `/api/v1/posts` | Admin key required |
+| `GET` | `/api/v1/projects` | Public list projects; supports `featured=true` and `sort=newest|oldest` |
+| `POST` | `/api/v1/projects` | Admin key required |
+| `PUT` | `/api/v1/projects/{id}` | Admin key required |
+| `DELETE` | `/api/v1/projects/{id}` | Admin key required |
 | `GET` | `/api/v1/categories` | Public categories |
 | `GET` | `/api/v1/servers` | Admin key required |
 | `GET` | `/api/v1/servers/{id}` | Admin key required |
@@ -55,6 +67,25 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 | `GET` | `/docs`, `/lab/docs` | Public-safe docs |
 
 Public docs sengaja hanya menjelaskan read-only surface dan privacy boundary. Endpoint admin/server setup tetap operator-only.
+
+### Project write payload shape
+
+Create project via `POST /api/v1/projects`:
+
+```json
+{
+  "title": "Whyred Watchtower",
+  "content_md": "# Whyred Watchtower\n\nBuild log...",
+  "excerpt": "Public-facing project note.",
+  "cover_image_url": "/uploads/watchtower.png",
+  "published": true,
+  "featured": true,
+  "sort_order": 1,
+  "tags": ["oss", "monitoring"]
+}
+```
+
+Update project via `PUT /api/v1/projects/{id}` memakai shape yang sama. Server mempertahankan slug yang sudah ada, memvalidasi `title` + `content_md`, dan menormalkan `sort_order` negatif menjadi `0`.
 
 ## Agent Monitoring
 

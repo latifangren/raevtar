@@ -84,6 +84,69 @@ Semua endpoint di atas pakai **admin key** seperti protected API lain di Raevtar
 
 ---
 
+## Protected Project Content API
+
+Di luar editorial inbox, Raevtar sekarang juga punya project content flow yang bisa dikelola operator atau agent lewat protected API.
+
+Endpoint yang tersedia:
+
+- `GET /api/v1/projects`
+- `POST /api/v1/projects`
+- `PUT /api/v1/projects/{projectID}`
+- `DELETE /api/v1/projects/{projectID}`
+
+Catatan penting:
+
+- `GET /api/v1/projects` bersifat public-safe dan hanya mengembalikan project yang published
+- query yang didukung untuk list public:
+  - `featured=true`
+  - `sort=newest|oldest`
+- endpoint write (`POST`/`PUT`/`DELETE`) tetap **protected** dan butuh `Authorization: Bearer <RAEVTAR_ADMIN_KEY>`
+- update/delete pakai **numeric project ID**, bukan slug
+- slug project dihasilkan saat create dan dipertahankan saat update
+
+Ini berguna kalau nanti Hermes atau operator workflow mau:
+
+1. publish artikel biasa ke `/api/v1/posts`
+2. atau publish build log / showcase project ke `/api/v1/projects`
+
+Dengan begitu, blog dan project archive tetap terpisah secara sengaja.
+
+### Payload create/update project
+
+```json
+{
+  "title": "Whyred Watchtower",
+  "content_md": "# Whyred Watchtower\n\nProject build log...",
+  "excerpt": "Ringkasan singkat buat archive card.",
+  "cover_image_url": "/uploads/watchtower.png",
+  "published": true,
+  "featured": true,
+  "sort_order": 1,
+  "tags": ["oss", "self-hosted"]
+}
+```
+
+Semantics tambahan:
+
+- `title` dan `content_md` wajib ada
+- `featured` menentukan apakah project masuk featured lane publik
+- `sort_order` menentukan urutan internal di antara project featured/public
+- `sort_order < 0` akan dinormalisasi server menjadi `0`
+- response create/update mengembalikan object project lengkap, termasuk `id`, `slug`, dan tags yang sudah dinormalisasi
+
+### Kapan pakai posts vs projects
+
+Gunakan `posts` kalau outputnya adalah artikel blog kronologis yang masuk archive kategori biasa.
+
+Gunakan `projects` kalau outputnya adalah:
+
+- build log yang ingin hidup di `/projects`
+- showcase project yang perlu featured lane di homepage/public archive
+- artefak yang lebih cocok diposisikan sebagai public project entry daripada dispatch blog
+
+---
+
 ## Data Model Ringkas
 
 Inbox item menyimpan field berikut:
