@@ -1,7 +1,7 @@
 package pages
 
 templ BlogPost(data BlogPostData) {
-	@page(data.Post.Title + " — Raevtar", data.CurrentPath, data.Categories) {
+@page(data.Post.Title + " — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<article class="mb-12">
 			<header class="full-width bg-retro-sage border-b-2 border-retro-ink mb-10 overflow-hidden">
 				<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">

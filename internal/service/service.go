@@ -12,6 +12,7 @@ type Service struct {
 	Cfg       *config.Config
 	Blog      *BlogService
 	Projects  *ProjectService
+	SiteMeta  *SiteMetaService
 	Pages     *PageContentService
 	Editorial *EditorialInboxService
 	Media     *MediaService
@@ -20,11 +21,14 @@ type Service struct {
 }
 
 func New(repos *repo.Repositories, cfg *config.Config) *Service {
+	blog := NewBlogService(repos)
+	projects := NewProjectService(repos)
 	return &Service{
 		repos:     repos,
 		Cfg:       cfg,
-		Blog:      NewBlogService(repos),
-		Projects:  NewProjectService(repos),
+		Blog:      blog,
+		Projects:  projects,
+		SiteMeta:  NewSiteMetaService(blog, projects, cfg.Domain),
 		Pages:     NewPageContentService(repos),
 		Editorial: NewEditorialInboxService(repos),
 		Media:     NewMediaService(repos, cfg.MediaDir),

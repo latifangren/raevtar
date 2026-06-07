@@ -3,7 +3,7 @@ package pages
 import "raevtar/internal/view/components"
 
 templ Index(data IndexData) {
-	@page("Raevtar", data.CurrentPath, data.Categories) {
+@page("Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<section class="rv-hero-ambient full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
 			<div class="max-w-6xl mx-auto px-4 py-16 md:py-24">
 				<div class="grid gap-8 lg:grid-cols-[1.25fr_0.75fr] items-center">

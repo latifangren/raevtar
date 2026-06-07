@@ -5,7 +5,7 @@ import (
 	"raevtar/internal/view/components"
 )
 
-templ Base(title string, currentPath string, categories []model.Category) {
+templ Base(title string, currentPath string, categories []model.Category, seo model.SEOData) {
 	<!DOCTYPE html>
 	<html lang="en">
 		<head>
@@ -18,20 +18,26 @@ templ Base(title string, currentPath string, categories []model.Category) {
 			<link rel="stylesheet" href="/static/css/style.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 			<link rel="alternate" type="application/rss+xml" title="Raevtar" href="https://raevtar.tech/blog/feed.xml"/>
+			if seo.CanonicalURL != "" {
+				<link rel="canonical" href={ seo.CanonicalURL }/>
+			}
 			<meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false}'/>
 			<script src="/static/js/htmx.min.js"></script>
 			<script src="/static/js/raevtar-ui.js" defer></script>
-			<meta name="description" content="Raevtar — Personal blog, server status board, and automation platform running on postmarketOS"/>
+			<meta name="description" content={ seo.Description }/>
 			<meta name="keywords" content="raevtar, blog, server monitoring, postmarketOS, linux"/>
 			<meta name="author" content="latifangren"/>
 			<meta property="og:type" content="website"/>
 			<meta property="og:site_name" content="Raevtar"/>
 			<meta property="og:title" content={ title }/>
-			<meta property="og:description" content="Personal platform for project notes, server monitoring, and automation."/>
-			<meta property="og:url" content="https://raevtar.tech"/>
+			<meta property="og:description" content={ seo.Description }/>
+			<meta property="og:url" content={ seo.CanonicalURL }/>
 			<meta name="twitter:card" content="summary"/>
-			<meta name="twitter:title" content="Raevtar"/>
-			<meta name="twitter:description" content="Personal platform for project notes, server monitoring, and automation."/>
+			<meta name="twitter:title" content={ title }/>
+			<meta name="twitter:description" content={ seo.Description }/>
+			if seo.JSONLD != "" {
+				@RawHTML("<script type=\"application/ld+json\">" + seo.JSONLD + "</script>")
+			}
 		</head>
 		<body class="min-h-screen bg-retro-cream text-retro-ink antialiased">
 			<div class="max-w-6xl mx-auto px-4 pt-4">

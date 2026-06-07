@@ -330,6 +330,9 @@ func TestPublicRoutes(t *testing.T) {
 				`href="/blog"`,
 				`href="/dashboard"`,
 				`href="/docs"`,
+				`rel="canonical" href="https://raevtar.test/"`,
+				`application/ld+json`,
+				`"@type":"WebSite"`,
 			},
 		},
 		{
@@ -438,6 +441,7 @@ func TestPublicRoutes(t *testing.T) {
 				"GET /api/v1/categories",
 				"related public pages",
 				`href="/projects"`,
+				`rel="canonical" href="https://raevtar.test/docs"`,
 			},
 		},
 		{
@@ -449,6 +453,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Public docs",
 				"Public front, admin back room",
 				"related public pages",
+				`rel="canonical" href="https://raevtar.test/docs"`,
 			},
 		},
 		{
@@ -473,6 +478,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Read dispatch",
 				`href="/blog?category=devops"`,
 				`href="/blog/hello-raevtar"`,
+				`rel="canonical" href="https://raevtar.test/blog"`,
 			},
 		},
 		{
@@ -486,6 +492,9 @@ func TestPublicRoutes(t *testing.T) {
 				"Back to blog",
 				"Hello Raevtar",
 				"Baseline route test.",
+				`rel="canonical" href="https://raevtar.test/blog/hello-raevtar"`,
+				`"@type":"BlogPosting"`,
+				`"headline":"Hello Raevtar"`,
 			},
 		},
 		{
@@ -519,7 +528,7 @@ func TestPublicRoutes(t *testing.T) {
 		{
 			name:           "missing route",
 			path:           "/missing-route",
-			wantStatus:     http.StatusOK,
+			wantStatus:     http.StatusNotFound,
 			wantContentTyp: "text/html",
 			wantContains: []string{
 				"Halaman gak ketemu",
@@ -535,6 +544,31 @@ func TestPublicRoutes(t *testing.T) {
 				"<title>Hello Raevtar</title>",
 				"https://raevtar.test/blog/hello-raevtar",
 				"<category>devops</category>",
+			},
+		},
+		{
+			name:           "llms txt",
+			path:           "/llms.txt",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "text/plain",
+			wantContains: []string{
+				"# Raevtar",
+				"https://raevtar.test/blog",
+				"https://raevtar.test/projects",
+				"Hello Raevtar",
+				"Whyred Watchtower",
+			},
+		},
+		{
+			name:           "sitemap xml",
+			path:           "/sitemap.xml",
+			wantStatus:     http.StatusOK,
+			wantContentTyp: "application/xml",
+			wantContains: []string{
+				`<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">`,
+				`<loc>https://raevtar.test/</loc>`,
+				`<loc>https://raevtar.test/blog/hello-raevtar</loc>`,
+				`<loc>https://raevtar.test/projects/whyred-watchtower</loc>`,
 			},
 		},
 	}
@@ -559,6 +593,24 @@ func TestPublicRoutes(t *testing.T) {
 			}
 		})
 	}
+}
+
+func TestCanonicalNormalization(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/blog?category=devops&page=2", nil)
+	if status != http.StatusOK {
+		t.Fatalf("blog status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, `rel="canonical" href="https://raevtar.test/blog"`)
+	assertNotContains(t, body, `https://raevtar.test/blog?category=devops&page=2`)
+
+	status, body = getBody(t, app, "/projects?featured=true&sort=oldest", nil)
+	if status != http.StatusOK {
+		t.Fatalf("projects status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, `rel="canonical" href="https://raevtar.test/projects"`)
+	assertNotContains(t, body, `https://raevtar.test/projects?featured=true&sort=oldest`)
 }
 
 func TestAPIListProjectsReturnsPublishedProjectsOnly(t *testing.T) {

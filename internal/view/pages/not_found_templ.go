@@ -47,7 +47,7 @@ func NotFound(data NotFoundData) templ.Component {
 			}
 			return nil
 		})
-		templ_7745c5c3_Err = page("404 — Raevtar", data.CurrentPath, data.Categories).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
+		templ_7745c5c3_Err = page("404 — Raevtar", data.CurrentPath, data.Categories, data.SEO).Render(templ.WithChildren(ctx, templ_7745c5c3_Var2), templ_7745c5c3_Buffer)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

@@ -15,6 +15,7 @@ const (
 
 type IndexData struct {
 	CurrentPath      string
+	SEO              model.SEOData
 	Posts            []model.Post
 	PostCount        int
 	Servers          []model.Server
@@ -25,6 +26,7 @@ type IndexData struct {
 
 type AboutData struct {
 	CurrentPath   string
+	SEO           model.SEOData
 	Categories    []model.Category
 	PostCount     int
 	CategoryCount int
@@ -35,6 +37,7 @@ type AboutData struct {
 
 type BlogListData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Posts       []model.Post
 	Categories  []model.Category
 	CurrentCat  string
@@ -44,12 +47,14 @@ type BlogListData struct {
 
 type BlogPostData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Post        *model.Post
 	Categories  []model.Category
 }
 
 type LabData struct {
 	CurrentPath   string
+	SEO           model.SEOData
 	Categories    []model.Category
 	PostCount     int
 	CategoryCount int
@@ -58,6 +63,7 @@ type LabData struct {
 
 type DocsData struct {
 	CurrentPath  string
+	SEO          model.SEOData
 	Categories   []model.Category
 	PostCount    int
 	ProjectCount int
@@ -65,6 +71,7 @@ type DocsData struct {
 
 type ProjectsData struct {
 	CurrentPath         string
+	SEO                 model.SEOData
 	Categories          []model.Category
 	PostCount           int
 	CategoryCount       int
@@ -80,6 +87,7 @@ type ProjectsData struct {
 
 type ProjectDetailData struct {
 	CurrentPath   string
+	SEO           model.SEOData
 	Project       *model.Project
 	Categories    []model.Category
 	Timeline      []model.ProjectUpdateEntry
@@ -90,6 +98,7 @@ type ProjectDetailData struct {
 
 type ProjectChangelogData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Project     *model.Project
 	Categories  []model.Category
 	Changelog   []model.ProjectUpdateEntry
@@ -97,6 +106,7 @@ type ProjectChangelogData struct {
 
 type ContactData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Categories  []model.Category
 	Domain      string
 	Page        *model.PageContent
@@ -104,12 +114,14 @@ type ContactData struct {
 
 type TopicsData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Categories  []model.Category
 	PostCount   int
 }
 
 type DashboardData struct {
 	CurrentPath     string
+	SEO             model.SEOData
 	Servers         []model.Server
 	ServerSummaries []PublicServerSummary
 	Categories      []model.Category
@@ -134,6 +146,7 @@ type PublicServerSummary struct {
 
 type ServerDetailData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Server      *model.Server
 	Metrics     []model.ServerMetric
 	Categories  []model.Category
@@ -142,6 +155,7 @@ type ServerDetailData struct {
 
 type NotFoundData struct {
 	CurrentPath string
+	SEO         model.SEOData
 	Categories  []model.Category
 }
 

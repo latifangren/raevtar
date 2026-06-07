@@ -3,7 +3,7 @@ package pages
 import "raevtar/internal/view/components"
 
 templ ProjectDetail(data ProjectDetailData) {
-	@page(data.Project.Title + " — Projects — Raevtar", data.CurrentPath, data.Categories) {
+@page(data.Project.Title + " — Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<article class="mb-12">
 			<header class="full-width bg-retro-wheat border-b-2 border-retro-ink mb-10 overflow-hidden">
 				<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">

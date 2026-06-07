@@ -29,6 +29,8 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
 	r.Get("/robots.txt", h.serveStatic("robots.txt"))
 	r.Get("/favicon.svg", h.serveStatic("favicon.svg"))
+	r.Get("/llms.txt", h.llmsTxt)
+	r.Get("/sitemap.xml", h.sitemapXML)
 	r.Get("/uploads/{filename}", h.serveUpload)
 
 	// pages

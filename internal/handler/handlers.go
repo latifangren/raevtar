@@ -39,6 +39,7 @@ func (h *Handler) landingIndex(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Index(pages.IndexData{
 		CurrentPath:      r.URL.Path,
+		SEO:              h.svc.SiteMeta.HomeSEO(),
 		Posts:            posts,
 		PostCount:        postCount,
 		Servers:          servers,
@@ -72,6 +73,7 @@ func (h *Handler) aboutPage(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.About(pages.AboutData{
 		CurrentPath:   r.URL.Path,
+		SEO:           h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:    categories,
 		PostCount:     postCount,
 		CategoryCount: len(categories),
@@ -100,6 +102,7 @@ func (h *Handler) labPage(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Lab(pages.LabData{
 		CurrentPath:   r.URL.Path,
+		SEO:           h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:    categories,
 		PostCount:     postCount,
 		CategoryCount: len(categories),
@@ -126,6 +129,7 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Docs(pages.DocsData{
 		CurrentPath:  r.URL.Path,
+		SEO:          h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:   categories,
 		PostCount:    postCount,
 		ProjectCount: projectCount,
@@ -175,6 +179,7 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Projects(pages.ProjectsData{
 		CurrentPath:         r.URL.Path,
+		SEO:                 h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:          categories,
 		PostCount:           postCount,
 		CategoryCount:       len(categories),
@@ -226,6 +231,7 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	renderHTML(w, r, pages.ProjectDetail(pages.ProjectDetailData{
 		CurrentPath:   r.URL.Path,
+		SEO:           h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Project:       project,
 		Categories:    categories,
 		Timeline:      timeline,
@@ -255,7 +261,7 @@ func (h *Handler) projectChangelogPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	renderHTML(w, r, pages.ProjectChangelog(pages.ProjectChangelogData{CurrentPath: r.URL.Path, Project: project, Categories: categories, Changelog: changelog}))
+	renderHTML(w, r, pages.ProjectChangelog(pages.ProjectChangelogData{CurrentPath: r.URL.Path, SEO: h.svc.SiteMeta.DefaultSEO(r.URL.Path), Project: project, Categories: categories, Changelog: changelog}))
 }
 
 func (h *Handler) contactPage(w http.ResponseWriter, r *http.Request) {
@@ -272,6 +278,7 @@ func (h *Handler) contactPage(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Contact(pages.ContactData{
 		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:  categories,
 		Domain:      h.cfg.Domain,
 		Page:        page,
@@ -292,6 +299,7 @@ func (h *Handler) topicsPage(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Topics(pages.TopicsData{
 		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:  categories,
 		PostCount:   postCount,
 	}))
@@ -317,6 +325,7 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.BlogList(pages.BlogListData{
 		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Posts:       posts,
 		Categories:  categories,
 		CurrentCat:  cat,
@@ -343,6 +352,7 @@ func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.BlogPost(pages.BlogPostData{
 		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.BlogPostSEO(post),
 		Post:        post,
 		Categories:  categories,
 	}))
@@ -372,6 +382,7 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 
 	renderHTML(w, r, pages.Dashboard(pages.DashboardData{
 		CurrentPath:     r.URL.Path,
+		SEO:             h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Servers:         servers,
 		ServerSummaries: summaries,
 		Categories:      categories,
@@ -426,6 +437,7 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 
 	return pages.ServerDetailData{
 		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Server:      server,
 		Metrics:     metrics,
 		Categories:  categories,
@@ -519,5 +531,6 @@ func (h *Handler) page404(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	renderHTML(w, r, pages.NotFound(pages.NotFoundData{CurrentPath: r.URL.Path, Categories: categories}))
+	w.WriteHeader(http.StatusNotFound)
+	renderHTML(w, r, pages.NotFound(pages.NotFoundData{CurrentPath: r.URL.Path, SEO: h.svc.SiteMeta.DefaultSEO(r.URL.Path), Categories: categories}))
 }

@@ -1,7 +1,7 @@
 package pages
 
 templ ProjectChangelog(data ProjectChangelogData) {
-	@page(data.Project.Title + " Changelog — Projects — Raevtar", data.CurrentPath, data.Categories) {
+@page(data.Project.Title + " Changelog — Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<section class="mb-12 max-w-5xl mx-auto px-4 py-10">
 			<div class="mb-6">
 				<a href={ templ.URL("/projects/" + data.Project.Slug) } class="inline-flex items-center gap-1.5 mb-4 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:bg-retro-wheat">&larr; Back to project</a>

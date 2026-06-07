@@ -1,7 +1,7 @@
 package pages
 
 templ NotFound(data NotFoundData) {
-	@page("404 — Raevtar", data.CurrentPath, data.Categories) {
+@page("404 — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<div class="flex flex-col items-center justify-center py-24 text-center">
 			<h1 class="text-9xl font-black text-retro-ink border-2 border-retro-ink px-8 py-4 inline-block shadow-[8px_8px_0px_0px_#2D3748]">404</h1>
 			<h2 class="text-2xl font-black uppercase text-retro-ink mt-6 mb-2">Halaman gak ketemu</h2>

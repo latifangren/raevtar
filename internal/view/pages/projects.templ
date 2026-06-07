@@ -3,7 +3,7 @@ package pages
 import "raevtar/internal/view/components"
 
 templ Projects(data ProjectsData) {
-	@page("Projects — Raevtar", data.CurrentPath, data.Categories) {
+@page("Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<section class="full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden">
 			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
 				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">

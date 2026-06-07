@@ -5,8 +5,8 @@ import (
 	"raevtar/internal/view/layouts"
 )
 
-templ page(title string, currentPath string, categories []model.Category) {
-	@layouts.Base(title, currentPath, categories) {
+templ page(title string, currentPath string, categories []model.Category, seo model.SEOData) {
+	@layouts.Base(title, currentPath, categories, seo) {
 		{ children... }
 	}
 }
