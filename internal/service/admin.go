@@ -147,6 +147,27 @@ func (s *AdminService) LogProjectUpdated(username, title, ip string) error {
 	return nil
 }
 
+func (s *AdminService) LogCategoryCreated(username, name, ip string) error {
+	if err := s.repos.Audit.Insert(username, "CREATE_CATEGORY", "created category: "+name, ip); err != nil {
+		return fmt.Errorf("audit create category: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) LogCategoryUpdated(username, name, ip string) error {
+	if err := s.repos.Audit.Insert(username, "UPDATE_CATEGORY", "updated category: "+name, ip); err != nil {
+		return fmt.Errorf("audit update category: %w", err)
+	}
+	return nil
+}
+
+func (s *AdminService) DeleteCategory(username string, category *model.Category, ip string) error {
+	if err := s.repos.Audit.Insert(username, "DELETE_CATEGORY", "deleted category: "+category.Name, ip); err != nil {
+		return fmt.Errorf("audit delete category: %w", err)
+	}
+	return nil
+}
+
 func (s *AdminService) DeleteProject(username string, id int64, ip string) error {
 	project, err := s.repos.Project.GetByID(id)
 	if err != nil {

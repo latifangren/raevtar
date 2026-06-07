@@ -20,6 +20,9 @@ var slugRe = regexp.MustCompile(`[^a-z0-9-]`)
 
 var ErrInvalidPostInput = errors.New("invalid post input")
 var ErrPostNotFound = errors.New("post not found")
+var ErrInvalidCategoryInput = errors.New("invalid category input")
+var ErrCategoryNotFound = errors.New("category not found")
+var ErrCategoryInUse = errors.New("category in use")
 
 type BlogService struct {
 	repos    *repo.Repositories
@@ -77,6 +80,117 @@ func (s *BlogService) ListCategories() ([]model.Category, error) {
 		return nil, fmt.Errorf("list categories: %w", err)
 	}
 	return categories, nil
+}
+
+func (s *BlogService) GetCategoryByID(id int64) (*model.Category, int, error) {
+	category, err := s.repos.Category.GetByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, 0, fmt.Errorf("%w: %w", ErrCategoryNotFound, err)
+		}
+		return nil, 0, fmt.Errorf("get category: %w", err)
+	}
+	count, err := s.repos.Post.CountByCategoryID(id)
+	if err != nil {
+		return nil, 0, fmt.Errorf("count category posts: %w", err)
+	}
+	return category, count, nil
+}
+
+func (s *BlogService) PostCountForCategory(categoryID int64) (int, error) {
+	count, err := s.repos.Post.CountByCategoryID(categoryID)
+	if err != nil {
+		return 0, fmt.Errorf("count category posts: %w", err)
+	}
+	return count, nil
+}
+
+func (s *BlogService) CreateCategory(input model.Category) (*model.Category, error) {
+	input, err := cleanCategoryInput(input)
+	if err != nil {
+		return nil, err
+	}
+	exists, err := s.repos.Category.SlugExists(input.Slug)
+	if err != nil {
+		return nil, fmt.Errorf("check category slug: %w", err)
+	}
+	if exists {
+		return nil, fmt.Errorf("%w: slug already exists", ErrInvalidCategoryInput)
+	}
+	now := time.Now()
+	category := &model.Category{
+		Slug:        input.Slug,
+		Name:        input.Name,
+		Description: input.Description,
+		CreatedAt:   now,
+		UpdatedAt:   now,
+	}
+	if err := s.repos.Category.Create(category); err != nil {
+		return nil, fmt.Errorf("create category: %w", err)
+	}
+	return category, nil
+}
+
+func (s *BlogService) UpdateCategory(id int64, input model.Category) (*model.Category, error) {
+	input, err := cleanCategoryInput(input)
+	if err != nil {
+		return nil, err
+	}
+	current, err := s.repos.Category.GetByID(id)
+	if err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %w", ErrCategoryNotFound, err)
+		}
+		return nil, fmt.Errorf("get category: %w", err)
+	}
+	exists, err := s.repos.Category.SlugExistsExcludingID(input.Slug, id)
+	if err != nil {
+		return nil, fmt.Errorf("check category slug: %w", err)
+	}
+	if exists {
+		return nil, fmt.Errorf("%w: slug already exists", ErrInvalidCategoryInput)
+	}
+	postCount, err := s.repos.Post.CountByCategoryID(id)
+	if err != nil {
+		return nil, fmt.Errorf("count category posts: %w", err)
+	}
+	if current.Slug != input.Slug && postCount > 0 {
+		return nil, fmt.Errorf("%w: slug cannot change while posts exist", ErrCategoryInUse)
+	}
+	current.Slug = input.Slug
+	current.Name = input.Name
+	current.Description = input.Description
+	current.UpdatedAt = time.Now()
+	if err := s.repos.Category.Update(current); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return nil, fmt.Errorf("%w: %w", ErrCategoryNotFound, err)
+		}
+		return nil, fmt.Errorf("update category: %w", err)
+	}
+	return current, nil
+}
+
+func (s *BlogService) DeleteCategory(id int64) error {
+	if _, err := s.repos.Category.GetByID(id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w: %w", ErrCategoryNotFound, err)
+		}
+		return fmt.Errorf("get category: %w", err)
+	}
+	postCount, err := s.repos.Post.CountByCategoryID(id)
+	if err != nil {
+		return fmt.Errorf("count category posts: %w", err)
+	}
+	if postCount > 0 {
+		return fmt.Errorf("%w: category still has posts", ErrCategoryInUse)
+	}
+	if err := s.repos.Category.Delete(id); err != nil {
+		if errors.Is(err, sql.ErrNoRows) {
+			return fmt.Errorf("%w: %w", ErrCategoryNotFound, err)
+		}
+		return fmt.Errorf("delete category: %w", err)
+	}
+	return nil
 }
 
 func (s *BlogService) GetPost(slug string) (*model.Post, error) {
@@ -222,6 +336,19 @@ func cleanPostCreate(input model.PostCreate) model.PostCreate {
 	}
 	input.Tags = cleanTags
 	return input
+}
+
+func cleanCategoryInput(input model.Category) (model.Category, error) {
+	input.Slug = strings.TrimSpace(strings.ToLower(input.Slug))
+	input.Name = strings.TrimSpace(input.Name)
+	input.Description = strings.TrimSpace(input.Description)
+	if input.Slug == "" || input.Name == "" {
+		return model.Category{}, fmt.Errorf("%w: slug and name required", ErrInvalidCategoryInput)
+	}
+	if generateSlug(input.Slug) != input.Slug {
+		return model.Category{}, fmt.Errorf("%w: slug must be lowercase kebab-case", ErrInvalidCategoryInput)
+	}
+	return input, nil
 }
 
 func generateSlug(title string) string {

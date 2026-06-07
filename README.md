@@ -19,9 +19,9 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 ### Blog
 
 - Artikel Markdown disimpan di SQLite dan dirender pakai Goldmark.
-- Kategori bawaan: AI Agent, Security, Kernel & Embedded, DevOps, Tools.
+- Topic blog dikelola lewat `categories`; default seed awal: AI Agent, Security, Kernel & Embedded, DevOps, Tools.
 - Tags normalized (`tags` + `post_tags`) dan badge di UI.
-- Admin Content Studio: draft/publish, Markdown preview, media upload, cover image.
+- Admin Content Studio: draft/publish, Markdown preview, media upload, cover image, dan topic management di `/admin/topics`.
 - RSS feed di `/blog/feed.xml`.
 - API `POST /api/v1/posts` untuk integrasi agent seperti Hermes.
 
@@ -46,7 +46,7 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 
 - Login session di `/admin/login`.
 - RBAC role: `owner`, `admin`, `operator`, `readonly`.
-- Manage posts, media, servers, users, dan audit log.
+- Manage posts, blog topics, media, servers, users, dan audit log.
 - Server diagnostics di `/admin/servers/{id}` berisi endpoint, metric history, setup command, token rotation, dan activity log admin-only.
 
 ### REST API
@@ -80,6 +80,13 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 | `GET` | `/docs`, `/lab/docs` | Public-safe docs |
 
 Public docs sengaja hanya menjelaskan read-only surface dan privacy boundary. Endpoint admin/server setup tetap operator-only.
+
+### Blog topic management
+
+- Public topic switchboard tetap hidup di `/blog` dan `/topics`.
+- Admin topic management sekarang hidup di `/admin/topics` dan memakai entity `categories` yang sama dengan public blog surface.
+- Topic slug harus lowercase kebab-case.
+- Topic yang sudah dipakai post **tidak bisa** dihapus atau diganti slug-nya, supaya filter publik seperti `/blog?category=...` tetap stabil.
 
 ### Project write payload shape
 

@@ -75,6 +75,24 @@ type PostEditData struct {
 	MediaAssets []model.MediaAsset
 }
 
+type TopicRow struct {
+	Category  model.Category
+	PostCount int
+}
+
+type TopicsData struct {
+	CurrentPath string
+	CSRFToken   string
+	Topics      []TopicRow
+}
+
+type TopicEditData struct {
+	CurrentPath string
+	CSRFToken   string
+	Category    *model.Category
+	PostCount   int
+}
+
 type ProjectsData struct {
 	CurrentPath  string
 	CSRFToken    string

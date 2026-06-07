@@ -182,6 +182,133 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *Handler) adminTopics(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	rows := make([]adminview.TopicRow, 0, len(categories))
+	for _, category := range categories {
+		count, err := h.svc.Blog.PostCountForCategory(category.ID)
+		if err != nil {
+			internalServerError(w, r, err)
+			return
+		}
+		rows = append(rows, adminview.TopicRow{Category: category, PostCount: count})
+	}
+	renderHTML(w, r, adminview.Topics(adminview.TopicsData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Topics:      rows,
+	}))
+}
+
+func (h *Handler) adminCreateTopic(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	category, err := h.svc.Blog.CreateCategory(model.Category{
+		Slug:        r.FormValue("slug"),
+		Name:        r.FormValue("name"),
+		Description: r.FormValue("description"),
+	})
+	if err != nil {
+		h.writeCategoryAdminError(w, r, err)
+		return
+	}
+	warnAfterMutation(r, "create_category_audit", h.svc.Admin.LogCategoryCreated(entry.username, category.Name, clientIP(r)))
+	http.Redirect(w, r, "/admin/topics", http.StatusSeeOther)
+}
+
+func (h *Handler) adminEditTopic(w http.ResponseWriter, r *http.Request) {
+	id, err := strconv.ParseInt(r.PathValue("categoryID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	category, postCount, err := h.svc.Blog.GetCategoryByID(id)
+	if err != nil {
+		if errors.Is(err, service.ErrCategoryNotFound) {
+			http.Error(w, "topic not found", http.StatusNotFound)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, adminview.TopicEdit(adminview.TopicEditData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Category:    category,
+		PostCount:   postCount,
+	}))
+}
+
+func (h *Handler) adminUpdateTopic(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("categoryID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	category, err := h.svc.Blog.UpdateCategory(id, model.Category{
+		Slug:        r.FormValue("slug"),
+		Name:        r.FormValue("name"),
+		Description: r.FormValue("description"),
+	})
+	if err != nil {
+		h.writeCategoryAdminError(w, r, err)
+		return
+	}
+	warnAfterMutation(r, "update_category_audit", h.svc.Admin.LogCategoryUpdated(entry.username, category.Name, clientIP(r)))
+	http.Redirect(w, r, "/admin/topics", http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteTopic(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	entry, _ := getSessionEntry(r)
+	id, err := strconv.ParseInt(r.PathValue("categoryID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	category, _, err := h.svc.Blog.GetCategoryByID(id)
+	if err != nil {
+		if errors.Is(err, service.ErrCategoryNotFound) {
+			http.Error(w, "topic not found", http.StatusNotFound)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
+	if err := h.svc.Blog.DeleteCategory(id); err != nil {
+		h.writeCategoryAdminError(w, r, err)
+		return
+	}
+	warnAfterMutation(r, "delete_category_audit", h.svc.Admin.DeleteCategory(entry.username, category, clientIP(r)))
+	http.Redirect(w, r, "/admin/topics", http.StatusSeeOther)
+}
+
+func (h *Handler) writeCategoryAdminError(w http.ResponseWriter, r *http.Request, err error) {
+	switch {
+	case errors.Is(err, service.ErrCategoryNotFound):
+		http.Error(w, "topic not found", http.StatusNotFound)
+	case errors.Is(err, service.ErrInvalidCategoryInput), errors.Is(err, service.ErrCategoryInUse):
+		http.Error(w, err.Error(), http.StatusBadRequest)
+	default:
+		internalServerError(w, r, err)
+	}
+}
+
 func (h *Handler) adminMedia(w http.ResponseWriter, r *http.Request) {
 	assets, err := h.svc.Media.ListAssets()
 	if err != nil {

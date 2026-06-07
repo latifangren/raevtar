@@ -2200,7 +2200,7 @@ func TestAdminPagesRenderCSRFTokens(t *testing.T) {
 	app := newPublicTestApp(t)
 	token := sessions.create(47, "owner", model.RoleOwner)
 
-	for _, path := range []string{"/admin", "/admin/posts", "/admin/servers", "/admin/manage-users", "/admin/editorial-inbox"} {
+	for _, path := range []string{"/admin", "/admin/posts", "/admin/topics", "/admin/servers", "/admin/manage-users", "/admin/editorial-inbox"} {
 		t.Run(path, func(t *testing.T) {
 			status, body := getBody(t, app, path, &http.Cookie{Name: sessionCookieName, Value: token})
 			if status != http.StatusOK {
@@ -2263,6 +2263,7 @@ func TestAdminManagementPagesRequireOwnerOrAdmin(t *testing.T) {
 	for _, path := range []string{
 		"/admin/editorial-inbox",
 		"/admin/posts",
+		"/admin/topics",
 		"/admin/servers",
 		"/admin/audit-log",
 		"/admin/manage-users",
@@ -2287,6 +2288,7 @@ func TestAdminDeleteRoutesRejectGET(t *testing.T) {
 
 	for i, path := range []string{
 		"/admin/posts/delete/1",
+		"/admin/topics/delete/1",
 		"/admin/servers/rotate-token/1",
 		"/admin/servers/delete/1",
 		"/admin/manage-users/delete/1",
@@ -2301,6 +2303,88 @@ func TestAdminDeleteRoutesRejectGET(t *testing.T) {
 
 			if rr.Code != http.StatusMethodNotAllowed {
 				t.Fatalf("status = %d, want %d", rr.Code, http.StatusMethodNotAllowed)
+			}
+		})
+	}
+}
+
+func TestAdminTopicRoutesRequireOwnerOrAdminAndExposeCRUDSurface(t *testing.T) {
+	app := newPublicTestApp(t)
+	readonlyToken := sessions.create(49, "reader", model.RoleReadonly)
+	ownerToken := sessions.create(50, "owner", model.RoleOwner)
+	ownerEntry, ok := sessions.get(ownerToken)
+	if !ok {
+		t.Fatalf("expected owner session")
+	}
+
+	for _, path := range []string{"/admin/topics", "/admin/topics/edit/1"} {
+		t.Run("redirect guest "+path, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			rr := httptest.NewRecorder()
+			app.handler.ServeHTTP(rr, req)
+			if rr.Code != http.StatusSeeOther {
+				t.Fatalf("guest status = %d, want %d", rr.Code, http.StatusSeeOther)
+			}
+			if got := rr.Header().Get("Location"); got != "/admin/login" {
+				t.Fatalf("guest location = %q, want /admin/login", got)
+			}
+		})
+
+		t.Run("forbid readonly "+path, func(t *testing.T) {
+			req := httptest.NewRequest(http.MethodGet, path, nil)
+			req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: readonlyToken})
+			rr := httptest.NewRecorder()
+			app.handler.ServeHTTP(rr, req)
+			if rr.Code != http.StatusForbidden {
+				t.Fatalf("readonly status = %d, want %d", rr.Code, http.StatusForbidden)
+			}
+		})
+
+		t.Run("owner can reach "+path, func(t *testing.T) {
+			status, body := getBody(t, app, path, &http.Cookie{Name: sessionCookieName, Value: ownerToken})
+			if status != http.StatusOK {
+				t.Fatalf("owner status = %d, want %d; body: %s", status, http.StatusOK, body)
+			}
+			assertContains(t, body, `name="_csrf"`)
+		})
+	}
+
+	for _, tc := range []struct {
+		name string
+		path string
+	}{
+		{name: "create topic", path: "/admin/topics"},
+		{name: "update topic", path: "/admin/topics/update/1"},
+		{name: "delete topic", path: "/admin/topics/delete/1"},
+	} {
+		t.Run(tc.name+" requires csrf", func(t *testing.T) {
+			form := url.Values{"name": {"Topic"}, "slug": {"topic-slug"}}
+			req := httptest.NewRequest(http.MethodPost, tc.path, strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: ownerToken})
+			rr := httptest.NewRecorder()
+			app.handler.ServeHTTP(rr, req)
+			if rr.Code != http.StatusForbidden {
+				t.Fatalf("status = %d, want %d", rr.Code, http.StatusForbidden)
+			}
+		})
+
+		t.Run(tc.name+" accepts valid csrf", func(t *testing.T) {
+			form := url.Values{
+				"name":  {"Topic"},
+				"slug":  {"topic-slug"},
+				"_csrf": {ownerEntry.csrfToken},
+			}
+			req := httptest.NewRequest(http.MethodPost, tc.path, strings.NewReader(form.Encode()))
+			req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+			req.AddCookie(&http.Cookie{Name: sessionCookieName, Value: ownerToken})
+			rr := httptest.NewRecorder()
+			app.handler.ServeHTTP(rr, req)
+			if rr.Code == http.StatusForbidden {
+				t.Fatalf("valid csrf should pass middleware for %s; body: %s", tc.path, rr.Body.String())
+			}
+			if rr.Code == http.StatusNotFound {
+				t.Fatalf("missing admin topic route: %s", tc.path)
 			}
 		})
 	}

@@ -52,6 +52,7 @@ templ Dashboard(data DashboardData) {
 				<div class="grid grid-cols-2 md:grid-cols-4 gap-4">
 					@quickLink("/admin/editorial-inbox", "Editorial", "Control Hermes inbox")
 					@quickLink("/admin/posts", "Posts", "Manage articles")
+					@quickLink("/admin/topics", "Topics", "Manage blog taxonomy")
 					@quickLink("/admin/projects", "Projects", "Manage project postings")
 					@quickLink("/admin/pages", "Pages", "Edit About and Contact")
 					@quickLink("/admin/servers", "Servers", "Add or remove")
@@ -362,6 +363,141 @@ templ PostEdit(data PostEditData) {
 						<button type="submit" name="intent" value="publish" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Publish</button>
 					</div>
 				</form>
+			</div>
+		</div>
+	}
+}
+
+templ Topics(data TopicsData) {
+	@Shell("Manage Topics", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			@pageHeader("Manage Topics", CountText(len(data.Topics))+" total")
+			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+				<table class="w-full text-left">
+					<thead>
+						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+							<th class="py-3 px-4 font-bold">Name</th>
+							<th class="py-3 px-4 font-bold">Slug</th>
+							<th class="py-3 px-4 font-bold">Posts</th>
+							<th class="py-3 px-4 font-bold">Description</th>
+							<th class="py-3 px-4"></th>
+						</tr>
+					</thead>
+					<tbody>
+						for _, topic := range data.Topics {
+							<tr class="border-b-2 border-retro-ink last:border-b-0">
+								<td class="py-3 px-4 text-sm font-bold text-retro-ink">{ topic.Category.Name }</td>
+								<td class="py-3 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(topic.Category.Slug) }>{ topic.Category.Slug }</span></td>
+								<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ CountText(topic.PostCount) }</td>
+								<td class="py-3 px-4 text-sm font-bold text-retro-muted max-w-[360px] truncate">{ topic.Category.Description }</td>
+								<td class="py-3 px-4 text-right">
+									<a href={ templ.URL("/admin/topics/edit/" + IDText(topic.Category.ID)) } class="text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline">Edit</a>
+									if topic.PostCount == 0 {
+										<form method="POST" action={ templ.URL("/admin/topics/delete/" + IDText(topic.Category.ID)) } class="inline" data-confirm="Delete this topic? This cannot be undone.">
+											<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+											<button type="submit" class="text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer">✕</button>
+										</form>
+									}
+								</td>
+							</tr>
+						}
+					</tbody>
+				</table>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<div class="flex flex-wrap items-start justify-between gap-3 mb-5">
+					<div>
+						<h2 class="text-sm font-black uppercase text-retro-ink mb-1">Create New Topic</h2>
+						<p class="text-sm font-bold text-retro-muted max-w-2xl">Topics drive the /blog switchboard and public archive taxonomy. Keep slugs stable once posts start using them.</p>
+					</div>
+					<span class="text-xs font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight px-3 py-1 text-retro-ink">blog taxonomy</span>
+				</div>
+				<form method="POST" action="/admin/topics" class="space-y-4" data-confirm="Create this topic?">
+					<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+					<div class="grid gap-4 lg:grid-cols-2">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Name</label>
+							<input type="text" name="name" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink" placeholder="Systems"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Slug</label>
+							<input type="text" name="slug" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono" placeholder="systems"/>
+						</div>
+					</div>
+					<div>
+						<label class="block text-sm font-bold text-retro-muted mb-1">Description</label>
+						<textarea name="description" rows="3" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink" placeholder="Optional public-facing note for this topic."></textarea>
+					</div>
+					<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Slug policy</p>
+						<p class="text-xs font-bold leading-5 text-retro-ink">Use lowercase kebab-case. Once posts are assigned to a topic, slug changes and delete are blocked to preserve public filter links.</p>
+					</div>
+					<div class="flex justify-end gap-2">
+						<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Create Topic</button>
+					</div>
+				</form>
+			</div>
+		</div>
+	}
+}
+
+templ TopicEdit(data TopicEditData) {
+	@Shell("Edit Topic", data.CurrentPath, data.CSRFToken) {
+		<div class="space-y-6">
+			<div class="flex items-center justify-between">
+				<div>
+					<a href="/admin/topics" class="text-xs font-bold no-underline hover:bg-retro-wheat">&larr; Topics</a>
+					<h1 class="text-xl font-black uppercase text-retro-ink mt-1">Edit topic</h1>
+				</div>
+				<span class="text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono">posts: { CountText(data.PostCount) }</span>
+			</div>
+			<div class="bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
+				<div class="space-y-4">
+					<form method="POST" action={ templ.URL("/admin/topics/update/" + IDText(data.Category.ID)) } class="space-y-4" data-confirm="Save topic changes?">
+						<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Name</label>
+							<input type="text" name="name" value={ data.Category.Name } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Slug</label>
+							if data.PostCount > 0 {
+								<input type="text" name="slug" value={ data.Category.Slug } readonly class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-cream text-sm font-bold text-retro-muted font-mono"/>
+							} else {
+								<input type="text" name="slug" value={ data.Category.Slug } required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono"/>
+							}
+						</div>
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Description</label>
+							<textarea name="description" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">{ data.Category.Description }</textarea>
+						</div>
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Usage safety</p>
+							if data.PostCount > 0 {
+								<p class="text-xs font-bold leading-5 text-retro-ink">This topic already powers public post filters. Slug is locked and delete is disabled while { CountText(data.PostCount) } post(s) still reference it.</p>
+							} else {
+								<p class="text-xs font-bold leading-5 text-retro-ink">No posts use this topic yet. You can still rename the slug or delete it safely.</p>
+							}
+						</div>
+						<div class="flex flex-wrap justify-between gap-2">
+							if data.PostCount > 0 {
+								<span class="text-xs font-bold text-retro-muted">Delete disabled while posts still reference this topic.</span>
+							} else {
+								<span class="text-xs font-bold text-retro-muted">Unused topics can still be removed safely.</span>
+							}
+							<div class="flex gap-2">
+								<a href="/admin/topics" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline">Cancel</a>
+								<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Update Topic</button>
+							</div>
+						</div>
+					</form>
+					if data.PostCount == 0 {
+						<form method="POST" action={ templ.URL("/admin/topics/delete/" + IDText(data.Category.ID)) } class="flex justify-start" data-confirm="Delete this topic? This cannot be undone.">
+							<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+							<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Delete Topic</button>
+						</form>
+					}
+				</div>
 			</div>
 		</div>
 	}

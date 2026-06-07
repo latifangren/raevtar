@@ -239,17 +239,18 @@ raevtar/
 |--------|------|---------|------------|
 | GET | `/` | landing.Index | Landing page |
 | GET | `/blog` | blog.List | Blog list (semua) |
-| GET | `/blog?category=ai-agent` | blog.List | Filter by kategori |
+| GET | `/blog?category=ai-agent` | blog.List | Filter by kategori/topic |
 | GET | `/blog/{slug}` | blog.Detail | Single post |
+| GET | `/topics` | topics.Page | Public topic index / switchboard |
 | GET | `/blog/feed.xml` | rss.Feed | RSS feed |
 | GET | `/lab` | lab.Page | Public-safe aggregate lab page |
 | GET | `/dashboard` | dashboard.Index | Public-safe server monitoring + Platform System Health |
 | GET | `/dashboard/{serverID}` | dashboard.Detail | Public-safe detail server |
 | GET | `/dashboard/{serverID}/live` | dashboard.DetailLive | HTMX fragment detail server, refresh 15s |
-| GET | `/admin/*` | admin.* | Admin panel session auth; topology/setup/token area |
+| GET | `/admin/*` | admin.* | Admin panel session auth; content/topic/topology/setup/token area |
 | GET | `/api/v1/posts` | api.ListPosts | JSON posts |
 | POST | `/api/v1/posts` | api.CreatePost | JSON create (cron) |
-| GET | `/api/v1/categories` | api.ListCategories | JSON categories |
+| GET | `/api/v1/categories` | api.ListCategories | JSON public topics/categories |
 | GET | `/api/v1/hoststats` | api.HostStats | Host CPU/RAM/disk/temp (Bearer auth) |
 | GET | `/api/v1/servers` | api.ListServers | JSON server status (Bearer auth) |
 | POST | `/api/v1/servers` | api.CreateServer | Register server + return one-time agent token |
@@ -259,6 +260,8 @@ raevtar/
 | GET | `/lab/docs` | public docs page | Alias docs dari area lab |
 
 Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai public read-only spec dan sengaja tidak mendokumentasikan endpoint admin/server/agent setup.
+
+`categories` adalah source of truth untuk topic blog. Public `/blog` dan `/topics` membaca entity yang sama dengan admin topic management di `/admin/topics`. Karena `posts` menyimpan `category_id`, service layer memblok slug change dan delete saat category masih dipakai post, supaya link/filter publik tidak rusak.
 
 Public dashboard/detail boleh menampilkan resource summary yang sudah dibulatkan dan aman: CPU, load, RAM, disk, temperature, uptime, latest sample age, sample count, history window, dan availability aggregate. Host/IP, port, tags privat, agent token, install command, setup command, dan audit log tetap admin-only.
 

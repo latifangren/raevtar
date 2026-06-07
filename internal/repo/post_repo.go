@@ -143,3 +143,11 @@ func (r *PostRepo) Count(categorySlug string, publishedOnly bool) (int, error) {
 	}
 	return count, r.db.Get(&count, query, args...)
 }
+
+func (r *PostRepo) CountByCategoryID(categoryID int64) (int, error) {
+	var count int
+	if err := r.db.Get(&count, "SELECT COUNT(*) FROM posts WHERE category_id = ?", categoryID); err != nil {
+		return 0, err
+	}
+	return count, nil
+}

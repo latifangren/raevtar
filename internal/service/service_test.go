@@ -44,6 +44,71 @@ type testServices struct {
 	repos *repo.Repositories
 }
 
+func requireBlogMethod(t *testing.T, state *testServices, name string) reflect.Value {
+	t.Helper()
+	method := reflect.ValueOf(state.svc.Blog).MethodByName(name)
+	if !method.IsValid() {
+		t.Fatalf("BlogService missing %s; topic/category CRUD support not wired yet", name)
+	}
+	return method
+}
+
+func callCreateCategory(t *testing.T, state *testServices, input model.Category) (*model.Category, error) {
+	t.Helper()
+	results := requireBlogMethod(t, state, "CreateCategory").Call([]reflect.Value{reflect.ValueOf(input)})
+	if len(results) != 2 {
+		t.Fatalf("CreateCategory result count = %d, want 2", len(results))
+	}
+	if !results[0].IsNil() {
+		cat, ok := results[0].Interface().(*model.Category)
+		if !ok {
+			t.Fatalf("CreateCategory first result type = %T, want *model.Category", results[0].Interface())
+		}
+		if results[1].IsNil() {
+			return cat, nil
+		}
+		return cat, results[1].Interface().(error)
+	}
+	if results[1].IsNil() {
+		return nil, nil
+	}
+	return nil, results[1].Interface().(error)
+}
+
+func callUpdateCategory(t *testing.T, state *testServices, id int64, input model.Category) (*model.Category, error) {
+	t.Helper()
+	results := requireBlogMethod(t, state, "UpdateCategory").Call([]reflect.Value{reflect.ValueOf(id), reflect.ValueOf(input)})
+	if len(results) != 2 {
+		t.Fatalf("UpdateCategory result count = %d, want 2", len(results))
+	}
+	if !results[0].IsNil() {
+		cat, ok := results[0].Interface().(*model.Category)
+		if !ok {
+			t.Fatalf("UpdateCategory first result type = %T, want *model.Category", results[0].Interface())
+		}
+		if results[1].IsNil() {
+			return cat, nil
+		}
+		return cat, results[1].Interface().(error)
+	}
+	if results[1].IsNil() {
+		return nil, nil
+	}
+	return nil, results[1].Interface().(error)
+}
+
+func callDeleteCategory(t *testing.T, state *testServices, id int64) error {
+	t.Helper()
+	results := requireBlogMethod(t, state, "DeleteCategory").Call([]reflect.Value{reflect.ValueOf(id)})
+	if len(results) != 1 {
+		t.Fatalf("DeleteCategory result count = %d, want 1", len(results))
+	}
+	if results[0].IsNil() {
+		return nil
+	}
+	return results[0].Interface().(error)
+}
+
 func newTestServices(t *testing.T) *testServices {
 	t.Helper()
 
@@ -215,6 +280,152 @@ func TestBlogServiceUpdatePostPreservesSlugAndReplacesTags(t *testing.T) {
 	}
 	if len(updated.Tags) != 2 || updated.Tags[0].Name != "commissioned" || updated.Tags[1].Name != "new" {
 		t.Fatalf("updated tags = %+v, want commissioned,new", updated.Tags)
+	}
+}
+
+func TestBlogServiceTopicCRUDSupportsSafeCategoryLifecycle(t *testing.T) {
+	state := newTestServices(t)
+
+	created, err := callCreateCategory(t, state, model.Category{
+		Slug:        "systems",
+		Name:        "Systems",
+		Description: "Low-level systems notes",
+	})
+	if err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+	if created == nil {
+		t.Fatalf("create category returned nil category")
+	}
+	if created.ID == 0 {
+		t.Fatalf("created category id = 0, want persisted category")
+	}
+	if created.Slug != "systems" || created.Name != "Systems" {
+		t.Fatalf("created category mismatch: %+v", created)
+	}
+
+	stored, err := state.repos.Category.GetBySlug("systems")
+	if err != nil {
+		t.Fatalf("get created category by slug: %v", err)
+	}
+	if stored.ID != created.ID {
+		t.Fatalf("stored category id = %d, want %d", stored.ID, created.ID)
+	}
+
+	updated, err := callUpdateCategory(t, state, created.ID, model.Category{
+		Slug:        "systems-and-ops",
+		Name:        "Systems and Ops",
+		Description: "Expanded operating notes",
+	})
+	if err != nil {
+		t.Fatalf("update category: %v", err)
+	}
+	if updated == nil {
+		t.Fatalf("update category returned nil category")
+	}
+	if updated.ID != created.ID {
+		t.Fatalf("updated category id = %d, want %d", updated.ID, created.ID)
+	}
+	if updated.Slug != "systems-and-ops" || updated.Name != "Systems and Ops" || updated.Description != "Expanded operating notes" {
+		t.Fatalf("updated category mismatch: %+v", updated)
+	}
+
+	if _, err := state.repos.Category.GetBySlug("systems"); err == nil {
+		t.Fatalf("old category slug should no longer resolve")
+	}
+	stored, err = state.repos.Category.GetBySlug("systems-and-ops")
+	if err != nil {
+		t.Fatalf("get updated category by slug: %v", err)
+	}
+	if stored.Name != "Systems and Ops" || stored.Description != "Expanded operating notes" {
+		t.Fatalf("stored updated category mismatch: %+v", stored)
+	}
+
+	if err := callDeleteCategory(t, state, created.ID); err != nil {
+		t.Fatalf("delete category: %v", err)
+	}
+	if _, err := state.repos.Category.GetBySlug("systems-and-ops"); err == nil {
+		t.Fatalf("deleted category should not resolve by slug")
+	}
+}
+
+func TestBlogServiceTopicSlugChangeBlockedWhenPostsExist(t *testing.T) {
+	state := newTestServices(t)
+
+	category, err := state.repos.Category.GetBySlug("devops")
+	if err != nil {
+		t.Fatalf("get seeded category: %v", err)
+	}
+	post, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: category.Slug,
+		Title:        "Pinned Topic Post",
+		ContentMD:    "# Keep slug stable",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post in category: %v", err)
+	}
+
+	updated, err := callUpdateCategory(t, state, category.ID, model.Category{
+		Slug:        "platform-ops",
+		Name:        "Platform Ops",
+		Description: "Attempted rename while posts exist",
+	})
+	if err == nil {
+		t.Fatalf("expected slug change for category with posts to fail; got %+v", updated)
+	}
+	if updated != nil {
+		t.Fatalf("blocked slug change should not return updated category: %+v", updated)
+	}
+	if !strings.Contains(strings.ToLower(err.Error()), "slug") {
+		t.Fatalf("err = %v, want slug-related failure", err)
+	}
+
+	reloaded, err := state.repos.Post.GetByID(post.ID)
+	if err != nil {
+		t.Fatalf("reload post after blocked slug change: %v", err)
+	}
+	if reloaded.CategorySlug != category.Slug {
+		t.Fatalf("post category slug = %q, want preserved %q", reloaded.CategorySlug, category.Slug)
+	}
+	unchanged, err := state.repos.Category.GetBySlug(category.Slug)
+	if err != nil {
+		t.Fatalf("reload original category slug: %v", err)
+	}
+	if unchanged.ID != category.ID {
+		t.Fatalf("category id after blocked slug change = %d, want %d", unchanged.ID, category.ID)
+	}
+}
+
+func TestBlogServiceTopicDeleteBlockedWhenPostsExist(t *testing.T) {
+	state := newTestServices(t)
+
+	category, err := callCreateCategory(t, state, model.Category{
+		Slug:        "field-notes",
+		Name:        "Field Notes",
+		Description: "Observations from field work",
+	})
+	if err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: category.Slug,
+		Title:        "Field Note #1",
+		ContentMD:    "# Field Note #1",
+		Published:    true,
+	}); err != nil {
+		t.Fatalf("create post in created category: %v", err)
+	}
+
+	err = callDeleteCategory(t, state, category.ID)
+	if err == nil {
+		t.Fatalf("expected delete for category with posts to fail")
+	}
+	if !strings.Contains(strings.ToLower(err.Error()), "post") {
+		t.Fatalf("err = %v, want post-related safety failure", err)
+	}
+	if _, err := state.repos.Category.GetBySlug(category.Slug); err != nil {
+		t.Fatalf("blocked delete should keep category addressable: %v", err)
 	}
 }
 
