@@ -2,6 +2,10 @@
 
 Raevtar adalah platform personal yang jalan sebagai satu binary Go: blog, public lab, dashboard monitoring server lokal, admin panel, dan REST API kecil. Target utamanya tetap sederhana: bisa hidup di postmarketOS/aarch64, hemat resource, dan cukup aman untuk dibuka lewat domain pribadi.
 
+<p align="center">
+  <img src="docs/images/public.png" alt="Public Raevtar surface" width="900">
+</p>
+
 ## Current Scope
 
 | Area | Status |
@@ -48,6 +52,10 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 - RBAC role: `owner`, `admin`, `operator`, `readonly`.
 - Manage posts, blog topics, media, servers, users, dan audit log.
 - Server diagnostics di `/admin/servers/{id}` berisi endpoint, metric history, setup command, token rotation, dan activity log admin-only.
+
+<p align="center">
+  <img src="docs/images/admin.png" alt="Raevtar admin panel" width="900">
+</p>
 
 ### REST API
 
