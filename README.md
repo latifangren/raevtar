@@ -2,6 +2,8 @@
 
 Raevtar adalah platform personal yang jalan sebagai satu binary Go: blog, public lab, dashboard monitoring server lokal, admin panel, dan REST API kecil. Target utamanya tetap sederhana: bisa hidup di postmarketOS/aarch64, hemat resource, dan cukup aman untuk dibuka lewat domain pribadi.
 
+Observed di deployment whyred/postmarketOS saat idle, footprint runtime Raevtar biasanya tetap kecil: sekitar **24 MB RSS**, CPU idle nyaris nol, binary sekitar **17.5 MB**, dan SQLite database masih di bawah **1 MB** untuk pemakaian saat ini. Angka ini adalah observasi operasional pada host sekarang, bukan benchmark universal lintas semua deployment.
+
 <p align="center">
   <img src="docs/images/public.png" alt="Public Raevtar surface" width="900">
 </p>

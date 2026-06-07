@@ -10,6 +10,8 @@ Runtime: postmarketOS (aarch64) — Redmi Note 5 (whyred)
 
 Platform pribadi all-in-one yang jalan di HP (postmarketOS) dengan akses publik via Cloudflare Tunnel. Isinya blog rekomendasi projek GitHub, dashboard monitoring server lokal, public lab, landing page profil, admin panel, dan API kecil untuk integrasi agent.
 
+Observed di deployment whyred saat idle: Raevtar berjalan di sekitar **24 MB RSS**, CPU time nyaris tidak bergerak, binary sekitar **17.5 MB**, dan SQLite database masih sub-1 MB pada pemakaian sekarang. Ini memperkuat constraint bahwa stack harus tetap hemat resource di device target.
+
 ## 2. Target User
 
 Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untuk single-user dengan kebutuhan spesifik.
@@ -89,6 +91,8 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 | Network | Gak ada IP publik. Harus Cloudflare Tunnel. |
 | Arsitektur | aarch64 — semua binary harus ARM64 native. |
 | OS | Alpine-based (postmarketOS). Pakai apk. |
+
+Catatan observasional saat ini: virtual memory Go process bisa terlihat besar karena mapping runtime, tapi footprint yang lebih relevan untuk operasi harian adalah RSS nyata. Build cache Go juga bisa ratusan MB, namun itu overhead toolchain/dev, bukan biaya runtime aplikasi.
 
 ## 6. Stack Decision
 

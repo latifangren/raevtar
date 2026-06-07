@@ -15,6 +15,8 @@ Single binary. Go + Templ + self-hosted HTMX + SQLite.
 4. **Backend process stateless** — persistent state di SQLite. Restart server = gak ada data ilang.
 5. **Progressive enhancement** — HTML dikirim dari server (SSR). HTMX untuk interaktivitas tanpa JS berat. API untuk akses dari luar.
 
+Observed di deployment whyred saat idle, keputusan arsitektur ini memang menghasilkan footprint kecil: sekitar **24 MB RSS**, CPU idle nyaris nol, binary sekitar **17.5 MB**, dan SQLite database masih sub-1 MB pada pemakaian saat ini. Virtual memory process Go bisa tampak jauh lebih besar karena mapping runtime, tapi itu bukan angka resident memory yang benar-benar dipakai sehari-hari.
+
 ---
 
 ## Layer Architecture
