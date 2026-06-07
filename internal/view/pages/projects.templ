@@ -90,6 +90,17 @@ templ Projects(data ProjectsData) {
 						<option value="oldest" if data.CurrentSort == "oldest" { selected }>Oldest first</option>
 					</select>
 				</div>
+				<div>
+					<label for="state" class="block text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Project state</label>
+					<select id="state" name="state" class="w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink">
+						<option value="">All states</option>
+						<option value="planning" if data.CurrentState == "planning" { selected }>Planning</option>
+						<option value="active" if data.CurrentState == "active" { selected }>Active</option>
+						<option value="paused" if data.CurrentState == "paused" { selected }>Paused</option>
+						<option value="shipped" if data.CurrentState == "shipped" { selected }>Shipped</option>
+						<option value="archived" if data.CurrentState == "archived" { selected }>Archived</option>
+					</select>
+				</div>
 				<label class="inline-flex items-center gap-3 border-2 border-retro-ink bg-retro-blush px-4 py-2 text-sm font-black uppercase tracking-wide text-retro-ink">
 					<input type="checkbox" name="featured" value="true" checked?={ data.CurrentFeaturedOnly } class="h-4 w-4 accent-retro-ink"/>
 					Featured only

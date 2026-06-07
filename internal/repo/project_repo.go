@@ -11,6 +11,7 @@ type ProjectRepo struct{ db *sqlx.DB }
 type ProjectListOptions struct {
 	PublishedOnly bool
 	FeaturedOnly  bool
+	State         string
 	Sort          string
 	Limit         int
 	Offset        int
@@ -24,6 +25,10 @@ func (r *ProjectRepo) List(opts ProjectListOptions) ([]model.Project, error) {
 	}
 	if opts.FeaturedOnly {
 		query += " AND featured = 1"
+	}
+	if opts.State != "" {
+		query += " AND state = ?"
+		args = append(args, opts.State)
 	}
 	query += " ORDER BY " + projectOrderClause(opts.Sort) + " LIMIT ? OFFSET ?"
 	args = append(args, opts.Limit, opts.Offset)
@@ -88,9 +93,9 @@ func (r *ProjectRepo) GetByID(id int64) (*model.Project, error) {
 
 func (r *ProjectRepo) Create(project *model.Project) error {
 	result, err := r.db.Exec(`
-		INSERT INTO projects (title, slug, content_md, excerpt, cover_image_url, published, featured, sort_order)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
-		project.Title, project.Slug, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.Featured, project.SortOrder,
+		INSERT INTO projects (title, slug, content_md, excerpt, cover_image_url, published, state, featured, sort_order)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+		project.Title, project.Slug, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.State, project.Featured, project.SortOrder,
 	)
 	if err != nil {
 		return err
@@ -103,9 +108,9 @@ func (r *ProjectRepo) Create(project *model.Project) error {
 func (r *ProjectRepo) Update(project *model.Project) error {
 	_, err := r.db.Exec(`
 		UPDATE projects
-		SET title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, featured = ?, sort_order = ?, updated_at = ?
+		SET title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, state = ?, featured = ?, sort_order = ?, updated_at = ?
 		WHERE id = ?`,
-		project.Title, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.Featured, project.SortOrder, project.UpdatedAt, project.ID,
+		project.Title, project.ContentMD, project.Excerpt, project.CoverImageURL, project.Published, project.State, project.Featured, project.SortOrder, project.UpdatedAt, project.ID,
 	)
 	return err
 }
@@ -123,14 +128,19 @@ func (r *ProjectRepo) Delete(id int64) error {
 	return err
 }
 
-func (r *ProjectRepo) Count(publishedOnly bool, featuredOnly bool) (int, error) {
+func (r *ProjectRepo) Count(publishedOnly bool, featuredOnly bool, state string) (int, error) {
 	var count int
 	query := `SELECT COUNT(*) FROM projects WHERE 1=1`
+	args := make([]interface{}, 0, 1)
 	if publishedOnly {
 		query += ` AND published = 1`
 	}
 	if featuredOnly {
 		query += ` AND featured = 1`
 	}
-	return count, r.db.Get(&count, query)
+	if state != "" {
+		query += ` AND state = ?`
+		args = append(args, state)
+	}
+	return count, r.db.Get(&count, query, args...)
 }

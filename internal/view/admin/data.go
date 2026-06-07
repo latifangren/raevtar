@@ -76,17 +76,24 @@ type PostEditData struct {
 }
 
 type ProjectsData struct {
-	CurrentPath string
-	CSRFToken   string
-	Projects    []model.Project
-	MediaAssets []model.MediaAsset
+	CurrentPath  string
+	CSRFToken    string
+	Projects     []model.Project
+	MediaAssets  []model.MediaAsset
+	StateOptions []string
 }
 
 type ProjectEditData struct {
-	CurrentPath string
-	CSRFToken   string
-	Project     *model.Project
-	MediaAssets []model.MediaAsset
+	CurrentPath   string
+	CSRFToken     string
+	Project       *model.Project
+	MediaAssets   []model.MediaAsset
+	StateOptions  []string
+	Posts         []model.Post
+	Projects      []model.Project
+	Timeline      []model.ProjectUpdateEntry
+	RelatedItems  []model.ContentRelationView
+	ShowcaseItems []model.ProjectShowcaseItem
 }
 
 type PagesData struct {
@@ -493,6 +500,37 @@ func TagsInput(tags []model.Tag) string {
 		parts = append(parts, tag.Name)
 	}
 	return strings.Join(parts, ", ")
+}
+
+func ProjectStateOptions() []string {
+	return model.ValidProjectStates()
+}
+
+func ProjectUpdateKindOptions() []string {
+	return model.ValidProjectUpdateKinds()
+}
+
+func ContentRelationKindOptions() []string {
+	return model.ValidContentRelationKinds()
+}
+
+func ProjectShowcaseKindOptions() []string {
+	return model.ValidProjectShowcaseKinds()
+}
+
+func ProjectStateLabel(state string) string {
+	state = strings.TrimSpace(strings.ToLower(state))
+	if state == "" {
+		return "Active"
+	}
+	parts := strings.Split(state, "_")
+	for i, part := range parts {
+		if part == "" {
+			continue
+		}
+		parts[i] = strings.ToUpper(part[:1]) + part[1:]
+	}
+	return strings.Join(parts, " ")
 }
 
 func TagList(tags string) []string {

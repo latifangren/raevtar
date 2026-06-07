@@ -2,8 +2,8 @@
   "openapi": "3.0.3",
   "info": {
     "title": "Raevtar Public API",
-    "description": "Public read-only API for published posts, projects, and categories. Operator and monitoring endpoints are intentionally omitted from this public spec.",
-    "version": "1.0.0",
+    "description": "Public read-only API for published posts, published projects, project timelines/changelog/showcase, and categories. Operator and monitoring write endpoints are intentionally omitted from this public spec.",
+    "version": "1.1.0",
     "contact": {
       "name": "latifangren",
       "url": "https://raevtar.tech"
@@ -54,6 +54,13 @@
             "schema": { "type": "boolean" }
           },
           {
+            "name": "state",
+            "in": "query",
+            "description": "Optional lifecycle filter for published projects",
+            "required": false,
+            "schema": { "type": "string", "enum": ["planning", "active", "paused", "shipped", "archived"] }
+          },
+          {
             "name": "sort",
             "in": "query",
             "description": "Optional ordering override. Supported values: newest, oldest",
@@ -76,6 +83,114 @@
           "400": {
             "description": "Invalid query parameter"
           }
+        }
+      }
+    },
+    "/api/v1/projects/{slug}/updates": {
+      "get": {
+        "summary": "List published project timeline entries",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published timeline/build log/changelog entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ProjectUpdateEntry" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Project not found" }
+        }
+      }
+    },
+    "/api/v1/projects/{slug}/changelog": {
+      "get": {
+        "summary": "List published project changelog entries",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published changelog entries",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ProjectUpdateEntry" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Project not found" }
+        }
+      }
+    },
+    "/api/v1/projects/{slug}/relations": {
+      "get": {
+        "summary": "List public related posts and projects",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Resolved related content",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ContentRelationView" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Project not found" }
+        }
+      }
+    },
+    "/api/v1/projects/{slug}/showcase": {
+      "get": {
+        "summary": "List published project showcase items",
+        "parameters": [
+          {
+            "name": "slug",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "string" }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Published showcase items",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": { "$ref": "#/components/schemas/ProjectShowcaseItem" }
+                }
+              }
+            }
+          },
+          "404": { "description": "Project not found" }
         }
       }
     },
@@ -130,6 +245,7 @@
           "excerpt": { "type": "string" },
           "cover_image_url": { "type": "string" },
           "published": { "type": "boolean" },
+          "state": { "type": "string", "enum": ["planning", "active", "paused", "shipped", "archived"] },
           "featured": { "type": "boolean" },
           "sort_order": { "type": "integer" },
           "created_at": { "type": "string", "format": "date-time" },
@@ -138,6 +254,54 @@
             "type": "array",
             "items": { "$ref": "#/components/schemas/Tag" }
           }
+        }
+      },
+      "ProjectUpdateEntry": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "project_id": { "type": "integer" },
+          "kind": { "type": "string", "enum": ["timeline", "build_log", "changelog"] },
+          "title": { "type": "string" },
+          "content_md": { "type": "string" },
+          "published": { "type": "boolean" },
+          "pinned": { "type": "boolean" },
+          "sort_order": { "type": "integer" },
+          "event_at": { "type": "string", "format": "date-time" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
+        }
+      },
+      "ContentRelationView": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "relation_kind": { "type": "string", "enum": ["related", "inspired_by", "builds_on"] },
+          "target_type": { "type": "string", "enum": ["post", "project"] },
+          "target_id": { "type": "integer" },
+          "title": { "type": "string" },
+          "slug": { "type": "string" },
+          "excerpt": { "type": "string" },
+          "url": { "type": "string" },
+          "published": { "type": "boolean" }
+        }
+      },
+      "ProjectShowcaseItem": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "integer" },
+          "project_id": { "type": "integer" },
+          "kind": { "type": "string", "enum": ["image", "link", "repo", "metric", "video"] },
+          "title": { "type": "string" },
+          "body_md": { "type": "string" },
+          "asset_url": { "type": "string" },
+          "external_url": { "type": "string" },
+          "embed_provider": { "type": "string" },
+          "embed_ref": { "type": "string" },
+          "published": { "type": "boolean" },
+          "sort_order": { "type": "integer" },
+          "created_at": { "type": "string", "format": "date-time" },
+          "updated_at": { "type": "string", "format": "date-time" }
         }
       },
       "Category": {

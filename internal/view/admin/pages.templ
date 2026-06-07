@@ -463,11 +463,20 @@ templ Projects(data ProjectsData) {
 					</div>
 					<div class="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
 						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Project state</label>
+							<select name="state" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink mb-2">
+								for _, state := range data.StateOptions {
+									<option value={ state }>{ ProjectStateLabel(state) }</option>
+								}
+							</select>
+							<p class="text-xs font-bold text-retro-muted mt-2">Public-facing lifecycle badge for archive and detail pages.</p>
+						</div>
+						<div>
 							<label class="block text-sm font-bold text-retro-muted mb-1">Sort order</label>
 							<input type="number" name="sort_order" min="0" value="0" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
 							<p class="text-xs font-bold text-retro-muted mt-2">Lower number shows earlier once featured lane is applied.</p>
 						</div>
-						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3">
+						<div class="border-2 border-retro-ink bg-retro-cream px-4 py-3 lg:col-span-2">
 							<label class="flex items-start gap-3 cursor-pointer">
 								<input type="checkbox" name="featured" class="mt-1 h-4 w-4 accent-retro-ink"/>
 								<span>
@@ -535,7 +544,20 @@ templ ProjectEdit(data ProjectEditData) {
 							<p class="text-xs font-bold text-retro-muted mt-2">Shown as badges in hero brief and archive cards.</p>
 						</div>
 					</div>
-					<div class="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]">
+					<div class="grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)]">
+						<div>
+							<label class="block text-sm font-bold text-retro-muted mb-1">Project state</label>
+							<select name="state" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								for _, state := range data.StateOptions {
+									if state == data.Project.State {
+										<option value={ state } selected>{ ProjectStateLabel(state) }</option>
+									} else {
+										<option value={ state }>{ ProjectStateLabel(state) }</option>
+									}
+								}
+							</select>
+							<p class="text-xs font-bold text-retro-muted mt-2">Shown as state badge on project archive and detail.</p>
+						</div>
 						<div>
 							<label class="block text-sm font-bold text-retro-muted mb-1">Sort order</label>
 							<input type="number" name="sort_order" min="0" value={ PortText(data.Project.SortOrder) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
@@ -579,6 +601,168 @@ templ ProjectEdit(data ProjectEditData) {
 						<button type="submit" name="intent" value="publish" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Publish</button>
 					</div>
 				</form>
+			</div>
+			<div class="grid gap-6 xl:grid-cols-3">
+				<section class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] xl:col-span-2">
+					<div class="flex items-center justify-between gap-3 mb-4">
+						<div>
+							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Timeline</p>
+							<h2 class="text-lg font-black uppercase text-retro-ink">Build log and changelog entries</h2>
+						</div>
+					</div>
+					<form method="POST" action={ templ.URL("/admin/projects/" + IDText(data.Project.ID) + "/updates") } class="grid gap-3 mb-5" data-confirm="Add project update?">
+						<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+						<div class="grid gap-3 md:grid-cols-2">
+							<input type="text" name="title" placeholder="Update title" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<select name="kind" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								for _, kind := range ProjectUpdateKindOptions() {
+									<option value={ kind }>{ ProjectStateLabel(kind) }</option>
+								}
+							</select>
+						</div>
+						<textarea name="content_md" rows="6" required class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono" placeholder="Markdown update..."></textarea>
+						<div class="grid gap-3 md:grid-cols-3">
+							<input type="datetime-local" name="event_at" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<input type="number" name="sort_order" min="0" value="0" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<div class="flex gap-4 items-center border-2 border-retro-ink bg-retro-cream px-3 py-2">
+								<label class="text-xs font-black uppercase text-retro-ink"><input type="checkbox" name="published" checked class="mr-2"/>Published</label>
+								<label class="text-xs font-black uppercase text-retro-ink"><input type="checkbox" name="pinned" class="mr-2"/>Pinned</label>
+							</div>
+						</div>
+						<div class="flex justify-end"><button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Add update</button></div>
+					</form>
+					<div class="space-y-3">
+						for _, item := range data.Timeline {
+							<form method="POST" action={ templ.URL("/admin/projects/updates/update/" + IDText(item.ID)) } class="border-2 border-retro-ink bg-retro-cream p-4 space-y-3" data-confirm="Update timeline entry?">
+								<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+								<input type="hidden" name="project_id" value={ IDText(data.Project.ID) }/>
+								<div class="grid gap-3 md:grid-cols-2">
+									<input type="text" name="title" value={ item.Title } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									<select name="kind" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+										for _, kind := range ProjectUpdateKindOptions() {
+											if kind == item.Kind {
+												<option value={ kind } selected>{ ProjectStateLabel(kind) }</option>
+											} else {
+												<option value={ kind }>{ ProjectStateLabel(kind) }</option>
+											}
+										}
+									</select>
+								</div>
+								<textarea name="content_md" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono">{ item.ContentMD }</textarea>
+								<div class="grid gap-3 md:grid-cols-3">
+									<input type="datetime-local" name="event_at" value={ item.EventAt.Format("2006-01-02T15:04") } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									<input type="number" name="sort_order" min="0" value={ PortText(item.SortOrder) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									<div class="flex gap-4 items-center border-2 border-retro-ink bg-retro-paper px-3 py-2">
+										<label class="text-xs font-black uppercase text-retro-ink"><input type="checkbox" name="published" checked?={ item.Published } class="mr-2"/>Published</label>
+										<label class="text-xs font-black uppercase text-retro-ink"><input type="checkbox" name="pinned" checked?={ item.Pinned } class="mr-2"/>Pinned</label>
+									</div>
+								</div>
+								<div class="flex justify-between gap-3">
+									<p class="text-xs font-mono font-bold text-retro-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
+									<div class="flex gap-2">
+										<button type="submit" class="px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-xs cursor-pointer">Save entry</button>
+										<form method="POST" action={ templ.URL("/admin/projects/updates/delete/" + IDText(item.ID)) } class="inline" data-confirm="Delete this update?">
+											<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+											<input type="hidden" name="project_id" value={ IDText(data.Project.ID) }/>
+											<button type="submit" class="px-4 py-2 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-xs cursor-pointer">Delete</button>
+										</form>
+									</div>
+								</div>
+							</form>
+						}
+					</div>
+				</section>
+				<section class="space-y-6">
+					<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Related content</p>
+						<form method="POST" action={ templ.URL("/admin/projects/" + IDText(data.Project.ID) + "/relations") } class="space-y-3" data-confirm="Add related content link?">
+							<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+							<select name="target_type" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								<option value="project">Project</option>
+								<option value="post">Post</option>
+							</select>
+							<input type="number" name="target_id" min="1" placeholder="Target ID" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<select name="relation_kind" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								for _, kind := range ContentRelationKindOptions() {
+									<option value={ kind }>{ ProjectStateLabel(kind) }</option>
+								}
+							</select>
+							<input type="number" name="sort_order" min="0" value="0" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<div class="flex justify-end"><button type="submit" class="px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-xs cursor-pointer">Add relation</button></div>
+						</form>
+						<div class="space-y-2 mt-4">
+							for _, item := range data.RelatedItems {
+								<div class="border-2 border-retro-ink bg-retro-cream p-3">
+									<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">{ ProjectStateLabel(item.RelationKind) }</p>
+									<p class="text-sm font-black text-retro-ink">{ item.Title }</p>
+									<p class="text-xs font-bold text-retro-muted mb-2">{ item.URL }</p>
+									<form method="POST" action={ templ.URL("/admin/projects/relations/delete/" + IDText(item.ID)) } data-confirm="Delete relation?">
+										<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+										<input type="hidden" name="project_id" value={ IDText(data.Project.ID) }/>
+										<button type="submit" class="px-3 py-1 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-xs cursor-pointer">Delete</button>
+									</form>
+								</div>
+							}
+						</div>
+					</div>
+					<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Showcase items</p>
+						<form method="POST" action={ templ.URL("/admin/projects/" + IDText(data.Project.ID) + "/showcase") } class="space-y-3" data-confirm="Add showcase item?">
+							<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+							<select name="kind" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+								for _, kind := range ProjectShowcaseKindOptions() {
+									<option value={ kind }>{ ProjectStateLabel(kind) }</option>
+								}
+							</select>
+							<input type="text" name="title" placeholder="Showcase title" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<textarea name="body_md" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono" placeholder="Markdown description..."></textarea>
+							<input type="text" name="asset_url" placeholder="Asset URL" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<input type="text" name="external_url" placeholder="External URL" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							<div class="grid gap-3 md:grid-cols-3">
+								<input type="text" name="embed_provider" placeholder="Embed provider" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+								<input type="text" name="embed_ref" placeholder="Embed ref" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+								<input type="number" name="sort_order" min="0" value="0" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+							</div>
+							<label class="text-xs font-black uppercase text-retro-ink"><input type="checkbox" name="published" checked class="mr-2"/>Published</label>
+							<div class="flex justify-end"><button type="submit" class="px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-xs cursor-pointer">Add showcase item</button></div>
+						</form>
+						<div class="space-y-3 mt-4">
+							for _, item := range data.ShowcaseItems {
+								<form method="POST" action={ templ.URL("/admin/projects/showcase/update/" + IDText(item.ID)) } class="border-2 border-retro-ink bg-retro-cream p-3 space-y-2" data-confirm="Update showcase item?">
+									<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+									<input type="hidden" name="project_id" value={ IDText(data.Project.ID) }/>
+									<input type="text" name="title" value={ item.Title } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									<select name="kind" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink">
+										for _, kind := range ProjectShowcaseKindOptions() {
+											if kind == item.Kind {
+												<option value={ kind } selected>{ ProjectStateLabel(kind) }</option>
+											} else {
+												<option value={ kind }>{ ProjectStateLabel(kind) }</option>
+											}
+										}
+									</select>
+									<textarea name="body_md" rows="3" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono">{ item.BodyMD }</textarea>
+									<input type="text" name="asset_url" value={ item.AssetURL } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									<input type="text" name="external_url" value={ item.ExternalURL } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									<div class="grid gap-3 md:grid-cols-3">
+										<input type="text" name="embed_provider" value={ item.EmbedProvider } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+										<input type="text" name="embed_ref" value={ item.EmbedRef } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+										<input type="number" name="sort_order" min="0" value={ PortText(item.SortOrder) } class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink"/>
+									</div>
+									<label class="text-xs font-black uppercase text-retro-ink"><input type="checkbox" name="published" checked?={ item.Published } class="mr-2"/>Published</label>
+									<div class="flex justify-between gap-2">
+										<button type="submit" class="px-3 py-1 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-xs cursor-pointer">Save</button>
+										<form method="POST" action={ templ.URL("/admin/projects/showcase/delete/" + IDText(item.ID)) } class="inline" data-confirm="Delete showcase item?">
+											<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
+											<input type="hidden" name="project_id" value={ IDText(data.Project.ID) }/>
+											<button type="submit" class="px-3 py-1 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-xs cursor-pointer">Delete</button>
+										</form>
+									</div>
+								</form>
+							}
+						</div>
+					</div>
+				</section>
 			</div>
 		</div>
 	}

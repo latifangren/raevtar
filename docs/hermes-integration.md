@@ -91,16 +91,30 @@ Di luar editorial inbox, Raevtar sekarang juga punya project content flow yang b
 Endpoint yang tersedia:
 
 - `GET /api/v1/projects`
+- `GET /api/v1/projects/{slug}/updates`
+- `GET /api/v1/projects/{slug}/changelog`
+- `GET /api/v1/projects/{slug}/relations`
+- `GET /api/v1/projects/{slug}/showcase`
 - `POST /api/v1/projects`
 - `PUT /api/v1/projects/{projectID}`
 - `DELETE /api/v1/projects/{projectID}`
+- `POST /api/v1/projects/{projectID}/updates`
+- `PUT /api/v1/projects/updates/{updateID}`
+- `DELETE /api/v1/projects/updates/{updateID}`
+- `POST /api/v1/projects/{projectID}/relations`
+- `DELETE /api/v1/projects/relations/{relationID}`
+- `POST /api/v1/projects/{projectID}/showcase`
+- `PUT /api/v1/projects/showcase/{itemID}`
+- `DELETE /api/v1/projects/showcase/{itemID}`
 
 Catatan penting:
 
 - `GET /api/v1/projects` bersifat public-safe dan hanya mengembalikan project yang published
 - query yang didukung untuk list public:
   - `featured=true`
+  - `state=planning|active|paused|shipped|archived`
   - `sort=newest|oldest`
+- read endpoint child resources (`updates`, `changelog`, `relations`, `showcase`) juga public-safe dan hanya mengembalikan surface yang sudah published / public-facing
 - endpoint write (`POST`/`PUT`/`DELETE`) tetap **protected** dan butuh `Authorization: Bearer <RAEVTAR_ADMIN_KEY>`
 - update/delete pakai **numeric project ID**, bukan slug
 - slug project dihasilkan saat create dan dipertahankan saat update
@@ -121,6 +135,7 @@ Dengan begitu, blog dan project archive tetap terpisah secara sengaja.
   "excerpt": "Ringkasan singkat buat archive card.",
   "cover_image_url": "/uploads/watchtower.png",
   "published": true,
+  "state": "active",
   "featured": true,
   "sort_order": 1,
   "tags": ["oss", "self-hosted"]
@@ -130,10 +145,60 @@ Dengan begitu, blog dan project archive tetap terpisah secara sengaja.
 Semantics tambahan:
 
 - `title` dan `content_md` wajib ada
+- `state` menentukan lifecycle publik project (`planning`, `active`, `paused`, `shipped`, `archived`)
 - `featured` menentukan apakah project masuk featured lane publik
 - `sort_order` menentukan urutan internal di antara project featured/public
 - `sort_order < 0` akan dinormalisasi server menjadi `0`
 - response create/update mengembalikan object project lengkap, termasuk `id`, `slug`, dan tags yang sudah dinormalisasi
+
+### Payload build log / changelog project update
+
+```json
+{
+  "kind": "build_log",
+  "title": "Collector tuning pass",
+  "content_md": "## Notes\n\n- Reduced noise\n- Improved queue ordering",
+  "published": true,
+  "pinned": false,
+  "sort_order": 0,
+  "event_at": "2026-06-07T13:30:00Z"
+}
+```
+
+Catatan:
+
+- `kind` yang valid: `timeline`, `build_log`, `changelog`
+- updates ini yang kemudian muncul di project detail timeline dan `/projects/{slug}/changelog`
+- cocok untuk Hermes kalau outputnya bukan satu page overwrite penuh, tapi tambahan progres / release note ke project yang sudah ada
+
+### Payload relation dan showcase
+
+Relation ke post/project lain:
+
+```json
+{
+  "target_type": "post",
+  "target_id": 12,
+  "relation_kind": "related",
+  "sort_order": 0
+}
+```
+
+Showcase item terstruktur:
+
+```json
+{
+  "kind": "image",
+  "title": "Operator overview",
+  "body_md": "Screenshot atau artefak yang menjelaskan state terbaru.",
+  "asset_url": "/uploads/watchtower-overview.png",
+  "external_url": "",
+  "embed_provider": "",
+  "embed_ref": "",
+  "published": true,
+  "sort_order": 0
+}
+```
 
 ### Kapan pakai posts vs projects
 

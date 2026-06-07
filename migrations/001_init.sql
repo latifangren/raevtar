@@ -23,6 +23,63 @@ CREATE TABLE IF NOT EXISTS posts (
     updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 );
 
+CREATE TABLE IF NOT EXISTS projects (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    title TEXT NOT NULL,
+    slug TEXT UNIQUE NOT NULL,
+    content_md TEXT NOT NULL DEFAULT '',
+    excerpt TEXT NOT NULL DEFAULT '',
+    published INTEGER DEFAULT 1,
+    state TEXT NOT NULL DEFAULT 'active',
+    featured INTEGER NOT NULL DEFAULT 0,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    cover_image_url TEXT NOT NULL DEFAULT '',
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS project_updates (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    content_md TEXT NOT NULL DEFAULT '',
+    published INTEGER NOT NULL DEFAULT 1,
+    pinned INTEGER NOT NULL DEFAULT 0,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    event_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
+CREATE TABLE IF NOT EXISTS content_relations (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    source_type TEXT NOT NULL,
+    source_id INTEGER NOT NULL,
+    target_type TEXT NOT NULL,
+    target_id INTEGER NOT NULL,
+    relation_kind TEXT NOT NULL DEFAULT 'related',
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    UNIQUE(source_type, source_id, target_type, target_id, relation_kind)
+);
+
+CREATE TABLE IF NOT EXISTS project_showcase_items (
+    id INTEGER PRIMARY KEY AUTOINCREMENT,
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    kind TEXT NOT NULL,
+    title TEXT NOT NULL,
+    body_md TEXT NOT NULL DEFAULT '',
+    asset_url TEXT NOT NULL DEFAULT '',
+    external_url TEXT NOT NULL DEFAULT '',
+    embed_provider TEXT NOT NULL DEFAULT '',
+    embed_ref TEXT NOT NULL DEFAULT '',
+    published INTEGER NOT NULL DEFAULT 1,
+    sort_order INTEGER NOT NULL DEFAULT 0,
+    created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
+
 CREATE TABLE IF NOT EXISTS servers (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     name TEXT UNIQUE NOT NULL,
@@ -56,6 +113,17 @@ CREATE TABLE IF NOT EXISTS server_metrics (
 CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category_id);
 CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
 CREATE INDEX IF NOT EXISTS idx_posts_published ON posts(published);
+CREATE INDEX IF NOT EXISTS idx_projects_slug ON projects(slug);
+CREATE INDEX IF NOT EXISTS idx_projects_published ON projects(published);
+CREATE INDEX IF NOT EXISTS idx_projects_state ON projects(state);
+CREATE INDEX IF NOT EXISTS idx_projects_featured ON projects(featured);
+CREATE INDEX IF NOT EXISTS idx_projects_sort_order ON projects(sort_order);
+CREATE INDEX IF NOT EXISTS idx_project_updates_project ON project_updates(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_updates_kind ON project_updates(kind);
+CREATE INDEX IF NOT EXISTS idx_project_updates_event_at ON project_updates(event_at);
+CREATE INDEX IF NOT EXISTS idx_content_relations_source ON content_relations(source_type, source_id);
+CREATE INDEX IF NOT EXISTS idx_content_relations_target ON content_relations(target_type, target_id);
+CREATE INDEX IF NOT EXISTS idx_project_showcase_items_project ON project_showcase_items(project_id);
 CREATE INDEX IF NOT EXISTS idx_metrics_server ON server_metrics(server_id);
 
 CREATE TABLE IF NOT EXISTS tags (
@@ -71,8 +139,24 @@ CREATE TABLE IF NOT EXISTS post_tags (
     PRIMARY KEY (post_id, tag_id)
 );
 
+CREATE TABLE IF NOT EXISTS project_tags (
+    project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+    tag_id INTEGER NOT NULL REFERENCES tags(id) ON DELETE CASCADE,
+    PRIMARY KEY (project_id, tag_id)
+);
+
 CREATE INDEX IF NOT EXISTS idx_post_tags_post ON post_tags(post_id);
 CREATE INDEX IF NOT EXISTS idx_post_tags_tag ON post_tags(tag_id);
+CREATE INDEX IF NOT EXISTS idx_project_tags_project ON project_tags(project_id);
+CREATE INDEX IF NOT EXISTS idx_project_tags_tag ON project_tags(tag_id);
+
+CREATE TABLE IF NOT EXISTS page_contents (
+    key TEXT PRIMARY KEY,
+    title TEXT NOT NULL DEFAULT '',
+    summary TEXT NOT NULL DEFAULT '',
+    content_md TEXT NOT NULL DEFAULT '',
+    updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+);
 
 CREATE TABLE IF NOT EXISTS media_assets (
     id INTEGER PRIMARY KEY AUTOINCREMENT,

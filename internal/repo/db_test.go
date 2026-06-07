@@ -122,7 +122,10 @@ func TestAutoMigrateCreatesProjectsAndPageContentsTables(t *testing.T) {
 		name    string
 		columns []string
 	}{
-		{name: "projects", columns: []string{"id", "title", "slug", "content_md", "excerpt", "published", "featured", "sort_order", "cover_image_url", "created_at", "updated_at"}},
+		{name: "projects", columns: []string{"id", "title", "slug", "content_md", "excerpt", "published", "state", "featured", "sort_order", "cover_image_url", "created_at", "updated_at"}},
+		{name: "project_updates", columns: []string{"id", "project_id", "kind", "title", "content_md", "published", "pinned", "sort_order", "event_at", "created_at", "updated_at"}},
+		{name: "content_relations", columns: []string{"id", "source_type", "source_id", "target_type", "target_id", "relation_kind", "sort_order", "created_at"}},
+		{name: "project_showcase_items", columns: []string{"id", "project_id", "kind", "title", "body_md", "asset_url", "external_url", "embed_provider", "embed_ref", "published", "sort_order", "created_at", "updated_at"}},
 		{name: "page_contents", columns: []string{"key", "title", "summary", "content_md", "updated_at"}},
 		{name: "project_tags", columns: []string{"project_id", "tag_id"}},
 	} {
@@ -196,7 +199,7 @@ func TestAutoMigrateAddsProjectOrderingColumnsToExistingDatabase(t *testing.T) {
 		t.Fatalf("iterate project columns: %v", err)
 	}
 
-	for _, name := range []string{"featured", "sort_order"} {
+	for _, name := range []string{"state", "featured", "sort_order"} {
 		if !columns[name] {
 			t.Fatalf("projects missing additive migration column %q", name)
 		}

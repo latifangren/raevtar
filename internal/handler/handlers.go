@@ -135,7 +135,8 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 	featuredOnly := strings.EqualFold(r.URL.Query().Get("featured"), "true")
 	sort := r.URL.Query().Get("sort")
-	listOpts := service.ProjectListOptions{FeaturedOnly: featuredOnly, Sort: sort}
+	state := r.URL.Query().Get("state")
+	listOpts := service.ProjectListOptions{FeaturedOnly: featuredOnly, State: state, Sort: sort}
 
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
@@ -154,7 +155,7 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 	}
 	projects, visibleCount, err := h.svc.Projects.ListProjects(1, 12, listOpts)
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidProjectSort) {
+		if errors.Is(err, service.ErrInvalidProjectSort) || errors.Is(err, service.ErrInvalidProjectState) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -183,6 +184,7 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		VisibleProjectCount: visibleCount,
 		FeaturedCount:       featuredCount,
 		CurrentFeaturedOnly: featuredOnly,
+		CurrentState:        state,
 		CurrentSort:         sort,
 	}))
 }
@@ -202,11 +204,58 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	timeline, err := h.svc.Projects.ListProjectTimeline(project.ID, true, 8)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	changelog, err := h.svc.Projects.ListProjectChangelog(project.ID, true, 8)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	related, err := h.svc.Projects.GetResolvedProjectRelations(project.ID, true)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	showcase, err := h.svc.Projects.ListProjectShowcase(project.ID, true)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	renderHTML(w, r, pages.ProjectDetail(pages.ProjectDetailData{
-		CurrentPath: r.URL.Path,
-		Project:     project,
-		Categories:  categories,
+		CurrentPath:   r.URL.Path,
+		Project:       project,
+		Categories:    categories,
+		Timeline:      timeline,
+		Changelog:     changelog,
+		RelatedItems:  related,
+		ShowcaseItems: showcase,
 	}))
+}
+
+func (h *Handler) projectChangelogPage(w http.ResponseWriter, r *http.Request) {
+	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	if err != nil {
+		if !errors.Is(err, sql.ErrNoRows) {
+			internalServerError(w, r, err)
+			return
+		}
+		http.Error(w, "Project not found", http.StatusNotFound)
+		return
+	}
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	changelog, err := h.svc.Projects.ListProjectChangelog(project.ID, true, 100)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, pages.ProjectChangelog(pages.ProjectChangelogData{CurrentPath: r.URL.Path, Project: project, Categories: categories, Changelog: changelog}))
 }
 
 func (h *Handler) contactPage(w http.ResponseWriter, r *http.Request) {

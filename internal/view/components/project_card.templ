@@ -10,6 +10,7 @@ templ ProjectCard(project model.Project) {
 				if project.Featured {
 					<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">featured lane</span>
 				}
+				<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ project.State }</span>
 				<span class="text-xs font-bold uppercase tracking-wide text-retro-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
 			</div>
 			<div>
@@ -41,11 +42,7 @@ templ ProjectCard(project model.Project) {
 			<div class="grid gap-2 sm:grid-cols-2">
 				<div class="border-2 border-retro-ink bg-retro-paper px-3 py-3">
 					<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">State</p>
-					if project.Featured {
-						<p class="text-sm font-black uppercase text-retro-ink">Featured build</p>
-					} else {
-						<p class="text-sm font-black uppercase text-retro-ink">Public</p>
-					}
+					<p class="text-sm font-black uppercase text-retro-ink">{ project.State }</p>
 				</div>
 				<div class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">
 					<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Tags</p>

@@ -28,10 +28,11 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 ### Projects
 
 - Project entries disimpan sebagai content type terpisah dari blog posts.
-- Public archive ada di `/projects` dengan featured lane, sort order, dan detail page per slug.
+- Public archive ada di `/projects` dengan featured lane, state filter, sort order, dan detail page per slug.
+- Tiap project sekarang bisa punya timeline/build log, changelog publik di `/projects/{slug}/changelog`, related content rail, dan showcase sections terstruktur.
 - Homepage bisa menampilkan featured published projects sebagai preview lane.
-- Admin panel bisa mengatur `featured` dan `sort_order` untuk menentukan urutan publik.
-- Protected API sekarang mendukung create, update, dan delete project entries untuk workflow operator/agent.
+- Admin panel bisa mengatur `state`, `featured`, `sort_order`, timeline entries, related links, dan showcase items.
+- Protected API sekarang mendukung create, update, dan delete project entries, update entries, relations, dan showcase items untuk workflow operator/agent.
 
 ### Public Monitoring
 
@@ -54,10 +55,22 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 |--------|------|-------|
 | `GET` | `/api/v1/posts` | Public list posts |
 | `POST` | `/api/v1/posts` | Admin key required |
-| `GET` | `/api/v1/projects` | Public list projects; supports `featured=true` and `sort=newest|oldest` |
+| `GET` | `/api/v1/projects` | Public list projects; supports `featured=true`, `state=planning|active|paused|shipped|archived`, and `sort=newest|oldest` |
+| `GET` | `/api/v1/projects/{slug}/updates` | Public published project timeline |
+| `GET` | `/api/v1/projects/{slug}/changelog` | Public published changelog entries |
+| `GET` | `/api/v1/projects/{slug}/relations` | Public related posts/projects |
+| `GET` | `/api/v1/projects/{slug}/showcase` | Public published showcase items |
 | `POST` | `/api/v1/projects` | Admin key required |
 | `PUT` | `/api/v1/projects/{id}` | Admin key required |
 | `DELETE` | `/api/v1/projects/{id}` | Admin key required |
+| `POST` | `/api/v1/projects/{id}/updates` | Admin key required |
+| `PUT` | `/api/v1/projects/updates/{updateID}` | Admin key required |
+| `DELETE` | `/api/v1/projects/updates/{updateID}` | Admin key required |
+| `POST` | `/api/v1/projects/{id}/relations` | Admin key required |
+| `DELETE` | `/api/v1/projects/relations/{relationID}` | Admin key required |
+| `POST` | `/api/v1/projects/{id}/showcase` | Admin key required |
+| `PUT` | `/api/v1/projects/showcase/{itemID}` | Admin key required |
+| `DELETE` | `/api/v1/projects/showcase/{itemID}` | Admin key required |
 | `GET` | `/api/v1/categories` | Public categories |
 | `GET` | `/api/v1/servers` | Admin key required |
 | `GET` | `/api/v1/servers/{id}` | Admin key required |
@@ -79,13 +92,72 @@ Create project via `POST /api/v1/projects`:
   "excerpt": "Public-facing project note.",
   "cover_image_url": "/uploads/watchtower.png",
   "published": true,
+  "state": "active",
   "featured": true,
   "sort_order": 1,
   "tags": ["oss", "monitoring"]
 }
 ```
 
-Update project via `PUT /api/v1/projects/{id}` memakai shape yang sama. Server mempertahankan slug yang sudah ada, memvalidasi `title` + `content_md`, dan menormalkan `sort_order` negatif menjadi `0`.
+Update project via `PUT /api/v1/projects/{id}` memakai shape yang sama. Server mempertahankan slug yang sudah ada, memvalidasi `title` + `content_md`, menormalkan `sort_order` negatif menjadi `0`, dan default `state` ke `active` bila kosong.
+
+### Project child resource payloads
+
+Create/update project timeline or changelog entry:
+
+```json
+{
+  "kind": "changelog",
+  "title": "v0.3.0 public rollout",
+  "content_md": "## Changed\n\n- Added project states\n- Added showcase rail",
+  "published": true,
+  "pinned": false,
+  "sort_order": 0,
+  "event_at": "2026-06-07T13:30:00Z"
+}
+```
+
+- `kind` yang valid: `timeline`, `build_log`, `changelog`
+- endpoint write:
+  - `POST /api/v1/projects/{id}/updates`
+  - `PUT /api/v1/projects/updates/{updateID}`
+  - `DELETE /api/v1/projects/updates/{updateID}`
+
+Create related content edge:
+
+```json
+{
+  "target_type": "post",
+  "target_id": 12,
+  "relation_kind": "related",
+  "sort_order": 0
+}
+```
+
+- `target_type` yang valid: `post`, `project`
+- `relation_kind` yang valid: `related`, `inspired_by`, `builds_on`
+
+Create/update showcase item:
+
+```json
+{
+  "kind": "image",
+  "title": "Control room screenshot",
+  "body_md": "Short note for what the reader is seeing.",
+  "asset_url": "/uploads/watchtower-control-room.png",
+  "external_url": "",
+  "embed_provider": "",
+  "embed_ref": "",
+  "published": true,
+  "sort_order": 0
+}
+```
+
+- `kind` yang valid: `image`, `link`, `repo`, `metric`, `video`
+- endpoint write:
+  - `POST /api/v1/projects/{id}/showcase`
+  - `PUT /api/v1/projects/showcase/{itemID}`
+  - `DELETE /api/v1/projects/showcase/{itemID}`
 
 ## Agent Monitoring
 

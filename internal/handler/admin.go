@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"strconv"
 	"strings"
+	"time"
 
 	"raevtar/internal/model"
 	"raevtar/internal/service"
@@ -394,10 +395,11 @@ func (h *Handler) adminProjects(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	renderHTML(w, r, adminview.Projects(adminview.ProjectsData{
-		CurrentPath: r.URL.Path,
-		CSRFToken:   csrfTokenForRequest(r),
-		Projects:    projects,
-		MediaAssets: mediaAssets,
+		CurrentPath:  r.URL.Path,
+		CSRFToken:    csrfTokenForRequest(r),
+		Projects:     projects,
+		MediaAssets:  mediaAssets,
+		StateOptions: adminview.ProjectStateOptions(),
 	}))
 }
 
@@ -414,6 +416,7 @@ func (h *Handler) adminCreateProject(w http.ResponseWriter, r *http.Request) {
 		Excerpt:       r.FormValue("excerpt"),
 		CoverImageURL: r.FormValue("cover_image_url"),
 		Published:     intent == adminPostIntentPublish,
+		State:         r.FormValue("state"),
 		Featured:      r.FormValue("featured") == "on",
 		SortOrder:     parseSortOrder(r.FormValue("sort_order")),
 		Tags:          splitTags(r.FormValue("tags")),
@@ -464,11 +467,42 @@ func (h *Handler) adminEditProject(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	projects, _, err := h.svc.Projects.ListAllProjects(1, 9999, service.ProjectListOptions{})
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	posts, _, err := h.svc.Blog.ListAllPosts(1, 9999)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	timeline, err := h.svc.Projects.ListProjectTimeline(project.ID, false, 100)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	related, err := h.svc.Projects.GetResolvedProjectRelations(project.ID, false)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	showcase, err := h.svc.Projects.ListProjectShowcase(project.ID, false)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
 	renderHTML(w, r, adminview.ProjectEdit(adminview.ProjectEditData{
-		CurrentPath: r.URL.Path,
-		CSRFToken:   csrfTokenForRequest(r),
-		Project:     project,
-		MediaAssets: mediaAssets,
+		CurrentPath:   r.URL.Path,
+		CSRFToken:     csrfTokenForRequest(r),
+		Project:       project,
+		MediaAssets:   mediaAssets,
+		StateOptions:  adminview.ProjectStateOptions(),
+		Posts:         posts,
+		Projects:      projects,
+		Timeline:      timeline,
+		RelatedItems:  related,
+		ShowcaseItems: showcase,
 	}))
 }
 
@@ -506,6 +540,7 @@ func (h *Handler) adminUpdateProject(w http.ResponseWriter, r *http.Request) {
 		Excerpt:       r.FormValue("excerpt"),
 		CoverImageURL: r.FormValue("cover_image_url"),
 		Published:     published,
+		State:         r.FormValue("state"),
 		Featured:      r.FormValue("featured") == "on",
 		SortOrder:     parseSortOrder(r.FormValue("sort_order")),
 		Tags:          splitTags(r.FormValue("tags")),
@@ -542,6 +577,170 @@ func (h *Handler) adminDeleteProject(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/admin/projects", http.StatusSeeOther)
+}
+
+func (h *Handler) adminCreateProjectUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	projectID, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	eventAt := parseDateTimeValue(r.FormValue("event_at"))
+	_, err = h.svc.Projects.CreateProjectUpdate(projectID, model.ProjectUpdateEntryCreate{Kind: r.FormValue("kind"), Title: r.FormValue("title"), ContentMD: r.FormValue("content_md"), Published: r.FormValue("published") == "on", Pinned: r.FormValue("pinned") == "on", SortOrder: parseSortOrder(r.FormValue("sort_order")), EventAt: eventAt})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+strconv.FormatInt(projectID, 10), http.StatusSeeOther)
+}
+
+func (h *Handler) adminUpdateProjectUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	updateID, err := strconv.ParseInt(r.PathValue("updateID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	projectID, _ := strconv.ParseInt(r.FormValue("project_id"), 10, 64)
+	_, err = h.svc.Projects.UpdateProjectUpdate(updateID, model.ProjectUpdateEntryUpdate{Kind: r.FormValue("kind"), Title: r.FormValue("title"), ContentMD: r.FormValue("content_md"), Published: r.FormValue("published") == "on", Pinned: r.FormValue("pinned") == "on", SortOrder: parseSortOrder(r.FormValue("sort_order")), EventAt: parseDateTimeValue(r.FormValue("event_at"))})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+strconv.FormatInt(projectID, 10), http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteProjectUpdate(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	updateID, err := strconv.ParseInt(r.PathValue("updateID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	projectID := r.FormValue("project_id")
+	if err := h.svc.Projects.DeleteProjectUpdate(updateID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+projectID, http.StatusSeeOther)
+}
+
+func (h *Handler) adminCreateProjectRelation(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	projectID, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	targetID, err := strconv.ParseInt(r.FormValue("target_id"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid target id", http.StatusBadRequest)
+		return
+	}
+	_, err = h.svc.Projects.CreateProjectRelation(projectID, model.ContentRelationCreate{TargetType: r.FormValue("target_type"), TargetID: targetID, RelationKind: r.FormValue("relation_kind"), SortOrder: parseSortOrder(r.FormValue("sort_order"))})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+strconv.FormatInt(projectID, 10), http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteProjectRelation(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	relationID, err := strconv.ParseInt(r.PathValue("relationID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	projectID := r.FormValue("project_id")
+	if err := h.svc.Projects.DeleteProjectRelation(relationID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+projectID, http.StatusSeeOther)
+}
+
+func (h *Handler) adminCreateProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	projectID, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	_, err = h.svc.Projects.CreateProjectShowcase(projectID, model.ProjectShowcaseItemCreate{Kind: r.FormValue("kind"), Title: r.FormValue("title"), BodyMD: r.FormValue("body_md"), AssetURL: r.FormValue("asset_url"), ExternalURL: r.FormValue("external_url"), EmbedProvider: r.FormValue("embed_provider"), EmbedRef: r.FormValue("embed_ref"), Published: r.FormValue("published") == "on", SortOrder: parseSortOrder(r.FormValue("sort_order"))})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+strconv.FormatInt(projectID, 10), http.StatusSeeOther)
+}
+
+func (h *Handler) adminUpdateProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	itemID, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	projectID := r.FormValue("project_id")
+	_, err = h.svc.Projects.UpdateProjectShowcase(itemID, model.ProjectShowcaseItemUpdate{Kind: r.FormValue("kind"), Title: r.FormValue("title"), BodyMD: r.FormValue("body_md"), AssetURL: r.FormValue("asset_url"), ExternalURL: r.FormValue("external_url"), EmbedProvider: r.FormValue("embed_provider"), EmbedRef: r.FormValue("embed_ref"), Published: r.FormValue("published") == "on", SortOrder: parseSortOrder(r.FormValue("sort_order"))})
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+projectID, http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	itemID, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	projectID := r.FormValue("project_id")
+	if err := h.svc.Projects.DeleteProjectShowcase(itemID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	http.Redirect(w, r, "/admin/projects/edit/"+projectID, http.StatusSeeOther)
+}
+
+func parseDateTimeValue(value string) time.Time {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return time.Time{}
+	}
+	parsed, err := time.Parse("2006-01-02T15:04", value)
+	if err != nil {
+		return time.Time{}
+	}
+	return parsed
 }
 
 func (h *Handler) adminPages(w http.ResponseWriter, r *http.Request) {

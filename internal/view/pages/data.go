@@ -74,13 +74,25 @@ type ProjectsData struct {
 	VisibleProjectCount int
 	FeaturedCount       int
 	CurrentFeaturedOnly bool
+	CurrentState        string
 	CurrentSort         string
 }
 
 type ProjectDetailData struct {
+	CurrentPath   string
+	Project       *model.Project
+	Categories    []model.Category
+	Timeline      []model.ProjectUpdateEntry
+	Changelog     []model.ProjectUpdateEntry
+	RelatedItems  []model.ContentRelationView
+	ShowcaseItems []model.ProjectShowcaseItem
+}
+
+type ProjectChangelogData struct {
 	CurrentPath string
 	Project     *model.Project
 	Categories  []model.Category
+	Changelog   []model.ProjectUpdateEntry
 }
 
 type ContactData struct {
@@ -135,6 +147,21 @@ type NotFoundData struct {
 
 func PortText(port int) string {
 	return strconv.Itoa(port)
+}
+
+func ProjectStateLabel(state string) string {
+	state = strings.TrimSpace(strings.ToLower(state))
+	if state == "" {
+		return "Active"
+	}
+	parts := strings.Split(state, "_")
+	for i, part := range parts {
+		if part == "" {
+			continue
+		}
+		parts[i] = strings.ToUpper(part[:1]) + part[1:]
+	}
+	return strings.Join(parts, " ")
 }
 
 func IDText(id int64) string {

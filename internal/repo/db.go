@@ -50,9 +50,52 @@ func AutoMigrate(db *sqlx.DB) {
 		content_md TEXT NOT NULL DEFAULT '',
 		excerpt TEXT NOT NULL DEFAULT '',
 		published INTEGER DEFAULT 1,
+		state TEXT NOT NULL DEFAULT 'active',
 		featured INTEGER NOT NULL DEFAULT 0,
 		sort_order INTEGER NOT NULL DEFAULT 0,
 		cover_image_url TEXT NOT NULL DEFAULT '',
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE TABLE IF NOT EXISTS project_updates (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+		kind TEXT NOT NULL,
+		title TEXT NOT NULL,
+		content_md TEXT NOT NULL DEFAULT '',
+		published INTEGER NOT NULL DEFAULT 1,
+		pinned INTEGER NOT NULL DEFAULT 0,
+		sort_order INTEGER NOT NULL DEFAULT 0,
+		event_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE TABLE IF NOT EXISTS content_relations (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		source_type TEXT NOT NULL,
+		source_id INTEGER NOT NULL,
+		target_type TEXT NOT NULL,
+		target_id INTEGER NOT NULL,
+		relation_kind TEXT NOT NULL DEFAULT 'related',
+		sort_order INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(source_type, source_id, target_type, target_id, relation_kind)
+	);
+
+	CREATE TABLE IF NOT EXISTS project_showcase_items (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		project_id INTEGER NOT NULL REFERENCES projects(id) ON DELETE CASCADE,
+		kind TEXT NOT NULL,
+		title TEXT NOT NULL,
+		body_md TEXT NOT NULL DEFAULT '',
+		asset_url TEXT NOT NULL DEFAULT '',
+		external_url TEXT NOT NULL DEFAULT '',
+		embed_provider TEXT NOT NULL DEFAULT '',
+		embed_ref TEXT NOT NULL DEFAULT '',
+		published INTEGER NOT NULL DEFAULT 1,
+		sort_order INTEGER NOT NULL DEFAULT 0,
 		created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
 		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
 	);
@@ -201,10 +244,18 @@ func AutoMigrate(db *sqlx.DB) {
 	}
 	ensureColumn(db, "servers", "agent_token_hash", "TEXT NOT NULL DEFAULT ''")
 	ensureColumn(db, "posts", "cover_image_url", "TEXT NOT NULL DEFAULT ''")
+	ensureColumn(db, "projects", "state", "TEXT NOT NULL DEFAULT 'active'")
 	ensureColumn(db, "projects", "featured", "INTEGER NOT NULL DEFAULT 0")
 	ensureColumn(db, "projects", "sort_order", "INTEGER NOT NULL DEFAULT 0")
+	ensureIndex(db, "idx_projects_state", "CREATE INDEX IF NOT EXISTS idx_projects_state ON projects(state)")
 	ensureIndex(db, "idx_projects_featured", "CREATE INDEX IF NOT EXISTS idx_projects_featured ON projects(featured)")
 	ensureIndex(db, "idx_projects_sort_order", "CREATE INDEX IF NOT EXISTS idx_projects_sort_order ON projects(sort_order)")
+	ensureIndex(db, "idx_project_updates_project", "CREATE INDEX IF NOT EXISTS idx_project_updates_project ON project_updates(project_id)")
+	ensureIndex(db, "idx_project_updates_kind", "CREATE INDEX IF NOT EXISTS idx_project_updates_kind ON project_updates(kind)")
+	ensureIndex(db, "idx_project_updates_event_at", "CREATE INDEX IF NOT EXISTS idx_project_updates_event_at ON project_updates(event_at)")
+	ensureIndex(db, "idx_content_relations_source", "CREATE INDEX IF NOT EXISTS idx_content_relations_source ON content_relations(source_type, source_id)")
+	ensureIndex(db, "idx_content_relations_target", "CREATE INDEX IF NOT EXISTS idx_content_relations_target ON content_relations(target_type, target_id)")
+	ensureIndex(db, "idx_project_showcase_items_project", "CREATE INDEX IF NOT EXISTS idx_project_showcase_items_project ON project_showcase_items(project_id)")
 	ensureColumn(db, "server_metrics", "cpu_load_1", "REAL DEFAULT 0")
 	ensureColumn(db, "server_metrics", "cpu_load_5", "REAL DEFAULT 0")
 	ensureColumn(db, "server_metrics", "cpu_load_15", "REAL DEFAULT 0")
@@ -267,31 +318,37 @@ func ensureIndex(db *sqlx.DB, name, statement string) {
 
 // Repositories groups all repos
 type Repositories struct {
-	Post           *PostRepo
-	Project        *ProjectRepo
-	PageContent    *PageContentRepo
-	Category       *CategoryRepo
-	EditorialInbox *EditorialInboxRepo
-	Server         *ServerRepo
-	Metric         *MetricRepo
-	Tag            *TagRepo
-	Media          *MediaRepo
-	User           *UserRepo
-	Audit          *AuditRepo
+	Post            *PostRepo
+	Project         *ProjectRepo
+	ProjectUpdate   *ProjectUpdateRepo
+	ContentRelation *ContentRelationRepo
+	ProjectShowcase *ProjectShowcaseRepo
+	PageContent     *PageContentRepo
+	Category        *CategoryRepo
+	EditorialInbox  *EditorialInboxRepo
+	Server          *ServerRepo
+	Metric          *MetricRepo
+	Tag             *TagRepo
+	Media           *MediaRepo
+	User            *UserRepo
+	Audit           *AuditRepo
 }
 
 func New(db *sqlx.DB) *Repositories {
 	return &Repositories{
-		Post:           &PostRepo{db: db},
-		Project:        &ProjectRepo{db: db},
-		PageContent:    &PageContentRepo{db: db},
-		Category:       &CategoryRepo{db: db},
-		EditorialInbox: &EditorialInboxRepo{db: db},
-		Server:         &ServerRepo{db: db},
-		Metric:         &MetricRepo{db: db},
-		Tag:            &TagRepo{db: db},
-		Media:          &MediaRepo{db: db},
-		User:           &UserRepo{db: db},
-		Audit:          &AuditRepo{db: db},
+		Post:            &PostRepo{db: db},
+		Project:         &ProjectRepo{db: db},
+		ProjectUpdate:   &ProjectUpdateRepo{db: db},
+		ContentRelation: &ContentRelationRepo{db: db},
+		ProjectShowcase: &ProjectShowcaseRepo{db: db},
+		PageContent:     &PageContentRepo{db: db},
+		Category:        &CategoryRepo{db: db},
+		EditorialInbox:  &EditorialInboxRepo{db: db},
+		Server:          &ServerRepo{db: db},
+		Metric:          &MetricRepo{db: db},
+		Tag:             &TagRepo{db: db},
+		Media:           &MediaRepo{db: db},
+		User:            &UserRepo{db: db},
+		Audit:           &AuditRepo{db: db},
 	}
 }

@@ -26,13 +26,15 @@ func (h *Handler) apiListPosts(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) apiListProjects(w http.ResponseWriter, r *http.Request) {
 	featuredOnly := strings.EqualFold(r.URL.Query().Get("featured"), "true")
+	state := r.URL.Query().Get("state")
 	sort := r.URL.Query().Get("sort")
 	projects, _, err := h.svc.Projects.ListProjects(1, 100, service.ProjectListOptions{
 		FeaturedOnly: featuredOnly,
+		State:        state,
 		Sort:         sort,
 	})
 	if err != nil {
-		if errors.Is(err, service.ErrInvalidProjectSort) {
+		if errors.Is(err, service.ErrInvalidProjectSort) || errors.Is(err, service.ErrInvalidProjectState) {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
@@ -41,6 +43,212 @@ func (h *Handler) apiListProjects(w http.ResponseWriter, r *http.Request) {
 	}
 
 	writeJSON(w, http.StatusOK, projects)
+}
+
+func (h *Handler) apiListProjectUpdates(w http.ResponseWriter, r *http.Request) {
+	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	if err != nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "project not found"})
+		return
+	}
+	items, err := h.svc.Projects.ListProjectTimeline(project.ID, true, 100)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, items)
+}
+
+func (h *Handler) apiListProjectChangelog(w http.ResponseWriter, r *http.Request) {
+	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	if err != nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "project not found"})
+		return
+	}
+	items, err := h.svc.Projects.ListProjectChangelog(project.ID, true, 100)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, items)
+}
+
+func (h *Handler) apiListProjectRelations(w http.ResponseWriter, r *http.Request) {
+	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	if err != nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "project not found"})
+		return
+	}
+	items, err := h.svc.Projects.GetResolvedProjectRelations(project.ID, true)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, items)
+}
+
+func (h *Handler) apiListProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	if err != nil {
+		writeJSON(w, http.StatusNotFound, map[string]string{"error": "project not found"})
+		return
+	}
+	items, err := h.svc.Projects.ListProjectShowcase(project.ID, true)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, items)
+}
+
+func (h *Handler) apiCreateProjectUpdate(w http.ResponseWriter, r *http.Request) {
+	projectID, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.ProjectUpdateEntryCreate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Projects.CreateProjectUpdate(projectID, input)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusCreated, item)
+}
+
+func (h *Handler) apiUpdateProjectUpdate(w http.ResponseWriter, r *http.Request) {
+	updateID, err := strconv.ParseInt(r.PathValue("updateID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.ProjectUpdateEntryUpdate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Projects.UpdateProjectUpdate(updateID, input)
+	if err != nil {
+		status := http.StatusBadRequest
+		if errors.Is(err, service.ErrProjectUpdateNotFound) {
+			status = http.StatusNotFound
+		}
+		writeJSON(w, status, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, item)
+}
+
+func (h *Handler) apiDeleteProjectUpdate(w http.ResponseWriter, r *http.Request) {
+	updateID, err := strconv.ParseInt(r.PathValue("updateID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if err := h.svc.Projects.DeleteProjectUpdate(updateID); err != nil {
+		status := http.StatusBadRequest
+		if errors.Is(err, service.ErrProjectUpdateNotFound) {
+			status = http.StatusNotFound
+		}
+		writeJSON(w, status, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+func (h *Handler) apiCreateProjectRelation(w http.ResponseWriter, r *http.Request) {
+	projectID, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.ContentRelationCreate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Projects.CreateProjectRelation(projectID, input)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusCreated, item)
+}
+
+func (h *Handler) apiDeleteProjectRelation(w http.ResponseWriter, r *http.Request) {
+	relationID, err := strconv.ParseInt(r.PathValue("relationID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if err := h.svc.Projects.DeleteProjectRelation(relationID); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+func (h *Handler) apiCreateProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	projectID, err := strconv.ParseInt(r.PathValue("projectID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.ProjectShowcaseItemCreate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Projects.CreateProjectShowcase(projectID, input)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusCreated, item)
+}
+
+func (h *Handler) apiUpdateProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	itemID, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	var input model.ProjectShowcaseItemUpdate
+	if err := json.NewDecoder(r.Body).Decode(&input); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	item, err := h.svc.Projects.UpdateProjectShowcase(itemID, input)
+	if err != nil {
+		status := http.StatusBadRequest
+		if errors.Is(err, service.ErrProjectShowcaseNotFound) {
+			status = http.StatusNotFound
+		}
+		writeJSON(w, status, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, item)
+}
+
+func (h *Handler) apiDeleteProjectShowcase(w http.ResponseWriter, r *http.Request) {
+	itemID, err := strconv.ParseInt(r.PathValue("itemID"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if err := h.svc.Projects.DeleteProjectShowcase(itemID); err != nil {
+		status := http.StatusBadRequest
+		if errors.Is(err, service.ErrProjectShowcaseNotFound) {
+			status = http.StatusNotFound
+		}
+		writeJSON(w, status, map[string]string{"error": err.Error()})
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
 func (h *Handler) apiCreatePost(w http.ResponseWriter, r *http.Request) {
