@@ -216,7 +216,7 @@ raevtar/
 ├── cron/              # Backup/automation scripts
 ├── migrations/        # Fresh SQLite schema
 ├── static/            # CSS, JS, agent script, uploads/static assets
-└── docs/              # Notes and historical debugging docs
+└── docs/              # Canonical project docs, runbooks, and notes
 ```
 
 ## Arsitektur Layer
@@ -274,7 +274,7 @@ sudo systemctl enable --now raevtar
 # 0 3 * * * /home/latif/raevtar/cron/backup.sh
 ```
 
-Runbook lengkap ada di `DEPLOYMENT.md`. Jangan restart/deploy service kecuali memang sedang melakukan operasi deploy.
+Runbook lengkap ada di `docs/DEPLOYMENT.md`. Jangan restart/deploy service kecuali memang sedang melakukan operasi deploy.
 
 ## Prinsip
 

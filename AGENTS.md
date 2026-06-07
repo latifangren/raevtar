@@ -126,8 +126,8 @@ make db-reset
 
 ## Ketika Lo Bingung
 
-1. Cek ARCHITECTURE.md — arsitektur lengkap
-2. Cek PRD.md — fitur apa aja yg harus ada
-3. Cek ROADMAP.md — apa yg belum dikerjain
+1. Cek docs/ARCHITECTURE.md — arsitektur lengkap
+2. Cek docs/PRD.md — fitur apa aja yg harus ada
+3. Cek docs/ROADMAP.md — apa yg belum dikerjain
 4. Jangan nembus layer: Handler → Service → Repo
 5. Jangan nambah dependency tanpa alasan jelas
