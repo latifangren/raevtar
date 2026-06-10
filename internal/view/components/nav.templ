@@ -8,6 +8,7 @@ templ Nav(categories []model.Category, currentPath string) {
 		<a href="/about" class={ navClass(currentPath == "/about") }>about</a>
 		<a href="/blog" class={ navClass(currentPath == "/blog") }>blog</a>
 		<a href="/projects" class={ navClass(isProjectsPath(currentPath)) }>projects</a>
+		<a href="/search" class={ navClass(currentPath == "/search") }>search</a>
 		<a href="/topics" class={ navClass(currentPath == "/topics") }>topics</a>
 		<a href="/lab" class={ navClass(currentPath == "/lab") }>lab</a>
 		<a href="/docs" class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
