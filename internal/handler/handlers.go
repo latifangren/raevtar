@@ -137,10 +137,15 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
 	featuredOnly := strings.EqualFold(r.URL.Query().Get("featured"), "true")
 	sort := r.URL.Query().Get("sort")
 	state := r.URL.Query().Get("state")
-	listOpts := service.ProjectListOptions{FeaturedOnly: featuredOnly, State: state, Sort: sort}
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	listOpts := service.ProjectListOptions{FeaturedOnly: featuredOnly, State: state, Sort: sort, Query: query}
 
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
@@ -157,7 +162,7 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	projects, visibleCount, err := h.svc.Projects.ListProjects(1, 12, listOpts)
+	projects, visibleCount, err := h.svc.Projects.ListProjects(page, 12, listOpts)
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidProjectSort) || errors.Is(err, service.ErrInvalidProjectState) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -191,6 +196,9 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 		CurrentFeaturedOnly: featuredOnly,
 		CurrentState:        state,
 		CurrentSort:         sort,
+		Query:               query,
+		Page:                page,
+		TotalPages:          (visibleCount + 11) / 12,
 	}))
 }
 
@@ -307,12 +315,13 @@ func (h *Handler) topicsPage(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 	cat := r.URL.Query().Get("category")
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	if page < 1 {
 		page = 1
 	}
 
-	posts, total, err := h.svc.Blog.ListPosts(cat, page, 10)
+	posts, total, err := h.svc.Blog.ListPostsWithOptions(service.BlogListOptions{CategorySlug: cat, Query: query, Page: page, PageSize: 10})
 	if err != nil {
 		internalServerError(w, r, err)
 		return
@@ -329,8 +338,54 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 		Posts:       posts,
 		Categories:  categories,
 		CurrentCat:  cat,
+		Query:       query,
+		ResultCount: total,
 		Page:        page,
 		TotalPages:  (total + 9) / 10,
+	}))
+}
+
+func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
+	if page < 1 {
+		page = 1
+	}
+	query := strings.TrimSpace(r.URL.Query().Get("q"))
+	scope := strings.TrimSpace(r.URL.Query().Get("scope"))
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	results, err := h.svc.Search.SearchPublic(service.SearchOptions{Query: query, Scope: scope, Page: page, PageSize: 10})
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid search scope") {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, pages.Search(pages.SearchData{
+		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
+		Categories:  categories,
+		Results: pages.SearchViewData{
+			Query:        results.Query,
+			Scope:        results.Scope,
+			Page:         results.Page,
+			PageSize:     results.PageSize,
+			Total:        results.Total,
+			TotalPages:   results.TotalPages,
+			Paginated:    results.Paginated,
+			Posts:        results.Posts,
+			Projects:     results.Projects,
+			Pages:        results.Pages,
+			PostCount:    results.PostCount,
+			ProjectCount: results.ProjectCount,
+			PageCount:    results.PageCount,
+			HasQuery:     results.Query != "",
+		},
 	}))
 }
 

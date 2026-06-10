@@ -43,6 +43,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/docs", h.docsPage)
 	r.Get("/lab/docs", h.docsPage)
 	r.Get("/projects", h.projectsPage)
+	r.Get("/search", h.searchPage)
 	r.Get("/projects/{slug}/changelog", h.projectChangelogPage)
 	r.Get("/projects/{slug}", h.projectDetail)
 	r.Get("/topics", h.topicsPage)
