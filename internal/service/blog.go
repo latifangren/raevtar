@@ -29,6 +29,13 @@ type BlogService struct {
 	markdown goldmark.Markdown
 }
 
+type BlogListOptions struct {
+	CategorySlug string
+	Query        string
+	Page         int
+	PageSize     int
+}
+
 func NewBlogService(repos *repo.Repositories) *BlogService {
 	md := goldmark.New(
 		goldmark.WithExtensions(
@@ -40,17 +47,36 @@ func NewBlogService(repos *repo.Repositories) *BlogService {
 }
 
 func (s *BlogService) ListPosts(categorySlug string, page, pageSize int) ([]model.Post, int, error) {
-	if pageSize <= 0 {
-		pageSize = 10
-	}
-	offset := (page - 1) * pageSize
+	return s.ListPostsWithOptions(BlogListOptions{CategorySlug: categorySlug, Page: page, PageSize: pageSize})
+}
 
-	total, err := s.repos.Post.Count(categorySlug, true)
+func (s *BlogService) ListPostsWithOptions(opts BlogListOptions) ([]model.Post, int, error) {
+	if opts.Page < 1 {
+		opts.Page = 1
+	}
+	if opts.PageSize <= 0 {
+		opts.PageSize = 10
+	}
+	opts.CategorySlug = strings.TrimSpace(opts.CategorySlug)
+	opts.Query = strings.TrimSpace(opts.Query)
+	offset := (opts.Page - 1) * opts.PageSize
+
+	total, err := s.repos.Post.CountWithOptions(repo.PostListOptions{
+		CategorySlug:  opts.CategorySlug,
+		PublishedOnly: true,
+		Query:         opts.Query,
+	})
 	if err != nil {
 		return nil, 0, fmt.Errorf("count posts: %w", err)
 	}
 
-	posts, err := s.repos.Post.List(categorySlug, true, pageSize, offset)
+	posts, err := s.repos.Post.ListWithOptions(repo.PostListOptions{
+		CategorySlug:  opts.CategorySlug,
+		PublishedOnly: true,
+		Query:         opts.Query,
+		Limit:         opts.PageSize,
+		Offset:        offset,
+	})
 	if err != nil {
 		return nil, 0, fmt.Errorf("list posts: %w", err)
 	}
@@ -59,15 +85,18 @@ func (s *BlogService) ListPosts(categorySlug string, page, pageSize int) ([]mode
 }
 
 func (s *BlogService) ListAllPosts(page, pageSize int) ([]model.Post, int, error) {
+	if page < 1 {
+		page = 1
+	}
 	if pageSize <= 0 {
 		pageSize = 10
 	}
 	offset := (page - 1) * pageSize
-	total, err := s.repos.Post.Count("", false)
+	total, err := s.repos.Post.CountWithOptions(repo.PostListOptions{PublishedOnly: false})
 	if err != nil {
 		return nil, 0, fmt.Errorf("count posts: %w", err)
 	}
-	posts, err := s.repos.Post.List("", false, pageSize, offset)
+	posts, err := s.repos.Post.ListWithOptions(repo.PostListOptions{PublishedOnly: false, Limit: pageSize, Offset: offset})
 	if err != nil {
 		return nil, 0, fmt.Errorf("list posts: %w", err)
 	}

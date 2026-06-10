@@ -28,6 +28,7 @@ type ProjectListOptions struct {
 	FeaturedOnly bool
 	State        string
 	Sort         string
+	Query        string
 }
 
 type ProjectService struct {
@@ -57,7 +58,12 @@ func (s *ProjectService) ListProjects(page, pageSize int, opts ProjectListOption
 		return nil, 0, err
 	}
 	offset := (page - 1) * pageSize
-	total, err := s.repos.Project.Count(true, opts.FeaturedOnly, opts.State)
+	total, err := s.repos.Project.CountWithOptions(repo.ProjectListOptions{
+		PublishedOnly: true,
+		FeaturedOnly:  opts.FeaturedOnly,
+		State:         opts.State,
+		Query:         opts.Query,
+	})
 	if err != nil {
 		return nil, 0, fmt.Errorf("count projects: %w", err)
 	}
@@ -66,6 +72,7 @@ func (s *ProjectService) ListProjects(page, pageSize int, opts ProjectListOption
 		FeaturedOnly:  opts.FeaturedOnly,
 		State:         opts.State,
 		Sort:          opts.Sort,
+		Query:         opts.Query,
 		Limit:         pageSize,
 		Offset:        offset,
 	})
@@ -87,7 +94,12 @@ func (s *ProjectService) ListAllProjects(page, pageSize int, opts ProjectListOpt
 		return nil, 0, err
 	}
 	offset := (page - 1) * pageSize
-	total, err := s.repos.Project.Count(false, opts.FeaturedOnly, opts.State)
+	total, err := s.repos.Project.CountWithOptions(repo.ProjectListOptions{
+		PublishedOnly: false,
+		FeaturedOnly:  opts.FeaturedOnly,
+		State:         opts.State,
+		Query:         opts.Query,
+	})
 	if err != nil {
 		return nil, 0, fmt.Errorf("count projects: %w", err)
 	}
@@ -96,6 +108,7 @@ func (s *ProjectService) ListAllProjects(page, pageSize int, opts ProjectListOpt
 		FeaturedOnly:  opts.FeaturedOnly,
 		State:         opts.State,
 		Sort:          opts.Sort,
+		Query:         opts.Query,
 		Limit:         pageSize,
 		Offset:        offset,
 	})
@@ -262,6 +275,7 @@ func normalizeProjectSortOrder(sortOrder int) int {
 func normalizeProjectListOptions(opts ProjectListOptions) (ProjectListOptions, error) {
 	sort := strings.TrimSpace(strings.ToLower(opts.Sort))
 	state := normalizeProjectFilterState(opts.State)
+	opts.Query = strings.TrimSpace(opts.Query)
 	switch sort {
 	case "", "newest", "oldest":
 		opts.Sort = sort
