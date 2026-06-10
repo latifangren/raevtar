@@ -45,6 +45,59 @@ func (h *Handler) apiListProjects(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, projects)
 }
 
+func (h *Handler) apiSearch(w http.ResponseWriter, r *http.Request) {
+	page, err := strconv.Atoi(r.URL.Query().Get("page"))
+	if err != nil && strings.TrimSpace(r.URL.Query().Get("page")) != "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid page"})
+		return
+	}
+	if page < 1 {
+		page = 1
+	}
+	pageSize, err := strconv.Atoi(r.URL.Query().Get("page_size"))
+	if err != nil && strings.TrimSpace(r.URL.Query().Get("page_size")) != "" {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid page_size"})
+		return
+	}
+	if pageSize <= 0 {
+		pageSize = 10
+	}
+	if pageSize > 50 {
+		pageSize = 50
+	}
+	results, err := h.svc.Search.SearchPublic(service.SearchOptions{
+		Query:    strings.TrimSpace(r.URL.Query().Get("q")),
+		Scope:    strings.TrimSpace(r.URL.Query().Get("scope")),
+		Page:     page,
+		PageSize: pageSize,
+	})
+	if err != nil {
+		if strings.Contains(err.Error(), "invalid search scope") {
+			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
+			return
+		}
+		internalServerJSON(w, r, err)
+		return
+	}
+	writeJSON(w, http.StatusOK, map[string]any{
+		"query":       results.Query,
+		"scope":       results.Scope,
+		"page":        results.Page,
+		"page_size":   results.PageSize,
+		"total":       results.Total,
+		"total_pages": results.TotalPages,
+		"paginated":   results.Paginated,
+		"counts": map[string]int{
+			"posts":    results.PostCount,
+			"projects": results.ProjectCount,
+			"pages":    results.PageCount,
+		},
+		"posts":    results.Posts,
+		"projects": results.Projects,
+		"pages":    results.Pages,
+	})
+}
+
 func (h *Handler) apiListProjectUpdates(w http.ResponseWriter, r *http.Request) {
 	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
 	if err != nil {

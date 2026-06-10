@@ -123,6 +123,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	// API v1
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/posts", h.apiListPosts)
+		r.Get("/search", h.apiSearch)
 		r.Get("/projects", h.apiListProjects)
 		r.Get("/projects/{slug}/updates", h.apiListProjectUpdates)
 		r.Get("/projects/{slug}/changelog", h.apiListProjectChangelog)

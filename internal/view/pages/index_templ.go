@@ -43,14 +43,14 @@ func Index(data IndexData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"rv-hero-ambient full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-6xl mx-auto px-4 py-16 md:py-24\"><div class=\"grid gap-8 lg:grid-cols-[1.25fr_0.75fr] items-center\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">Go 1.26</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">HTMX</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">SQLite</span></div><h1 class=\"text-6xl md:text-8xl font-black mb-5 tracking-tight text-retro-ink uppercase leading-none\">raevtar</h1><p class=\"text-xl md:text-2xl text-retro-ink font-black mb-3 max-w-2xl\">Personal platform for project notes, server monitoring, and automation.</p><p class=\"text-sm md:text-base text-retro-ink font-bold mb-8 opacity-75 max-w-xl\">Single Go binary running on postmarketOS (whyred), serving blog notes, live monitor cards, API docs, and automation hooks from one small machine.</p><div class=\"flex flex-wrap gap-4\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read the Blog &rarr;</a> <a href=\"/dashboard\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open Status</a> <a href=\"/docs\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read API Docs</a></div></div><div class=\"relative\"><div class=\"absolute -right-6 -top-6 h-24 w-24 border-2 border-retro-ink bg-retro-wheat shadow-[4px_4px_0px_0px_#2D3748]\"></div><div class=\"relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-4\">live stack board</p><div class=\"grid grid-cols-3 gap-3 text-center\"><div class=\"border-2 border-retro-ink bg-retro-sageLight p-3\"><span class=\"block text-3xl font-black text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"rv-hero-ambient full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-6xl mx-auto px-4 py-16 md:py-24\"><div class=\"grid gap-8 lg:grid-cols-[1.25fr_0.75fr] items-center\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">Go 1.26</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">HTMX</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink shadow-[3px_3px_0px_0px_#2D3748]\">SQLite</span></div><h1 class=\"text-6xl md:text-8xl font-black mb-5 tracking-tight text-retro-ink uppercase leading-none\">raevtar</h1><p class=\"text-xl md:text-2xl text-retro-ink font-black mb-3 max-w-2xl\">Personal platform for project notes, server monitoring, and automation.</p><p class=\"text-sm md:text-base text-retro-ink font-bold mb-8 opacity-75 max-w-xl\">Single Go binary running on postmarketOS (whyred), serving blog notes, live monitor cards, API docs, and automation hooks from one small machine.</p><form method=\"get\" action=\"/search\" class=\"mb-8 max-w-2xl border-2 border-retro-ink bg-retro-paper p-3 shadow-[4px_4px_0px_0px_#2D3748]\"><input type=\"hidden\" name=\"scope\" value=\"all\"> <label for=\"hero-search\" class=\"block text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Search public notes</label><div class=\"flex flex-col gap-2 sm:flex-row\"><input id=\"hero-search\" type=\"search\" name=\"q\" placeholder=\"Cari blog, project, atau page...\" class=\"min-w-0 flex-1 border-2 border-retro-ink bg-retro-cream px-4 py-3 text-sm font-bold text-retro-ink\"> <button type=\"submit\" class=\"inline-flex items-center justify-center gap-1.5 px-5 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Search</button></div></form><div class=\"flex flex-wrap gap-4\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read the Blog &rarr;</a> <a href=\"/dashboard\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open Status</a> <a href=\"/docs\" class=\"inline-flex items-center gap-1.5 px-6 py-3 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Read API Docs</a></div></div><div class=\"relative\"><div class=\"absolute -right-6 -top-6 h-24 w-24 border-2 border-retro-ink bg-retro-wheat shadow-[4px_4px_0px_0px_#2D3748]\"></div><div class=\"relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-4\">live stack board</p><div class=\"grid grid-cols-3 gap-3 text-center\"><div class=\"border-2 border-retro-ink bg-retro-sageLight p-3\"><span class=\"block text-3xl font-black text-retro-ink\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 30, Col: 151}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 38, Col: 151}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -63,7 +63,7 @@ func Index(data IndexData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 31, Col: 153}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 39, Col: 153}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -76,7 +76,7 @@ func Index(data IndexData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Servers)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 32, Col: 150}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 40, Col: 150}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -89,7 +89,7 @@ func Index(data IndexData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 92, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 100, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -102,7 +102,7 @@ func Index(data IndexData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Servers)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 97, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/index.templ`, Line: 105, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
