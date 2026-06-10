@@ -13,13 +13,14 @@ type ProjectListOptions struct {
 	FeaturedOnly  bool
 	State         string
 	Sort          string
+	Query         string
 	Limit         int
 	Offset        int
 }
 
 func (r *ProjectRepo) List(opts ProjectListOptions) ([]model.Project, error) {
 	query := `SELECT * FROM projects WHERE 1=1`
-	args := make([]interface{}, 0, 4)
+	args := make([]interface{}, 0, 6)
 	if opts.PublishedOnly {
 		query += " AND published = 1"
 	}
@@ -29,6 +30,10 @@ func (r *ProjectRepo) List(opts ProjectListOptions) ([]model.Project, error) {
 	if opts.State != "" {
 		query += " AND state = ?"
 		args = append(args, opts.State)
+	}
+	if pattern := likePattern(opts.Query); pattern != "" {
+		query += " AND (LOWER(title) LIKE LOWER(?) ESCAPE '\\' OR LOWER(excerpt) LIKE LOWER(?) ESCAPE '\\' OR LOWER(content_md) LIKE LOWER(?) ESCAPE '\\')"
+		args = append(args, pattern, pattern, pattern)
 	}
 	query += " ORDER BY " + projectOrderClause(opts.Sort) + " LIMIT ? OFFSET ?"
 	args = append(args, opts.Limit, opts.Offset)
@@ -129,18 +134,26 @@ func (r *ProjectRepo) Delete(id int64) error {
 }
 
 func (r *ProjectRepo) Count(publishedOnly bool, featuredOnly bool, state string) (int, error) {
+	return r.CountWithOptions(ProjectListOptions{PublishedOnly: publishedOnly, FeaturedOnly: featuredOnly, State: state})
+}
+
+func (r *ProjectRepo) CountWithOptions(opts ProjectListOptions) (int, error) {
 	var count int
 	query := `SELECT COUNT(*) FROM projects WHERE 1=1`
-	args := make([]interface{}, 0, 1)
-	if publishedOnly {
+	args := make([]interface{}, 0, 4)
+	if opts.PublishedOnly {
 		query += ` AND published = 1`
 	}
-	if featuredOnly {
+	if opts.FeaturedOnly {
 		query += ` AND featured = 1`
 	}
-	if state != "" {
+	if opts.State != "" {
 		query += ` AND state = ?`
-		args = append(args, state)
+		args = append(args, opts.State)
+	}
+	if pattern := likePattern(opts.Query); pattern != "" {
+		query += ` AND (LOWER(title) LIKE LOWER(?) ESCAPE '\' OR LOWER(excerpt) LIKE LOWER(?) ESCAPE '\' OR LOWER(content_md) LIKE LOWER(?) ESCAPE '\')`
+		args = append(args, pattern, pattern, pattern)
 	}
 	return count, r.db.Get(&count, query, args...)
 }

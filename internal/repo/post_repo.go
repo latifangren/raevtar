@@ -10,21 +10,42 @@ import (
 
 type PostRepo struct{ db *sqlx.DB }
 
+type PostListOptions struct {
+	CategorySlug  string
+	PublishedOnly bool
+	Query         string
+	Limit         int
+	Offset        int
+}
+
 func (r *PostRepo) List(categorySlug string, publishedOnly bool, limit, offset int) ([]model.Post, error) {
+	return r.ListWithOptions(PostListOptions{
+		CategorySlug:  categorySlug,
+		PublishedOnly: publishedOnly,
+		Limit:         limit,
+		Offset:        offset,
+	})
+}
+
+func (r *PostRepo) ListWithOptions(opts PostListOptions) ([]model.Post, error) {
 	query := `
 		SELECT p.*, c.name AS category_name, c.slug AS category_slug
 		FROM posts p JOIN categories c ON p.category_id = c.id
 		WHERE 1=1`
-	var args []interface{}
-	if categorySlug != "" {
+	args := make([]interface{}, 0, 5)
+	if opts.CategorySlug != "" {
 		query += " AND c.slug = ?"
-		args = append(args, categorySlug)
+		args = append(args, opts.CategorySlug)
 	}
-	if publishedOnly {
+	if opts.PublishedOnly {
 		query += " AND p.published = 1"
 	}
+	if pattern := likePattern(opts.Query); pattern != "" {
+		query += " AND (LOWER(p.title) LIKE LOWER(?) ESCAPE '\\' OR LOWER(p.excerpt) LIKE LOWER(?) ESCAPE '\\' OR LOWER(p.content_md) LIKE LOWER(?) ESCAPE '\\' OR LOWER(c.name) LIKE LOWER(?) ESCAPE '\\' OR LOWER(c.slug) LIKE LOWER(?) ESCAPE '\\')"
+		args = append(args, pattern, pattern, pattern, pattern, pattern)
+	}
 	query += " ORDER BY p.created_at DESC LIMIT ? OFFSET ?"
-	args = append(args, limit, offset)
+	args = append(args, opts.Limit, opts.Offset)
 
 	var posts []model.Post
 	if err := r.db.Select(&posts, query, args...); err != nil {
@@ -127,21 +148,38 @@ func (r *PostRepo) Delete(id int64) error {
 }
 
 func (r *PostRepo) Count(categorySlug string, publishedOnly bool) (int, error) {
+	return r.CountWithOptions(PostListOptions{CategorySlug: categorySlug, PublishedOnly: publishedOnly})
+}
+
+func (r *PostRepo) CountWithOptions(opts PostListOptions) (int, error) {
 	var count int
 	query := `SELECT COUNT(*) FROM posts p JOIN categories c ON p.category_id = c.id`
-	conditions := make([]string, 0, 2)
-	args := make([]interface{}, 0, 1)
-	if categorySlug != "" {
+	conditions := make([]string, 0, 3)
+	args := make([]interface{}, 0, 6)
+	if opts.CategorySlug != "" {
 		conditions = append(conditions, "c.slug = ?")
-		args = append(args, categorySlug)
+		args = append(args, opts.CategorySlug)
 	}
-	if publishedOnly {
+	if opts.PublishedOnly {
 		conditions = append(conditions, "p.published = 1")
+	}
+	if pattern := likePattern(opts.Query); pattern != "" {
+		conditions = append(conditions, "(LOWER(p.title) LIKE LOWER(?) ESCAPE '\\' OR LOWER(p.excerpt) LIKE LOWER(?) ESCAPE '\\' OR LOWER(p.content_md) LIKE LOWER(?) ESCAPE '\\' OR LOWER(c.name) LIKE LOWER(?) ESCAPE '\\' OR LOWER(c.slug) LIKE LOWER(?) ESCAPE '\\')")
+		args = append(args, pattern, pattern, pattern, pattern, pattern)
 	}
 	if len(conditions) > 0 {
 		query += " WHERE " + strings.Join(conditions, " AND ")
 	}
 	return count, r.db.Get(&count, query, args...)
+}
+
+func likePattern(query string) string {
+	query = strings.TrimSpace(query)
+	if query == "" {
+		return ""
+	}
+	replacer := strings.NewReplacer(`\\`, `\\\\`, `%`, `\\%`, `_`, `\\_`)
+	return "%" + replacer.Replace(query) + "%"
 }
 
 func (r *PostRepo) CountByCategoryID(categoryID int64) (int, error) {
