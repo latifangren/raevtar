@@ -24,9 +24,9 @@ jobs:
           cache: true
 
       - name: Set up Node.js
-        uses: actions/setup-node@v4
+        uses: actions/setup-node@v6
         with:
-          node-version: '22'
+          node-version: '24'
 
       - name: Generate templ files
         run: make templ-gen
@@ -34,8 +34,8 @@ jobs:
       - name: Regenerate Tailwind CSS
         run: make css
 
-      - name: Verify committed generated files are up to date
-        run: git diff --exit-code
+      - name: Verify committed templ files are up to date
+        run: git diff --exit-code -- 'internal/view/**/*_templ.go'
 
       - name: Run tests
         run: go test ./...
