@@ -1,27 +1,40 @@
 package components
 
 import (
+	"net/url"
 	"strconv"
 )
 
 templ Pagination(currentPage int, totalPages int, currentCat string) {
+	@PaginationWithBase("/blog", currentPage, totalPages, map[string]string{"category": currentCat})
+}
+
+templ PaginationWithBase(basePath string, currentPage int, totalPages int, params map[string]string) {
 	if totalPages > 1 {
 		<div class="flex gap-2 mt-6 justify-center">
 			for i := 1; i <= totalPages; i++ {
 				if i == currentPage {
 					<span class="px-3 py-1.5 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm">{ strconv.Itoa(i) }</span>
 				} else {
-					<a href={ templ.URL(pageHref(i, currentCat)) } class="px-3 py-1.5 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] transition-all">{ strconv.Itoa(i) }</a>
+					<a href={ templ.URL(pageHref(basePath, i, params)) } class="px-3 py-1.5 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] transition-all">{ strconv.Itoa(i) }</a>
 				}
 			}
 		</div>
 	}
 }
 
-func pageHref(page int, category string) string {
-	href := "/blog?page=" + strconv.Itoa(page)
-	if category != "" {
-		href += "&category=" + category
+func pageHref(basePath string, page int, params map[string]string) string {
+	values := url.Values{}
+	for key, value := range params {
+		if value == "" {
+			continue
+		}
+		values.Set(key, value)
 	}
-	return href
+	values.Set("page", strconv.Itoa(page))
+	encoded := values.Encode()
+	if encoded == "" {
+		return basePath
+	}
+	return basePath + "?" + encoded
 }
