@@ -611,6 +611,43 @@ func TestCanonicalNormalization(t *testing.T) {
 	}
 	assertContains(t, body, `rel="canonical" href="https://raevtar.test/projects"`)
 	assertNotContains(t, body, `https://raevtar.test/projects?featured=true&sort=oldest`)
+
+	status, body = getBody(t, app, "/search?q=hello&scope=posts&page=2", nil)
+	if status != http.StatusOK {
+		t.Fatalf("search status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, `rel="canonical" href="https://raevtar.test/search"`)
+	assertNotContains(t, body, `https://raevtar.test/search?q=hello&scope=posts&page=2`)
+}
+
+func TestBlogPageSupportsSearchQuery(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	_, err := app.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "tools",
+		Title:        "Terminal Search",
+		ContentMD:    "# Terminal Search\n\nFinding notes fast.",
+		Excerpt:      "Search fixture",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create search post: %v", err)
+	}
+
+	status, body := getBody(t, app, "/blog?q=terminal", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Terminal Search")
+	assertNotContains(t, body, "Hello Raevtar")
+	assertContains(t, body, `name="q" value="terminal"`)
+
+	status, body = getBody(t, app, "/blog?category=tools&q=terminal", nil)
+	if status != http.StatusOK {
+		t.Fatalf("filtered status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Terminal Search")
+	assertContains(t, body, `/blog?category=tools&amp;q=terminal`)
 }
 
 func TestAPIListProjectsReturnsPublishedProjectsOnly(t *testing.T) {
@@ -856,12 +893,68 @@ func TestProjectsPageSupportsFeaturedFilterAndSortQuery(t *testing.T) {
 	assertContains(t, body, "Old Featured")
 	assertContains(t, body, "Whyred Watchtower")
 	assertNotContains(t, body, "Normal Project")
+	assertContains(t, body, `name="q" value=""`)
+
+	searchStatus, searchBody := getBody(t, app, "/projects?q=watchtower", nil)
+	if searchStatus != http.StatusOK {
+		t.Fatalf("search status = %d, want %d; body: %s", searchStatus, http.StatusOK, searchBody)
+	}
+	assertContains(t, searchBody, `name="q" value="watchtower"`)
+	assertContains(t, searchBody, "Whyred Watchtower")
+	assertNotContains(t, searchBody, "Old Featured")
+
+	comboStatus, comboBody := getBody(t, app, "/projects?featured=true&sort=oldest&q=watchtower", nil)
+	if comboStatus != http.StatusOK {
+		t.Fatalf("combo status = %d, want %d; body: %s", comboStatus, http.StatusOK, comboBody)
+	}
+	assertContains(t, comboBody, `name="q" value="watchtower"`)
+	assertContains(t, comboBody, `name="featured" value="true" checked`)
+	assertContains(t, comboBody, `<option value="oldest" selected>Oldest first</option>`)
 
 	badStatus, badBody := getBody(t, app, "/projects?sort=sideways", nil)
 	if badStatus != http.StatusBadRequest {
 		t.Fatalf("bad sort status = %d, want %d; body: %s", badStatus, http.StatusBadRequest, badBody)
 	}
 	assertContains(t, badBody, "invalid project sort")
+}
+
+func TestUnifiedSearchPageSupportsScopes(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	status, body := getBody(t, app, "/search?q=hello&scope=posts", nil)
+	if status != http.StatusOK {
+		t.Fatalf("posts scope status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Hello Raevtar")
+	assertContains(t, body, "Posts")
+	assertNotContains(t, body, "Whyred Watchtower")
+
+	status, body = getBody(t, app, "/search?q=watchtower&scope=projects", nil)
+	if status != http.StatusOK {
+		t.Fatalf("projects scope status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Whyred Watchtower")
+	assertContains(t, body, `value="projects" selected`)
+
+	status, body = getBody(t, app, "/search?q=lightweight&scope=pages", nil)
+	if status != http.StatusOK {
+		t.Fatalf("pages scope status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Raevtar keeps contact intentionally lightweight.")
+	assertContains(t, body, `href="/contact"`)
+
+	status, body = getBody(t, app, "/search?q=hello", nil)
+	if status != http.StatusOK {
+		t.Fatalf("all scope status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "total hits")
+	assertContains(t, body, "Hello Raevtar")
+
+	badStatus, badBody := getBody(t, app, "/search?q=test&scope=servers", nil)
+	if badStatus != http.StatusBadRequest {
+		t.Fatalf("bad scope status = %d, want %d; body: %s", badStatus, http.StatusBadRequest, badBody)
+	}
+	assertContains(t, badBody, "invalid search scope")
 }
 
 func TestUIPolishSourceHooks(t *testing.T) {
