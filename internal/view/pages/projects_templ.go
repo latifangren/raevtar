@@ -305,7 +305,7 @@ func Projects(data ProjectsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				for _, project := range data.Projects {
-					templ_7745c5c3_Err = components.ProjectCard(project).Render(ctx, templ_7745c5c3_Buffer)
+					templ_7745c5c3_Err = components.ProjectCardWithHighlight(project, data.Query).Render(ctx, templ_7745c5c3_Buffer)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

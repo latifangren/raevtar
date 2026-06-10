@@ -237,7 +237,7 @@ func BlogList(data BlogListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			for _, post := range data.Posts {
-				templ_7745c5c3_Err = components.PostCard(post).Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = components.PostCardWithHighlight(post, data.Query).Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
