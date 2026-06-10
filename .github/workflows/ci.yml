@@ -1,0 +1,44 @@
+name: ci
+
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v6
+
+      - name: Set up Go
+        uses: actions/setup-go@v6
+        with:
+          go-version: '1.26.3'
+          cache: true
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+
+      - name: Generate templ files
+        run: make templ-gen
+
+      - name: Regenerate Tailwind CSS
+        run: make css
+
+      - name: Verify committed generated files are up to date
+        run: git diff --exit-code
+
+      - name: Run tests
+        run: go test ./...
+
+      - name: Build project
+        run: make build
