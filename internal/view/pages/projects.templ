@@ -1,6 +1,8 @@
 package pages
 
-import "raevtar/internal/view/components"
+import (
+	"raevtar/internal/view/components"
+)
 
 templ Projects(data ProjectsData) {
 @page("Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
@@ -82,7 +84,11 @@ templ Projects(data ProjectsData) {
 					}
 				</div>
 			</div>
-			<form method="get" action="/projects" class="mb-5 grid gap-4 border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:grid-cols-[1fr_auto_auto] md:items-end">
+			<form method="get" action="/projects" class="mb-5 grid gap-4 border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:grid-cols-2 xl:grid-cols-[1.2fr_auto_auto_auto] md:items-end">
+				<div class="md:col-span-2 xl:col-span-1">
+					<label for="project-search" class="block text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Search archive</label>
+					<input id="project-search" type="search" name="q" value={ data.Query } placeholder="Cari project, excerpt, isi..." class="w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink"/>
+				</div>
 				<div>
 					<label for="sort" class="block text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Sort archive</label>
 					<select id="sort" name="sort" class="w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink">
@@ -112,8 +118,13 @@ templ Projects(data ProjectsData) {
 			</form>
 			if len(data.Projects) == 0 {
 				<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xl font-black uppercase text-retro-ink mb-2">Belum ada project posting.</p>
-					<p class="text-sm font-bold text-retro-muted max-w-xl mx-auto">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page. Kalau filter aktif, reset dulu buat lihat arsip lengkap.</p>
+					if data.Query != "" {
+						<p class="text-xl font-black uppercase text-retro-ink mb-2">Belum ada hasil project.</p>
+						<p class="text-sm font-bold text-retro-muted max-w-xl mx-auto">Coba ganti kata kunci atau reset filter buat lihat arsip penuh lagi.</p>
+					} else {
+						<p class="text-xl font-black uppercase text-retro-ink mb-2">Belum ada project posting.</p>
+						<p class="text-sm font-bold text-retro-muted max-w-xl mx-auto">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page. Kalau filter aktif, reset dulu buat lihat arsip lengkap.</p>
+					}
 				</div>
 			} else {
 				<div class="grid gap-5 xl:grid-cols-2">
@@ -122,6 +133,7 @@ templ Projects(data ProjectsData) {
 					}
 				</div>
 			}
+			@components.PaginationWithBase("/projects", data.Page, data.TotalPages, map[string]string{"featured": projectsFeaturedValue(data.CurrentFeaturedOnly), "state": data.CurrentState, "sort": data.CurrentSort, "q": data.Query})
 		</section>
 		<section class="mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
 			<div class="grid gap-0 lg:grid-cols-[0.8fr_1.2fr]">
@@ -139,4 +151,11 @@ templ Projects(data ProjectsData) {
 			</div>
 		</section>
 	}
+}
+
+func projectsFeaturedValue(featuredOnly bool) string {
+	if featuredOnly {
+		return "true"
+	}
+	return ""
 }

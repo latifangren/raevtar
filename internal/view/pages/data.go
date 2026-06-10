@@ -41,6 +41,8 @@ type BlogListData struct {
 	Posts       []model.Post
 	Categories  []model.Category
 	CurrentCat  string
+	Query       string
+	ResultCount int
 	Page        int
 	TotalPages  int
 }
@@ -83,6 +85,33 @@ type ProjectsData struct {
 	CurrentFeaturedOnly bool
 	CurrentState        string
 	CurrentSort         string
+	Query               string
+	Page                int
+	TotalPages          int
+}
+
+type SearchData struct {
+	CurrentPath string
+	SEO         model.SEOData
+	Categories  []model.Category
+	Results     SearchViewData
+}
+
+type SearchViewData struct {
+	Query        string
+	Scope        string
+	Page         int
+	PageSize     int
+	Total        int
+	TotalPages   int
+	Paginated    bool
+	Posts        []model.Post
+	Projects     []model.Project
+	Pages        []model.PageContent
+	PostCount    int
+	ProjectCount int
+	PageCount    int
+	HasQuery     bool
 }
 
 type ProjectDetailData struct {

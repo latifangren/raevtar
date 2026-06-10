@@ -8,7 +8,9 @@ package pages
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-import "raevtar/internal/view/components"
+import (
+	"raevtar/internal/view/components"
+)
 
 func Projects(data ProjectsData) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
@@ -50,7 +52,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 25, Col: 146}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 27, Col: 146}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -63,7 +65,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 26, Col: 152}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 28, Col: 152}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -76,7 +78,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.TotalProjectCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 27, Col: 154}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 29, Col: 154}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -89,7 +91,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 39, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 41, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -102,7 +104,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 49, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 51, Col: 83}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -115,7 +117,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.CategoryCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 59, Col: 85}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 61, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -133,7 +135,7 @@ func Projects(data ProjectsData) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.FeaturedCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 77, Col: 161}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 79, Col: 161}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -151,7 +153,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.VisibleProjectCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 79, Col: 170}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 81, Col: 170}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -169,7 +171,7 @@ func Projects(data ProjectsData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.TotalProjectCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 81, Col: 165}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 83, Col: 165}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -180,97 +182,125 @@ func Projects(data ProjectsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div><form method=\"get\" action=\"/projects\" class=\"mb-5 grid gap-4 border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:grid-cols-[1fr_auto_auto] md:items-end\"><div><label for=\"sort\" class=\"block text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Sort archive</label> <select id=\"sort\" name=\"sort\" class=\"w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink\"><option value=\"newest\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div></div><form method=\"get\" action=\"/projects\" class=\"mb-5 grid gap-4 border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:grid-cols-2 xl:grid-cols-[1.2fr_auto_auto_auto] md:items-end\"><div class=\"md:col-span-2 xl:col-span-1\"><label for=\"project-search\" class=\"block text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Search archive</label> <input id=\"project-search\" type=\"search\" name=\"q\" value=\"")
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			var templ_7745c5c3_Var12 string
+			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(data.Query)
+			if templ_7745c5c3_Err != nil {
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 90, Col: 73}
+			}
+			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "\" placeholder=\"Cari project, excerpt, isi...\" class=\"w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink\"></div><div><label for=\"sort\" class=\"block text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Sort archive</label> <select id=\"sort\" name=\"sort\" class=\"w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink\"><option value=\"newest\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentSort == "" || data.CurrentSort == "newest" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, ">Newest first</option> <option value=\"oldest\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, ">Newest first</option> <option value=\"oldest\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentSort == "oldest" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, ">Oldest first</option></select></div><div><label for=\"state\" class=\"block text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Project state</label> <select id=\"state\" name=\"state\" class=\"w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink\"><option value=\"\">All states</option> <option value=\"planning\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">Oldest first</option></select></div><div><label for=\"state\" class=\"block text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Project state</label> <select id=\"state\" name=\"state\" class=\"w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink\"><option value=\"\">All states</option> <option value=\"planning\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentState == "planning" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, ">Planning</option> <option value=\"active\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, ">Planning</option> <option value=\"active\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentState == "active" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, ">Active</option> <option value=\"paused\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, ">Active</option> <option value=\"paused\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentState == "paused" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, ">Paused</option> <option value=\"shipped\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, ">Paused</option> <option value=\"shipped\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentState == "shipped" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, ">Shipped</option> <option value=\"archived\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, ">Shipped</option> <option value=\"archived\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentState == "archived" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, " selected")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, " selected")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, ">Archived</option></select></div><label class=\"inline-flex items-center gap-3 border-2 border-retro-ink bg-retro-blush px-4 py-2 text-sm font-black uppercase tracking-wide text-retro-ink\"><input type=\"checkbox\" name=\"featured\" value=\"true\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, ">Archived</option></select></div><label class=\"inline-flex items-center gap-3 border-2 border-retro-ink bg-retro-blush px-4 py-2 text-sm font-black uppercase tracking-wide text-retro-ink\"><input type=\"checkbox\" name=\"featured\" value=\"true\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.CurrentFeaturedOnly {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, " checked")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " checked")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 30, " class=\"h-4 w-4 accent-retro-ink\"> Featured only</label><div class=\"flex flex-wrap gap-3\"><button type=\"submit\" class=\"inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Apply view</button> <a href=\"/projects\" class=\"inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Reset filters</a></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, " class=\"h-4 w-4 accent-retro-ink\"> Featured only</label><div class=\"flex flex-wrap gap-3\"><button type=\"submit\" class=\"inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Apply view</button> <a href=\"/projects\" class=\"inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Reset filters</a></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Projects) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xl font-black uppercase text-retro-ink mb-2\">Belum ada project posting.</p><p class=\"text-sm font-bold text-retro-muted max-w-xl mx-auto\">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page. Kalau filter aktif, reset dulu buat lihat arsip lengkap.</p></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\">")
+				if templ_7745c5c3_Err != nil {
+					return templ_7745c5c3_Err
+				}
+				if data.Query != "" {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<p class=\"text-xl font-black uppercase text-retro-ink mb-2\">Belum ada hasil project.</p><p class=\"text-sm font-bold text-retro-muted max-w-xl mx-auto\">Coba ganti kata kunci atau reset filter buat lihat arsip penuh lagi.</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				} else {
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "<p class=\"text-xl font-black uppercase text-retro-ink mb-2\">Belum ada project posting.</p><p class=\"text-sm font-bold text-retro-muted max-w-xl mx-auto\">Begitu project notes dipublish dari admin, kartu publik pertama bakal muncul di sini dengan excerpt, tags, dan jalur masuk ke detail page. Kalau filter aktif, reset dulu buat lihat arsip lengkap.</p>")
+					if templ_7745c5c3_Err != nil {
+						return templ_7745c5c3_Err
+					}
+				}
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 35, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 32, "<div class=\"grid gap-5 xl:grid-cols-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<div class=\"grid gap-5 xl:grid-cols-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -280,12 +310,16 @@ func Projects(data ProjectsData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "</section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">route map</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Move sideways, not only downward.</h2><p class=\"text-sm font-bold text-retro-sageLight\">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">about</p><p class=\"text-sm font-bold text-retro-ink\">Personal framing, stack choices, and public/private split.</p></a> <a href=\"/topics\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">topics</p><p class=\"text-sm font-bold text-retro-ink\">Category index for finding writing by subject, not chronology.</p></a> <a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">docs</p><p class=\"text-sm font-bold text-retro-ink\">Read-only route list and boundary notes for public readers.</p></a> <a href=\"/contact\" class=\"border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">contact</p><p class=\"text-sm font-bold text-retro-ink\">Where to start if you need context before reaching elsewhere.</p></a></div></div></section>")
+			templ_7745c5c3_Err = components.PaginationWithBase("/projects", data.Page, data.TotalPages, map[string]string{"featured": projectsFeaturedValue(data.CurrentFeaturedOnly), "state": data.CurrentState, "sort": data.CurrentSort, "q": data.Query}).Render(ctx, templ_7745c5c3_Buffer)
+			if templ_7745c5c3_Err != nil {
+				return templ_7745c5c3_Err
+			}
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-retro-ink text-retro-cream p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-wheat mb-3\">route map</p><h2 class=\"text-3xl md:text-4xl font-black uppercase leading-tight mb-4\">Move sideways, not only downward.</h2><p class=\"text-sm font-bold text-retro-sageLight\">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">about</p><p class=\"text-sm font-bold text-retro-ink\">Personal framing, stack choices, and public/private split.</p></a> <a href=\"/topics\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">topics</p><p class=\"text-sm font-bold text-retro-ink\">Category index for finding writing by subject, not chronology.</p></a> <a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">docs</p><p class=\"text-sm font-bold text-retro-ink\">Read-only route list and boundary notes for public readers.</p></a> <a href=\"/contact\" class=\"border-2 border-retro-ink bg-retro-blush p-4 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><p class=\"text-xs font-black uppercase text-retro-muted mb-2\">contact</p><p class=\"text-sm font-bold text-retro-ink\">Where to start if you need context before reaching elsewhere.</p></a></div></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -297,6 +331,13 @@ func Projects(data ProjectsData) templ.Component {
 		}
 		return nil
 	})
+}
+
+func projectsFeaturedValue(featuredOnly bool) string {
+	if featuredOnly {
+		return "true"
+	}
+	return ""
 }
 
 var _ = templruntime.GeneratedTemplate
