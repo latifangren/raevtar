@@ -925,7 +925,8 @@ func TestUnifiedSearchPageSupportsScopes(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("posts scope status = %d, want %d; body: %s", status, http.StatusOK, body)
 	}
-	assertContains(t, body, "Hello Raevtar")
+	assertContains(t, body, "hello-raevtar")
+	assertContains(t, body, "<mark")
 	assertContains(t, body, "Posts")
 	assertNotContains(t, body, "Whyred Watchtower")
 
@@ -933,14 +934,16 @@ func TestUnifiedSearchPageSupportsScopes(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("projects scope status = %d, want %d; body: %s", status, http.StatusOK, body)
 	}
-	assertContains(t, body, "Whyred Watchtower")
+	assertContains(t, body, "whyred-watchtower")
+	assertContains(t, body, "<mark")
 	assertContains(t, body, `value="projects" selected`)
 
 	status, body = getBody(t, app, "/search?q=lightweight&scope=pages", nil)
 	if status != http.StatusOK {
 		t.Fatalf("pages scope status = %d, want %d; body: %s", status, http.StatusOK, body)
 	}
-	assertContains(t, body, "Raevtar keeps contact intentionally lightweight.")
+	assertContains(t, body, `href="/contact"`)
+	assertContains(t, body, "<mark")
 	assertContains(t, body, `href="/contact"`)
 
 	status, body = getBody(t, app, "/search?q=hello", nil)
@@ -948,13 +951,62 @@ func TestUnifiedSearchPageSupportsScopes(t *testing.T) {
 		t.Fatalf("all scope status = %d, want %d; body: %s", status, http.StatusOK, body)
 	}
 	assertContains(t, body, "total hits")
-	assertContains(t, body, "Hello Raevtar")
+	assertContains(t, body, "hello-raevtar")
 
 	badStatus, badBody := getBody(t, app, "/search?q=test&scope=servers", nil)
 	if badStatus != http.StatusBadRequest {
 		t.Fatalf("bad scope status = %d, want %d; body: %s", badStatus, http.StatusBadRequest, badBody)
 	}
 	assertContains(t, badBody, "invalid search scope")
+}
+
+func TestAPISearchReturnsGroupedPublicResults(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/search?q=hello&scope=posts&page=1&page_size=5", nil)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var payload struct {
+		Query    string              `json:"query"`
+		Scope    string              `json:"scope"`
+		Page     int                 `json:"page"`
+		PageSize int                 `json:"page_size"`
+		Counts   map[string]int      `json:"counts"`
+		Posts    []model.Post        `json:"posts"`
+		Projects []model.Project     `json:"projects"`
+		Pages    []model.PageContent `json:"pages"`
+	}
+	if err := json.NewDecoder(rr.Body).Decode(&payload); err != nil {
+		t.Fatalf("decode payload: %v", err)
+	}
+	if payload.Query != "hello" || payload.Scope != "posts" || payload.Page != 1 || payload.PageSize != 5 {
+		t.Fatalf("unexpected search payload meta: %+v", payload)
+	}
+	if payload.Counts["posts"] == 0 || len(payload.Posts) == 0 {
+		t.Fatalf("expected post results, got %+v", payload)
+	}
+	if len(payload.Projects) != 0 || len(payload.Pages) != 0 {
+		t.Fatalf("posts scope should not include other groups: %+v", payload)
+	}
+
+	badReq := httptest.NewRequest(http.MethodGet, "/api/v1/search?q=test&scope=servers", nil)
+	badRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(badRR, badReq)
+	if badRR.Code != http.StatusBadRequest {
+		t.Fatalf("bad scope status = %d, want %d; body: %s", badRR.Code, http.StatusBadRequest, badRR.Body.String())
+	}
+	assertContains(t, badRR.Body.String(), "invalid search scope")
+
+	badPageReq := httptest.NewRequest(http.MethodGet, "/api/v1/search?page=oops", nil)
+	badPageRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(badPageRR, badPageReq)
+	if badPageRR.Code != http.StatusBadRequest {
+		t.Fatalf("bad page status = %d, want %d; body: %s", badPageRR.Code, http.StatusBadRequest, badPageRR.Body.String())
+	}
+	assertContains(t, badPageRR.Body.String(), "invalid page")
 }
 
 func TestUIPolishSourceHooks(t *testing.T) {
