@@ -638,7 +638,8 @@ func TestBlogPageSupportsSearchQuery(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
 	}
-	assertContains(t, body, "Terminal Search")
+	assertContains(t, body, "<mark")
+	assertContains(t, body, `href="/blog/terminal-search"`)
 	assertNotContains(t, body, "Hello Raevtar")
 	assertContains(t, body, `name="q" value="terminal"`)
 
@@ -646,7 +647,8 @@ func TestBlogPageSupportsSearchQuery(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("filtered status = %d, want %d; body: %s", status, http.StatusOK, body)
 	}
-	assertContains(t, body, "Terminal Search")
+	assertContains(t, body, "<mark")
+	assertContains(t, body, `href="/blog/terminal-search"`)
 	assertContains(t, body, `/blog?category=tools&amp;q=terminal`)
 }
 
@@ -900,7 +902,8 @@ func TestProjectsPageSupportsFeaturedFilterAndSortQuery(t *testing.T) {
 		t.Fatalf("search status = %d, want %d; body: %s", searchStatus, http.StatusOK, searchBody)
 	}
 	assertContains(t, searchBody, `name="q" value="watchtower"`)
-	assertContains(t, searchBody, "Whyred Watchtower")
+	assertContains(t, searchBody, "<mark")
+	assertContains(t, searchBody, `href="/projects/whyred-watchtower"`)
 	assertNotContains(t, searchBody, "Old Featured")
 
 	comboStatus, comboBody := getBody(t, app, "/projects?featured=true&sort=oldest&q=watchtower", nil)
