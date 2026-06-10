@@ -447,6 +447,42 @@ func TestBlogServiceListAllPostsIncludesDrafts(t *testing.T) {
 	}
 }
 
+func TestBlogServiceListPostsWithQuery(t *testing.T) {
+	state := newTestServices(t)
+
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{CategorySlug: "devops", Title: "Go Search Notes", Excerpt: "SQLite search field notes", ContentMD: "# Search\n\nquery tuning", Published: true}); err != nil {
+		t.Fatalf("create search post: %v", err)
+	}
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{CategorySlug: "tools", Title: "Hidden Search Draft", Excerpt: "should never leak", ContentMD: "# draft", Published: false}); err != nil {
+		t.Fatalf("create hidden draft: %v", err)
+	}
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{CategorySlug: "tools", Title: "Terminal Tricks", Excerpt: "CLI grep tricks", ContentMD: "# Terminal", Published: true}); err != nil {
+		t.Fatalf("create terminal post: %v", err)
+	}
+
+	posts, total, err := state.svc.Blog.ListPostsWithOptions(BlogListOptions{Query: "search", Page: 1, PageSize: 10})
+	if err != nil {
+		t.Fatalf("search posts: %v", err)
+	}
+	if total != 1 || len(posts) != 1 {
+		t.Fatalf("search total/len = %d/%d, want 1/1", total, len(posts))
+	}
+	if posts[0].Title != "Go Search Notes" {
+		t.Fatalf("search result title = %q, want Go Search Notes", posts[0].Title)
+	}
+
+	filtered, filteredTotal, err := state.svc.Blog.ListPostsWithOptions(BlogListOptions{CategorySlug: "tools", Query: "grep", Page: 1, PageSize: 10})
+	if err != nil {
+		t.Fatalf("filtered search: %v", err)
+	}
+	if filteredTotal != 1 || len(filtered) != 1 {
+		t.Fatalf("filtered total/len = %d/%d, want 1/1", filteredTotal, len(filtered))
+	}
+	if filtered[0].Title != "Terminal Tricks" {
+		t.Fatalf("filtered title = %q, want Terminal Tricks", filtered[0].Title)
+	}
+}
+
 func TestProjectServiceCreateAndUpdateProject(t *testing.T) {
 	state := newTestServices(t)
 
@@ -570,6 +606,42 @@ func TestProjectServiceRejectsInvalidSort(t *testing.T) {
 	}
 }
 
+func TestProjectServiceListProjectsWithQuery(t *testing.T) {
+	state := newTestServices(t)
+
+	if _, err := state.svc.Projects.CreateProject(model.ProjectCreate{Title: "Search Relay", ContentMD: "# Search Relay\n\nIndexing public notes.", Excerpt: "Search aggregator project", Published: true, State: model.ProjectStateActive, Featured: true}); err != nil {
+		t.Fatalf("create search project: %v", err)
+	}
+	if _, err := state.svc.Projects.CreateProject(model.ProjectCreate{Title: "Paused Bot", ContentMD: "# Paused", Excerpt: "Background worker", Published: true, State: model.ProjectStatePaused}); err != nil {
+		t.Fatalf("create paused project: %v", err)
+	}
+	if _, err := state.svc.Projects.CreateProject(model.ProjectCreate{Title: "Hidden Search Project", ContentMD: "# Hidden", Excerpt: "Should not leak", Published: false, State: model.ProjectStateActive}); err != nil {
+		t.Fatalf("create hidden project: %v", err)
+	}
+
+	projects, total, err := state.svc.Projects.ListProjects(1, 10, ProjectListOptions{Query: "search"})
+	if err != nil {
+		t.Fatalf("search projects: %v", err)
+	}
+	if total != 1 || len(projects) != 1 {
+		t.Fatalf("search total/len = %d/%d, want 1/1", total, len(projects))
+	}
+	if projects[0].Title != "Search Relay" {
+		t.Fatalf("project title = %q, want Search Relay", projects[0].Title)
+	}
+
+	paused, pausedTotal, err := state.svc.Projects.ListProjects(1, 10, ProjectListOptions{Query: "worker", State: model.ProjectStatePaused})
+	if err != nil {
+		t.Fatalf("paused search: %v", err)
+	}
+	if pausedTotal != 1 || len(paused) != 1 {
+		t.Fatalf("paused total/len = %d/%d, want 1/1", pausedTotal, len(paused))
+	}
+	if paused[0].Title != "Paused Bot" {
+		t.Fatalf("paused title = %q, want Paused Bot", paused[0].Title)
+	}
+}
+
 func TestProjectServiceDeleteProjectAndMissingUpdate(t *testing.T) {
 	state := newTestServices(t)
 
@@ -626,6 +698,52 @@ func TestPageContentServiceUpdateAndRender(t *testing.T) {
 	}
 	if updated.ContentHTML == "" || !strings.Contains(updated.ContentHTML, "Updated body") {
 		t.Fatalf("expected rendered html, got %q", updated.ContentHTML)
+	}
+}
+
+func TestSearchServiceUnifiedPublicScopes(t *testing.T) {
+	state := newTestServices(t)
+
+	if _, err := state.svc.Blog.CreatePost(model.PostCreate{CategorySlug: "devops", Title: "Search Story", Excerpt: "Public search article", ContentMD: "# Story", Published: true}); err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+	if _, err := state.svc.Projects.CreateProject(model.ProjectCreate{Title: "Search Engine Board", ContentMD: "# Board", Excerpt: "Public search project", Published: true, State: model.ProjectStateActive}); err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+	if _, err := state.svc.Pages.UpdatePage(model.PageContent{Key: model.PageKeyAbout, Title: "About search", Summary: "Search summary", ContentMD: "# About\n\nSearch appears here too."}); err != nil {
+		t.Fatalf("update page: %v", err)
+	}
+
+	all, err := state.svc.Search.SearchPublic(SearchOptions{Query: "search", Scope: SearchScopeAll, Page: 1, PageSize: 10})
+	if err != nil {
+		t.Fatalf("search all: %v", err)
+	}
+	if all.PostCount == 0 || all.ProjectCount == 0 || all.PageCount == 0 {
+		t.Fatalf("expected all scopes populated, got posts=%d projects=%d pages=%d", all.PostCount, all.ProjectCount, all.PageCount)
+	}
+
+	postsOnly, err := state.svc.Search.SearchPublic(SearchOptions{Query: "search", Scope: SearchScopePosts, Page: 1, PageSize: 10})
+	if err != nil {
+		t.Fatalf("search posts scope: %v", err)
+	}
+	if postsOnly.ProjectCount != 0 || postsOnly.PageCount != 0 || postsOnly.PostCount == 0 {
+		t.Fatalf("unexpected posts scope counts: %+v", postsOnly)
+	}
+
+	pagesOnly, err := state.svc.Search.SearchPublic(SearchOptions{Query: "search", Scope: SearchScopePages, Page: 1, PageSize: 10})
+	if err != nil {
+		t.Fatalf("search pages scope: %v", err)
+	}
+	if pagesOnly.PageCount == 0 || len(pagesOnly.Posts) != 0 || len(pagesOnly.Projects) != 0 {
+		t.Fatalf("unexpected pages scope results: %+v", pagesOnly)
+	}
+
+	empty, err := state.svc.Search.SearchPublic(SearchOptions{Query: "   ", Scope: SearchScopeAll, Page: 1, PageSize: 10})
+	if err != nil {
+		t.Fatalf("empty search: %v", err)
+	}
+	if empty.Total != 0 || len(empty.Posts) != 0 || len(empty.Projects) != 0 || len(empty.Pages) != 0 {
+		t.Fatalf("empty search should not dump content: %+v", empty)
 	}
 }
 
