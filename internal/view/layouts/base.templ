@@ -7,7 +7,7 @@ import (
 
 templ Base(title string, currentPath string, categories []model.Category, seo model.SEOData) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="scroll-smooth">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
@@ -39,10 +39,12 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 				@RawHTML("<script type=\"application/ld+json\">" + seo.JSONLD + "</script>")
 			}
 		</head>
-		<body class="min-h-screen bg-retro-cream text-retro-ink antialiased">
-			<div class="max-w-6xl mx-auto px-4 pt-4">
+		<body class="min-h-screen bg-retro-cream text-retro-ink antialiased selection:bg-retro-yellow selection:text-retro-ink">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				@components.Nav(categories, currentPath)
-				{ children... }
+				<main>
+					{ children... }
+				</main>
 				@components.Footer()
 			</div>
 		</body>

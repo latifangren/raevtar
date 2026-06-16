@@ -31,7 +31,7 @@ func Nav(categories []model.Category, currentPath string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"sticky top-0 z-50 flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-3 px-4 sm:px-6 mb-8 bg-retro-ink border-b-2 border-retro-ink shadow-[0_4px_0px_0px_#2D3748] max-w-6xl mx-auto\" style=\"margin-left:0;margin-right:0\"><a href=\"/\" class=\"text-lg sm:text-xl font-black text-retro-sageLight hover:text-retro-wheat no-underline\">raevtar</a> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"sticky top-4 z-50 flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-4 px-6 mb-12 bg-retro-paper border-4 border-retro-ink shadow-[6px_6px_0px_0px_#000000] max-w-6xl mx-auto rounded-none\"><a href=\"/\" class=\"text-xl sm:text-2xl font-black text-retro-ink hover:bg-retro-yellow no-underline uppercase tracking-tighter\">raevtar</a><div class=\"h-8 w-1 bg-retro-ink mx-2\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -246,10 +246,11 @@ func isProjectsPath(path string) bool {
 }
 
 func navClass(active bool) string {
+	base := "text-sm font-black uppercase tracking-widest no-underline transition-all px-2 py-1 "
 	if active {
-		return "text-sm font-bold text-retro-cream no-underline"
+		return base + "bg-retro-yellow text-retro-ink border-2 border-retro-ink shadow-[2px_2px_0px_0px_#000000]"
 	}
-	return "text-sm font-medium text-retro-sageLight hover:text-retro-cream no-underline transition-colors"
+	return base + "text-retro-ink hover:bg-retro-yellow/50"
 }
 
 var _ = templruntime.GeneratedTemplate

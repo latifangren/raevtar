@@ -13,9 +13,10 @@ module.exports = {
       },
       colors: {
         retro: {
-          cream: '#FDFCF5',
-          paper: '#FFF8E8',
-          ink: '#2D3748',
+          cream: '#F5F2ED', // Background color from RetroUI
+          paper: '#FFFFFF',
+          ink: '#000000',   // Pure black for borders and text
+          yellow: '#FACC15', // Vibrant yellow from RetroUI
           sage: '#6A9B7D',
           sageLight: '#DDEBDD',
           wheat: '#EFE2B8',
