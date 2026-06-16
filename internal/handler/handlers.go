@@ -332,7 +332,7 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderHTML(w, r, pages.BlogList(pages.BlogListData{
+	blogData := pages.BlogListData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Posts:       posts,
@@ -342,7 +342,14 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 		ResultCount: total,
 		Page:        page,
 		TotalPages:  (total + 9) / 10,
-	}))
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderHTML(w, r, pages.BlogListItems(blogData))
+		return
+	}
+
+	renderHTML(w, r, pages.BlogList(blogData))
 }
 
 func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
@@ -366,7 +373,7 @@ func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	renderHTML(w, r, pages.Search(pages.SearchData{
+	searchData := pages.SearchData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:  categories,
@@ -386,7 +393,14 @@ func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
 			PageCount:    results.PageCount,
 			HasQuery:     results.Query != "",
 		},
-	}))
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderHTML(w, r, pages.SearchResults(searchData))
+		return
+	}
+
+	renderHTML(w, r, pages.Search(searchData))
 }
 
 func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
