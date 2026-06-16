@@ -125,10 +125,12 @@ func AutoMigrate(db *sqlx.DB) {
 		disk_total_gb REAL DEFAULT 0,
 		temperature_c REAL DEFAULT 0,
 		temperature_available INTEGER DEFAULT 0,
-		uptime_seconds INTEGER DEFAULT 0,
-		online INTEGER DEFAULT 1,
-		recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP
-	);
+			uptime_seconds INTEGER DEFAULT 0,
+			online INTEGER DEFAULT 1,
+			top_processes TEXT DEFAULT '',
+			logs TEXT DEFAULT '',
+			recorded_at DATETIME DEFAULT CURRENT_TIMESTAMP
+		);
 
 	CREATE INDEX IF NOT EXISTS idx_posts_category ON posts(category_id);
 	CREATE INDEX IF NOT EXISTS idx_posts_slug ON posts(slug);
@@ -262,8 +264,10 @@ func AutoMigrate(db *sqlx.DB) {
 	ensureColumn(db, "server_metrics", "cpu_cores", "INTEGER DEFAULT 0")
 	ensureColumn(db, "server_metrics", "disk_total_gb", "REAL DEFAULT 0")
 	ensureColumn(db, "server_metrics", "temperature_c", "REAL DEFAULT 0")
-	ensureColumn(db, "server_metrics", "temperature_available", "INTEGER DEFAULT 0")
-	ensureColumn(db, "editorial_inbox", "published_post_id", "INTEGER")
+		ensureColumn(db, "server_metrics", "temperature_available", "INTEGER DEFAULT 0")
+		ensureColumn(db, "server_metrics", "top_processes", "TEXT DEFAULT ''")
+		ensureColumn(db, "server_metrics", "logs", "TEXT DEFAULT ''")
+		ensureColumn(db, "editorial_inbox", "published_post_id", "INTEGER")
 	ensureColumn(db, "editorial_inbox", "failure_note", "TEXT NOT NULL DEFAULT ''")
 	ensureColumn(db, "editorial_inbox", "failure_meta", "TEXT NOT NULL DEFAULT ''")
 	ensureColumn(db, "editorial_inbox", "claimed_by", "TEXT NOT NULL DEFAULT ''")

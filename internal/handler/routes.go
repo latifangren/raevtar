@@ -31,9 +31,11 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/favicon.svg", h.serveStatic("favicon.svg"))
 	r.Get("/llms.txt", h.llmsTxt)
 	r.Get("/sitemap.xml", h.sitemapXML)
-	r.Get("/uploads/{filename}", h.serveUpload)
-
-	// pages
+		r.Get("/uploads/{filename}", h.serveUpload)
+		r.Get("/og-image/blog/{slug}", h.serveBlogOGImage)
+		r.Get("/og-image/project/{slug}", h.serveProjectOGImage)
+	
+		// pages
 	r.Get("/", h.landingIndex)
 	r.Get("/about", h.aboutPage)
 	r.Get("/blog", h.blogList)
@@ -45,8 +47,9 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/projects", h.projectsPage)
 	r.Get("/search", h.searchPage)
 	r.Get("/projects/{slug}/changelog", h.projectChangelogPage)
-	r.Get("/projects/{slug}", h.projectDetail)
-	r.Get("/topics", h.topicsPage)
+		r.Get("/projects/{slug}", h.projectDetail)
+		r.Get("/lab/node-status/{name}", h.nodeStatusShortcode)
+		r.Get("/topics", h.topicsPage)
 	r.Get("/dashboard", h.dashboardIndex)
 	r.Get("/dashboard/{serverID}/live", h.dashboardDetailLive)
 	r.Get("/dashboard/{serverID}", h.dashboardDetail)
@@ -110,8 +113,9 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Get("/servers/{serverID}", h.adminServerDetail)
 				r.Post("/servers", h.adminCreateServer)
 				r.Post("/servers/update/{serverID}", h.adminUpdateServer)
-				r.Post("/servers/rotate-token/{serverID}", h.adminRotateServerToken)
-				r.Post("/servers/delete/{serverID}", h.adminDeleteServer)
+					r.Post("/servers/rotate-token/{serverID}", h.adminRotateServerToken)
+					r.Post("/servers/delete/{serverID}", h.adminDeleteServer)
+					r.Post("/servers/command/{serverID}", h.adminServerCommand)
 				r.Get("/audit-log", h.adminAuditLog)
 				r.Get("/manage-users", h.adminUsers)
 				r.Post("/manage-users", h.adminCreateUser)

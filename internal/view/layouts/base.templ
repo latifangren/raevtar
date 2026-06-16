@@ -31,9 +31,15 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 			<meta property="og:type" content="website"/>
 			<meta property="og:site_name" content="Raevtar"/>
 			<meta property="og:title" content={ title }/>
-			<meta property="og:description" content={ seo.Description }/>
-			<meta property="og:url" content={ seo.CanonicalURL }/>
-			<meta name="twitter:card" content="summary"/>
+				<meta property="og:description" content={ seo.Description }/>
+				<meta property="og:url" content={ seo.CanonicalURL }/>
+				if seo.ImageURL != "" {
+					<meta property="og:image" content={ seo.ImageURL }/>
+					<meta name="twitter:image" content={ seo.ImageURL }/>
+					<meta name="twitter:card" content="summary_large_image"/>
+				} else {
+					<meta name="twitter:card" content="summary"/>
+				}
 			<meta name="twitter:title" content={ title }/>
 			<meta name="twitter:description" content={ seo.Description }/>
 			if seo.JSONLD != "" {

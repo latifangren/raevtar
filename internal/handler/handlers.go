@@ -239,7 +239,7 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	renderHTML(w, r, pages.ProjectDetail(pages.ProjectDetailData{
 		CurrentPath:   r.URL.Path,
-		SEO:           h.svc.SiteMeta.DefaultSEO(r.URL.Path),
+		SEO:           h.svc.SiteMeta.ProjectSEO(project),
 		Project:       project,
 		Categories:    categories,
 		Timeline:      timeline,
@@ -247,6 +247,35 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 		RelatedItems:  related,
 		ShowcaseItems: showcase,
 	}))
+}
+
+func (h *Handler) nodeStatusShortcode(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+	server, err := h.svc.Monitor.GetServerByName(name)
+	if err != nil {
+		fmt.Fprintf(w, `<div class="nb-card bg-retro-blush p-4 my-6 text-sm font-bold">Node "%s" not found.</div>`, name)
+		return
+	}
+	metrics, _ := h.svc.Monitor.GetRecentMetrics(server.ID, 1)
+	
+	statusColor := "bg-retro-blush"
+	statusText := "Offline"
+	if len(metrics) > 0 && metrics[0].Online {
+		statusColor = "bg-retro-sage"
+		statusText = "Online"
+	}
+
+	fmt.Fprintf(w, `
+	<div class="nb-card bg-retro-paper p-4 my-6 flex items-center justify-between border-l-8 border-l-retro-ink">
+		<div>
+			<p class="text-[10px] font-black uppercase text-retro-muted mb-1">Live Node Status</p>
+			<h4 class="text-lg font-black uppercase">%s</h4>
+		</div>
+		<div class="flex items-center gap-3">
+			<span class="text-xs font-black uppercase">%s</span>
+			<div class="w-4 h-4 nb-border %s"></div>
+		</div>
+	</div>`, server.Name, statusText, statusColor)
 }
 
 func (h *Handler) projectChangelogPage(w http.ResponseWriter, r *http.Request) {

@@ -1048,29 +1048,55 @@ func (h *Handler) adminRotateServerToken(w http.ResponseWriter, r *http.Request)
 }
 
 func (h *Handler) adminDeleteServer(w http.ResponseWriter, r *http.Request) {
-	if r.Method != http.MethodPost {
-		http.Error(w, "POST required", http.StatusMethodNotAllowed)
-		return
-	}
-
-	entry, _ := getSessionEntry(r)
-	idStr := r.PathValue("serverID")
-	id, err := strconv.ParseInt(idStr, 10, 64)
-	if err != nil {
-		http.Error(w, "invalid id", http.StatusBadRequest)
-		return
-	}
-
-	if err := h.svc.Admin.DeleteServer(entry.username, id, idStr, clientIP(r)); err != nil {
-		if errors.Is(err, service.ErrServerNotFound) {
-			http.Error(w, "server not found", http.StatusNotFound)
+		if r.Method != http.MethodPost {
+			http.Error(w, "POST required", http.StatusMethodNotAllowed)
 			return
 		}
-		internalServerError(w, r, err)
-		return
+	
+		entry, _ := getSessionEntry(r)
+		idStr := r.PathValue("serverID")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+	
+		if err := h.svc.Admin.DeleteServer(entry.username, id, idStr, clientIP(r)); err != nil {
+			if errors.Is(err, service.ErrServerNotFound) {
+				http.Error(w, "server not found", http.StatusNotFound)
+				return
+			}
+			internalServerError(w, r, err)
+			return
+		}
+		http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
 	}
-	http.Redirect(w, r, "/admin/servers", http.StatusSeeOther)
-}
+	
+	func (h *Handler) adminServerCommand(w http.ResponseWriter, r *http.Request) {
+		if r.Method != http.MethodPost {
+			http.Error(w, "POST required", http.StatusMethodNotAllowed)
+			return
+		}
+	
+		entry, _ := getSessionEntry(r)
+		idStr := r.PathValue("serverID")
+		id, err := strconv.ParseInt(idStr, 10, 64)
+		if err != nil {
+			http.Error(w, "invalid id", http.StatusBadRequest)
+			return
+		}
+		command := r.FormValue("command")
+		if command == "" {
+			http.Error(w, "command required", http.StatusBadRequest)
+			return
+		}
+	
+		// For now, we log the command. In a real implementation, this would be queued
+		// in the database for the agent to pick up on the next ping.
+		h.svc.Admin.LogAudit(entry.username, "REMOTE_COMMAND", fmt.Sprintf("Command %s sent to server %d", command, id), clientIP(r))
+	
+		http.Redirect(w, r, "/admin/servers/"+idStr, http.StatusSeeOther)
+	}
 
 func (h *Handler) renderAdminServers(w http.ResponseWriter, r *http.Request, servers []model.Server, tokenServerID int64, token string) {
 	renderHTML(w, r, adminview.Servers(adminview.ServersData{

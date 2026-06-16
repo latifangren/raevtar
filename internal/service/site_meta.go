@@ -62,6 +62,7 @@ func (s *SiteMetaService) HomeSEO() model.SEOData {
 
 func (s *SiteMetaService) BlogPostSEO(post *model.Post) model.SEOData {
 	seo := s.DefaultSEO("/blog/" + post.Slug)
+	seo.ImageURL = s.CanonicalURL("/og-image/blog/" + post.Slug)
 	description := strings.TrimSpace(post.Excerpt)
 	if description == "" {
 		description = defaultSEODescription
@@ -117,6 +118,30 @@ func (s *SiteMetaService) SitemapEntries() ([]SitemapEntry, error) {
 		entries = append(entries, SitemapEntry{URL: s.CanonicalURL("/projects/" + project.Slug + "/changelog"), LastMod: lastMod})
 	}
 	return entries, nil
+}
+
+func (s *SiteMetaService) ProjectSEO(project *model.Project) model.SEOData {
+	seo := s.DefaultSEO("/projects/" + project.Slug)
+	seo.ImageURL = s.CanonicalURL("/og-image/project/" + project.Slug)
+	description := strings.TrimSpace(project.Excerpt)
+	if description == "" {
+		description = defaultSEODescription
+	}
+	seo.Description = description
+	payload := map[string]any{
+		"@context":      "https://schema.org",
+		"@type":         "CreativeWork",
+		"headline":      project.Title,
+		"url":           seo.CanonicalURL,
+		"description":   description,
+		"datePublished": project.CreatedAt.UTC().Format(time.RFC3339),
+		"dateModified":  maxTime(project.UpdatedAt, project.CreatedAt).UTC().Format(time.RFC3339),
+	}
+	if strings.TrimSpace(project.CoverImageURL) != "" {
+		payload["image"] = absoluteAssetURL(s.domain, project.CoverImageURL)
+	}
+	seo.JSONLD = model.MustJSONLD(payload)
+	return seo
 }
 
 func (s *SiteMetaService) LLMSText() (string, error) {

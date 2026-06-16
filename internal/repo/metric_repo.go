@@ -10,16 +10,16 @@ type MetricRepo struct{ db *sqlx.DB }
 
 func (r *MetricRepo) Insert(m *model.ServerMetric) error {
 	_, err := r.db.Exec(`
-		INSERT INTO server_metrics (server_id, cpu_percent, cpu_load_1, cpu_load_5,
-			cpu_load_15, cpu_cores, ram_used_mb, ram_total_mb, disk_used_gb,
-			disk_total_gb, temperature_c, temperature_available, uptime_seconds,
-			online, recorded_at)
-		VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-		m.ServerID, m.CPUPercent, m.CPULoad1, m.CPULoad5,
-		m.CPULoad15, m.CPUCores, m.RAMUsedMB, m.RAMTotalMB,
-		m.DiskUsedGB, m.DiskTotalGB, m.TemperatureC,
-		m.TemperatureAvailable, m.UptimeSeconds, m.Online, m.RecordedAt,
-	)
+			INSERT INTO server_metrics (server_id, cpu_percent, cpu_load_1, cpu_load_5,
+				cpu_load_15, cpu_cores, ram_used_mb, ram_total_mb, disk_used_gb,
+				disk_total_gb, temperature_c, temperature_available, uptime_seconds,
+				online, top_processes, logs, recorded_at)
+			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+			m.ServerID, m.CPUPercent, m.CPULoad1, m.CPULoad5,
+			m.CPULoad15, m.CPUCores, m.RAMUsedMB, m.RAMTotalMB,
+			m.DiskUsedGB, m.DiskTotalGB, m.TemperatureC,
+			m.TemperatureAvailable, m.UptimeSeconds, m.Online, m.TopProcesses, m.Logs, m.RecordedAt,
+		)
 	return err
 }
 

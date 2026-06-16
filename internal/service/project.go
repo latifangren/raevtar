@@ -239,6 +239,19 @@ func (s *ProjectService) DeleteProject(id int64) error {
 }
 
 func (s *ProjectService) RenderMarkdown(content string) (string, error) {
+	// Pre-process shortcodes (same logic as BlogService)
+	re := regexp.MustCompile(`\[\[server-status:([a-zA-Z0-9-]+)\]\]`)
+	content = re.ReplaceAllStringFunc(content, func(match string) string {
+		parts := re.FindStringSubmatch(match)
+		if len(parts) < 2 {
+			return match
+		}
+		nodeName := parts[1]
+		return fmt.Sprintf(`<div class="nb-card bg-retro-paper p-4 my-6" hx-get="/lab/node-status/%s" hx-trigger="load" hx-swap="outerHTML">
+			<p class="text-xs font-black uppercase text-retro-muted animate-pulse">Loading node status: %s...</p>
+		</div>`, nodeName, nodeName)
+	})
+
 	var buf strings.Builder
 	if err := s.markdown.Convert([]byte(content), &buf); err != nil {
 		return "", fmt.Errorf("render markdown: %w", err)

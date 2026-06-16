@@ -121,6 +121,11 @@ templ ServerDetailLive(data ServerDetailData) {
 						<p class="text-xs font-bold text-retro-sageLight mt-2">{ MetricSampleCountText(data.Metrics) } samples collected.</p>
 					</div>
 				</div>
+				
+				<div class="grid gap-8 lg:grid-cols-2">
+					@TopProcessesTable(data.Metrics[0].TopProcesses)
+					@LogStream(data.Metrics[0].Logs)
+				</div>
 			}
 		</section>
 	</div>
