@@ -10,7 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"encoding/json"
-	"fmt"
 	"raevtar/internal/model"
 )
 

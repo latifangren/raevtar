@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -14,7 +15,11 @@ import (
 	"github.com/yuin/goldmark/extension"
 )
 
-var ErrInvalidProjectInput = errors.New("invalid project input")
+var (
+	ErrInvalidProjectInput = errors.New("invalid project input")
+
+	serverStatusRe = regexp.MustCompile(`\[\[server-status:([a-zA-Z0-9-]+)\]\]`)
+)
 var ErrProjectNotFound = errors.New("project not found")
 var ErrInvalidProjectSort = errors.New("invalid project sort")
 var ErrInvalidProjectState = errors.New("invalid project state")
@@ -239,10 +244,9 @@ func (s *ProjectService) DeleteProject(id int64) error {
 }
 
 func (s *ProjectService) RenderMarkdown(content string) (string, error) {
-	// Pre-process shortcodes (same logic as BlogService)
-	re := regexp.MustCompile(`\[\[server-status:([a-zA-Z0-9-]+)\]\]`)
-	content = re.ReplaceAllStringFunc(content, func(match string) string {
-		parts := re.FindStringSubmatch(match)
+	// Pre-process shortcodes
+	content = serverStatusRe.ReplaceAllStringFunc(content, func(match string) string {
+		parts := serverStatusRe.FindStringSubmatch(match)
 		if len(parts) < 2 {
 			return match
 		}

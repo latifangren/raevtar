@@ -24,6 +24,15 @@ func (r *ServerRepo) GetByID(id int64) (*model.Server, error) {
 	return &s, nil
 }
 
+func (r *ServerRepo) GetByName(name string) (*model.Server, error) {
+	var s model.Server
+	err := r.db.Get(&s, "SELECT * FROM servers WHERE name = ?", name)
+	if err != nil {
+		return nil, err
+	}
+	return &s, nil
+}
+
 func (r *ServerRepo) Create(s *model.Server) error {
 	now := time.Now()
 	s.CreatedAt = now

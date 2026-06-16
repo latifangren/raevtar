@@ -2,13 +2,13 @@ package pages
 
 templ About(data AboutData) {
 @page("About — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
-			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
-				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
-					<div>
-						<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">About Raevtar</p>
-						<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Page.Title }</h1>
-						<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Page.Summary }</p>
+			<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden">
+				<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+					<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
+						<div>
+							<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">About Raevtar</p>
+							<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Page.Title }</h1>
+							<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Page.Summary }</p>
 						<div class="flex flex-wrap gap-2 mt-4 max-w-xl">
 							<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">projects</a>
 							<a href="/topics" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">topics</a>

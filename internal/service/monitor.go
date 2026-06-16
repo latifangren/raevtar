@@ -63,6 +63,10 @@ func (s *MonitorService) GetServer(id int64) (*model.Server, error) {
 	return s.repos.Server.GetByID(id)
 }
 
+func (s *MonitorService) GetServerByName(name string) (*model.Server, error) {
+	return s.repos.Server.GetByName(name)
+}
+
 func (s *MonitorService) UpdateServer(id int64, name, host string, port int, tags string) (*model.Server, error) {
 	server, err := s.repos.Server.GetByID(id)
 	if err != nil {

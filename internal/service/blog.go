@@ -312,15 +312,12 @@ func (s *BlogService) RenderMarkdown(content string) (string, error) {
 func (s *BlogService) processShortcodes(content string) string {
 	// Simple shortcode: [[server-status:node-name]]
 	// This will be rendered as a div that HTMX can pick up
-	re := regexp.MustCompile(`\[\[server-status:([a-zA-Z0-9-]+)\]\]`)
-	return re.ReplaceAllStringFunc(content, func(match string) string {
-		parts := re.FindStringSubmatch(match)
+	return serverStatusRe.ReplaceAllStringFunc(content, func(match string) string {
+		parts := serverStatusRe.FindStringSubmatch(match)
 		if len(parts) < 2 {
 			return match
 		}
 		nodeName := parts[1]
-		// Return a placeholder that HTMX will use to load the actual status
-		// We use a specific class for the raevtar-ui.js to initialize if needed
 		return fmt.Sprintf(`<div class="nb-card bg-retro-paper p-4 my-6" hx-get="/lab/node-status/%s" hx-trigger="load" hx-swap="outerHTML">
 			<p class="text-xs font-black uppercase text-retro-muted animate-pulse">Loading node status: %s...</p>
 		</div>`, nodeName, nodeName)

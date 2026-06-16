@@ -580,3 +580,14 @@ func MetricDotClass(online bool) string {
 	}
 	return "bg-retro-blush"
 }
+
+func searchPageHref(key string) string {
+	switch key {
+	case model.PageKeyAbout:
+		return "/about"
+	case model.PageKeyContact:
+		return "/contact"
+	default:
+		return "/"
+	}
+}

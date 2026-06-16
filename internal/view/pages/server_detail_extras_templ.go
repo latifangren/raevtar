@@ -10,10 +10,10 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"encoding/json"
-	"raevtar/internal/model"
 	"strings"
 )
 
+// ProcessInfo is used for JSON unmarshaling of top processes data
 type ProcessInfo struct {
 	PID     string `json:"pid"`
 	User    string `json:"user"`

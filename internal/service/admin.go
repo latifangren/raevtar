@@ -253,3 +253,10 @@ func (s *AdminService) LogEditorialInboxDeleted(username string, item *model.Edi
 	}
 	return nil
 }
+
+func (s *AdminService) LogAudit(username, action, details, ip string) error {
+	if err := s.repos.Audit.Insert(username, action, details, ip); err != nil {
+		return fmt.Errorf("audit log: %w", err)
+	}
+	return nil
+}

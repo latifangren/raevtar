@@ -41,14 +41,14 @@ func Contact(data ContactData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-paper border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Contact</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-ink mb-2\">Contact</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 8, Col: 108}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 8, Col: 109}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -61,20 +61,20 @@ func Contact(data ContactData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.Summary)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 9, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 9, Col: 102}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p><p class=\"text-sm font-bold text-retro-muted mt-4 max-w-xl\">Public starting point anchored at ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p><p class=\"text-sm font-bold text-retro-ink mt-4 max-w-xl\">Public starting point anchored at ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Domain)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 10, Col: 111}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 10, Col: 110}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {

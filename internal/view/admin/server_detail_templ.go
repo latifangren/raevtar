@@ -10,7 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"fmt"
-	"raevtar/internal/model"
 )
 
 func ServerDetail(data ServerDetailData) templ.Component {
@@ -81,7 +80,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Server.Host)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 37, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 36, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -94,7 +93,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.Server.Port))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 41, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 40, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
@@ -107,7 +106,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Server.Tags)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 45, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 44, Col: 70}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
@@ -120,7 +119,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(AgentTokenStatus(*data.Server))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 49, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 48, Col: 84}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -130,7 +129,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = copyableCommandBlock("Ping Endpoint", "Copy URL", "agent-url", AgentURLExample).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = copyableCommandBlock("Ping Endpoint", "Copy URL", "agent-url", data.AgentURLExample).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -141,7 +140,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			var templ_7745c5c3_Var7 templ.SafeURL
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/servers/rotate-token/" + IDText(data.Server.ID)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 65, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 64, Col: 102}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -154,7 +153,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(data.CSRFToken)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 66, Col: 64}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 65, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -202,7 +201,7 @@ func remoteCommandButton(serverID int64, command, label, color, csrf string) tem
 		var templ_7745c5c3_Var10 templ.SafeURL
 		templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinURLErrs(templ.URL("/admin/servers/command/" + IDText(serverID)))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 78, Col: 85}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 77, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 		if templ_7745c5c3_Err != nil {
@@ -215,7 +214,7 @@ func remoteCommandButton(serverID int64, command, label, color, csrf string) tem
 		var templ_7745c5c3_Var11 string
 		templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(fmt.Sprintf("Execute %s on this node?", label))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 78, Col: 149}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 77, Col: 149}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 		if templ_7745c5c3_Err != nil {
@@ -228,7 +227,7 @@ func remoteCommandButton(serverID int64, command, label, color, csrf string) tem
 		var templ_7745c5c3_Var12 string
 		templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(csrf)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 79, Col: 48}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 78, Col: 48}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 		if templ_7745c5c3_Err != nil {
@@ -241,7 +240,7 @@ func remoteCommandButton(serverID int64, command, label, color, csrf string) tem
 		var templ_7745c5c3_Var13 string
 		templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(command)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 80, Col: 53}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 79, Col: 53}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 		if templ_7745c5c3_Err != nil {
@@ -276,7 +275,7 @@ func remoteCommandButton(serverID int64, command, label, color, csrf string) tem
 		var templ_7745c5c3_Var16 string
 		templ_7745c5c3_Var16, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 82, Col: 10}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 81, Col: 10}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var16))
 		if templ_7745c5c3_Err != nil {

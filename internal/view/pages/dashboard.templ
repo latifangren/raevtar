@@ -1,19 +1,21 @@
 package pages
 
 templ Dashboard(data DashboardData) {
-@page("Status — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<div class="grid gap-4 md:grid-cols-[1fr_auto] md:items-end mb-6">
-			<div>
-				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Monitor Grid</p>
-				<h1 class="text-3xl md:text-5xl font-black uppercase leading-none">Server Status</h1>
-				<p class="text-sm font-bold text-retro-muted mt-2">Public-safe signal board showing status windows, last signal age, and drill-down history without private topology.</p>
-				<div class="flex flex-wrap gap-2 mt-3 max-w-2xl">
-					<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">projects</a>
-					<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">docs</a>
-					<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink no-underline hover:bg-retro-paper">about</a>
+	@page("Status — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
+				<section class="full-width bg-retro-sageLight border-b-2 border-retro-ink mb-12 overflow-hidden">
+				<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+					<div class="max-w-3xl">
+						<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">Monitor Grid</p>
+						<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Server Status</h1>
+						<p class="text-base md:text-lg font-bold text-retro-ink opacity-80">Public-safe signal board showing status windows, last signal age, and drill-down history without private topology.</p>
+						<div class="flex flex-wrap gap-2 mt-4">
+							<a href="/projects" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat">projects</a>
+							<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper">docs</a>
+							<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink no-underline hover:bg-retro-paper">about</a>
+						</div>
+					</div>
 				</div>
-			</div>
-		</div>
+			</section>
 		<section class="mb-6 bg-retro-ink text-retro-cream border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
 			<div class="flex flex-wrap items-end justify-between gap-3 mb-4">
 				<div>

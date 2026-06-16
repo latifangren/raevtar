@@ -10,7 +10,6 @@ import templruntime "github.com/a-h/templ/runtime"
 
 import (
 	"net/url"
-	"raevtar/internal/view/components"
 )
 
 func BlogList(data BlogListData) templ.Component {

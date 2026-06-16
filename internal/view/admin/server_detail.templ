@@ -1,7 +1,6 @@
 package admin
 
 import (
-	"raevtar/internal/model"
 	"fmt"
 )
 
@@ -56,7 +55,7 @@ templ ServerDetail(data ServerDetailData) {
 					<div class="nb-card bg-retro-paper p-6">
 						<h3 class="nb-h3 text-xl mb-4">Agent Config</h3>
 						<div class="space-y-4">
-							@copyableCommandBlock("Ping Endpoint", "Copy URL", "agent-url", AgentURLExample)
+							@copyableCommandBlock("Ping Endpoint", "Copy URL", "agent-url", data.AgentURLExample)
 							<div class="p-3 bg-retro-ink text-retro-wheat rounded-sm overflow-hidden">
 								<p class="text-[10px] font-bold uppercase mb-2 text-retro-yellow">Agent Secret Token</p>
 								<p class="text-xs font-mono break-all opacity-80">********************************</p>

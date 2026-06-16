@@ -39,3 +39,8 @@ temp/
 /.omo
 /.playwright-mcp
 /.tmp
+*.exe
+homepage.html
+
+# Demo
+raevtar-demo*.log

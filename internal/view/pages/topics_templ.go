@@ -41,7 +41,7 @@ func Topics(data TopicsData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-sageLight border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Topics</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">Browse the archive by category.</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl\">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p><p class=\"text-sm font-bold text-retro-muted mt-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Topics</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">Browse the archive by category.</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl\">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p><p class=\"text-sm font-bold text-retro-muted mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

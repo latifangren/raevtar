@@ -1,11 +1,11 @@
 package pages
 
 import (
-	"raevtar/internal/model"
 	"encoding/json"
 	"strings"
 )
 
+// ProcessInfo is used for JSON unmarshaling of top processes data
 type ProcessInfo struct {
 	PID     string `json:"pid"`
 	User    string `json:"user"`
