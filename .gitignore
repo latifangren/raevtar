@@ -32,6 +32,12 @@ Thumbs.db
 # Auto-generated Go test binary
 *.test
 
+# Coverage artifacts
+coverage
+coverage.out
+coverage.html
+*.coverprofile
+
 # Temp
 tmp/
 temp/

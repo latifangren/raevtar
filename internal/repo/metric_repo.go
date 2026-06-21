@@ -9,7 +9,7 @@ import (
 type MetricRepo struct{ db *sqlx.DB }
 
 func (r *MetricRepo) Insert(m *model.ServerMetric) error {
-	_, err := r.db.Exec(`
+	result, err := r.db.Exec(`
 			INSERT INTO server_metrics (server_id, cpu_percent, cpu_load_1, cpu_load_5,
 				cpu_load_15, cpu_cores, ram_used_mb, ram_total_mb, disk_used_gb,
 				disk_total_gb, temperature_c, temperature_available, uptime_seconds,
@@ -20,7 +20,12 @@ func (r *MetricRepo) Insert(m *model.ServerMetric) error {
 		m.DiskUsedGB, m.DiskTotalGB, m.TemperatureC,
 		m.TemperatureAvailable, m.UptimeSeconds, m.Online, m.TopProcesses, m.Logs, m.RecordedAt,
 	)
-	return err
+	if err != nil {
+		return err
+	}
+	id, _ := result.LastInsertId()
+	m.ID = id
+	return nil
 }
 
 func (r *MetricRepo) GetByServerID(serverID int64, limit int) ([]model.ServerMetric, error) {
