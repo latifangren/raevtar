@@ -26,6 +26,7 @@ templ ServerDetailLive(data ServerDetailData) {
 					<p class="nb-badge bg-retro-yellow text-retro-ink mb-3">Node detail</p>
 					<h1 class="nb-h1 text-retro-cream mb-4">{ data.Server.Name }</h1>
 					<p class="text-sm font-bold text-retro-sageLight">Endpoint hidden on public view.</p>
+					<p class="text-xs font-bold text-retro-muted mt-2">Use admin diagnostics for network details.</p>
 					<div class="flex flex-wrap gap-2 mt-6">
 						<span class="nb-badge bg-retro-paper text-retro-ink">{ ServerStatusTextAt(data.Server.LastSeen, data.RefreshedAt) }</span>
 						<span class="nb-badge bg-retro-sageLight text-retro-ink">{ FreshnessWindowText(data.Server.LastSeen, data.RefreshedAt) }</span>
@@ -118,14 +119,16 @@ templ ServerDetailLive(data ServerDetailData) {
 					<div class="bg-retro-ink text-retro-cream nb-border p-5 nb-shadow">
 						<p class="text-xs font-black uppercase text-retro-yellow mb-1">Latest sample</p>
 						<p class="text-3xl font-black font-mono">{ MetricRecordedAgeText(data.Metrics[0].RecordedAt, data.RefreshedAt) }</p>
-						<p class="text-xs font-bold text-retro-sageLight mt-2">{ MetricSampleCountText(data.Metrics) } samples collected.</p>
+						<p class="text-xs font-bold text-retro-sageLight mt-2">{ MetricSampleCountText(data.Metrics) } · { MetricWindowText(data.Metrics) } · { MetricAvailabilityText(data.Metrics) }</p>
 					</div>
 				</div>
 				
-				<div class="grid gap-8 lg:grid-cols-2">
-					@TopProcessesTable(data.Metrics[0].TopProcesses)
-					@LogStream(data.Metrics[0].Logs)
-				</div>
+				if data.IsAdmin {
+					<div class="grid gap-8 lg:grid-cols-2">
+						@TopProcessesTable(data.Metrics[0].TopProcesses)
+						@LogStream(data.Metrics[0].Logs)
+					</div>
+				}
 			}
 		</section>
 	</div>

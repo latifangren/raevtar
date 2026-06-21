@@ -3,13 +3,14 @@ package handler
 import (
 	"database/sql"
 	"errors"
+	"fmt"
+	"html"
 	"math"
 	"net/http"
 	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
-	"fmt"
 
 	"raevtar/internal/model"
 	"raevtar/internal/service"
@@ -254,11 +255,15 @@ func (h *Handler) nodeStatusShortcode(w http.ResponseWriter, r *http.Request) {
 	name := r.PathValue("name")
 	server, err := h.svc.Monitor.GetServerByName(name)
 	if err != nil {
-		fmt.Fprintf(w, `<div class="nb-card bg-retro-blush p-4 my-6 text-sm font-bold">Node "%s" not found.</div>`, name)
+		fmt.Fprintf(w, `<div class="nb-card bg-retro-blush p-4 my-6 text-sm font-bold">Node "%s" not found.</div>`, html.EscapeString(name))
 		return
 	}
-	metrics, _ := h.svc.Monitor.GetRecentMetrics(server.ID, 1)
-	
+	metrics, err := h.svc.Monitor.GetRecentMetrics(server.ID, 1)
+	if err != nil {
+		// Log but do not fail hard for shortcode
+		h.svc.Admin.LogAudit("system", "METRIC_FETCH_ERROR", err.Error(), clientIP(r))
+	}
+
 	statusColor := "bg-retro-blush"
 	statusText := "Offline"
 	if len(metrics) > 0 && metrics[0].Online {
@@ -534,6 +539,8 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 		return pages.ServerDetailData{}, false
 	}
 
+	_, loggedIn := getSessionEntry(r)
+
 	return pages.ServerDetailData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
@@ -541,6 +548,7 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 		Metrics:     metrics,
 		Categories:  categories,
 		RefreshedAt: time.Now().UTC(),
+		IsAdmin:     loggedIn,
 	}, true
 }
 

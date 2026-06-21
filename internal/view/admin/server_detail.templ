@@ -49,6 +49,36 @@ templ ServerDetail(data ServerDetailData) {
 							</div>
 						</div>
 					</div>
+
+					<div class="nb-card bg-retro-paper p-6">
+						<h3 class="nb-h3 text-xl mb-4">Audit Logs</h3>
+						<div class="overflow-x-auto border-2 border-retro-ink bg-retro-paper">
+							<table class="w-full text-left">
+								<thead>
+									<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+										<th class="py-3 px-4 font-bold">Time</th>
+										<th class="py-3 px-4 font-bold">Action</th>
+										<th class="py-3 px-4 font-bold">User</th>
+										<th class="py-3 px-4 font-bold">Details</th>
+									</tr>
+								</thead>
+								<tbody>
+									if len(data.Logs) == 0 {
+										<tr><td colspan="4" class="py-8 text-center text-retro-muted font-bold text-sm">No audit logs for this server</td></tr>
+									} else {
+										for _, log := range data.Logs {
+											<tr class="border-b-2 border-retro-ink text-xs last:border-b-0">
+												<td class="py-2.5 px-4 text-retro-muted font-mono font-bold whitespace-nowrap">{ log.CreatedAt.Format("02 Jan 15:04") }</td>
+												<td class="py-2.5 px-4"><span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", ActionBadgeClass(log.Action) }>{ log.Action }</span></td>
+												<td class="py-2.5 px-4 font-bold text-retro-ink">{ log.User }</td>
+												<td class="py-2.5 px-4 text-retro-muted font-bold max-w-xs truncate" title={ log.Details }>{ log.Details }</td>
+											</tr>
+										}
+									}
+								</tbody>
+							</table>
+						</div>
+					</div>
 				</div>
 
 				<div class="space-y-6">

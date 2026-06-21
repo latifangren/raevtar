@@ -2,6 +2,7 @@ package pages
 
 import (
 	"encoding/json"
+	"log"
 	"strings"
 )
 
@@ -19,7 +20,9 @@ func parseProcesses(jsonStr string) []ProcessInfo {
 	if jsonStr == "" {
 		return procs
 	}
-	_ = json.Unmarshal([]byte(jsonStr), &procs)
+	if err := json.Unmarshal([]byte(jsonStr), &procs); err != nil {
+		log.Printf("error unmarshaling processes json: %v", err)
+	}
 	return procs
 }
 

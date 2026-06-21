@@ -180,6 +180,7 @@ type ServerDetailData struct {
 	Metrics     []model.ServerMetric
 	Categories  []model.Category
 	RefreshedAt time.Time
+	IsAdmin     bool
 }
 
 type NotFoundData struct {

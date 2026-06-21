@@ -2,6 +2,7 @@ package handler
 
 import (
 	"fmt"
+	"html"
 	"net/http"
 )
 
@@ -45,5 +46,5 @@ func (h *Handler) serveOGImage(w http.ResponseWriter, title, subtitle string) {
 		<!-- Branding -->
 		<rect x="60" y="500" width="200" height="60" fill="#2D3748"/>
 		<text x="80" y="540" font-family="sans-serif" font-size="32" font-weight="bold" fill="#F5F2ED">raevtar.tech</text>
-	</svg>`, subtitle, title)
+	</svg>`, html.EscapeString(subtitle), html.EscapeString(title))
 }

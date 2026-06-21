@@ -15,11 +15,11 @@ func (r *MetricRepo) Insert(m *model.ServerMetric) error {
 				disk_total_gb, temperature_c, temperature_available, uptime_seconds,
 				online, top_processes, logs, recorded_at)
 			VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-			m.ServerID, m.CPUPercent, m.CPULoad1, m.CPULoad5,
-			m.CPULoad15, m.CPUCores, m.RAMUsedMB, m.RAMTotalMB,
-			m.DiskUsedGB, m.DiskTotalGB, m.TemperatureC,
-			m.TemperatureAvailable, m.UptimeSeconds, m.Online, m.TopProcesses, m.Logs, m.RecordedAt,
-		)
+		m.ServerID, m.CPUPercent, m.CPULoad1, m.CPULoad5,
+		m.CPULoad15, m.CPUCores, m.RAMUsedMB, m.RAMTotalMB,
+		m.DiskUsedGB, m.DiskTotalGB, m.TemperatureC,
+		m.TemperatureAvailable, m.UptimeSeconds, m.Online, m.TopProcesses, m.Logs, m.RecordedAt,
+	)
 	return err
 }
 
