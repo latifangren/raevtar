@@ -174,12 +174,14 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	viewCounts, _ := h.svc.Blog.AllPostViewCounts()
 	renderHTML(w, r, adminview.Posts(adminview.PostsData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
 		Posts:       posts,
 		Categories:  categories,
 		MediaAssets: mediaAssets,
+		ViewCounts:  viewCounts,
 	}))
 }
 
@@ -952,13 +954,21 @@ func (h *Handler) adminServerDetail(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+	cmdHistory, err := h.svc.CommandQ.CommandHistory(id, 20)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	_, genToken := popAgentTokenFlash(r)
 	renderHTML(w, r, adminview.ServerDetail(adminview.ServerDetailData{
-		CurrentPath:     r.URL.Path,
-		CSRFToken:       csrfTokenForRequest(r),
-		Server:          server,
-		Metrics:         metrics,
-		Logs:            logs,
-		AgentURLExample: agentURLExample(h.cfg.Domain),
+		CurrentPath:         r.URL.Path,
+		CSRFToken:           csrfTokenForRequest(r),
+		Server:              server,
+		Metrics:             metrics,
+		Logs:                logs,
+		Commands:            cmdHistory,
+		AgentURLExample:     agentURLExample(h.cfg.Domain),
+		GeneratedAgentToken: genToken,
 	}))
 }
 
@@ -1104,9 +1114,13 @@ func (h *Handler) adminServerCommand(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	// For now, we log the command. In a real implementation, this would be queued
-	// in the database for the agent to pick up on the next ping.
-	h.svc.Admin.LogAudit(entry.username, "REMOTE_COMMAND", fmt.Sprintf("Command %s sent to server %d", command, id), clientIP(r))
+	cmd, err := h.svc.CommandQ.QueueCommand(id, command, "")
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	h.svc.Admin.LogAudit(entry.username, "REMOTE_COMMAND",
+		fmt.Sprintf("Command %s queued to server %d (cmd #%d)", command, id, cmd.ID), clientIP(r))
 
 	http.Redirect(w, r, "/admin/servers/"+idStr, http.StatusSeeOther)
 }
@@ -1155,22 +1169,87 @@ func adminHostStats(stats HostStats) adminview.HostStatsData {
 	}
 }
 
-func splitTags(tags string) []string {
-	parts := strings.Split(tags, ",")
-	out := make([]string, 0, len(parts))
-	for _, part := range parts {
-		part = strings.TrimSpace(part)
-		if part != "" {
-			out = append(out, part)
-		}
-	}
-	return out
-}
-
 func parseSortOrder(value string) int {
 	n, err := strconv.Atoi(strings.TrimSpace(value))
 	if err != nil || n < 0 {
 		return 0
 	}
 	return n
+}
+
+func (h *Handler) adminWebhooks(w http.ResponseWriter, r *http.Request) {
+	cfgs, err := h.svc.Webhook.ListConfigs()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	renderHTML(w, r, adminview.Webhooks(adminview.WebhooksData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+		Webhooks:    cfgs,
+	}))
+}
+
+func (h *Handler) adminCreateWebhook(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	name := r.FormValue("name")
+	url := r.FormValue("url")
+	secret := r.FormValue("secret")
+	enabled := r.FormValue("enabled") == "1"
+	if name == "" || url == "" {
+		http.Error(w, "name and url required", http.StatusBadRequest)
+		return
+	}
+	_, err := h.svc.Webhook.CreateConfig(name, url, secret, enabled)
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	http.Redirect(w, r, "/admin/webhooks", http.StatusSeeOther)
+}
+
+func (h *Handler) adminUpdateWebhook(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	id, err := strconv.ParseInt(r.PathValue("webhookID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	cfg, err := h.svc.Webhook.GetConfig(id)
+	if err != nil {
+		http.Error(w, "webhook not found", http.StatusNotFound)
+		return
+	}
+	cfg.Name = r.FormValue("name")
+	cfg.URL = r.FormValue("url")
+	cfg.Secret = r.FormValue("secret")
+	cfg.Enabled = r.FormValue("enabled") == "1"
+	if err := h.svc.Webhook.UpdateConfig(cfg); err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	http.Redirect(w, r, "/admin/webhooks", http.StatusSeeOther)
+}
+
+func (h *Handler) adminDeleteWebhook(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		http.Error(w, "POST required", http.StatusMethodNotAllowed)
+		return
+	}
+	id, err := strconv.ParseInt(r.PathValue("webhookID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid id", http.StatusBadRequest)
+		return
+	}
+	if err := h.svc.Webhook.DeleteConfig(id); err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+	http.Redirect(w, r, "/admin/webhooks", http.StatusSeeOther)
 }

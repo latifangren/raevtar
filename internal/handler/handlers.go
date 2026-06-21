@@ -1,13 +1,16 @@
 package handler
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
 	"fmt"
 	"html"
 	"math"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -448,6 +451,11 @@ func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post not found", http.StatusNotFound)
 		return
 	}
+	// Record view asynchronously (best-effort, fire-and-forget)
+	go func() {
+		hash := sha256.Sum256([]byte(r.RemoteAddr))
+		_ = h.svc.Blog.RecordPostView(post.ID, hex.EncodeToString(hash[:8]))
+	}()
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
 		internalServerError(w, r, err)
@@ -473,6 +481,32 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+
+	activeTag := strings.TrimSpace(r.URL.Query().Get("tag"))
+	tagSet := make(map[string]bool)
+	var filtered []model.Server
+	for _, s := range servers {
+		for _, t := range splitTags(s.Tags) {
+			tagSet[t] = true
+		}
+		if activeTag == "" {
+			filtered = append(filtered, s)
+		} else {
+			for _, t := range splitTags(s.Tags) {
+				if strings.EqualFold(t, activeTag) {
+					filtered = append(filtered, s)
+					break
+				}
+			}
+		}
+	}
+	uniqueTags := make([]string, 0, len(tagSet))
+	for t := range tagSet {
+		uniqueTags = append(uniqueTags, t)
+	}
+	sort.Strings(uniqueTags)
+	servers = filtered
+
 	summaries := make([]pages.PublicServerSummary, 0, len(servers))
 	for _, server := range servers {
 		metrics, err := h.svc.Monitor.GetRecentMetrics(server.ID, 50)
@@ -492,6 +526,8 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		Categories:      categories,
 		PlatformHealth:  publicHostHealth(stats),
 		RefreshedAt:     time.Now().UTC(),
+		ActiveTag:       activeTag,
+		UniqueTags:      uniqueTags,
 	}))
 }
 
@@ -630,6 +666,19 @@ func (h *Handler) serveUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFile(w, r, path)
+}
+
+// splitTags splits comma-separated tags and trims whitespace.
+func splitTags(tags string) []string {
+	parts := strings.Split(tags, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 func (h *Handler) page404(w http.ResponseWriter, r *http.Request) {

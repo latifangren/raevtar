@@ -67,6 +67,15 @@ templ Dashboard(data DashboardData) {
 				<a href="/contact" class="border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper">Contact points readers toward public context first &rarr;</a>
 			</div>
 		</section>
+		if len(data.UniqueTags) > 0 {
+			<div class="flex flex-wrap items-center gap-2 mb-4">
+				<span class="text-xs font-black uppercase tracking-widest text-retro-muted mr-1">Filter:</span>
+				<a href="/dashboard" class={ "text-xs px-3 py-1 font-black uppercase tracking-widest border-2 no-underline", tern(data.ActiveTag == "", "bg-retro-ink text-retro-cream", "bg-retro-paper text-retro-ink hover:bg-retro-yellow") }>All</a>
+				for _, tag := range data.UniqueTags {
+					<a href={ templ.URL("/dashboard?tag=" + tag) } class={ "text-xs px-3 py-1 font-black uppercase tracking-widest border-2 no-underline", tern(data.ActiveTag == tag, "bg-retro-ink text-retro-cream", "bg-retro-paper text-retro-ink hover:bg-retro-yellow") }>{ tag }</a>
+				}
+			</div>
+		}
 		if len(data.Servers) == 0 {
 			<div id="server-list" class="rv-refresh-target bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
 				<p class="text-retro-muted font-bold">Belum ada server terdaftar.</p>
@@ -122,6 +131,6 @@ templ Dashboard(data DashboardData) {
 				}
 			</div>
 		}
-		<div class="mt-4 text-xs font-bold text-retro-muted" hx-get="/dashboard" hx-trigger="every 30s" hx-select="#server-list" hx-target="#server-list" hx-swap="outerHTML" hx-indicator="#server-list">Auto-refresh every 30s</div>
+		<div class="mt-4 text-xs font-bold text-retro-muted" hx-get={ templ.URL(DashboardURL(data.ActiveTag)) } hx-trigger="every 30s" hx-select="#server-list" hx-target="#server-list" hx-swap="outerHTML" hx-indicator="#server-list">Auto-refresh every 30s</div>
 	}
 }

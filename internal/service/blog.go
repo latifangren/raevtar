@@ -427,3 +427,18 @@ func (s *BlogService) uniqueSlug(title string) (string, error) {
 		}
 	}
 }
+
+// RecordPostView records a view for a post from an IP hash.
+func (s *BlogService) RecordPostView(postID int64, ipHash string) error {
+	return s.repos.View.RecordPostView(postID, ipHash)
+}
+
+// PostViewCount returns total views for a post.
+func (s *BlogService) PostViewCount(postID int64) (int, error) {
+	return s.repos.View.CountPostViews(postID)
+}
+
+// AllPostViewCounts returns view counts keyed by post ID for all posts.
+func (s *BlogService) AllPostViewCounts() (map[int64]int, error) {
+	return s.repos.View.CountAllPostViews()
+}

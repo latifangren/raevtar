@@ -163,6 +163,15 @@ func AutoMigrate(db *sqlx.DB) {
 	CREATE INDEX IF NOT EXISTS idx_project_tags_project ON project_tags(project_id);
 	CREATE INDEX IF NOT EXISTS idx_project_tags_tag ON project_tags(tag_id);
 
+	CREATE TABLE IF NOT EXISTS post_views (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+		ip_hash TEXT NOT NULL DEFAULT '',
+		viewed_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_post_views_post ON post_views(post_id);
+
 	CREATE TABLE IF NOT EXISTS page_contents (
 		key TEXT PRIMARY KEY,
 		title TEXT NOT NULL DEFAULT '',
@@ -239,6 +248,44 @@ func AutoMigrate(db *sqlx.DB) {
 	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_status ON editorial_inbox(status);
 	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_not_before ON editorial_inbox(not_before);
 	CREATE INDEX IF NOT EXISTS idx_editorial_inbox_priority ON editorial_inbox(priority);
+
+	CREATE TABLE IF NOT EXISTS server_commands (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		server_id INTEGER NOT NULL REFERENCES servers(id),
+		command TEXT NOT NULL,
+		status TEXT NOT NULL DEFAULT 'pending',
+		payload TEXT DEFAULT '',
+		result TEXT DEFAULT '',
+		queued_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+		started_at DATETIME,
+		completed_at DATETIME
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_server_commands_server ON server_commands(server_id);
+	CREATE INDEX IF NOT EXISTS idx_server_commands_status ON server_commands(status);
+
+	CREATE TABLE IF NOT EXISTS webhook_configs (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		name TEXT NOT NULL,
+		url TEXT NOT NULL,
+		secret TEXT NOT NULL DEFAULT '',
+		enabled INTEGER DEFAULT 1,
+		created_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE TABLE IF NOT EXISTS webhook_events (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		webhook_id INTEGER NOT NULL REFERENCES webhook_configs(id) ON DELETE CASCADE,
+		event_type TEXT NOT NULL,
+		server_id INTEGER NOT NULL DEFAULT 0,
+		payload TEXT DEFAULT '',
+		response_code INTEGER DEFAULT 0,
+		response_body TEXT DEFAULT '',
+		fired_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE INDEX IF NOT EXISTS idx_webhook_events_webhook ON webhook_events(webhook_id);
+	CREATE INDEX IF NOT EXISTS idx_webhook_events_type ON webhook_events(event_type);
 	`
 	if _, err := db.Exec(schema); err != nil {
 		slog.Error("migration failed", "error", err)
@@ -336,6 +383,9 @@ type Repositories struct {
 	Media           *MediaRepo
 	User            *UserRepo
 	Audit           *AuditRepo
+	View            *ViewRepo
+	Command         *CommandRepo
+	Webhook         *WebhookRepo
 }
 
 func New(db *sqlx.DB) *Repositories {
@@ -354,5 +404,8 @@ func New(db *sqlx.DB) *Repositories {
 		Media:           &MediaRepo{db: db},
 		User:            &UserRepo{db: db},
 		Audit:           &AuditRepo{db: db},
+		View:            &ViewRepo{db: db},
+		Command:         &CommandRepo{db: db},
+		Webhook:         &WebhookRepo{db: db},
 	}
 }

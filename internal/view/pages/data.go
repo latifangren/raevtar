@@ -156,6 +156,8 @@ type DashboardData struct {
 	Categories      []model.Category
 	PlatformHealth  PublicHostHealthData
 	RefreshedAt     time.Time
+	ActiveTag       string
+	UniqueTags      []string
 }
 
 type PublicHostHealthData struct {
@@ -591,4 +593,20 @@ func searchPageHref(key string) string {
 	default:
 		return "/"
 	}
+}
+
+// DashboardURL returns "/dashboard" with optional tag query param.
+func DashboardURL(tag string) string {
+	if tag == "" {
+		return "/dashboard"
+	}
+	return "/dashboard?tag=" + tag
+}
+
+// tern returns a if cond is true, otherwise b.
+func tern[T any](cond bool, a, b T) T {
+	if cond {
+		return a
+	}
+	return b
 }

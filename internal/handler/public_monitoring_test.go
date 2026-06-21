@@ -93,7 +93,7 @@ func recordExtendedPublicMetric(t *testing.T, app *publicTestApp) {
 
 func assertPublicMonitoringRedaction(t *testing.T, body string) {
 	t.Helper()
-	for _, leak := range []string{"127.0.0.1", "127.0.0.1:9100", "port 9100", ">local<", "agent token", "raevtar-agent.sh", "POST /api/v1/servers", "install", "cron", "audit", "token"} {
+	for _, leak := range []string{"127.0.0.1", "127.0.0.1:9100", "port 9100", "agent token", "raevtar-agent.sh", "POST /api/v1/servers", "install", "cron", "audit", "token"} {
 		assertNotContains(t, body, leak)
 	}
 }

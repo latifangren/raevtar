@@ -216,6 +216,7 @@ templ Posts(data PostsData) {
 							<th class="py-3 px-4 font-bold">Title</th>
 							<th class="py-3 px-4 font-bold">Category</th>
 							<th class="py-3 px-4 font-bold">Status</th>
+							<th class="py-3 px-4 font-bold text-right">Views</th>
 							<th class="py-3 px-4 font-bold">Date</th>
 							<th class="py-3 px-4"></th>
 						</tr>
@@ -232,6 +233,7 @@ templ Posts(data PostsData) {
 										<span>draft</span>
 									}
 								</td>
+								<td class="py-3 px-4 text-right text-sm font-mono font-bold text-retro-muted">{ tern(data.ViewCounts != nil, CountText(data.ViewCounts[post.ID]), "0") }</td>
 								<td class="py-3 px-4 text-sm font-mono font-bold text-retro-muted">{ post.CreatedAt.Format("2006-01-02") }</td>
 								<td class="py-3 px-4 text-right">
 									<a href={ templ.URL("/admin/posts/edit/" + IDText(post.ID)) } class="text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline">Edit</a>

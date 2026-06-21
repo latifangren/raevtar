@@ -116,6 +116,10 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Post("/servers/rotate-token/{serverID}", h.adminRotateServerToken)
 				r.Post("/servers/delete/{serverID}", h.adminDeleteServer)
 				r.Post("/servers/command/{serverID}", h.adminServerCommand)
+				r.Get("/webhooks", h.adminWebhooks)
+				r.Post("/webhooks", h.adminCreateWebhook)
+				r.Post("/webhooks/update/{webhookID}", h.adminUpdateWebhook)
+				r.Post("/webhooks/delete/{webhookID}", h.adminDeleteWebhook)
 				r.Get("/audit-log", h.adminAuditLog)
 				r.Get("/manage-users", h.adminUsers)
 				r.Post("/manage-users", h.adminCreateUser)
@@ -163,6 +167,8 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		r.With(h.adminAuth).Get("/servers/{serverID}", h.apiGetServer)
 		r.With(h.adminAuth).Post("/servers", h.apiCreateServer)
 		r.Post("/servers/{serverID}/ping", h.apiRecordMetrics)
+		r.Get("/servers/{serverID}/commands", h.apiGetPendingCommands)
+		r.Post("/servers/{serverID}/commands/result", h.apiReportCommandResult)
 	})
 
 	// Store mux for debugging

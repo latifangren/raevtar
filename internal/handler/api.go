@@ -538,6 +538,75 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
+func (h *Handler) apiGetPendingCommands(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("serverID")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if !h.canRecordMetrics(id, r) {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing or invalid agent token"})
+		return
+	}
+
+	cmds, err := h.svc.CommandQ.PendingCommands(id)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	if cmds == nil {
+		cmds = []model.ServerCommand{}
+	}
+	writeJSON(w, http.StatusOK, cmds)
+}
+
+type commandResultRequest struct {
+	CommandID int64  `json:"command_id"`
+	Result    string `json:"result"`
+	Failed    bool   `json:"failed"`
+}
+
+func (h *Handler) apiReportCommandResult(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	idStr := r.PathValue("serverID")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if !h.canRecordMetrics(id, r) {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing or invalid agent token"})
+		return
+	}
+
+	var req commandResultRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	if req.CommandID == 0 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "command_id required"})
+		return
+	}
+
+	if req.Failed {
+		err = h.svc.CommandQ.FailCommand(req.CommandID, req.Result)
+	} else {
+		err = h.svc.CommandQ.CompleteCommand(req.CommandID, req.Result)
+	}
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
 func (h *Handler) canRecordMetrics(serverID int64, r *http.Request) bool {
 	token, ok := bearerToken(r)
 	if !ok {

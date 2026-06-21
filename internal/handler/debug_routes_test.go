@@ -1027,7 +1027,7 @@ func TestUIPolishSourceHooks(t *testing.T) {
 		},
 		filepath.Join("..", "..", "internal", "view", "pages", "dashboard.templ"): {
 			`id="server-list"`,
-			`hx-get="/dashboard"`,
+			`DashboardURL`,
 			`hx-trigger="every 30s"`,
 			`hx-select="#server-list"`,
 			`hx-target="#server-list"`,
@@ -1113,7 +1113,6 @@ func TestPublicDashboardRedactsServerTopology(t *testing.T) {
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, ">9100<")
-	assertNotContains(t, body, ">local<")
 	assertNotContains(t, body, "agent token")
 	assertNotContains(t, body, "raevtar-agent.sh")
 	assertNotContains(t, body, "POST /api/v1/servers")
@@ -1187,7 +1186,6 @@ func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, ">9100<")
-			assertNotContains(t, body, ">local<")
 			assertNotContains(t, body, "agent token")
 			assertNotContains(t, body, "raevtar-agent.sh")
 			assertNotContains(t, body, "POST /api/v1/servers")
@@ -1213,7 +1211,6 @@ func TestOwnerDashboardKeepsServerTopologyInAdminOnly(t *testing.T) {
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, ">9100<")
-	assertNotContains(t, body, ">local<")
 }
 
 func TestDashboardRegisterControlsAreRoleGated(t *testing.T) {

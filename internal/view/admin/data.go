@@ -65,6 +65,7 @@ type PostsData struct {
 	Posts       []model.Post
 	Categories  []model.Category
 	MediaAssets []model.MediaAsset
+	ViewCounts  map[int64]int
 }
 
 type PostEditData struct {
@@ -142,12 +143,20 @@ type ServersData struct {
 }
 
 type ServerDetailData struct {
-	CurrentPath     string
-	CSRFToken       string
-	Server          *model.Server
-	Metrics         []model.ServerMetric
-	Logs            []model.AuditLog
-	AgentURLExample string
+	CurrentPath         string
+	CSRFToken           string
+	Server              *model.Server
+	Metrics             []model.ServerMetric
+	Logs                []model.AuditLog
+	Commands            []model.ServerCommand
+	AgentURLExample     string
+	GeneratedAgentToken string
+}
+
+type WebhooksData struct {
+	CurrentPath string
+	CSRFToken   string
+	Webhooks    []model.WebhookConfig
 }
 
 type EditorialInboxData struct {
@@ -495,6 +504,19 @@ func ActionBadgeClass(action string) string {
 	}
 }
 
+func CommandStatusBadgeClass(status string) string {
+	switch status {
+	case "completed":
+		return "bg-retro-sage text-retro-cream"
+	case "running":
+		return "bg-retro-yellow text-retro-ink"
+	case "failed":
+		return "bg-retro-blush text-retro-ink"
+	default:
+		return "bg-retro-paper text-retro-ink"
+	}
+}
+
 func CategoryBadgeClass(slug string) string {
 	switch slug {
 	case "ai-agent":
@@ -689,4 +711,12 @@ func EditorialItemLockedReason(item model.EditorialInboxItem) string {
 		return "Locked after first execution attempt"
 	}
 	return "Locked by item status"
+}
+
+// tern returns a if cond is true, otherwise b.
+func tern[T any](cond bool, a, b T) T {
+	if cond {
+		return a
+	}
+	return b
 }
