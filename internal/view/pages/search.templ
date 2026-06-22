@@ -17,12 +17,14 @@ templ Search(data SearchData) {
 				class="mb-8 grid gap-6 nb-card md:grid-cols-[1fr_auto_auto] md:items-end"
 				hx-get="/search"
 				hx-target="#search-results"
-				hx-trigger="keyup changed delay:500ms from:#global-search, change from:#scope"
-				hx-push-url="true">
+				hx-trigger="keyup changed delay:300ms from:#global-search, change from:#scope, submit"
+				hx-push-url="true"
+				hx-indicator="#search-indicator">
 				<div>
 					<label for="global-search" class="block text-xs font-black uppercase tracking-widest text-muted mb-2">Search public content</label>
 					<input id="global-search" type="search" name="q" value={ data.Results.Query } 
 						placeholder="Cari notes, projects, pages..." 
+						autocomplete="off"
 						class="w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 				</div>
 				<div>
@@ -40,6 +42,9 @@ templ Search(data SearchData) {
 				</div>
 			</form>
 			
+			<div id="search-indicator" class="htmx-indicator text-center py-4">
+				<span class="text-sm font-bold text-muted animate-pulse">Mencari...</span>
+			</div>
 			<div id="search-results">
 				@SearchResults(data)
 			</div>

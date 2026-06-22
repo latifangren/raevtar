@@ -79,7 +79,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Editorial inbox Phase 3: claim/lock/retry flow buat hindari double-processing antar run Hermes
 - [x] Editorial inbox Phase 4: fairness policy, overdue escalation, dan analytics hasil publish
 - [x] Search endpoint + HTMX search UI (`/search`, `GET /api/v1/search`)
-- [ ] Read-time tracker di artikel
+- [x] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.
 
@@ -102,8 +102,8 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Admin creds via env file (`/home/latif/raevtar/.env.production`)
 - [x] Health check: Hermes cronjob tiap 5 menit (silent if healthy)
 - [ ] Update dependencies periodik (go mod update, npm update)
-- [ ] Alerting sederhana untuk node stale/offline
-- [ ] Versioned schema migration ledger jika migration makin banyak
+- [x] Alerting sederhana untuk node stale/offline — background goroutine tiap 5 menit, threshold 15 menit sejak LastSeen, `server_stale` event ke webhook
+- [x] Versioned schema migration ledger — `schema_migrations` table + v1 backfill untuk existing DB + template untuk future migrations
 - [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
 - [x] Webhook system: threshold alerts (CPU/RAM/disk >= 90%), HMAC-SHA256, admin UI
 - [x] Server command queue: admin queue → agent poll → result report
@@ -112,6 +112,34 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Dynamic OG images (SVG, neo-brutalist, tiap blog post + project)
 - [x] CI/CD pipeline: GitHub Actions test+build + GoReleaser multi-platform releases
 **Deliverable:** Platform cukup stabil untuk personal deployment yang exposed ke internet, dengan hardening dasar dan boundary publik/admin jelas.
+
+---
+
+---
+
+## Fase 7: Iteration & UX 🔄 (done ✅)
+
+Perbaikan berdasarkan audit Hermes + feedback real usage.
+
+- [x] **Server monitoring cleanup** — Fix 401/404 agent ping (server ID 5 token mismatch, server ID 1 deleted). Rotate token, redeploy pake one-liner baru.
+- [x] **HTMX search real-time** — Ganti form submit ke `hx-get="/search" hx-trigger="keyup changed delay:300ms, submit" hx-target="#search-results"`. Loading indicator. `autocomplete="off"`.
+- [x] **RSS feed: verify & promote** — Cek `/blog/feed.xml` isinya proper, tambah link visible di footer / blog page sidebar.
+- [ ] ~~**Dark mode toggle**~~ — Di-skip. Neo-brutalist sudah light-first.
+- [x] **Content scheduling** — `scheduled_at` field (datetime-local picker di admin form), background goroutine publish otomatis tiap 60s.
+- [x] **Media library improvements** — Alt text field (wajib di upload form + display di card). Default dari cleaned filename.
+- [x] **Webmention / IndieWeb** — Receive-only. Link tags di `<head>`, POST endpoint, admin approval flow, display section di blog page.
+- [x] **API docs page** — `/docs/api` dengan contoh request/response tiap endpoint (curl + JSON).
+- [x] **DB export/import dari admin** — Download SQLite via `/admin/db/export`, upload + replace via `/admin/db/import` (SQLite header validation, restart required).
+
+**Deliverable:** Platform lebih mature, UX lebih mulus, konten lebih terkelola.
+
+---
+
+## Known Issues (dari Hermes audit)
+
+- Build berat di aarch64 — `make build` jalan templ-gen + tailwind + go build ~12s + CPU 100%. Pertimbangin cross-compile dari laptop atau `go build -ldflags="-s -w"`.
+- Sitemap nampilin 166 URLs — validasi broken link / page ke-generate.
+- JSON-LD structured data — perlu dicek apakah proper untuk Google Scholar / blog post.
 
 ---
 

@@ -43,20 +43,20 @@ func Search(data SearchData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-accent border-b-2 border-foreground mb-10 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-12 md:py-16\"><p class=\"nb-badge bg-card mb-2\">Public Search</p><h1 class=\"nb-h1 font-head mb-5\">Find posts, projects, and key pages.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">Search stays on public-safe surfaces only: blog posts, project archive, and core pages.</p></div></section><section class=\"mb-12\"><form method=\"get\" action=\"/search\" class=\"mb-8 grid gap-6 nb-card md:grid-cols-[1fr_auto_auto] md:items-end\" hx-get=\"/search\" hx-target=\"#search-results\" hx-trigger=\"keyup changed delay:500ms from:#global-search, change from:#scope\" hx-push-url=\"true\"><div><label for=\"global-search\" class=\"block text-xs font-black uppercase tracking-widest text-muted mb-2\">Search public content</label> <input id=\"global-search\" type=\"search\" name=\"q\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-accent border-b-2 border-foreground mb-10 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-12 md:py-16\"><p class=\"nb-badge bg-card mb-2\">Public Search</p><h1 class=\"nb-h1 font-head mb-5\">Find posts, projects, and key pages.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">Search stays on public-safe surfaces only: blog posts, project archive, and core pages.</p></div></section><section class=\"mb-12\"><form method=\"get\" action=\"/search\" class=\"mb-8 grid gap-6 nb-card md:grid-cols-[1fr_auto_auto] md:items-end\" hx-get=\"/search\" hx-target=\"#search-results\" hx-trigger=\"keyup changed delay:300ms from:#global-search, change from:#scope, submit\" hx-push-url=\"true\" hx-indicator=\"#search-indicator\"><div><label for=\"global-search\" class=\"block text-xs font-black uppercase tracking-widest text-muted mb-2\">Search public content</label> <input id=\"global-search\" type=\"search\" name=\"q\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Results.Query)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/search.templ`, Line: 24, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/search.templ`, Line: 25, Col: 80}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" placeholder=\"Cari notes, projects, pages...\" class=\"w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div><label for=\"scope\" class=\"block text-xs font-black uppercase tracking-widest text-muted mb-2\">Scope</label> <select id=\"scope\" name=\"scope\" class=\"w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"all\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" placeholder=\"Cari notes, projects, pages...\" autocomplete=\"off\" class=\"w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div><label for=\"scope\" class=\"block text-xs font-black uppercase tracking-widest text-muted mb-2\">Scope</label> <select id=\"scope\" name=\"scope\" class=\"w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"all\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -96,7 +96,7 @@ func Search(data SearchData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, ">Pages only</option></select></div><div class=\"flex flex-wrap gap-3\"><button type=\"submit\" class=\"nb-button nb-button-primary py-2 px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Search</button> <a href=\"/search\" class=\"nb-button nb-button-secondary py-2 px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Reset</a></div></form><div id=\"search-results\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, ">Pages only</option></select></div><div class=\"flex flex-wrap gap-3\"><button type=\"submit\" class=\"nb-button nb-button-primary py-2 px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Search</button> <a href=\"/search\" class=\"nb-button nb-button-secondary py-2 px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Reset</a></div></form><div id=\"search-indicator\" class=\"htmx-indicator text-center py-4\"><span class=\"text-sm font-bold text-muted animate-pulse\">Mencari...</span></div><div id=\"search-results\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

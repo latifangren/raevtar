@@ -25,6 +25,10 @@ func NewSiteMetaService(blog *BlogService, projects *ProjectService, domain stri
 	return &SiteMetaService{blog: blog, projects: projects, domain: strings.TrimSpace(domain)}
 }
 
+func (s *SiteMetaService) Domain() string {
+	return s.domain
+}
+
 func (s *SiteMetaService) CanonicalURL(path string) string {
 	path = strings.TrimSpace(path)
 	if path == "" {

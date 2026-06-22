@@ -52,6 +52,7 @@ type BlogPostData struct {
 	SEO         model.SEOData
 	Post        *model.Post
 	Categories  []model.Category
+	Webmentions []model.Webmention
 }
 
 type LabData struct {
@@ -69,6 +70,13 @@ type DocsData struct {
 	Categories   []model.Category
 	PostCount    int
 	ProjectCount int
+}
+
+type APIDocsData struct {
+	CurrentPath string
+	SEO         model.SEOData
+	Categories  []model.Category
+	Host        string
 }
 
 type ProjectsData struct {

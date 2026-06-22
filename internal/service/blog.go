@@ -264,8 +264,19 @@ func (s *BlogService) CreatePost(input model.PostCreate) (*model.Post, error) {
 		Excerpt:       input.Excerpt,
 		CoverImageURL: input.CoverImageURL,
 		Published:     input.Published,
+		ScheduledAt:   input.ScheduledAt,
 		CreatedAt:     time.Now(),
 		UpdatedAt:     time.Now(),
+	}
+	// If scheduled in the future, keep unpublished until scheduler fires.
+	// If scheduled in the past, publish immediately.
+	if input.ScheduledAt != nil {
+		if input.ScheduledAt.After(time.Now()) {
+			post.Published = false
+		} else {
+			post.Published = true
+			post.ScheduledAt = nil
+		}
 	}
 	post.Slug, err = s.uniqueSlug(input.Title)
 	if err != nil {
@@ -358,6 +369,7 @@ func (s *BlogService) UpdatePost(id int64, input model.PostUpdate) (*model.Post,
 	post.Excerpt = input.Excerpt
 	post.CoverImageURL = input.CoverImageURL
 	post.Published = input.Published
+	post.ScheduledAt = input.ScheduledAt
 	post.UpdatedAt = time.Now()
 	if err := s.repos.Post.Update(post); err != nil {
 		return nil, fmt.Errorf("update post: %w", err)
@@ -454,4 +466,19 @@ func (s *BlogService) RecordPostReadTime(postID int64, ipHash string, seconds in
 // AllPostAverageReadTimes returns average read times (in seconds) keyed by post ID.
 func (s *BlogService) AllPostAverageReadTimes() (map[int64]int, error) {
 	return s.repos.View.AveragePostReadTimes()
+}
+
+// PublishScheduled publishes posts whose scheduled_at has passed.
+// Returns the number of posts published.
+func (s *BlogService) PublishScheduled() (int, error) {
+	posts, err := s.repos.Post.ListScheduled(50)
+	if err != nil {
+		return 0, fmt.Errorf("list scheduled posts: %w", err)
+	}
+	for _, p := range posts {
+		if err := s.repos.Post.PublishPost(p.ID); err != nil {
+			return 0, fmt.Errorf("publish post %d: %w", p.ID, err)
+		}
+	}
+	return len(posts), nil
 }

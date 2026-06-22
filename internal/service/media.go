@@ -29,6 +29,7 @@ type MediaService struct {
 type MediaUpload struct {
 	OriginalName string
 	Reader       io.Reader
+	AltText      string
 }
 
 func NewMediaService(repos *repo.Repositories, dir string) *MediaService {
@@ -103,6 +104,13 @@ func (s *MediaService) Upload(input MediaUpload) (*model.MediaAsset, error) {
 		MimeType:     mimeType,
 		SizeBytes:    int64(len(data)),
 	}
+	altText := strings.TrimSpace(input.AltText)
+	if altText == "" {
+		altText = strings.TrimSuffix(name, ext)
+		altText = strings.ReplaceAll(altText, "-", " ")
+		altText = strings.ReplaceAll(altText, "_", " ")
+	}
+	asset.AltText = altText
 	if err := s.repos.Media.Create(asset); err != nil {
 		_ = os.Remove(path)
 		return nil, fmt.Errorf("create media record: %w", err)

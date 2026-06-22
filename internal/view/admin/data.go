@@ -59,6 +59,11 @@ type AuditData struct {
 	Logs        []model.AuditLog
 }
 
+type DBData struct {
+	CurrentPath string
+	CSRFToken   string
+}
+
 type PostsData struct {
 	CurrentPath string
 	CSRFToken   string
@@ -188,6 +193,14 @@ func AgentRunCommand(serverID int64, url, token string) string {
 		token = "paste-token-here"
 	}
 	return "RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " /usr/local/bin/raevtar-agent.sh"
+}
+
+func AgentBootstrapCommand(serverID int64, url, token string) string {
+	url = strings.TrimRight(url, "/")
+	if token == "" {
+		return "curl -fsSL " + url + "/api/v1/bootstrap/" + IDText(serverID) + "/PASTE_TOKEN_HERE | sh"
+	}
+	return "curl -fsSL " + url + "/api/v1/bootstrap/" + IDText(serverID) + "/" + token + " | sh"
 }
 
 func AgentInstallCommand(url string) string {
@@ -541,6 +554,14 @@ func TagsInput(tags []model.Tag) string {
 		parts = append(parts, tag.Name)
 	}
 	return strings.Join(parts, ", ")
+}
+
+// ScheduleInputValue formats a *time.Time for datetime-local input value.
+func ScheduleInputValue(t *time.Time) string {
+	if t == nil || t.IsZero() {
+		return ""
+	}
+	return t.Format("2006-01-02T15:04")
 }
 
 func ProjectStateOptions() []string {

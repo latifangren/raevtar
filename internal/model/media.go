@@ -9,5 +9,6 @@ type MediaAsset struct {
 	URL          string    `db:"url" json:"url"`
 	MimeType     string    `db:"mime_type" json:"mime_type"`
 	SizeBytes    int64     `db:"size_bytes" json:"size_bytes"`
+	AltText      string    `db:"alt_text" json:"alt_text,omitempty"`
 	CreatedAt    time.Time `db:"created_at" json:"created_at"`
 }

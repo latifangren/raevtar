@@ -165,6 +165,51 @@ func (s *WebhookService) fireWebhook(cfg model.WebhookConfig, eventType string, 
 	_ = s.recordEvent(cfg.ID, eventType, serverID, string(body), resp.StatusCode, buf.String())
 }
 
+// FireAlert fires a generic event (no metric payload) to all enabled webhooks.
+// Used for stale-server alerts and similar non-metric notifications.
+func (s *WebhookService) FireAlert(serverID int64, eventType string, message string) {
+	cfgs, err := s.repos.Webhook.ListEnabledConfigs()
+	if err != nil || len(cfgs) == 0 {
+		return
+	}
+	for _, c := range cfgs {
+		go func(cfg model.WebhookConfig) {
+			payload := map[string]string{
+				"event":     eventType,
+				"message":   message,
+				"timestamp": time.Now().UTC().Format(time.RFC3339),
+			}
+			body, err := json.Marshal(payload)
+			if err != nil {
+				slog.Error("fire alert marshal", "error", err)
+				return
+			}
+			req, err := http.NewRequest(http.MethodPost, cfg.URL, bytes.NewReader(body))
+			if err != nil {
+				slog.Error("fire alert request", "error", err)
+				return
+			}
+			req.Header.Set("Content-Type", "application/json")
+			if cfg.Secret != "" {
+				mac := hmac.New(sha256.New, []byte(cfg.Secret))
+				mac.Write(body)
+				sig := hex.EncodeToString(mac.Sum(nil))
+				req.Header.Set("X-Webhook-Signature-256", sig)
+			}
+			resp, err := s.http.Do(req)
+			if err != nil {
+				slog.Error("fire alert", "event", eventType, "url", cfg.URL, "error", err)
+				_ = s.recordEvent(cfg.ID, eventType, serverID, string(body), 0, err.Error())
+				return
+			}
+			defer resp.Body.Close()
+			buf := new(bytes.Buffer)
+			_, _ = buf.ReadFrom(resp.Body)
+			_ = s.recordEvent(cfg.ID, eventType, serverID, string(body), resp.StatusCode, buf.String())
+		}(c)
+	}
+}
+
 func (s *WebhookService) recordEvent(webhookID int64, eventType string, serverID int64, payload string, code int, body string) error {
 	evt := &model.WebhookEvent{
 		WebhookID:    webhookID,

@@ -141,6 +141,21 @@ func (h *Handler) docsPage(w http.ResponseWriter, r *http.Request) {
 	}))
 }
 
+func (h *Handler) apiDocsPage(w http.ResponseWriter, r *http.Request) {
+	categories, err := h.svc.Blog.ListCategories()
+	if err != nil {
+		internalServerError(w, r, err)
+		return
+	}
+
+	renderHTML(w, r, pages.APIDocs(pages.APIDocsData{
+		CurrentPath: r.URL.Path,
+		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
+		Categories:  categories,
+		Host:        h.svc.SiteMeta.Domain(),
+	}))
+}
+
 func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	if page < 1 {
@@ -462,11 +477,13 @@ func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	mentions, _ := h.svc.Webmention.ListByPost(post.ID, true)
 	renderHTML(w, r, pages.BlogPost(pages.BlogPostData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.BlogPostSEO(post),
 		Post:        post,
 		Categories:  categories,
+		Webmentions: mentions,
 	}))
 }
 

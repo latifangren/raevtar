@@ -15,6 +15,8 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 			<link rel="stylesheet" href="/static/css/style.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 			<link rel="alternate" type="application/rss+xml" title="Raevtar" href="https://raevtar.tech/blog/feed.xml"/>
+			<link rel="webmention" href="https://raevtar.tech/webmention"/>
+			<link rel="pingback" href="https://raevtar.tech/webmention"/>
 			if seo.CanonicalURL != "" {
 				<link rel="canonical" href={ seo.CanonicalURL }/>
 			}

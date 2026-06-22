@@ -170,7 +170,7 @@ func BlogList(data BlogListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div></div></div></div></section><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-8\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Latest dispatches</p><h2 class=\"nb-h2 font-head text-3xl\">Field Notes</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><hr class=\"nb-border my-4\"><a href=\"/blog/feed.xml\" class=\"flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted hover:text-foreground no-underline transition-colors\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 11a9 9 0 0 1 9 9\"></path><path d=\"M4 4a16 16 0 0 1 16 16\"></path><circle cx=\"5\" cy=\"19\" r=\"1\"></circle></svg> Subscribe RSS</a></div></div></div></div></section><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-8\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Latest dispatches</p><h2 class=\"nb-h2 font-head text-3xl\">Field Notes</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -182,7 +182,7 @@ func BlogList(data BlogListData) templ.Component {
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ResultCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 53, Col: 79}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 58, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func BlogList(data BlogListData) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(data.Query)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 53, Col: 106}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 58, Col: 106}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {

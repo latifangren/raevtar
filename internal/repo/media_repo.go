@@ -10,9 +10,9 @@ type MediaRepo struct{ db *sqlx.DB }
 
 func (r *MediaRepo) Create(asset *model.MediaAsset) error {
 	result, err := r.db.Exec(`
-		INSERT INTO media_assets (original_name, stored_name, url, mime_type, size_bytes)
-		VALUES (?, ?, ?, ?, ?)`,
-		asset.OriginalName, asset.StoredName, asset.URL, asset.MimeType, asset.SizeBytes,
+		INSERT INTO media_assets (original_name, stored_name, url, mime_type, size_bytes, alt_text)
+		VALUES (?, ?, ?, ?, ?, ?)`,
+		asset.OriginalName, asset.StoredName, asset.URL, asset.MimeType, asset.SizeBytes, asset.AltText,
 	)
 	if err != nil {
 		return err

@@ -1622,28 +1622,19 @@ func TestAdminCreateServerShowsAgentInstallToken(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	assertContains(t, body, "One-time agent token")
-	assertContains(t, body, "Copy before leaving or reloading")
-	assertContains(t, body, "Copy token")
-	assertContains(t, body, `data-copy-target="server-2-agent-token"`)
-	assertContains(t, body, `id="server-2-agent-token"`)
-	assertContains(t, body, "Copy install command")
-	assertContains(t, body, "Copy run command")
-	assertContains(t, body, "Copy cron line")
-	assertContains(t, body, `data-copy-target="server-2-install-command"`)
-	assertContains(t, body, `data-copy-target="server-2-run-command"`)
-	assertContains(t, body, `data-copy-target="server-2-cron-command"`)
+	assertContains(t, body, "New token generated")
+	assertContains(t, body, "Copy the one-liner below")
+	assertContains(t, body, `data-copy-target="bootstrap-2"`)
+	assertContains(t, body, `id="bootstrap-2"`)
 	assertContains(t, body, `data-confirm="Rotate agent token?`)
 	assertContains(t, body, `data-confirm="Delete this server?`)
 	assertContains(t, body, `data-confirm="Register this server and issue a one-time agent token?"`)
-	assertContains(t, body, "raevtar-agent.sh")
-	assertContains(t, body, "RAEVTAR_URL=https://raevtar.test")
-	assertContains(t, body, "RAEVTAR_SERVER_ID=2")
-	assertContains(t, body, "RAEVTAR_AGENT_TOKEN=")
+	assertContains(t, body, "/api/v1/bootstrap/2/")
+	assertContains(t, body, "| sh")
 	assertNotContains(t, body, `data-copy-target="`+app.svc.Cfg.AdminKey)
 
 	_, secondBody := getBody(t, app, "/admin/servers", &http.Cookie{Name: sessionCookieName, Value: token})
-	assertNotContains(t, secondBody, "One-time agent token")
+	assertNotContains(t, secondBody, "New token generated")
 }
 
 func TestAdminServersEmptyStateShowsSetupAffordances(t *testing.T) {
@@ -1681,7 +1672,7 @@ func TestAdminServersEmptyStateShowsSetupAffordances(t *testing.T) {
 	} {
 		assertContains(t, body, want)
 	}
-	for _, leak := range []string{"One-time agent token", "Copy token", `data-copy-target="server-`, "Copy install command", "Copy run command", "Copy cron line", "RAEVTAR_AGENT_TOKEN=", "paste-token-here", "raevtar-agent.sh"} {
+	for _, leak := range []string{"New token generated", "RAEVTAR_AGENT_TOKEN=", "paste-token-here", "raevtar-agent.sh"} {
 		assertNotContains(t, body, leak)
 	}
 }
@@ -1700,10 +1691,7 @@ func TestPublicPagesDoNotLeakAdminAgentSetupAffordances(t *testing.T) {
 				"RAEVTAR_AGENT_TOKEN=",
 				"paste-token-here",
 				"raevtar-agent.sh",
-				"Copy install command",
-				"Copy run command",
-				"Copy cron line",
-				"One-time agent token",
+				"One-liner setup",
 				"data-copy-target",
 			} {
 				assertNotContains(t, body, leak)
@@ -1731,7 +1719,7 @@ func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("owner status = %d, want %d", status, http.StatusOK)
 	}
-	for _, want := range []string{"whyred", "127.0.0.1", "9100", "local", "Remote Command Center", "Node Metadata", "Audit Logs", "Agent Config", "Restart Agent", "Clear Cache", "Reboot Node", "Update Agent", "Rotate Token", "Ping Endpoint", "Agent Secret Token", "token missing"} {
+	for _, want := range []string{"whyred", "127.0.0.1", "9100", "local", "Remote Command Center", "Node Metadata", "Audit Logs", "Agent Setup", "Rotate Token", "token missing"} {
 		assertContains(t, body, want)
 	}
 	for _, want := range []string{
@@ -1740,7 +1728,7 @@ func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
 	} {
 		assertContains(t, body, want)
 	}
-	assertNotContains(t, body, "One-time agent token")
+	assertNotContains(t, body, "New token generated")
 	assertNotContains(t, body, "agent_token_hash")
 
 	status, body = getBody(t, app, "/admin/servers/1", &http.Cookie{Name: sessionCookieName, Value: readonlyToken})
@@ -1994,7 +1982,7 @@ func TestAdminMediaUploadStoresServesAndCanCoverPost(t *testing.T) {
 	}
 	assertContains(t, body, "cover.png")
 	assertContains(t, body, asset.URL)
-	assertContains(t, body, "![cover.png]("+asset.URL+")")
+	assertContains(t, body, "![cover]("+asset.URL+")")
 
 	status, body = getBody(t, app, asset.URL, nil)
 	if status != http.StatusOK {

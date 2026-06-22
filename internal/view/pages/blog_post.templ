@@ -41,6 +41,27 @@ templ BlogPost(data BlogPostData) {
 				}
 				<div class="prose text-foreground">@templ.Raw(data.Post.ContentHTML)</div>
 			</div>
+			if len(data.Webmentions) > 0 {
+				<div class="max-w-4xl mx-auto mt-8 bg-card nb-border p-5 md:p-8 nb-shadow">
+					<h3 class="text-sm font-black uppercase tracking-widest text-muted mb-4">Webmentions & replies</h3>
+					<div class="space-y-4">
+						for _, wm := range data.Webmentions {
+							<div class="nb-border bg-background p-4">
+								if wm.Title != "" {
+									<p class="text-sm font-black text-foreground">{ wm.Title }</p>
+								}
+								if wm.Author != "" {
+									<p class="text-xs font-bold text-muted mt-1">{ wm.Author }</p>
+								}
+								if wm.Content != "" {
+									<p class="text-sm font-bold text-foreground mt-2">{ wm.Content }</p>
+								}
+								<a href={ wm.SourceURL } target="_blank" rel="noopener noreferrer" class="inline-block mt-2 text-xs font-bold text-muted hover:text-foreground no-underline underline-offset-2 hover:underline">source &rarr;</a>
+							</div>
+						}
+					</div>
+				</div>
+			}
 			<div class="mt-8 pt-4 border-t-2 border-foreground">
 				<a href="/blog" class="font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><span aria-hidden="true">&larr;</span> Back to blog</a>
 			</div>

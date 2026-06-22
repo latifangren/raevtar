@@ -112,9 +112,9 @@ func (r *PostRepo) GetByID(id int64) (*model.Post, error) {
 
 func (r *PostRepo) Create(p *model.Post) error {
 	result, err := r.db.Exec(`
-		INSERT INTO posts (category_id, title, slug, content_md, excerpt, cover_image_url, published)
-		VALUES (?, ?, ?, ?, ?, ?, ?)`,
-		p.CategoryID, p.Title, p.Slug, p.ContentMD, p.Excerpt, p.CoverImageURL, p.Published,
+		INSERT INTO posts (category_id, title, slug, content_md, excerpt, cover_image_url, published, scheduled_at)
+		VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
+		p.CategoryID, p.Title, p.Slug, p.ContentMD, p.Excerpt, p.CoverImageURL, p.Published, p.ScheduledAt,
 	)
 	if err != nil {
 		return err
@@ -127,9 +127,9 @@ func (r *PostRepo) Create(p *model.Post) error {
 func (r *PostRepo) Update(p *model.Post) error {
 	_, err := r.db.Exec(`
 		UPDATE posts
-		SET category_id = ?, title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, updated_at = ?
+		SET category_id = ?, title = ?, content_md = ?, excerpt = ?, cover_image_url = ?, published = ?, scheduled_at = ?, updated_at = ?
 		WHERE id = ?`,
-		p.CategoryID, p.Title, p.ContentMD, p.Excerpt, p.CoverImageURL, p.Published, p.UpdatedAt, p.ID,
+		p.CategoryID, p.Title, p.ContentMD, p.Excerpt, p.CoverImageURL, p.Published, p.ScheduledAt, p.UpdatedAt, p.ID,
 	)
 	return err
 }
@@ -188,4 +188,25 @@ func (r *PostRepo) CountByCategoryID(categoryID int64) (int, error) {
 		return 0, err
 	}
 	return count, nil
+}
+
+// ListScheduled returns unpublished posts whose scheduled_at has passed.
+func (r *PostRepo) ListScheduled(limit int) ([]model.Post, error) {
+	var posts []model.Post
+	query := `
+		SELECT p.*, c.name AS category_name, c.slug AS category_slug
+		FROM posts p JOIN categories c ON p.category_id = c.id
+		WHERE p.published = 0 AND p.scheduled_at IS NOT NULL AND p.scheduled_at <= datetime('now')
+		ORDER BY p.scheduled_at ASC LIMIT ?`
+	if err := r.db.Select(&posts, query, limit); err != nil {
+		return nil, err
+	}
+	return posts, nil
+}
+
+// PublishPost flips a post to published and clears the scheduled_at.
+func (r *PostRepo) PublishPost(id int64) error {
+	_, err := r.db.Exec(`
+		UPDATE posts SET published = 1, scheduled_at = NULL, updated_at = CURRENT_TIMESTAMP WHERE id = ?`, id)
+	return err
 }

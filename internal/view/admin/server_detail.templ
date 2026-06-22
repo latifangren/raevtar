@@ -116,33 +116,73 @@ templ ServerDetail(data ServerDetailData) {
 
 				<div class="space-y-6">
 					<div class="nb-card bg-card p-6">
-						<h3 class="nb-h3 font-head text-xl mb-4">Agent Config</h3>
+						<h3 class="nb-h3 font-head text-xl mb-4">Agent Setup</h3>
+						<p class="text-sm font-bold text-muted mb-4">Single command — paste on the target device. Auto-detects OS, installs deps, and starts monitoring.</p>
 						<div class="space-y-3">
-							@copyableCommandBlock("Ping Endpoint", "Copy URL", "agent-url", data.AgentURLExample)
+							@copyableCommandBlock("One-liner setup", "Copy", "bootstrap-"+IDText(data.Server.ID), AgentBootstrapCommand(data.Server.ID, data.AgentURLExample, data.GeneratedAgentToken))
 							<div class="p-3 bg-foreground text-secondary rounded-sm overflow-hidden border-2 border-foreground">
-								<p class="text-[10px] font-bold uppercase mb-2 text-accent">Agent Secret Token</p>
-								<p class="text-xs font-mono break-all opacity-80">********************************</p>
-								<p class="text-[10px] mt-2 italic">Token is hashed. Rotate to get a new one.</p>
+								<p class="text-[10px] font-bold uppercase mb-2 text-accent">Token Status</p>
+								if data.GeneratedAgentToken != "" {
+									<p class="text-xs font-mono break-all">{ data.GeneratedAgentToken }</p>
+									<p class="text-[10px] mt-2 italic">Copy the one-liner above now — token won't be shown again.</p>
+								} else {
+									<p class="text-xs font-mono break-all opacity-80">********************************</p>
+									<p class="text-[10px] mt-2 italic">Token hidden. Rotate to get a new one-liner.</p>
+								}
 							</div>
 							<form method="POST" action={ templ.URL("/admin/servers/rotate-token/" + IDText(data.Server.ID)) } data-confirm="Rotate token? Existing agent will stop working until updated.">
 								<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
-								<button type="submit" class="w-full nb-button nb-button-secondary py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Rotate Token</button>
+								<button type="submit" class="w-full nb-button nb-button-secondary py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Rotate Token & Show New One-Liner</button>
 							</form>
 						</div>
 					</div>
 
 					<div class="nb-card bg-card p-6">
-						<h3 class="nb-h3 font-head text-xl mb-4">Agent Setup</h3>
-						<p class="text-sm font-bold text-muted mb-4">Copy these commands to install and run the agent on the target server.</p>
-						<div class="space-y-3">
-							@copyableCommandBlock("1. install agent", "Copy install", "agent-install-"+IDText(data.Server.ID), AgentInstallCommand(data.AgentURLExample))
-							@copyableCommandBlock("2. test run", "Copy run", "agent-run-"+IDText(data.Server.ID), AgentRunCommand(data.Server.ID, data.AgentURLExample, data.GeneratedAgentToken))
-							@copyableCommandBlock("3. cron every minute", "Copy cron", "agent-cron-"+IDText(data.Server.ID), AgentCronLine(data.Server.ID, data.AgentURLExample, data.GeneratedAgentToken))
+						<h3 class="nb-h3 font-head text-xl mb-4">Remote Commands</h3>
+						<p class="text-sm font-bold text-muted mb-4">Safe management actions for this node. Queued and picked up by agent on next ping.</p>
+						<div class="grid gap-4 sm:grid-cols-2">
+							@remoteCommandButton(data.Server.ID, "RESTART_AGENT", "Restart Agent", "bg-accent text-foreground", data.CSRFToken)
+							@remoteCommandButton(data.Server.ID, "CLEAR_CACHE", "Clear Cache", "bg-secondary text-secondary-foreground", data.CSRFToken)
+							@remoteCommandButton(data.Server.ID, "REBOOT_NODE", "Reboot Node", "bg-destructive text-destructive-foreground", data.CSRFToken)
+							@remoteCommandButton(data.Server.ID, "UPDATE_AGENT", "Update Agent", "bg-success text-success-foreground", data.CSRFToken)
 						</div>
 					</div>
-				</div>
+
+					if len(data.Commands) > 0 {
+						<div class="nb-card bg-card p-6">
+							<h3 class="nb-h3 font-head text-xl mb-4">Recent Commands</h3>
+							<div class="overflow-x-auto nb-border bg-card">
+								<table class="w-full text-left">
+									<thead>
+										<tr class="border-b-2 border-foreground text-xs uppercase bg-foreground text-primary-foreground">
+											<th class="py-2 px-3 font-bold">Command</th>
+											<th class="py-2 px-3 font-bold">Status</th>
+											<th class="py-2 px-3 font-bold">Result</th>
+											<th class="py-2 px-3 font-bold">Time</th>
+										</tr>
+									</thead>
+									<tbody>
+										for _, cmd := range data.Commands {
+											<tr class="border-b-2 border-foreground text-xs last:border-b-0">
+												<td class="py-2 px-3 font-mono font-bold text-foreground">{ cmd.Command }</td>
+												<td class="py-2 px-3">
+													<span class={ "text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono",
+														CommandStatusBadgeClass(string(cmd.Status)) }>
+														{ string(cmd.Status) }
+													</span>
+												</td>
+												<td class="py-2 px-3 text-muted font-bold max-w-[200px] truncate" title={ cmd.Result }>{ tern(cmd.Result != "", cmd.Result, "—") }</td>
+												<td class="py-2 px-3 text-muted font-mono font-bold whitespace-nowrap">{ cmd.QueuedAt.Format("02 Jan 15:04") }</td>
+											</tr>
+										}
+									</tbody>
+								</table>
+							</div>
+						</div>
+					}
 			</div>
 		</div>
+	</div>
 	}
 }
 
