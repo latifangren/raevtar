@@ -7,8 +7,8 @@ import (
 templ BlogPost(data BlogPostData) {
 @page(data.Post.Title + " — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<article class="mb-12" data-post-id={ fmt.Sprintf("%d", data.Post.ID) }>
-			<header class="full-width bg-success border-b-2 border-foreground mb-10 overflow-hidden">
-				<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">
+		<header class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 					<a href="/blog" class="inline-flex items-center gap-1.5 mb-6 px-4 py-2 nb-border bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><span aria-hidden="true">&larr;</span> Back to blog</a>
 					<div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end">
 						<div>
@@ -35,6 +35,7 @@ templ BlogPost(data BlogPostData) {
 					</div>
 				</div>
 			</header>
+		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 			<div class="max-w-4xl mx-auto bg-card nb-border p-5 md:p-8 nb-shadow">
 				if data.Post.CoverImageURL != "" {
 					<img src={ data.Post.CoverImageURL } alt={ data.Post.Title } class="w-full max-h-[460px] object-cover nb-border bg-background mb-6"/>
@@ -65,6 +66,7 @@ templ BlogPost(data BlogPostData) {
 			<div class="mt-8 pt-4 border-t-2 border-foreground">
 				<a href="/blog" class="font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><span aria-hidden="true">&larr;</span> Back to blog</a>
 			</div>
+		</div>
 		</article>
 		<script defer src="/static/js/read-tracker.js"></script>
 	}

@@ -1,112 +1,112 @@
 package pages
 
-import "raevtar/internal/view/components"
-
 templ Index(data IndexData) {
 	@page("Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="mb-20 text-center">
-			<div class="inline-block nb-badge bg-accent mb-6">Available for Projects</div>
-			<h1 class="nb-h1 font-head mb-8">
-				NOT EVERY WEBSITE HAS TO <br/>
-				<span class="bg-accent px-4 nb-border inline-block transform -rotate-1">LOOK THE SAME!</span>
-			</h1>
-			<p class="text-xl md:text-2xl font-bold max-w-3xl mx-auto mb-10 text-muted">
-				A bold, modern Go + Templ + HTMX platform for project notes, server monitoring, and automation.
-			</p>
-			<div class="flex flex-wrap justify-center gap-6">
-				<a href="/blog" class="nb-button nb-button-primary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Browse Notes</a>
-				<a href="/dashboard" class="nb-button nb-button-secondary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Live Status <span aria-hidden="true">&rarr;</span></a>
-			</div>
-		</section>
-
-		<div class="marquee-container mb-20 -mx-4 md:-mx-8 lg:-mx-12" aria-hidden="true">
-			<div class="marquee-content">
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">GO 1.26</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">HTMX REFRESH LOOPS</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">SQLITE FIELD NOTES</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">PUBLIC-SAFE MONITOR BOARD</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">LAB AUTOMATION RAILS</span>
-				<!-- Duplicate for seamless loop -->
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">GO 1.26</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">HTMX REFRESH LOOPS</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">SQLITE FIELD NOTES</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">PUBLIC-SAFE MONITOR BOARD</span>
-				<span class="text-2xl font-black uppercase tracking-tighter mx-8">LAB AUTOMATION RAILS</span>
-			</div>
-		</div>
-
-		<section class="grid gap-8 md:grid-cols-3 mb-20">
-			<div class="nb-card hover:bg-accent transition-colors group">
-				<div class="h-12 w-12 nb-border bg-foreground text-background flex items-center justify-center font-black text-xl mb-6 group-hover:bg-card group-hover:text-foreground">01</div>
-				<h3 class="text-2xl font-black uppercase mb-4">Project Log</h3>
-				<p class="font-bold text-muted mb-6">Fresh research, tools, security notes, and devops logs stay readable from the public blog.</p>
-				<a href="/blog" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Browse posts <span aria-hidden="true">&rarr;</span></a>
-			</div>
-			<div class="nb-card bg-accent">
-				<div class="h-12 w-12 nb-border bg-foreground text-background flex items-center justify-center font-black text-xl mb-6">02</div>
-				<h3 class="text-2xl font-black uppercase mb-4">Monitor Grid</h3>
-				<p class="font-bold text-foreground mb-6">Server health gets compact cards with public-safe status summaries and direct drill-down links.</p>
-				<a href="/dashboard" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Open status <span aria-hidden="true">&rarr;</span></a>
-			</div>
-			<div class="nb-card hover:bg-accent transition-colors group">
-				<div class="h-12 w-12 nb-border bg-foreground text-background flex items-center justify-center font-black text-xl mb-6 group-hover:bg-card group-hover:text-foreground">03</div>
-				<h3 class="text-2xl font-black uppercase mb-4">Automation API</h3>
-				<p class="font-bold text-muted mb-6">Hermes can publish posts, ping monitors, and inspect categories through documented endpoints.</p>
-				<a href="/docs" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Read docs <span aria-hidden="true">&rarr;</span></a>
-			</div>
-		</section>
-
-		<section class="mb-20 nb-card !p-0 overflow-hidden">
-			<div class="grid lg:grid-cols-2">
-				<div class="bg-foreground text-background p-8 md:p-12 flex flex-col justify-center">
-					<div class="nb-badge bg-accent text-foreground border-background mb-6 self-start">Platform Showcase</div>
-					<h2 class="text-4xl md:text-5xl font-black uppercase leading-none mb-6">Small server, loud interface.</h2>
-					<p class="text-lg font-bold opacity-80 mb-8">Raevtar is the public surface for a personal lab: notes on one side, machine telemetry on the other, plus API rails for automation.</p>
-					<div class="flex flex-wrap gap-3">
-						<span class="nb-badge bg-transparent border-background">Go 1.26</span>
-						<span class="nb-badge bg-transparent border-background">Templ</span>
-						<span class="nb-badge bg-transparent border-background">HTMX</span>
-					</div>
+		<!-- Hero -->
+		<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8 text-center">
+				<div class="inline-block nb-badge bg-accent mb-6">Available for Projects</div>
+				<h1 class="nb-h1 font-head mb-8">
+					NOT EVERY WEBSITE HAS TO <br/>
+					<span class="bg-accent px-4 nb-border inline-block transform -rotate-1">LOOK THE SAME!</span>
+				</h1>
+				<p class="text-xl md:text-2xl font-bold max-w-3xl mx-auto mb-10 text-muted">
+					A bold, modern Go + Templ + HTMX platform for project notes, server monitoring, and automation.
+				</p>
+				<div class="flex flex-wrap justify-center gap-6">
+					<a href="/blog" class="nb-button nb-button-primary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Browse Notes</a>
+					<a href="/dashboard" class="nb-button nb-button-secondary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Live Status <span aria-hidden="true">&rarr;</span></a>
 				</div>
-				<div class="p-8 md:p-12 grid grid-cols-2 gap-6 bg-card">
-					<div class="nb-card bg-accent flex flex-col items-center justify-center text-center">
-						<span class="text-5xl font-black mb-2">{ PortText(data.PostCount) }</span>
-						<span class="text-xs font-black uppercase tracking-widest">Posts</span>
-					</div>
-					<div class="nb-card flex flex-col items-center justify-center text-center">
-						<span class="text-5xl font-black mb-2">{ PortText(len(data.Categories)) }</span>
-						<span class="text-xs font-black uppercase tracking-widest">Topics</span>
-					</div>
-					<div class="nb-card col-span-2 bg-foreground text-background">
-						<p class="font-mono text-sm mb-4 uppercase tracking-widest">System Status: Online</p>
-						<div class="w-full bg-card/20 h-4 nb-border border-background relative">
-							<div class="absolute inset-0 bg-accent w-3/4"></div>
+			</div>
+		</section>
+
+		<!-- Marquee: full-width black bar -->
+		<section class="w-full bg-foreground border-y-2 border-foreground py-3 overflow-hidden" aria-hidden="true">
+			<div class="marquee-container">
+				<div class="marquee-content">
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">GO 1.26</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">HTMX REFRESH LOOPS</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">SQLITE FIELD NOTES</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">PUBLIC-SAFE MONITOR BOARD</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">LAB AUTOMATION RAILS</span>
+					<!-- Duplicate for seamless loop -->
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">GO 1.26</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">HTMX REFRESH LOOPS</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">SQLITE FIELD NOTES</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">PUBLIC-SAFE MONITOR BOARD</span>
+					<span class="text-2xl font-black uppercase tracking-tighter mx-8 text-background">LAB AUTOMATION RAILS</span>
+				</div>
+			</div>
+		</section>
+
+		<!-- Feature grid -->
+		<section class="w-full bg-background py-12 md:py-16">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
+				<div class="mb-8">
+					<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">The Feature Board</p>
+					<h2 class="text-3xl md:text-4xl font-black font-head uppercase">Everything ships here.</h2>
+				</div>
+				<div class="grid gap-4 md:grid-cols-2">
+					<div class="bg-card nb-border p-6 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_var(--retro-ink)] transition-all duration-200">
+						<div class="flex items-center gap-2 mb-4">
+							<span class="nb-badge nb-badge-surface">Blog</span>
 						</div>
+						<p class="text-2xl font-black font-head mb-2">Project notes.</p>
+						<p class="text-sm font-bold text-muted">Field dispatches from small-machine lab.</p>
+					</div>
+					<div class="bg-card nb-border p-6 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_var(--retro-ink)] transition-all duration-200">
+						<div class="flex items-center gap-2 mb-4">
+							<span class="nb-badge bg-success text-background">Live</span>
+						</div>
+						<p class="text-2xl font-black font-head mb-2">Server board.</p>
+						<p class="text-sm font-bold text-muted">Public-safe signal board showing status windows.</p>
+					</div>
+					<div class="bg-card nb-border p-6 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_var(--retro-ink)] transition-all duration-200">
+						<div class="flex items-center gap-2 mb-4">
+							<span class="nb-badge nb-badge-outline">Docs</span>
+						</div>
+						<p class="text-2xl font-black font-head mb-2">Docs.</p>
+						<p class="text-sm font-bold text-muted">Public API boundaries and platform shape.</p>
+					</div>
+					<div class="bg-card nb-border p-6 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-[1px_1px_0px_0px_var(--retro-ink)] transition-all duration-200">
+						<div class="flex items-center gap-2 mb-4">
+							<span class="nb-badge nb-badge-surface">Lab</span>
+						</div>
+						<p class="text-2xl font-black font-head mb-2">Lab.</p>
+						<p class="text-sm font-bold text-muted">Signal room and automation rails.</p>
 					</div>
 				</div>
 			</div>
 		</section>
 
-		if len(data.Posts) > 0 {
-			<section class="mb-20">
-				<div class="flex items-center justify-between mb-8">
-					<h2 class="nb-h2 font-head mb-0">Latest Posts</h2>
-					<a href="/blog" class="nb-button nb-button-secondary py-2 px-4 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">View all</a>
+		<!-- Quote card -->
+		<section class="w-full bg-background py-10">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
+				<div class="bg-accent nb-border p-8 nb-shadow-lg -rotate-1 relative">
+					<div class="absolute -top-4 -left-4 w-12 h-12 bg-destructive nb-border nb-shadow" aria-hidden="true"></div>
+					<blockquote class="text-xl md:text-2xl font-black font-head uppercase mb-4">
+						NOT EVERY WEBSITE HAS TO LOOK THE SAME!
+					</blockquote>
+					<cite class="text-sm font-bold text-muted not-italic">Raevtar Design Manifesto</cite>
 				</div>
-				<div class="grid gap-8">
-					for _, post := range data.Posts {
-						@components.PostCard(post)
-					}
-				</div>
-			</section>
-		}
+			</div>
+		</section>
 
-		<section class="mb-20 bg-accent nb-border nb-shadow p-12 text-center">
-			<h2 class="nb-h2 font-head mb-6">Build Faster with 200+ Blocks</h2>
-			<p class="text-xl font-bold mb-10 max-w-2xl mx-auto">Discover scalable UI components designed for landing pages, SaaS dashboards, and modern web apps.</p>
-			<a href="/projects" class="nb-button bg-foreground text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Explore Projects <span aria-hidden="true">&rarr;</span></a>
+		<!-- CTA -->
+		<section class="w-full bg-accent border-y-2 border-foreground py-16 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
+				<h2 class="text-3xl md:text-5xl font-head font-black uppercase leading-tight mb-8">Start building. No gatekeeping.</h2>
+				<a href="/contact" class="nb-button nb-button-secondary nb-button-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Open the contact card</a>
+			</div>
+		</section>
+
+		<!-- Footer banner (black bar) -->
+		<section class="w-full bg-foreground border-y-2 border-foreground py-8">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
+				<p class="text-xs font-black uppercase tracking-widest text-secondary text-center">
+					Single Go binary. Zero cold-starts. Public notes. Private diagnostics.
+				</p>
+			</div>
 		</section>
 	}
 }
-
-

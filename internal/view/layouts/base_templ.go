@@ -238,7 +238,7 @@ func Base(title string, currentPath string, categories []model.Category, seo mod
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</head><body class=\"min-h-screen bg-background text-foreground antialiased selection:bg-accent selection:text-accent-foreground\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "</head><body class=\"min-h-screen bg-background text-foreground antialiased selection:bg-accent selection:text-accent-foreground\"><!-- Nav: full-width bar, sticky --><section class=\"w-full bg-card border-b-2 border-foreground sticky top-0 z-50\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -246,7 +246,7 @@ func Base(title string, currentPath string, categories []model.Category, seo mod
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "<main role=\"main\" aria-label=\"Main content\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "</div></section><!-- Main content: pages control their own section widths --><main role=\"main\" aria-label=\"Main content\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -254,7 +254,7 @@ func Base(title string, currentPath string, categories []model.Category, seo mod
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</main>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</main><!-- Footer: full-width bar --><section class=\"w-full bg-background border-t-2 border-foreground py-12\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -262,7 +262,7 @@ func Base(title string, currentPath string, categories []model.Category, seo mod
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></body></html>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "</div></section></body></html>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

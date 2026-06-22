@@ -46,13 +46,22 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 			}
 		</head>
 		<body class="min-h-screen bg-background text-foreground antialiased selection:bg-accent selection:text-accent-foreground">
-			<div class="max-w-6xl mx-auto px-4 sm:px-8">
-				@components.Nav(categories, currentPath)
-				<main role="main" aria-label="Main content">
-					{ children... }
-				</main>
-				@components.Footer(seo.SiteDomain)
-			</div>
+			<!-- Nav: full-width bar, sticky -->
+			<section class="w-full bg-card border-b-2 border-foreground sticky top-0 z-50">
+				<div class="max-w-6xl mx-auto px-4 sm:px-8">
+					@components.Nav(categories, currentPath)
+				</div>
+			</section>
+			<!-- Main content: pages control their own section widths -->
+			<main role="main" aria-label="Main content">
+				{ children... }
+			</main>
+			<!-- Footer: full-width bar -->
+			<section class="w-full bg-background border-t-2 border-foreground py-12">
+				<div class="max-w-6xl mx-auto px-4 sm:px-8">
+					@components.Footer(seo.SiteDomain)
+				</div>
+			</section>
 		</body>
 	</html>
 }

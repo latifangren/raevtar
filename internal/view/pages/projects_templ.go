@@ -45,7 +45,7 @@ func Projects(data ProjectsData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-secondary border-b-2 border-foreground mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><div class=\"grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Projects</p><h1 class=\"text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5\">Three public lanes, one small machine.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">This is the public workbench view of Raevtar: writing lane, signal lane, and automation lane stitched together so readers can move around the platform without bumping into operator-only tooling.</p><div class=\"flex flex-wrap gap-2 mt-4 max-w-xl\"><a href=\"/about\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground no-underline hover:bg-destructive hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">about</a> <a href=\"/docs\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-success/20 text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">docs</a> <a href=\"/dashboard\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-destructive text-destructive-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">status</a></div></div><div class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 border-2 border-foreground bg-destructive nb-shadow\"></div><div class=\"relative bg-card border-2 border-foreground p-5 nb-shadow-lg -rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-4\">public board</p><div class=\"grid grid-cols-3 gap-3 text-center\"><div class=\"border-2 border-foreground bg-card p-3\"><span class=\"block text-3xl font-black text-foreground\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><div class=\"grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Projects</p><h1 class=\"text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5\">Three public lanes, one small machine.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">This is the public workbench view of Raevtar: writing lane, signal lane, and automation lane stitched together so readers can move around the platform without bumping into operator-only tooling.</p><div class=\"flex flex-wrap gap-2 mt-4 max-w-xl\"><a href=\"/about\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground no-underline hover:bg-destructive hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">about</a> <a href=\"/docs\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-success/20 text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">docs</a> <a href=\"/dashboard\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-destructive text-destructive-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">status</a></div></div><div class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 border-2 border-foreground bg-destructive nb-shadow\"></div><div class=\"relative bg-card border-2 border-foreground p-5 nb-shadow-lg -rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-4\">public board</p><div class=\"grid grid-cols-3 gap-3 text-center\"><div class=\"border-2 border-foreground bg-card p-3\"><span class=\"block text-3xl font-black text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -84,14 +84,14 @@ func Projects(data ProjectsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"text-xs font-bold uppercase text-muted\">projects</span></div></div><p class=\"text-sm font-bold text-muted mt-4\">Same public surface, three ways in.</p></div></div></div></div></section><section class=\"mb-12 grid gap-4 lg:grid-cols-3\"><div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">01 lane</p><h2 class=\"text-2xl font-head font-black uppercase mb-3\">Publishing System</h2><p class=\"text-sm font-bold text-muted mb-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span><span class=\"text-xs font-bold uppercase text-muted\">projects</span></div></div><p class=\"text-sm font-bold text-muted mt-4\">Same public surface, three ways in.</p></div></div></div></div></section><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><section class=\"mb-12 grid gap-4 lg:grid-cols-3\"><div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">01 lane</p><h2 class=\"text-2xl font-head font-black uppercase mb-3\">Publishing System</h2><p class=\"text-sm font-bold text-muted mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 41, Col: 75}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 42, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -104,7 +104,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 51, Col: 77}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 52, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -117,7 +117,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.CategoryCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 61, Col: 79}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 62, Col: 79}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
@@ -135,7 +135,7 @@ func Projects(data ProjectsData) templ.Component {
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.FeaturedCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 79, Col: 175}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 80, Col: 175}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
@@ -153,7 +153,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.VisibleProjectCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 81, Col: 167}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 82, Col: 167}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -171,7 +171,7 @@ func Projects(data ProjectsData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.TotalProjectCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 83, Col: 165}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 84, Col: 165}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
@@ -189,7 +189,7 @@ func Projects(data ProjectsData) templ.Component {
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(data.Query)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 90, Col: 73}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/projects.templ`, Line: 91, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
@@ -319,7 +319,7 @@ func Projects(data ProjectsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</section><section class=\"mb-12 bg-card border-2 border-foreground nb-shadow-lg overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-foreground text-primary-foreground p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-secondary mb-3\">route map</p><h2 class=\"text-3xl md:text-4xl font-head font-black uppercase leading-tight mb-4\">Move sideways, not only downward.</h2><p class=\"text-sm font-bold text-success\">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><a href=\"/about\" class=\"border-2 border-foreground bg-card p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase text-muted mb-2\">about</p><p class=\"text-sm font-bold text-foreground\">Personal framing, stack choices, and public/private split.</p></a> <a href=\"/topics\" class=\"border-2 border-foreground bg-success/20 p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase text-muted mb-2\">topics</p><p class=\"text-sm font-bold text-foreground\">Category index for finding writing by subject, not chronology.</p></a> <a href=\"/docs\" class=\"border-2 border-foreground bg-secondary p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase text-muted mb-2\">docs</p><p class=\"text-sm font-bold text-foreground\">Read-only route list and boundary notes for public readers.</p></a> <a href=\"/contact\" class=\"border-2 border-foreground bg-destructive text-destructive-foreground p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase opacity-90 mb-2\">contact</p><p class=\"text-sm font-bold opacity-90\">Where to start if you need context before reaching elsewhere.</p></a></div></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "</section><section class=\"mb-12 bg-card border-2 border-foreground nb-shadow-lg overflow-hidden\"><div class=\"grid gap-0 lg:grid-cols-[0.8fr_1.2fr]\"><div class=\"bg-foreground text-primary-foreground p-6 md:p-8\"><p class=\"text-xs font-black uppercase tracking-widest text-secondary mb-3\">route map</p><h2 class=\"text-3xl md:text-4xl font-head font-black uppercase leading-tight mb-4\">Move sideways, not only downward.</h2><p class=\"text-sm font-bold text-success\">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p></div><div class=\"grid gap-3 p-6 md:p-8 sm:grid-cols-2\"><a href=\"/about\" class=\"border-2 border-foreground bg-card p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase text-muted mb-2\">about</p><p class=\"text-sm font-bold text-foreground\">Personal framing, stack choices, and public/private split.</p></a> <a href=\"/topics\" class=\"border-2 border-foreground bg-success/20 p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase text-muted mb-2\">topics</p><p class=\"text-sm font-bold text-foreground\">Category index for finding writing by subject, not chronology.</p></a> <a href=\"/docs\" class=\"border-2 border-foreground bg-secondary p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase text-muted mb-2\">docs</p><p class=\"text-sm font-bold text-foreground\">Read-only route list and boundary notes for public readers.</p></a> <a href=\"/contact\" class=\"border-2 border-foreground bg-destructive text-destructive-foreground p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase opacity-90 mb-2\">contact</p><p class=\"text-sm font-bold opacity-90\">Where to start if you need context before reaching elsewhere.</p></a></div></div></section></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

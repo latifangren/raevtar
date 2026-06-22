@@ -6,8 +6,8 @@ import (
 
 templ Projects(data ProjectsData) {
 @page("Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="full-width bg-secondary border-b-2 border-foreground mb-12 overflow-hidden">
-			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+		<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
 					<div>
 						<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Projects</p>
@@ -34,6 +34,7 @@ templ Projects(data ProjectsData) {
 				</div>
 			</div>
 		</section>
+		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-12 grid gap-4 lg:grid-cols-3">
 			<div class="bg-card border-2 border-foreground p-5 nb-shadow">
 				<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">01 lane</p>
@@ -150,6 +151,7 @@ templ Projects(data ProjectsData) {
 				</div>
 			</div>
 		</section>
+	</div>
 	}
 }
 
