@@ -70,11 +70,11 @@ templ APIDocs(data APIDocsData) {
 				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">POST /api/v1/posts/&#123;id&#125;/read-time</code>
 				<p class="text-sm font-bold text-muted mb-3">Records a read session heartbeat. No auth required. IP-hashed for privacy.</p>
 				<h3 class="text-xs font-black uppercase tracking-widest text-muted mb-2">Request body</h3>
-				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">{"seconds": 30}</div>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">&#123;"seconds": 30&#125;</div>
 				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Example request</h3>
 				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl -X POST https://{ data.Host }/api/v1/posts/1/read-time \
   -H 'Content-Type: application/json' \
-  -d '{"seconds": 30}'</div>
+  -d '&#123;"seconds": 30&#125;'</div>
 				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Response</h3>
 				<p class="text-sm font-bold text-muted"><code class="bg-secondary px-1">204 No Content</code> on success.</p>
 			</section>
