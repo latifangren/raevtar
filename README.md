@@ -12,10 +12,12 @@ Observed di deployment whyred/postmarketOS saat idle, footprint runtime Raevtar 
 
 | Area | Status |
 |------|--------|
-| Blog | Markdown posts, kategori, tags, RSS, cover image, media upload |
-| Monitoring | Push-based agent telemetry, public-safe dashboard, admin diagnostics |
-| Admin | Session login, RBAC, posts/media/servers/users/audit log |
-| API | Public read endpoints + protected write/monitoring endpoints |
+| Blog | Markdown posts, kategori, tags, RSS, cover image, media upload, view tracking, OG images |
+| Monitoring | Push-based agent telemetry, public-safe dashboard, admin diagnostics, alert webhooks |
+| Admin | Session login, RBAC, posts/media/servers/users/audit log, webhooks, page editor, command queue |
+| API | Public read endpoints + protected write/monitoring/search endpoints |
+| SEO | Sitemap XML, JSON-LD structured data, LLMs.txt, canonical URLs, Open Graph |
+| CI/CD | GitHub Actions test+build, GoReleaser multi-platform releases |
 | Hardening | Request caps, login throttling, CSP, generic 500s, production secret checks |
 
 Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan boundary jelas antara tampilan publik dan data operator.
@@ -29,6 +31,8 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 - Tags normalized (`tags` + `post_tags`) dan badge di UI.
 - Admin Content Studio: draft/publish, Markdown preview, media upload, cover image, dan topic management di `/admin/topics`.
 - RSS feed di `/blog/feed.xml`.
+- View tracking per artikel via IP hash (SHA-256, 8 hex chars).
+- Dynamic OG image SVG per post di `/og-image/blog/{slug}`.
 - API `POST /api/v1/posts` untuk integrasi agent seperti Hermes.
 
 ### Projects
@@ -52,8 +56,11 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 
 - Login session di `/admin/login`.
 - RBAC role: `owner`, `admin`, `operator`, `readonly`.
-- Manage posts, blog topics, media, servers, users, dan audit log.
-- Server diagnostics di `/admin/servers/{id}` berisi endpoint, metric history, setup command, token rotation, dan activity log admin-only.
+- Manage posts, blog topics, projects, media, servers, users, webhooks, pages, dan audit log.
+- Editorial inbox di `/admin/editorial-inbox` untuk managing content queue Hermes.
+- Page editor di `/admin/pages` untuk manage static pages (about, contact).
+- Server diagnostics di `/admin/servers/{id}` berisi endpoint, metric history, setup command, token rotation, command queue, dan activity log admin-only.
+- Webhook management di `/admin/webhooks` untuk manage alert endpoints.
 
 <p align="center">
   <img src="docs/images/admin.png" alt="Raevtar admin panel" width="900">
@@ -65,7 +72,8 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 |--------|------|-------|
 | `GET` | `/api/v1/posts` | Public list posts |
 | `POST` | `/api/v1/posts` | Admin key required |
-| `GET` | `/api/v1/projects` | Public list projects; supports `featured=true`, `state=planning|active|paused|shipped|archived`, and `sort=newest|oldest` |
+| `GET` | `/api/v1/search` | Public search; supports `q`, `scope=posts\|projects\|pages`, `page`, `page_size` |
+| `GET` | `/api/v1/projects` | Public list projects; supports `featured=true`, `state=planning\|active\|paused\|shipped\|archived`, `sort=newest\|oldest` |
 | `GET` | `/api/v1/projects/{slug}/updates` | Public published project timeline |
 | `GET` | `/api/v1/projects/{slug}/changelog` | Public published changelog entries |
 | `GET` | `/api/v1/projects/{slug}/relations` | Public related posts/projects |
@@ -86,7 +94,18 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 | `GET` | `/api/v1/servers/{id}` | Admin key required |
 | `POST` | `/api/v1/servers` | Admin key required; returns one-time `agent_token` |
 | `POST` | `/api/v1/servers/{id}/ping` | Agent token or admin key |
+| `GET` | `/api/v1/servers/{id}/commands` | Agent polling pending commands |
+| `POST` | `/api/v1/servers/{id}/commands/result` | Agent report command result |
 | `GET` | `/api/v1/hoststats` | Admin key required |
+| `GET` | `/api/v1/editorial-inbox` | Admin key; list inbox items |
+| `GET` | `/api/v1/editorial-inbox/contract` | Admin key; machine-readable contract |
+| `GET` | `/api/v1/editorial-inbox/summary` | Admin key; analytics summary |
+| `POST` | `/api/v1/editorial-inbox` | Admin key; create item |
+| `POST` | `/api/v1/editorial-inbox/claim` | Admin key; claim next ready item |
+| `GET` | `/api/v1/editorial-inbox/{itemID}` | Admin key; detail item |
+| `POST` | `/api/v1/editorial-inbox/{itemID}` | Admin key; update item |
+| `POST` | `/api/v1/editorial-inbox/{itemID}/complete` | Admin key; mark done |
+| `POST` | `/api/v1/editorial-inbox/{itemID}/fail` | Admin key; mark failed |
 | `GET` | `/docs`, `/lab/docs` | Public-safe docs |
 
 Public docs sengaja hanya menjelaskan read-only surface dan privacy boundary. Endpoint admin/server setup tetap operator-only.
@@ -189,6 +208,56 @@ RAEVTAR_AGENT_TOKEN=token-per-server \
 
 Agent mengirim CPU percent, CPU load 1/5/15, core count, RAM used/total, disk used/total, uptime, online flag, dan temperature jika sensor tersedia. Token diambil dari `/admin/servers` atau response `POST /api/v1/servers`; token hanya ditampilkan saat create/rotate.
 
+## Search
+
+- Public search page di `/search` dengan HTMX partial updates.
+- API search endpoint `GET /api/v1/search` dengan parameter `q`, `scope` (posts/projects/pages), `page`, `page_size`.
+- Scope filter di UI untuk memilih antara posts, projects, dan static pages.
+
+Search mencakup database query terhadap posts (title + excerpt + content), projects (title + excerpt + content), dan static pages (title + content). Hasil di-paginate per 10 item.
+
+## SEO & Discovery
+
+- **Sitemap XML** di `/sitemap.xml` — mencakup semua halaman statis, blog posts, projects, dan changelog pages.
+- **LLMs.txt** di `/llms.txt` — ringkasan site buat LLM discovery, berisi core pages, RSS, sitemap, dan recent content.
+- **Robots.txt** di `/robots.txt` — mengizinkan indexing penuh.
+- **JSON-LD structured data** — `BlogPosting` schema untuk artikel, `CreativeWork` untuk projects, `WebSite` untuk homepage.
+- **Canonical URLs** — semua halaman punya canonical link.
+- **Open Graph images** — dynamic SVG OG image tiap blog post (`/og-image/blog/{slug}`) dan project (`/og-image/project/{slug}`) dengan gaya neo-brutalist (1200x630px).
+
+SEO data disiapkan oleh `SiteMetaService` dan di-render via Templ di layout `base.templ`.
+
+## Webhook Alerts
+
+- Konfigurasi webhook via admin panel `/admin/webhooks` atau API.
+- Setiap webhook bisa di-enable/disable dengan HMAC-SHA256 signature optional.
+- Webhook di-fire otomatis saat threshold metrics server tercapai:
+
+| Alert | Threshold |
+|-------|-----------|
+| `cpu_high` | CPU >= 90% |
+| `ram_high` | RAM >= 90% |
+| `disk_high` | Disk >= 90% |
+
+- Payload berisi event type, server ID, timestamp, dan full metric snapshot.
+- Signature dikirim via header `X-Webhook-Signature-256` (jika secret dikonfigurasi).
+- Event log tiap webhook tercatat di database (response code + body, max 1000 chars).
+
+## Command Queue
+
+- Admin bisa mengantarkan command ke server via `/admin/servers/{id}`.
+- Agent polling via `GET /api/v1/servers/{serverID}/commands` (mengembalikan pending commands).
+- Agent melapor hasil via `POST /api/v1/servers/{serverID}/commands/result` dengan `command_id` dan `result`.
+- Status lifecycle: `pending` → `running` → `completed` / `failed`.
+- Command history per server tercatat di admin panel.
+
+## CI/CD
+
+- **GitHub Actions CI** — test + build di tiap push ke `main`/`dev-*` dan PR ke `main`.
+- **GoReleaser** — build multi-platform (linux/darwin/windows, amd64/arm64) untuk tagged releases.
+- Build step includes: `templ generate`, Tailwind CLI, lalu `go build`.
+- Binary artifacts diupload ke GitHub Releases.
+
 ## Hardening Notes
 
 - Production mode menolak start kalau `RAEVTAR_ADMIN_KEY` atau `RAEVTAR_ADMIN_PASS` kosong.
@@ -204,11 +273,12 @@ Agent mengirim CPU percent, CPU load 1/5/15, core count, RAM used/total, disk us
 
 | Lapisan | Teknologi |
 |---------|-----------|
-| Backend | Go 1.26.3, `github.com/go-chi/chi/v5` |
+| Backend | Go 1.26, `github.com/go-chi/chi/v5` |
 | Templates | `github.com/a-h/templ` |
 | Frontend | SSR + self-hosted HTMX + Tailwind CSS |
 | Database | SQLite via `modernc.org/sqlite` + `github.com/jmoiron/sqlx` |
 | Markdown | `github.com/yuin/goldmark` |
+| CI/CD | GitHub Actions + GoReleaser |
 | Runtime target | postmarketOS/aarch64, Cloudflare Tunnel |
 
 ## Struktur
@@ -217,15 +287,17 @@ Agent mengirim CPU percent, CPU load 1/5/15, core count, RAM used/total, disk us
 raevtar/
 ├── cmd/server/        # Entry point: config, DB, router, HTTP server
 ├── internal/
-│   ├── config/        # Env-based config loader
-│   ├── model/         # Data structs
-│   ├── repo/          # SQL queries + migration helpers
-│   ├── service/       # Business logic and validation
-│   ├── handler/       # HTTP handlers + routing
-│   └── view/          # templ layouts, pages, admin views, components
+│   ├── config/        # Env-based config loader + CIDR parsing
+│   ├── model/         # Data structs (post, category, server, tag, user, audit, SEO, webhook, command, page content, editorial inbox)
+│   ├── repo/          # SQL queries + migration helpers (post, category, server, metric, tag, user, audit, webhook, command, view, page content, editorial inbox, media, project)
+│   ├── service/       # Business logic (blog, project, search, site meta, pages, editorial inbox, media, monitor, admin, command queue, webhook)
+│   ├── handler/       # HTTP handlers + routing + middleware + hardening
+│   └── view/          # templ layouts, pages, admin views, components + presentation helpers
 ├── cron/              # Backup/automation scripts
 ├── migrations/        # Fresh SQLite schema
 ├── static/            # CSS, JS, agent script, uploads/static assets
+├── .github/workflows/ # CI + release workflows
+├── .goreleaser.yaml   # Multi-platform release config
 └── docs/              # Canonical project docs, runbooks, and notes
 ```
 
@@ -273,6 +345,20 @@ npx --yes tailwindcss@3.4.19 -i static/css/tailwind.src.css -o static/css/style.
 
 `make build` menjalankan templ generate, Tailwind build, lalu `go build`.
 
+Untuk release multi-platform via GoReleaser:
+
+```bash
+# Tag release (trigger GitHub Actions)
+git tag v0.x.x
+git push origin v0.x.x
+```
+
+Atau build lokal pake goreleaser:
+
+```bash
+goreleaser build --snapshot --clean
+```
+
 ## Deploy Singkat
 
 ```bash
@@ -285,6 +371,16 @@ sudo systemctl enable --now raevtar
 ```
 
 Runbook lengkap ada di `docs/DEPLOYMENT.md`. Jangan restart/deploy service kecuali memang sedang melakukan operasi deploy.
+
+## Codebase Maps
+
+Untuk navigasi codebase secara detail:
+
+| Map | Description |
+|-----|-------------|
+| `docs/CODEMAPS/ARCHITECTURE.md` | High-level system architecture, data flow, layer diagram |
+| `docs/CODEMAPS/MODULES.md` | Module-by-module breakdown, public APIs, dependencies |
+| `docs/CODEMAPS/FILES.md` | Complete file inventory, purposes, and structure |
 
 ## Prinsip
 

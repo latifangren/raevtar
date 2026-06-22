@@ -44,18 +44,35 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 ### 3.4 REST API (v1)
 - `GET /api/v1/posts` — list blog posts
 - `POST /api/v1/posts` — create blog post (auth)
+- `GET /api/v1/search` — public search posts/projects/pages
+- `GET /api/v1/projects` — public list projects dengan filter featured, state, sort
+- `GET /api/v1/projects/{slug}/updates` — public project timeline
+- `GET /api/v1/projects/{slug}/changelog` — public changelog entries
+- `GET /api/v1/projects/{slug}/relations` — public related content
+- `GET /api/v1/projects/{slug}/showcase` — public showcase items
+- `POST /api/v1/projects` — create project (auth)
+- `PUT /api/v1/projects/{id}` — update project (auth)
+- `DELETE /api/v1/projects/{id}` — delete project (auth)
+- Project child resource CRUD (updates, relations, showcase) — auth
 - `GET /api/v1/categories` — daftar kategori
 - `GET /api/v1/servers` — daftar server + status (auth)
 - `POST /api/v1/servers` — register server (auth, return one-time agent token)
-- `POST /api/v1/servers/{id}/ping` — report metrics (agent token atau admin key)
 - `GET /api/v1/servers/{id}` — detail server (auth)
+- `POST /api/v1/servers/{id}/ping` — report metrics (agent token atau admin key)
+- `GET /api/v1/servers/{id}/commands` — agent polling pending commands
+- `POST /api/v1/servers/{id}/commands/result` — agent report command result
 - `GET /api/v1/hoststats` — host resource snapshot (auth)
+- Editorial inbox API: contract, list, create, claim, detail, update, complete, fail (auth)
 - `/docs` untuk public-safe docs dan read-only OpenAPI surface; endpoint admin/server/agent tidak dipublikasikan di docs publik
 
 ### 3.5 Admin Panel
 - Session login di `/admin/login`
-- Manage posts, media, servers, users
+- Manage posts, topics, projects, media, servers, users, webhooks, dan static pages
+- Editorial inbox untuk managing content queue Hermes
 - RBAC role: `owner`, `admin`, `operator`, `readonly`
+- Server diagnostics dengan metric history, command queue, token rotation
+- Manage webhook alert endpoints dan event log
+- Page editor untuk about dan contact pages
 - Audit log untuk login/logout dan aksi admin
 
 ### 3.6 Hardening
@@ -66,8 +83,28 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - Generic `internal server error` untuk 500; detail hanya di log server
 - CSP `script-src 'self'`; HTMX disajikan dari `/static/js/htmx.min.js`
 
-### 3.7 Integrasi Hermes
+### 3.7 Webhook Alerts
+- Konfigurasi webhook URL dengan HMAC-SHA256 signature
+- Threshold alerts: CPU >= 90%, RAM >= 90%, Disk >= 90%
+- Webhook event log dengan response tracking
+- Admin UI di `/admin/webhooks`
+
+### 3.8 Server Command Queue
+- Admin bisa mengantarkan perintah ke server via admin panel
+- Agent polling pending commands via API
+- Status lifecycle: pending → running → completed/failed
+- History per server di admin panel
+
+### 3.9 SEO & Discovery
+- Sitemap XML di `/sitemap.xml` — semua pages, posts, projects
+- LLMs.txt di `/llms.txt` — LLM-friendly site summary
+- JSON-LD structured data (BlogPosting, CreativeWork, WebSite)
+- Dynamic OG images per blog post dan project
+- Canonical URLs dan robots.txt
+
+### 3.10 Integrasi Hermes
 - Cronjob harian: riset projek GitHub → nulis artikel → POST ke API
+- Editorial inbox: Hermes cek queue Raevtar dulu sebelum tulis artikel
 - Hermes bisa manual: "tulis ini ke blog" → curl endpoint
 - Server monitoring: agent push metrics dari tiap perangkat
 
@@ -79,7 +116,7 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 - ❌ SPA / React / Next.js (RAM hp gak cukup)
 - ❌ Docker / Kubernetes (gak perlu untuk satu binary)
 - ❌ CI/CD pipeline (cukup `make build && ./raevtar`)
-- ❌ Search engine (bisa nanti, gak wajib awal)
+- ~~❌ Search engine (bisa nanti, gak wajib awal)~~ ✅ Implemented via `/search` + `GET /api/v1/search`
 
 ## 5. Constraints
 
