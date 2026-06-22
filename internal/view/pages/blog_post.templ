@@ -1,25 +1,29 @@
 package pages
 
+import (
+	"fmt"
+)
+
 templ BlogPost(data BlogPostData) {
 @page(data.Post.Title + " — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<article class="mb-12">
-			<header class="full-width bg-retro-sage border-b-2 border-retro-ink mb-10 overflow-hidden">
+		<article class="mb-12" data-post-id={ fmt.Sprintf("%d", data.Post.ID) }>
+			<header class="full-width bg-success border-b-2 border-foreground mb-10 overflow-hidden">
 				<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">
-					<a href="/blog" class="inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">&larr; Back to blog</a>
+					<a href="/blog" class="inline-flex items-center gap-1.5 mb-6 px-4 py-2 nb-border bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><span aria-hidden="true">&larr;</span> Back to blog</a>
 					<div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end">
 						<div>
-							<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">Signal brief</p>
-							<h1 class="text-4xl md:text-6xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Post.Title }</h1>
-							<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">{ data.Post.Excerpt }</p>
+							<p class="text-xs font-black uppercase tracking-widest text-foreground mb-2">Signal brief</p>
+							<h1 class="text-4xl md:text-6xl font-black font-head uppercase leading-none text-foreground mb-5">{ data.Post.Title }</h1>
+							<p class="text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl">{ data.Post.Excerpt }</p>
 						</div>
 						<aside class="relative">
-							<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-retro-ink bg-retro-wheat shadow-[4px_4px_0px_0px_#2D3748]"></div>
-							<div class="relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] -rotate-1">
-								<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">Filed under</p>
+							<div class="absolute -right-5 -top-5 h-16 w-16 nb-border bg-secondary nb-shadow" aria-hidden="true"></div>
+							<div class="relative bg-card nb-border p-5 nb-shadow-lg -rotate-1">
+								<p class="text-xs font-black uppercase tracking-widest text-muted mb-4">Filed under</p>
 								<div class="flex items-center gap-2 mb-4 flex-wrap">
-									<span class="text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sage text-retro-cream">{ data.Post.CategoryName }</span>
-									<span class="text-xs font-bold text-retro-muted">{ data.Post.CreatedAt.Format("Jan 2, 2006") }</span>
-									<span class="text-xs font-bold text-retro-muted">{ ReadMinutes(data.Post.ContentMD) } min read</span>
+									<span class="text-xs px-2 py-0.5 font-bold nb-border bg-success text-background">{ data.Post.CategoryName }</span>
+									<span class="text-xs font-bold text-muted">{ data.Post.CreatedAt.Format("Jan 2, 2006") }</span>
+									<span class="text-xs font-bold text-muted">{ ReadMinutes(data.Post.ContentMD) } min read</span>
 								</div>
 								<div class="flex flex-wrap gap-2">
 									for _, tag := range data.Post.Tags {
@@ -31,15 +35,16 @@ templ BlogPost(data BlogPostData) {
 					</div>
 				</div>
 			</header>
-			<div class="max-w-4xl mx-auto bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+			<div class="max-w-4xl mx-auto bg-card nb-border p-5 md:p-8 nb-shadow">
 				if data.Post.CoverImageURL != "" {
-					<img src={ data.Post.CoverImageURL } alt={ data.Post.Title } class="w-full max-h-[460px] object-cover border-2 border-retro-ink bg-retro-cream mb-6"/>
+					<img src={ data.Post.CoverImageURL } alt={ data.Post.Title } class="w-full max-h-[460px] object-cover nb-border bg-background mb-6"/>
 				}
-				<div class="prose text-retro-ink">@templ.Raw(data.Post.ContentHTML)</div>
+				<div class="prose text-foreground">@templ.Raw(data.Post.ContentHTML)</div>
 			</div>
-			<div class="mt-8 pt-4 border-t-2 border-retro-ink">
-				<a href="/blog" class="font-bold no-underline hover:bg-retro-wheat">&larr; Back to blog</a>
+			<div class="mt-8 pt-4 border-t-2 border-foreground">
+				<a href="/blog" class="font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><span aria-hidden="true">&larr;</span> Back to blog</a>
 			</div>
 		</article>
+		<script defer src="/static/js/read-tracker.js"></script>
 	}
 }

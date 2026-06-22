@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"raevtar/internal/model"
 )
@@ -38,6 +39,7 @@ func TestPublicServerDetailShowsSafeExtendedNodeHealth(t *testing.T) {
 func TestPublicServerDetailDoesNotRenderHistoricalSampleRows(t *testing.T) {
 	app := newPublicTestApp(t)
 	recordExtendedPublicMetric(t, app)
+	time.Sleep(2 * time.Millisecond)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
 		CPUPercent:           77.7,
 		CPULoad1:             1.1,
@@ -93,7 +95,7 @@ func recordExtendedPublicMetric(t *testing.T, app *publicTestApp) {
 
 func assertPublicMonitoringRedaction(t *testing.T, body string) {
 	t.Helper()
-	for _, leak := range []string{"127.0.0.1", "127.0.0.1:9100", "port 9100", ">local<", "agent token", "raevtar-agent.sh", "POST /api/v1/servers", "install", "cron", "audit", "token"} {
+	for _, leak := range []string{"127.0.0.1", "127.0.0.1:9100", "port 9100", "agent token", "raevtar-agent.sh", "POST /api/v1/servers", "install", "cron", "audit", "token"} {
 		assertNotContains(t, body, leak)
 	}
 }

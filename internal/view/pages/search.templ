@@ -1,25 +1,33 @@
 package pages
 
-import "raevtar/internal/view/components"
+import ()
 
 templ Search(data SearchData) {
 	@page("Search — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="full-width bg-retro-sage border-b-2 border-retro-ink mb-10 overflow-hidden">
+		<section class="full-width bg-accent border-b-2 border-foreground mb-10 overflow-hidden">
 			<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">
-				<p class="text-xs font-black uppercase tracking-widest text-retro-ink mb-2">Public Search</p>
-				<h1 class="text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5">Find posts, projects, and key pages.</h1>
-				<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl">Search stays on public-safe surfaces only: blog posts, project archive, and core pages.</p>
+				<p class="nb-badge bg-card mb-2">Public Search</p>
+				<h1 class="nb-h1 font-head mb-5">Find posts, projects, and key pages.</h1>
+				<p class="text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl">Search stays on public-safe surfaces only: blog posts, project archive, and core pages.</p>
 			</div>
 		</section>
+		
 		<section class="mb-12">
-			<form method="get" action="/search" class="mb-6 grid gap-4 border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748] md:grid-cols-[1fr_auto_auto] md:items-end">
+			<form method="get" action="/search" 
+				class="mb-8 grid gap-6 nb-card md:grid-cols-[1fr_auto_auto] md:items-end"
+				hx-get="/search"
+				hx-target="#search-results"
+				hx-trigger="keyup changed delay:500ms from:#global-search, change from:#scope"
+				hx-push-url="true">
 				<div>
-					<label for="global-search" class="block text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Search public content</label>
-					<input id="global-search" type="search" name="q" value={ data.Results.Query } placeholder="Cari notes, projects, pages..." class="w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink"/>
+					<label for="global-search" class="block text-xs font-black uppercase tracking-widest text-muted mb-2">Search public content</label>
+					<input id="global-search" type="search" name="q" value={ data.Results.Query } 
+						placeholder="Cari notes, projects, pages..." 
+						class="w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 				</div>
 				<div>
-					<label for="scope" class="block text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Scope</label>
-					<select id="scope" name="scope" class="w-full border-2 border-retro-ink bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink">
+					<label for="scope" class="block text-xs font-black uppercase tracking-widest text-muted mb-2">Scope</label>
+					<select id="scope" name="scope" class="w-full nb-border bg-background px-4 py-3 text-sm font-bold text-foreground focus:bg-card outline-none transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 						<option value="all" if data.Results.Scope == "all" { selected }>All public content</option>
 						<option value="posts" if data.Results.Scope == "posts" { selected }>Posts only</option>
 						<option value="projects" if data.Results.Scope == "projects" { selected }>Projects only</option>
@@ -27,80 +35,14 @@ templ Search(data SearchData) {
 					</select>
 				</div>
 				<div class="flex flex-wrap gap-3">
-					<button type="submit" class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Search</button>
-					<a href="/search" class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">Reset</a>
+					<button type="submit" class="nb-button nb-button-primary py-2 px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Search</button>
+					<a href="/search" class="nb-button nb-button-secondary py-2 px-6 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Reset</a>
 				</div>
 			</form>
-			if !data.Results.HasQuery {
-				<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-retro-muted font-bold">Masukkan kata kunci dulu buat mulai cari.</p>
-				</div>
-			} else if data.Results.Total == 0 {
-				<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-retro-muted font-bold">Tidak ada hasil buat "{ data.Results.Query }".</p>
-				</div>
-			} else {
-				<div class="flex flex-wrap gap-2 mb-6">
-					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">{ PortText(data.Results.Total) } total hits</span>
-					if data.Results.PostCount > 0 {
-						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink">{ PortText(data.Results.PostCount) } posts</span>
-					}
-					if data.Results.ProjectCount > 0 {
-						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ PortText(data.Results.ProjectCount) } projects</span>
-					}
-					if data.Results.PageCount > 0 {
-						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">{ PortText(data.Results.PageCount) } pages</span>
-					}
-				</div>
-				if len(data.Results.Posts) > 0 {
-					<div class="mb-8">
-						<h2 class="text-2xl font-black uppercase text-retro-ink mb-4">Posts</h2>
-						<div class="grid gap-4">
-							for _, post := range data.Results.Posts {
-								@components.PostCardWithHighlight(post, data.Results.Query)
-							}
-						</div>
-					</div>
-				}
-				if len(data.Results.Projects) > 0 {
-					<div class="mb-8">
-						<h2 class="text-2xl font-black uppercase text-retro-ink mb-4">Projects</h2>
-						<div class="grid gap-5 xl:grid-cols-2">
-							for _, project := range data.Results.Projects {
-								@components.ProjectCardWithHighlight(project, data.Results.Query)
-							}
-						</div>
-					</div>
-				}
-				if len(data.Results.Pages) > 0 {
-					<div class="mb-8">
-						<h2 class="text-2xl font-black uppercase text-retro-ink mb-4">Pages</h2>
-						<div class="grid gap-4 md:grid-cols-2">
-							for _, page := range data.Results.Pages {
-								<a href={ templ.URL(searchPageHref(page.Key)) } class="border-2 border-retro-ink bg-retro-paper p-5 shadow-[4px_4px_0px_0px_#2D3748] no-underline hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">
-									<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Page</p>
-									<h3 class="text-xl font-black uppercase text-retro-ink mb-2">@components.HighlightText(page.Title, data.Results.Query)</h3>
-									<p class="text-sm font-bold text-retro-muted">@components.HighlightText(page.Summary, data.Results.Query)</p>
-								</a>
-							}
-						</div>
-					</div>
-				}
-				if data.Results.Paginated {
-					@components.PaginationWithBase("/search", data.Results.Page, data.Results.TotalPages, map[string]string{"q": data.Results.Query, "scope": data.Results.Scope})
-				}
-			}
+			
+			<div id="search-results">
+				@SearchResults(data)
+			</div>
 		</section>
-	}
-}
-
-func searchPageHref(key string) string {
-	switch key {
-	case "about":
-		return "/about"
-	case "contact":
-		return "/contact"
-	default:
-		return "/search"
 	}
 }

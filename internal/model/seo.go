@@ -5,6 +5,7 @@ import "encoding/json"
 type SEOData struct {
 	Description  string
 	CanonicalURL string
+	ImageURL     string
 	JSONLD       string
 }
 

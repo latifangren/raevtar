@@ -1,0 +1,100 @@
+package pages
+
+import (
+	"raevtar/internal/model"
+	"encoding/json"
+
+)
+
+templ MetricCharts(metrics []model.ServerMetric) {
+	<div class="grid gap-6 md:grid-cols-2 mt-8">
+		<div class="nb-card bg-card p-5">
+			<h3 class="text-sm font-black uppercase text-muted mb-4">CPU Usage (%)</h3>
+			<canvas id="cpuChart" class="w-full h-48" role="img" aria-label="CPU Usage Chart"></canvas>
+		</div>
+		<div class="nb-card bg-card p-5">
+			<h3 class="text-sm font-black uppercase text-muted mb-4">RAM Usage (MB)</h3>
+			<canvas id="ramChart" class="w-full h-48" role="img" aria-label="RAM Usage Chart"></canvas>
+		</div>
+	</div>
+	@renderChartScript(metrics)
+}
+
+func getChartData(metrics []model.ServerMetric) string {
+	type ChartPoint struct {
+		T string  `json:"t"`
+		C float64 `json:"c"`
+		R float64 `json:"r"`
+	}
+	
+	// Reverse metrics to get chronological order
+	data := make([]ChartPoint, 0, len(metrics))
+	for i := len(metrics) - 1; i >= 0; i-- {
+		m := metrics[i]
+		data = append(data, ChartPoint{
+			T: m.RecordedAt.Format("15:04:05"),
+			C: m.CPUPercent,
+			R: m.RAMUsedMB,
+		})
+	}
+	
+	b, _ := json.Marshal(data)
+	return string(b)
+}
+
+templ renderChartScript(metrics []model.ServerMetric) {
+	<script type="text/javascript">
+		(function() {
+			const data = JSON.parse(document.getElementById('chart-data-json').textContent);
+			const labels = data.map(p => p.t);
+			const cpuData = data.map(p => p.c);
+			const ramData = data.map(p => p.r);
+
+			const chartOptions = {
+				responsive: true,
+				maintainAspectRatio: false,
+				animation: false,
+				scales: {
+					y: { beginAtZero: true, grid: { color: '#2D3748', lineWidth: 1 } },
+					x: { grid: { display: false } }
+				},
+				plugins: { legend: { display: false } }
+			};
+
+			new Chart(document.getElementById('cpuChart'), {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [{
+						data: cpuData,
+						borderColor: '#FACC15',
+						borderWidth: 3,
+						pointRadius: 0,
+						tension: 0.1,
+						fill: false
+					}]
+				},
+				options: chartOptions
+			});
+
+			new Chart(document.getElementById('ramChart'), {
+				type: 'line',
+				data: {
+					labels: labels,
+					datasets: [{
+						data: ramData,
+						borderColor: '#2D3748',
+						borderWidth: 3,
+						pointRadius: 0,
+						tension: 0.1,
+						fill: false
+					}]
+				},
+				options: chartOptions
+			});
+		})();
+	</script>
+	<script id="chart-data-json" type="application/json">
+		{ templ.Raw(getChartData(metrics)) }
+	</script>
+}

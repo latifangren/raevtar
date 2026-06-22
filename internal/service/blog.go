@@ -299,11 +299,29 @@ func (s *BlogService) GetPostByID(id int64) (*model.Post, error) {
 }
 
 func (s *BlogService) RenderMarkdown(content string) (string, error) {
+	// Pre-process shortcodes
+	content = s.processShortcodes(content)
+
 	var buf strings.Builder
 	if err := s.markdown.Convert([]byte(content), &buf); err != nil {
 		return "", fmt.Errorf("render markdown: %w", err)
 	}
 	return buf.String(), nil
+}
+
+func (s *BlogService) processShortcodes(content string) string {
+	// Simple shortcode: [[server-status:node-name]]
+	// This will be rendered as a div that HTMX can pick up
+	return serverStatusRe.ReplaceAllStringFunc(content, func(match string) string {
+		parts := serverStatusRe.FindStringSubmatch(match)
+		if len(parts) < 2 {
+			return match
+		}
+		nodeName := parts[1]
+		return fmt.Sprintf(`<div class="nb-card bg-retro-paper p-4 my-6" hx-get="/lab/node-status/%s" hx-trigger="load" hx-swap="outerHTML">
+			<p class="text-xs font-black uppercase text-retro-muted animate-pulse">Loading node status: %s...</p>
+		</div>`, nodeName, nodeName)
+	})
 }
 
 func (s *BlogService) UpdatePost(id int64, input model.PostUpdate) (*model.Post, error) {
@@ -408,4 +426,32 @@ func (s *BlogService) uniqueSlug(title string) (string, error) {
 			return slug, nil
 		}
 	}
+}
+
+// RecordPostView records a view for a post from an IP hash.
+func (s *BlogService) RecordPostView(postID int64, ipHash string) error {
+	return s.repos.View.RecordPostView(postID, ipHash)
+}
+
+// PostViewCount returns total views for a post.
+func (s *BlogService) PostViewCount(postID int64) (int, error) {
+	return s.repos.View.CountPostViews(postID)
+}
+
+// AllPostViewCounts returns view counts keyed by post ID for all posts.
+func (s *BlogService) AllPostViewCounts() (map[int64]int, error) {
+	return s.repos.View.CountAllPostViews()
+}
+
+// RecordPostReadTime records read time duration increment for a post.
+func (s *BlogService) RecordPostReadTime(postID int64, ipHash string, seconds int) error {
+	if seconds <= 0 {
+		return nil
+	}
+	return s.repos.View.IncrementPostReadTime(postID, ipHash, seconds)
+}
+
+// AllPostAverageReadTimes returns average read times (in seconds) keyed by post ID.
+func (s *BlogService) AllPostAverageReadTimes() (map[int64]int, error) {
+	return s.repos.View.AveragePostReadTimes()
 }

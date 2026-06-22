@@ -4,31 +4,31 @@ templ ProjectChangelog(data ProjectChangelogData) {
 @page(data.Project.Title + " Changelog — Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<section class="mb-12 max-w-5xl mx-auto px-4 py-10">
 			<div class="mb-6">
-				<a href={ templ.URL("/projects/" + data.Project.Slug) } class="inline-flex items-center gap-1.5 mb-4 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:bg-retro-wheat">&larr; Back to project</a>
-				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Project changelog</p>
-				<h1 class="text-4xl md:text-5xl font-black uppercase leading-none text-retro-ink mb-3">{ data.Project.Title }</h1>
-				<p class="text-base font-bold text-retro-muted max-w-2xl">Release notes, build log milestones, and public-facing change entries for this project.</p>
+				<a href={ templ.URL("/projects/" + data.Project.Slug) } class="inline-flex items-center gap-1.5 mb-4 px-4 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">&larr; Back to project</a>
+				<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Project changelog</p>
+				<h1 class="text-4xl md:text-5xl font-head font-black uppercase leading-none text-foreground mb-3">{ data.Project.Title }</h1>
+				<p class="text-base font-bold text-muted max-w-2xl">Release notes, build log milestones, and public-facing change entries for this project.</p>
 			</div>
 			if len(data.Changelog) == 0 {
-				<div class="bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xl font-black uppercase text-retro-ink mb-2">No changelog entries yet.</p>
-					<p class="text-sm font-bold text-retro-muted">Project detail page still carries full write-up while changelog fills over time.</p>
+				<div class="bg-card border-2 border-foreground p-8 text-center nb-shadow">
+					<p class="text-xl font-black uppercase text-foreground mb-2">No changelog entries yet.</p>
+					<p class="text-sm font-bold text-muted">Project detail page still carries full write-up while changelog fills over time.</p>
 				</div>
 			} else {
 				<div class="space-y-4">
 					for _, item := range data.Changelog {
-						<article class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
+						<article class="bg-card border-2 border-foreground p-5 nb-shadow">
 							<div class="flex flex-wrap items-center justify-between gap-3 mb-3">
 								<div class="flex flex-wrap items-center gap-2">
-									<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">{ ProjectStateLabel(item.Kind) }</span>
+									<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">{ ProjectStateLabel(item.Kind) }</span>
 									if item.Pinned {
-										<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink">Pinned</span>
+										<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-wheat text-foreground">Pinned</span>
 									}
 								</div>
-								<p class="text-xs font-mono font-bold text-retro-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
+								<p class="text-xs font-mono font-bold text-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
 							</div>
-							<h2 class="text-2xl font-black uppercase text-retro-ink mb-3">{ item.Title }</h2>
-							<div class="prose text-retro-ink max-w-none">@templ.Raw(item.ContentHTML)</div>
+							<h2 class="text-2xl font-head font-black uppercase text-foreground mb-3">{ item.Title }</h2>
+							<div class="prose text-foreground max-w-none">@templ.Raw(item.ContentHTML)</div>
 						</article>
 					}
 				</div>

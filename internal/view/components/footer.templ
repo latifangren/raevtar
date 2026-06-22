@@ -1,13 +1,21 @@
 package components
 
 templ Footer() {
-	<footer class="mt-12 py-8 border-t-2 border-retro-ink">
-		<div class="flex flex-wrap items-center justify-center gap-4 mb-4">
-			<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-paper">Go</span>
-			<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-paper">HTMX</span>
-			<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-paper">SQLite</span>
-			<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-paper">Cloudflare</span>
+	<footer class="mt-20 mb-12 py-12 nb-border-b">
+		<div class="flex flex-col md:flex-row justify-between items-center gap-8">
+			<div class="text-center md:text-left">
+				<a href="/" class="text-2xl font-head uppercase tracking-tighter no-underline text-foreground">raevtar</a>
+				<p class="text-sm font-bold text-muted mt-2">Single Go binary running on postmarketOS.</p>
+			</div>
+			<div class="flex flex-wrap justify-center gap-4" aria-label="Tech stack badges">
+				<span class="nb-badge bg-muted text-muted-foreground">Go 1.26</span>
+				<span class="nb-badge bg-accent text-accent-foreground">HTMX</span>
+				<span class="nb-badge bg-card text-card-foreground">SQLite</span>
+				<span class="nb-badge bg-destructive text-destructive-foreground">Cloudflare</span>
+			</div>
 		</div>
-		<p class="text-center text-sm text-retro-muted"><a href="https://raevtar.tech" class="font-bold no-underline hover:bg-retro-wheat">raevtar.tech</a> &middot; single binary on postmarketOS (whyred)</p>
+		<div class="mt-12 text-center text-xs font-black uppercase tracking-widest text-muted">
+			&copy; 2026 raevtar.tech &bull; Built with RetroUI principles
+		</div>
 	</footer>
 }

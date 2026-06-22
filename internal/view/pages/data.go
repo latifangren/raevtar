@@ -156,6 +156,8 @@ type DashboardData struct {
 	Categories      []model.Category
 	PlatformHealth  PublicHostHealthData
 	RefreshedAt     time.Time
+	ActiveTag       string
+	UniqueTags      []string
 }
 
 type PublicHostHealthData struct {
@@ -180,6 +182,7 @@ type ServerDetailData struct {
 	Metrics     []model.ServerMetric
 	Categories  []model.Category
 	RefreshedAt time.Time
+	IsAdmin     bool
 }
 
 type NotFoundData struct {
@@ -525,11 +528,11 @@ func ReadMinutes(markdown string) string {
 func TagClass(name string) string {
 	switch name {
 	case "auto":
-		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sageLight text-retro-ink"
+		return "text-xs px-2 py-0.5 font-bold nb-border bg-success/20 text-foreground"
 	case "commissioned":
-		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-wheat text-retro-ink"
+		return "text-xs px-2 py-0.5 font-bold nb-border bg-secondary text-foreground"
 	default:
-		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-paper text-retro-ink"
+		return "text-xs px-2 py-0.5 font-bold nb-border bg-card text-foreground"
 	}
 }
 
@@ -579,4 +582,31 @@ func MetricDotClass(online bool) string {
 		return "bg-retro-sage"
 	}
 	return "bg-retro-blush"
+}
+
+func searchPageHref(key string) string {
+	switch key {
+	case model.PageKeyAbout:
+		return "/about"
+	case model.PageKeyContact:
+		return "/contact"
+	default:
+		return "/"
+	}
+}
+
+// DashboardURL returns "/dashboard" with optional tag query param.
+func DashboardURL(tag string) string {
+	if tag == "" {
+		return "/dashboard"
+	}
+	return "/dashboard?tag=" + tag
+}
+
+// tern returns a if cond is true, otherwise b.
+func tern[T any](cond bool, a, b T) T {
+	if cond {
+		return a
+	}
+	return b
 }

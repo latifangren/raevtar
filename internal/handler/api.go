@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"crypto/sha256"
 	"crypto/subtle"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -12,6 +14,38 @@ import (
 	"raevtar/internal/model"
 	"raevtar/internal/service"
 )
+
+func (h *Handler) apiRecordPostReadTime(w http.ResponseWriter, r *http.Request) {
+	postID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid post id"})
+		return
+	}
+
+	var req struct {
+		Seconds int `json:"seconds"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid json payload"})
+		return
+	}
+
+	// security/correctness limits: pings must report standard heartbeats
+	if req.Seconds <= 0 || req.Seconds > 60 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid seconds value"})
+		return
+	}
+
+	hash := sha256.Sum256([]byte(clientIP(r)))
+	ipHash := hex.EncodeToString(hash[:8])
+
+	if err := h.svc.Blog.RecordPostReadTime(postID, ipHash, req.Seconds); err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
 
 func (h *Handler) apiListPosts(w http.ResponseWriter, r *http.Request) {
 	cat := r.URL.Query().Get("category")
@@ -531,6 +565,75 @@ func (h *Handler) apiRecordMetrics(w http.ResponseWriter, r *http.Request) {
 			writeJSON(w, http.StatusBadRequest, map[string]string{"error": err.Error()})
 			return
 		}
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
+}
+
+func (h *Handler) apiGetPendingCommands(w http.ResponseWriter, r *http.Request) {
+	idStr := r.PathValue("serverID")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if !h.canRecordMetrics(id, r) {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing or invalid agent token"})
+		return
+	}
+
+	cmds, err := h.svc.CommandQ.PendingCommands(id)
+	if err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+	if cmds == nil {
+		cmds = []model.ServerCommand{}
+	}
+	writeJSON(w, http.StatusOK, cmds)
+}
+
+type commandResultRequest struct {
+	CommandID int64  `json:"command_id"`
+	Result    string `json:"result"`
+	Failed    bool   `json:"failed"`
+}
+
+func (h *Handler) apiReportCommandResult(w http.ResponseWriter, r *http.Request) {
+	capRequestBody(w, r, apiBodyLimit)
+	idStr := r.PathValue("serverID")
+	id, err := strconv.ParseInt(idStr, 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid id"})
+		return
+	}
+	if !h.canRecordMetrics(id, r) {
+		writeJSON(w, http.StatusUnauthorized, map[string]string{"error": "missing or invalid agent token"})
+		return
+	}
+
+	var req commandResultRequest
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		if isBodyTooLarge(err) {
+			writeJSON(w, http.StatusRequestEntityTooLarge, map[string]string{"error": "request body too large"})
+			return
+		}
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid JSON"})
+		return
+	}
+	if req.CommandID == 0 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "command_id required"})
+		return
+	}
+
+	if req.Failed {
+		err = h.svc.CommandQ.FailCommand(req.CommandID, req.Result)
+	} else {
+		err = h.svc.CommandQ.CompleteCommand(req.CommandID, req.Result)
+	}
+	if err != nil {
 		internalServerJSON(w, r, err)
 		return
 	}

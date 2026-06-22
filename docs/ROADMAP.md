@@ -78,6 +78,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Editorial inbox Phase 2: lifecycle eksekusi (`running`, `failed`, `published_post_id`, failure metadata)
 - [x] Editorial inbox Phase 3: claim/lock/retry flow buat hindari double-processing antar run Hermes
 - [x] Editorial inbox Phase 4: fairness policy, overdue escalation, dan analytics hasil publish
+- [x] Search endpoint + HTMX search UI (`/search`, `GET /api/v1/search`)
 - [ ] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.
@@ -104,7 +105,12 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [ ] Alerting sederhana untuk node stale/offline
 - [ ] Versioned schema migration ledger jika migration makin banyak
 - [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
-
+- [x] Webhook system: threshold alerts (CPU/RAM/disk >= 90%), HMAC-SHA256, admin UI
+- [x] Server command queue: admin queue → agent poll → result report
+- [x] SEO/Sitemap/LLMs.txt: structured data, canonical URLs, OG images
+- [x] Post view tracking by IP hash (SHA-256, fire-and-forget)
+- [x] Dynamic OG images (SVG, neo-brutalist, tiap blog post + project)
+- [x] CI/CD pipeline: GitHub Actions test+build + GoReleaser multi-platform releases
 **Deliverable:** Platform cukup stabil untuk personal deployment yang exposed ke internet, dengan hardening dasar dan boundary publik/admin jelas.
 
 ---

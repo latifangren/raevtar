@@ -112,3 +112,64 @@ curl -fsS -X POST "${RAEVTAR_URL%/}/api/v1/servers/${SERVER_ID}/ping" \
 	-H "Authorization: Bearer ${TOKEN}" \
 	-H "Content-Type: application/json" \
 	-d "${JSON}"
+
+# Poll for pending commands
+COMMANDS_JSON=$(curl -fsS "${RAEVTAR_URL%/}/api/v1/servers/${SERVER_ID}/commands" \
+	-H "Authorization: Bearer ${TOKEN}" 2>/dev/null || echo "[]")
+
+if [ "${COMMANDS_JSON}" != "[]" ] && [ -n "${COMMANDS_JSON}" ]; then
+	# Split JSON array into individual objects, process each independently
+	echo "${COMMANDS_JSON}" | sed 's/^\[//;s/\]$//' | sed 's/},{/}\n{/g' | while read -r CMD_JSON; do
+		[ -z "${CMD_JSON}" ] && continue
+		CMD_ID=$(echo "${CMD_JSON}" | grep -o '"id":[0-9]*' | cut -d: -f2)
+		CMD_NAME=$(echo "${CMD_JSON}" | grep -o '"command":"[^"]*"' | cut -d'"' -f4)
+		if [ -z "${CMD_NAME}" ]; then
+			continue
+		fi
+
+		RESULT=""
+		FAILED="false"
+
+		case "${CMD_NAME}" in
+			RESTART_AGENT)
+				RESULT="Agent restart requested. Restart the agent process manually or via init/systemd."
+				;;
+			CLEAR_CACHE)
+				if command -v sync >/dev/null 2>&1; then
+					sync
+				fi
+				RESULT="Cache clear requested. System sync completed."
+				;;
+			REBOOT_NODE)
+				RESULT="Reboot requested. Node requires manual reboot or sudo privileges."
+				;;
+			UPDATE_AGENT)
+				# Re-fetch the agent script from the server
+				SCRIPT_PATH="${0}"
+				TMP_SCRIPT="/tmp/raevtar-agent-$$.sh"
+				if curl -fsS -o "${TMP_SCRIPT}" "${RAEVTAR_URL%/}/static/agent/raevtar-agent.sh" 2>/dev/null; then
+					chmod +x "${TMP_SCRIPT}"
+					mv "${TMP_SCRIPT}" "${SCRIPT_PATH}"
+					RESULT="Agent script updated successfully."
+				else
+					RESULT="Failed to fetch updated agent script."
+					FAILED="true"
+				fi
+				;;
+			*)
+				RESULT="Unknown command: ${CMD_NAME}"
+				FAILED="true"
+				;;
+		esac
+
+		# Report result back
+		# Escape JSON-special characters in result string
+		RESULT_ESC=$(printf '%s\n' "${RESULT}" | sed 's/"/\\"/g')
+		RESULT_JSON=$(printf '{"command_id":%d,"result":"%s","failed":%s}' \
+			"${CMD_ID}" "${RESULT_ESC}" "${FAILED}")
+		curl -fsS -X POST "${RAEVTAR_URL%/}/api/v1/servers/${SERVER_ID}/commands/result" \
+			-H "Authorization: Bearer ${TOKEN}" \
+			-H "Content-Type: application/json" \
+			-d "${RESULT_JSON}" >/dev/null 2>&1 || true
+	done
+fi

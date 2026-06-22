@@ -18,5 +18,7 @@ type ServerMetric struct {
 	TemperatureAvailable bool      `db:"temperature_available" json:"temperature_available"`
 	UptimeSeconds        int64     `db:"uptime_seconds" json:"uptime_seconds"`
 	Online               bool      `db:"online" json:"online"`
+	TopProcesses         string    `db:"top_processes" json:"top_processes"` // JSON string of top processes
+	Logs                 string    `db:"logs" json:"logs"`                   // Recent log snippets
 	RecordedAt           time.Time `db:"recorded_at" json:"recorded_at"`
 }

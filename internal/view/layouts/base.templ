@@ -7,14 +7,11 @@ import (
 
 templ Base(title string, currentPath string, categories []model.Category, seo model.SEOData) {
 	<!DOCTYPE html>
-	<html lang="en">
+	<html lang="en" class="scroll-smooth">
 		<head>
 			<meta charset="UTF-8"/>
 			<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
 			<title>{ title }</title>
-			<link rel="preconnect" href="https://fonts.googleapis.com"/>
-			<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
-			<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;900&family=JetBrains+Mono:wght@400;500;700&display=swap" rel="stylesheet"/>
 			<link rel="stylesheet" href="/static/css/style.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
 			<link rel="alternate" type="application/rss+xml" title="Raevtar" href="https://raevtar.tech/blog/feed.xml"/>
@@ -22,27 +19,36 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 				<link rel="canonical" href={ seo.CanonicalURL }/>
 			}
 			<meta name="htmx-config" content='{"allowEval":false,"allowScriptTags":false}'/>
-			<script src="/static/js/htmx.min.js"></script>
-			<script src="/static/js/raevtar-ui.js" defer></script>
+				<script src="/static/js/htmx.min.js"></script>
+				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+				<script src="/static/js/raevtar-ui.js" defer></script>
 			<meta name="description" content={ seo.Description }/>
 			<meta name="keywords" content="raevtar, blog, server monitoring, postmarketOS, linux"/>
 			<meta name="author" content="latifangren"/>
 			<meta property="og:type" content="website"/>
 			<meta property="og:site_name" content="Raevtar"/>
 			<meta property="og:title" content={ title }/>
-			<meta property="og:description" content={ seo.Description }/>
-			<meta property="og:url" content={ seo.CanonicalURL }/>
-			<meta name="twitter:card" content="summary"/>
+				<meta property="og:description" content={ seo.Description }/>
+				<meta property="og:url" content={ seo.CanonicalURL }/>
+				if seo.ImageURL != "" {
+					<meta property="og:image" content={ seo.ImageURL }/>
+					<meta name="twitter:image" content={ seo.ImageURL }/>
+					<meta name="twitter:card" content="summary_large_image"/>
+				} else {
+					<meta name="twitter:card" content="summary"/>
+				}
 			<meta name="twitter:title" content={ title }/>
 			<meta name="twitter:description" content={ seo.Description }/>
 			if seo.JSONLD != "" {
 				@RawHTML("<script type=\"application/ld+json\">" + seo.JSONLD + "</script>")
 			}
 		</head>
-		<body class="min-h-screen bg-retro-cream text-retro-ink antialiased">
-			<div class="max-w-6xl mx-auto px-4 pt-4">
+		<body class="min-h-screen bg-background text-foreground antialiased selection:bg-accent selection:text-accent-foreground">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				@components.Nav(categories, currentPath)
-				{ children... }
+				<main role="main" aria-label="Main content">
+					{ children... }
+				</main>
 				@components.Footer()
 			</div>
 		</body>

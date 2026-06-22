@@ -18,7 +18,12 @@ import (
 )
 
 type MonitorService struct {
-	repos *repo.Repositories
+	repos   *repo.Repositories
+	webhook *WebhookService
+}
+
+func (s *MonitorService) SetWebhook(ws *WebhookService) {
+	s.webhook = ws
 }
 
 var ErrServerNotFound = errors.New("server not found")
@@ -61,6 +66,10 @@ func (s *MonitorService) ListServers() ([]model.Server, error) {
 
 func (s *MonitorService) GetServer(id int64) (*model.Server, error) {
 	return s.repos.Server.GetByID(id)
+}
+
+func (s *MonitorService) GetServerByName(name string) (*model.Server, error) {
+	return s.repos.Server.GetByName(name)
 }
 
 func (s *MonitorService) UpdateServer(id int64, name, host string, port int, tags string) (*model.Server, error) {
@@ -111,6 +120,9 @@ func (s *MonitorService) RecordMetrics(serverID int64, m model.ServerMetric) err
 	}
 	if err := s.repos.Server.UpdateLastSeen(serverID, recordedAt); err != nil {
 		return fmt.Errorf("update last seen: %w", err)
+	}
+	if s.webhook != nil {
+		s.webhook.EvaluateAndFire(serverID, m)
 	}
 	return nil
 }

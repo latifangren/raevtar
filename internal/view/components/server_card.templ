@@ -8,15 +8,15 @@ import (
 )
 
 templ ServerCard(server model.Server) {
-	<a href={ templ.URL("/dashboard/" + strconv.FormatInt(server.ID, 10)) } class="rv-card-lift block bg-retro-paper border-2 border-retro-ink p-5 mb-4 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline">
+	<a href={ templ.URL("/dashboard/" + strconv.FormatInt(server.ID, 10)) } class="rv-card-lift block bg-card nb-border nb-shadow p-5 mb-4 no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" aria-label={ "View server: " + server.Name }>
 		<div class="flex items-center justify-between">
 			<div>
-				<h3 class="font-bold text-retro-ink">{ server.Name }</h3>
-				<p class="text-sm font-bold text-retro-muted">Endpoint hidden on public view</p>
+				<h3 class="font-bold text-foreground">{ server.Name }</h3>
+				<p class="text-sm font-bold text-muted">Endpoint hidden on public view</p>
 			</div>
-			<div class="flex items-center gap-1.5 text-sm">
-				<span class={ "inline-block w-3 h-3 border-2 border-retro-ink", statusDotClass(server.LastSeen) }></span>
-				<span class="font-bold text-retro-ink">{ serverStatusText(server.LastSeen) }</span>
+			<div class="flex items-center gap-1.5 text-sm" role="status" aria-label={ "Server status: " + serverStatusText(server.LastSeen) }>
+				<span class={ "inline-block w-3 h-3 border-2 border-foreground", statusDotClass(server.LastSeen) } aria-hidden="true"></span>
+				<span class="font-bold text-foreground">{ serverStatusText(server.LastSeen) }</span>
 			</div>
 		</div>
 	</a>

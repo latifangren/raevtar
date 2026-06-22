@@ -1,11 +1,16 @@
 package handler
 
 import (
+	"crypto/sha256"
 	"database/sql"
+	"encoding/hex"
 	"errors"
+	"fmt"
+	"html"
 	"math"
 	"net/http"
 	"path/filepath"
+	"sort"
 	"strconv"
 	"strings"
 	"time"
@@ -239,7 +244,7 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 	}
 	renderHTML(w, r, pages.ProjectDetail(pages.ProjectDetailData{
 		CurrentPath:   r.URL.Path,
-		SEO:           h.svc.SiteMeta.DefaultSEO(r.URL.Path),
+		SEO:           h.svc.SiteMeta.ProjectSEO(project),
 		Project:       project,
 		Categories:    categories,
 		Timeline:      timeline,
@@ -247,6 +252,39 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 		RelatedItems:  related,
 		ShowcaseItems: showcase,
 	}))
+}
+
+func (h *Handler) nodeStatusShortcode(w http.ResponseWriter, r *http.Request) {
+	name := r.PathValue("name")
+	server, err := h.svc.Monitor.GetServerByName(name)
+	if err != nil {
+		fmt.Fprintf(w, `<div class="nb-card bg-retro-blush p-4 my-6 text-sm font-bold">Node "%s" not found.</div>`, html.EscapeString(name))
+		return
+	}
+	metrics, err := h.svc.Monitor.GetRecentMetrics(server.ID, 1)
+	if err != nil {
+		// Log but do not fail hard for shortcode
+		h.svc.Admin.LogAudit("system", "METRIC_FETCH_ERROR", err.Error(), clientIP(r))
+	}
+
+	statusColor := "bg-retro-blush"
+	statusText := "Offline"
+	if len(metrics) > 0 && metrics[0].Online {
+		statusColor = "bg-retro-sage"
+		statusText = "Online"
+	}
+
+	fmt.Fprintf(w, `
+	<div class="nb-card bg-retro-paper p-4 my-6 flex items-center justify-between border-l-8 border-l-retro-ink">
+		<div>
+			<p class="text-[10px] font-black uppercase text-retro-muted mb-1">Live Node Status</p>
+			<h4 class="text-lg font-black uppercase">%s</h4>
+		</div>
+		<div class="flex items-center gap-3">
+			<span class="text-xs font-black uppercase">%s</span>
+			<div class="w-4 h-4 nb-border %s"></div>
+		</div>
+	</div>`, server.Name, statusText, statusColor)
 }
 
 func (h *Handler) projectChangelogPage(w http.ResponseWriter, r *http.Request) {
@@ -332,7 +370,7 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	renderHTML(w, r, pages.BlogList(pages.BlogListData{
+	blogData := pages.BlogListData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Posts:       posts,
@@ -342,7 +380,14 @@ func (h *Handler) blogList(w http.ResponseWriter, r *http.Request) {
 		ResultCount: total,
 		Page:        page,
 		TotalPages:  (total + 9) / 10,
-	}))
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderHTML(w, r, pages.BlogListItems(blogData))
+		return
+	}
+
+	renderHTML(w, r, pages.BlogList(blogData))
 }
 
 func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
@@ -366,7 +411,7 @@ func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	renderHTML(w, r, pages.Search(pages.SearchData{
+	searchData := pages.SearchData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
 		Categories:  categories,
@@ -386,7 +431,14 @@ func (h *Handler) searchPage(w http.ResponseWriter, r *http.Request) {
 			PageCount:    results.PageCount,
 			HasQuery:     results.Query != "",
 		},
-	}))
+	}
+
+	if r.Header.Get("HX-Request") == "true" {
+		renderHTML(w, r, pages.SearchResults(searchData))
+		return
+	}
+
+	renderHTML(w, r, pages.Search(searchData))
 }
 
 func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
@@ -399,6 +451,11 @@ func (h *Handler) blogDetail(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Post not found", http.StatusNotFound)
 		return
 	}
+	// Record view asynchronously (best-effort, fire-and-forget)
+	go func() {
+		hash := sha256.Sum256([]byte(r.RemoteAddr))
+		_ = h.svc.Blog.RecordPostView(post.ID, hex.EncodeToString(hash[:8]))
+	}()
 	categories, err := h.svc.Blog.ListCategories()
 	if err != nil {
 		internalServerError(w, r, err)
@@ -424,6 +481,32 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
+
+	activeTag := strings.TrimSpace(r.URL.Query().Get("tag"))
+	tagSet := make(map[string]bool)
+	var filtered []model.Server
+	for _, s := range servers {
+		for _, t := range splitTags(s.Tags) {
+			tagSet[t] = true
+		}
+		if activeTag == "" {
+			filtered = append(filtered, s)
+		} else {
+			for _, t := range splitTags(s.Tags) {
+				if strings.EqualFold(t, activeTag) {
+					filtered = append(filtered, s)
+					break
+				}
+			}
+		}
+	}
+	uniqueTags := make([]string, 0, len(tagSet))
+	for t := range tagSet {
+		uniqueTags = append(uniqueTags, t)
+	}
+	sort.Strings(uniqueTags)
+	servers = filtered
+
 	summaries := make([]pages.PublicServerSummary, 0, len(servers))
 	for _, server := range servers {
 		metrics, err := h.svc.Monitor.GetRecentMetrics(server.ID, 50)
@@ -443,6 +526,8 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		Categories:      categories,
 		PlatformHealth:  publicHostHealth(stats),
 		RefreshedAt:     time.Now().UTC(),
+		ActiveTag:       activeTag,
+		UniqueTags:      uniqueTags,
 	}))
 }
 
@@ -490,6 +575,8 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 		return pages.ServerDetailData{}, false
 	}
 
+	_, loggedIn := getSessionEntry(r)
+
 	return pages.ServerDetailData{
 		CurrentPath: r.URL.Path,
 		SEO:         h.svc.SiteMeta.DefaultSEO(r.URL.Path),
@@ -497,6 +584,7 @@ func (h *Handler) loadServerDetailData(w http.ResponseWriter, r *http.Request) (
 		Metrics:     metrics,
 		Categories:  categories,
 		RefreshedAt: time.Now().UTC(),
+		IsAdmin:     loggedIn,
 	}, true
 }
 
@@ -578,6 +666,19 @@ func (h *Handler) serveUpload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.ServeFile(w, r, path)
+}
+
+// splitTags splits comma-separated tags and trims whitespace.
+func splitTags(tags string) []string {
+	parts := strings.Split(tags, ",")
+	out := make([]string, 0, len(parts))
+	for _, p := range parts {
+		p = strings.TrimSpace(p)
+		if p != "" {
+			out = append(out, p)
+		}
+	}
+	return out
 }
 
 func (h *Handler) page404(w http.ResponseWriter, r *http.Request) {

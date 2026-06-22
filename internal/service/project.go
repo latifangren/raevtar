@@ -4,6 +4,7 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"regexp"
 	"strings"
 	"time"
 
@@ -14,7 +15,11 @@ import (
 	"github.com/yuin/goldmark/extension"
 )
 
-var ErrInvalidProjectInput = errors.New("invalid project input")
+var (
+	ErrInvalidProjectInput = errors.New("invalid project input")
+
+	serverStatusRe = regexp.MustCompile(`\[\[server-status:([a-zA-Z0-9-]+)\]\]`)
+)
 var ErrProjectNotFound = errors.New("project not found")
 var ErrInvalidProjectSort = errors.New("invalid project sort")
 var ErrInvalidProjectState = errors.New("invalid project state")
@@ -239,6 +244,18 @@ func (s *ProjectService) DeleteProject(id int64) error {
 }
 
 func (s *ProjectService) RenderMarkdown(content string) (string, error) {
+	// Pre-process shortcodes
+	content = serverStatusRe.ReplaceAllStringFunc(content, func(match string) string {
+		parts := serverStatusRe.FindStringSubmatch(match)
+		if len(parts) < 2 {
+			return match
+		}
+		nodeName := parts[1]
+		return fmt.Sprintf(`<div class="nb-card bg-retro-paper p-4 my-6" hx-get="/lab/node-status/%s" hx-trigger="load" hx-swap="outerHTML">
+			<p class="text-xs font-black uppercase text-retro-muted animate-pulse">Loading node status: %s...</p>
+		</div>`, nodeName, nodeName)
+	})
+
 	var buf strings.Builder
 	if err := s.markdown.Convert([]byte(content), &buf); err != nil {
 		return "", fmt.Errorf("render markdown: %w", err)

@@ -1,138 +1,134 @@
 package pages
 
 templ ServerDetail(data ServerDetailData) {
-@page(data.Server.Name + " — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<div class="mb-6 flex flex-wrap items-center gap-4 text-sm font-bold text-retro-muted">
-			<a href="/dashboard" class="font-bold no-underline hover:bg-retro-wheat">&larr; Back to status</a>
-			<span>&middot;</span>
-			<a href="/docs" class="no-underline hover:bg-retro-wheat">visibility rules</a>
-			<span>&middot;</span>
-			<a href="/projects" class="no-underline hover:bg-retro-wheat">project lanes</a>
+	@page(data.Server.Name + " — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
+		<div class="mb-6 flex flex-wrap items-center gap-4 text-sm font-bold text-muted">
+			<a href="/dashboard" class="nb-button py-1 px-3 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">&larr; Back to status</a>
+			<span aria-hidden="true">&middot;</span>
+			<a href="/docs" class="hover:bg-accent px-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">visibility rules</a>
+			<span aria-hidden="true">&middot;</span>
+			<a href="/projects" class="hover:bg-accent px-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">project lanes</a>
 		</div>
 		@ServerDetailLive(data)
 	}
 }
 
 templ ServerDetailLive(data ServerDetailData) {
-	<div id="server-detail-live" class="rv-refresh-target" hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") } hx-trigger="every 15s" hx-swap="outerHTML" hx-indicator="#server-detail-live">
-		<section class="mb-6 bg-retro-paper border-2 border-retro-ink shadow-[6px_6px_0px_0px_#2D3748] overflow-hidden">
+	<div id="server-detail-live" aria-live="polite" class="rv-refresh-target" 
+		hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") } 
+		hx-trigger="every 15s" 
+		hx-swap="outerHTML" 
+		hx-indicator="#server-detail-live">
+		
+		<section class="mb-8 nb-card bg-card overflow-hidden">
 			<div class="grid gap-0 lg:grid-cols-[0.9fr_1.1fr]">
-				<div class="bg-retro-ink text-retro-cream p-6 md:p-8">
-					<p class="text-xs font-black uppercase tracking-widest text-retro-wheat mb-3">Node detail</p>
-					<h1 class="text-4xl md:text-6xl font-black uppercase leading-none mb-4">{ data.Server.Name }</h1>
-					<p class="text-sm font-bold text-retro-sageLight">Endpoint hidden on public view.</p>
-					<div class="flex flex-wrap gap-2 mt-5">
-						<span class="text-xs px-2 py-1 font-black uppercase border-2 border-retro-cream bg-retro-wheat text-retro-ink">{ ServerStatusTextAt(data.Server.LastSeen, data.RefreshedAt) }</span>
-						<span class="text-xs px-2 py-1 font-black uppercase border-2 border-retro-cream bg-retro-sageLight text-retro-ink">{ FreshnessWindowText(data.Server.LastSeen, data.RefreshedAt) }</span>
-						<span class="text-xs px-2 py-1 font-black uppercase border-2 border-retro-cream bg-retro-paper text-retro-ink">public summary</span>
+				<div class="bg-foreground text-primary-foreground p-8">
+					<p class="nb-badge bg-accent text-foreground mb-3">Node detail</p>
+					<h1 class="nb-h1 text-primary-foreground font-head mb-4">{ data.Server.Name }</h1>
+					<p class="text-sm font-bold text-success">Endpoint hidden on public view.</p>
+					<p class="text-xs font-bold text-muted mt-2">Use admin diagnostics for network details.</p>
+					<div class="flex flex-wrap gap-2 mt-6">
+						<span class="nb-badge bg-card text-foreground">{ ServerStatusTextAt(data.Server.LastSeen, data.RefreshedAt) }</span>
+						<span class="nb-badge bg-success/20 text-foreground">{ FreshnessWindowText(data.Server.LastSeen, data.RefreshedAt) }</span>
 					</div>
 				</div>
-				<div class="grid gap-4 p-6 md:grid-cols-3 md:p-8">
-					<div class="border-2 border-retro-ink bg-retro-sageLight p-4 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">state</p>
-						<div class="flex items-center gap-2"><span class={ "inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClassAt(data.Server.LastSeen, data.RefreshedAt) }></span><span class="text-xl font-black text-retro-ink">{ ServerStatusTextAt(data.Server.LastSeen, data.RefreshedAt) }</span></div>
+				<div class="grid gap-4 p-8 md:grid-cols-3">
+					<div class="nb-card bg-success/20 p-4">
+						<p class="text-xs font-black uppercase text-muted mb-2">state</p>
+						<div class="flex items-center gap-2">
+							<span class={ "inline-block w-4 h-4 nb-border", StatusDotClassAt(data.Server.LastSeen, data.RefreshedAt) } aria-hidden="true"></span>
+							<span class="text-xl font-black text-foreground">{ ServerStatusTextAt(data.Server.LastSeen, data.RefreshedAt) }</span>
+						</div>
 					</div>
-					<div class="border-2 border-retro-ink bg-retro-wheat p-4 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">last signal age</p>
-						<p class="text-lg font-black text-retro-ink">{ LastSignalAgeText(data.Server.LastSeen, data.RefreshedAt) }</p>
+					<div class="nb-card bg-accent p-4">
+						<p class="text-xs font-black uppercase text-muted mb-2">last signal age</p>
+						<p class="text-lg font-black text-foreground">{ LastSignalAgeText(data.Server.LastSeen, data.RefreshedAt) }</p>
 					</div>
-					<div class="border-2 border-retro-ink bg-retro-paper p-4 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">latest sample age</p>
+					<div class="nb-card bg-card p-4">
+						<p class="text-xs font-black uppercase text-muted mb-2">latest sample age</p>
 						if len(data.Metrics) == 0 {
-							<p class="text-lg font-black text-retro-ink">N/A</p>
+							<p class="text-lg font-black text-foreground">N/A</p>
 						} else {
-							<p class="text-lg font-black text-retro-ink">{ MetricRecordedAgeText(data.Metrics[0].RecordedAt, data.RefreshedAt) }</p>
+							<p class="text-lg font-black text-foreground">{ MetricRecordedAgeText(data.Metrics[0].RecordedAt, data.RefreshedAt) }</p>
 						}
 					</div>
-					<div class="md:col-span-3 border-2 border-retro-ink bg-retro-paper p-4">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">freshness diagnosis</p>
-						<p class="text-sm font-black text-retro-ink">{ FreshnessCauseHint(data.Server.LastSeen, data.Metrics, data.RefreshedAt) }</p>
-						<p class="text-xs font-bold text-retro-muted mt-2">{ DashboardFreshnessReasonAt(data.Server.LastSeen, data.RefreshedAt) }</p>
-						<p class="text-xs font-bold text-retro-muted mt-2">{ FreshnessWindowText(data.Server.LastSeen, data.RefreshedAt) } &middot; Panel refreshed { RefreshTimeText(data.RefreshedAt) } &middot; Auto-refresh every 15s</p>
-					</div>
-					<div class="md:col-span-3 grid gap-3 md:grid-cols-3">
-						<div class="border-2 border-retro-ink bg-retro-wheat p-4"><p class="text-xs font-black uppercase text-retro-muted mb-2">sample count</p><p class="text-sm font-black text-retro-ink">{ MetricSampleCountText(data.Metrics) }</p></div>
-						<div class="border-2 border-retro-ink bg-retro-sageLight p-4"><p class="text-xs font-black uppercase text-retro-muted mb-2">history window</p><p class="text-sm font-black text-retro-ink">{ MetricWindowText(data.Metrics) }</p></div>
-						<div class="border-2 border-retro-ink bg-retro-paper p-4"><p class="text-xs font-black uppercase text-retro-muted mb-2">availability</p><p class="text-sm font-black text-retro-ink">{ MetricAvailabilityText(data.Metrics) }</p></div>
-					</div>
-					<div class="md:col-span-3 border-2 border-retro-ink bg-retro-paper p-4">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">endpoint</p>
-						<p class="text-sm font-black text-retro-ink">Hidden on public view. Use admin diagnostics for network details.</p>
+					<div class="md:col-span-3 nb-card bg-background p-4">
+						<p class="text-xs font-black uppercase text-muted mb-2">freshness diagnosis</p>
+						<p class="text-sm font-black text-foreground">{ FreshnessCauseHint(data.Server.LastSeen, data.Metrics, data.RefreshedAt) }</p>
+						<p class="text-xs font-bold text-muted mt-2">Panel refreshed { RefreshTimeText(data.RefreshedAt) } &middot; Auto-refresh every 15s</p>
 					</div>
 				</div>
 			</div>
 		</section>
-		<section class="rv-timeline mb-6 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]">
-				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">public timeline</p>
-				<h2 class="text-2xl font-black uppercase leading-tight mb-5">Signal path, public labels only.</h2>
-				<div class="grid gap-4 md:grid-cols-3">
-					<div class="rv-timeline-item border-2 border-retro-ink bg-retro-sageLight p-4">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">01 Signal</p>
-						<p class="text-sm font-bold text-retro-ink">Node sends a freshness pulse into Raevtar.</p>
-					</div>
-					<div class="rv-timeline-item border-2 border-retro-ink bg-retro-wheat p-4">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">02 Redact</p>
-						<p class="text-sm font-bold text-retro-ink">Private topology stays hidden before public render.</p>
-					</div>
-					<div class="rv-timeline-item border-2 border-retro-ink bg-retro-blush p-4">
-						<p class="text-xs font-black uppercase text-retro-muted mb-2">03 Refresh</p>
-						<p class="text-sm font-bold text-retro-ink">HTMX swaps this safe summary every 15 seconds.</p>
-					</div>
-				</div>
-		</section>
-		<section class="mb-6">
+
+		<section class="mb-8">
 			<div class="flex flex-wrap items-end justify-between gap-3 mb-4">
 				<div>
-					<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">latest public-safe sample</p>
-					<h2 class="text-2xl font-black uppercase leading-tight">System Health</h2>
+					<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">historical trends</p>
+					<h2 class="nb-h2 font-head text-2xl">Signal Performance</h2>
 				</div>
-				<p class="text-xs font-bold text-retro-muted">No endpoint, private labels, secrets, or logs included.</p>
+			</div>
+			if len(data.Metrics) > 0 {
+				@MetricCharts(data.Metrics)
+			} else {
+				<div class="nb-card bg-card p-8 text-center">
+					<p class="text-muted font-bold">Waiting for enough signal samples to render performance trends.</p>
+				</div>
+			}
+		</section>
+
+		<section class="mb-8">
+			<div class="flex flex-wrap items-end justify-between gap-3 mb-4">
+				<div>
+					<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">latest public-safe sample</p>
+					<h2 class="nb-h2 font-head text-2xl">System Health</h2>
+				</div>
+				<p class="text-xs font-bold text-muted">No private labels or secrets included.</p>
 			</div>
 			if len(data.Metrics) == 0 {
-				<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-sm font-black text-retro-muted mb-4">Belum ada sampel health. Safe readouts menunggu sinyal pertama.</p>
-					<div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-						<div class="border-2 border-retro-ink bg-retro-paper p-3"><p class="text-xs font-black uppercase text-retro-muted">CPU percent / load / cores</p><p class="text-lg font-mono font-black text-retro-ink">N/A</p></div>
-						<div class="border-2 border-retro-ink bg-retro-wheat p-3"><p class="text-xs font-black uppercase text-retro-muted">RAM used / total / percent</p><p class="text-lg font-mono font-black text-retro-ink">N/A</p></div>
-						<div class="border-2 border-retro-ink bg-retro-sageLight p-3"><p class="text-xs font-black uppercase text-retro-muted">Disk used / total / percent</p><p class="text-lg font-mono font-black text-retro-ink">N/A</p></div>
-						<div class="border-2 border-retro-ink bg-retro-blush p-3"><p class="text-xs font-black uppercase text-retro-muted">Temperature</p><p class="text-lg font-mono font-black text-retro-ink">N/A</p></div>
-						<div class="border-2 border-retro-ink bg-retro-paper p-3"><p class="text-xs font-black uppercase text-retro-muted">Uptime</p><p class="text-lg font-mono font-black text-retro-ink">N/A</p></div>
-						<div class="border-2 border-retro-ink bg-retro-ink p-3 text-retro-cream"><p class="text-xs font-black uppercase text-retro-wheat">Latest sample age</p><p class="text-lg font-mono font-black">N/A</p></div>
-					</div>
+				<div class="nb-card bg-card p-8 text-center">
+					<p class="text-sm font-black text-muted">Belum ada sampel health. Waiting for first signal pulse.</p>
 				</div>
 			} else {
-			<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
-				<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xs font-black uppercase text-retro-muted mb-1">CPU percent</p>
-					<p class="text-3xl font-black font-mono text-retro-ink">{ MetricText(data.Metrics[0].CPUPercent) }%</p>
-					<p class="text-xs font-bold text-retro-muted mt-2">Load { CPULoadText(data.Metrics[0]) } · { CPUCoresText(data.Metrics[0]) } cores</p>
+				<div class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
+					<div class="nb-card bg-card p-5">
+						<p class="text-xs font-black uppercase text-muted mb-1">CPU percent</p>
+						<p class="text-3xl font-black font-mono text-foreground">{ MetricText(data.Metrics[0].CPUPercent) }%</p>
+						<p class="text-xs font-bold text-muted mt-2">Load { CPULoadText(data.Metrics[0]) } · { CPUCoresText(data.Metrics[0]) } cores</p>
+					</div>
+					<div class="nb-card bg-accent p-5">
+						<p class="text-xs font-black uppercase text-muted mb-1">RAM</p>
+						<p class="text-xl font-black font-mono text-foreground">{ RAMHealthText(data.Metrics[0]) }</p>
+						<p class="text-xs font-bold text-muted mt-2">Used / total / percent.</p>
+					</div>
+					<div class="nb-card bg-success/20 p-5">
+						<p class="text-xs font-black uppercase text-muted mb-1">Disk</p>
+						<p class="text-xl font-black font-mono text-foreground">{ DiskHealthText(data.Metrics[0]) }</p>
+						<p class="text-xs font-bold text-muted mt-2">Used / total / percent.</p>
+					</div>
+					<div class="nb-card bg-destructive p-5">
+						<p class="text-xs font-black uppercase text-muted mb-1">Temperature</p>
+						<p class="text-3xl font-black font-mono text-foreground">{ TemperatureText(data.Metrics[0]) }</p>
+						<p class="text-xs font-bold text-muted mt-2">Reported when sensor is available.</p>
+					</div>
+					<div class="nb-card bg-card p-5">
+						<p class="text-xs font-black uppercase text-muted mb-1">Uptime</p>
+						<p class="text-3xl font-black font-mono text-foreground">{ UptimeText(data.Metrics[0].UptimeSeconds) }</p>
+						<p class="text-xs font-bold text-muted mt-2">Reported by latest metric.</p>
+					</div>
+					<div class="bg-foreground text-primary-foreground nb-border p-5 nb-shadow">
+						<p class="text-xs font-black uppercase text-accent mb-1">Latest sample</p>
+						<p class="text-3xl font-black font-mono">{ MetricRecordedAgeText(data.Metrics[0].RecordedAt, data.RefreshedAt) }</p>
+						<p class="text-xs font-bold text-success mt-2">{ MetricSampleCountText(data.Metrics) } · { MetricWindowText(data.Metrics) } · { MetricAvailabilityText(data.Metrics) }</p>
+					</div>
 				</div>
-				<div class="bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xs font-black uppercase text-retro-muted mb-1">RAM</p>
-					<p class="text-xl font-black font-mono text-retro-ink">{ RAMHealthText(data.Metrics[0]) }</p>
-					<p class="text-xs font-bold text-retro-muted mt-2">Used / total / percent.</p>
-				</div>
-				<div class="bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xs font-black uppercase text-retro-muted mb-1">Disk</p>
-					<p class="text-xl font-black font-mono text-retro-ink">{ DiskHealthText(data.Metrics[0]) }</p>
-					<p class="text-xs font-bold text-retro-muted mt-2">Used / total / percent.</p>
-				</div>
-				<div class="bg-retro-blush border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xs font-black uppercase text-retro-muted mb-1">Temperature</p>
-					<p class="text-3xl font-black font-mono text-retro-ink">{ TemperatureText(data.Metrics[0]) }</p>
-					<p class="text-xs font-bold text-retro-muted mt-2">Reported when sensor is available.</p>
-				</div>
-				<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xs font-black uppercase text-retro-muted mb-1">Uptime</p>
-					<p class="text-3xl font-black font-mono text-retro-ink">{ UptimeText(data.Metrics[0].UptimeSeconds) }</p>
-					<p class="text-xs font-bold text-retro-muted mt-2">Reported by latest metric.</p>
-				</div>
-				<div class="bg-retro-ink text-retro-cream border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-					<p class="text-xs font-black uppercase text-retro-wheat mb-1">Latest sample</p>
-					<p class="text-3xl font-black font-mono">{ MetricRecordedAgeText(data.Metrics[0].RecordedAt, data.RefreshedAt) }</p>
-					<p class="text-xs font-bold text-retro-sageLight mt-2">{ MetricSampleCountText(data.Metrics) } · { MetricWindowText(data.Metrics) } · { MetricAvailabilityText(data.Metrics) }</p>
-				</div>
-			</div>
+				
+				if data.IsAdmin {
+					<div class="grid gap-8 lg:grid-cols-2">
+						@TopProcessesTable(data.Metrics[0].TopProcesses)
+						@LogStream(data.Metrics[0].Logs)
+					</div>
+				}
 			}
 		</section>
 	</div>

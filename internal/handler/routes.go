@@ -32,6 +32,8 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/llms.txt", h.llmsTxt)
 	r.Get("/sitemap.xml", h.sitemapXML)
 	r.Get("/uploads/{filename}", h.serveUpload)
+	r.Get("/og-image/blog/{slug}", h.serveBlogOGImage)
+	r.Get("/og-image/project/{slug}", h.serveProjectOGImage)
 
 	// pages
 	r.Get("/", h.landingIndex)
@@ -46,6 +48,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/search", h.searchPage)
 	r.Get("/projects/{slug}/changelog", h.projectChangelogPage)
 	r.Get("/projects/{slug}", h.projectDetail)
+	r.Get("/lab/node-status/{name}", h.nodeStatusShortcode)
 	r.Get("/topics", h.topicsPage)
 	r.Get("/dashboard", h.dashboardIndex)
 	r.Get("/dashboard/{serverID}/live", h.dashboardDetailLive)
@@ -112,6 +115,11 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Post("/servers/update/{serverID}", h.adminUpdateServer)
 				r.Post("/servers/rotate-token/{serverID}", h.adminRotateServerToken)
 				r.Post("/servers/delete/{serverID}", h.adminDeleteServer)
+				r.Post("/servers/command/{serverID}", h.adminServerCommand)
+				r.Get("/webhooks", h.adminWebhooks)
+				r.Post("/webhooks", h.adminCreateWebhook)
+				r.Post("/webhooks/update/{webhookID}", h.adminUpdateWebhook)
+				r.Post("/webhooks/delete/{webhookID}", h.adminDeleteWebhook)
 				r.Get("/audit-log", h.adminAuditLog)
 				r.Get("/manage-users", h.adminUsers)
 				r.Post("/manage-users", h.adminCreateUser)
@@ -123,6 +131,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	// API v1
 	r.Route("/api/v1", func(r chi.Router) {
 		r.Get("/posts", h.apiListPosts)
+		r.Post("/posts/{id}/read-time", h.apiRecordPostReadTime)
 		r.Get("/search", h.apiSearch)
 		r.Get("/projects", h.apiListProjects)
 		r.Get("/projects/{slug}/updates", h.apiListProjectUpdates)
@@ -159,6 +168,8 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		r.With(h.adminAuth).Get("/servers/{serverID}", h.apiGetServer)
 		r.With(h.adminAuth).Post("/servers", h.apiCreateServer)
 		r.Post("/servers/{serverID}/ping", h.apiRecordMetrics)
+		r.Get("/servers/{serverID}/commands", h.apiGetPendingCommands)
+		r.Post("/servers/{serverID}/commands/result", h.apiReportCommandResult)
 	})
 
 	// Store mux for debugging

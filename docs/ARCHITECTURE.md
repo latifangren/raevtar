@@ -97,26 +97,48 @@ raevtar/
 │   ├── model/
 │   │   ├── post.go              # Post struct — blog article
 │   │   ├── category.go          # Category struct
+│   │   ├── project.go           # Project struct + updates/relations/showcase
 │   │   ├── server.go            # Server struct — monitoring target
 │   │   ├── server_metric.go     # Metrics history (CPU/load/RAM/disk/temp/uptime)
+│   │   ├── server_command.go    # Server command queue (pending/running/completed/failed)
 │   │   ├── tag.go               # Normalized blog tags
 │   │   ├── user.go              # Admin users + RBAC roles
-│   │   └── audit.go             # Admin audit log
+│   │   ├── audit.go             # Admin audit log
+│   │   ├── webhook.go           # Webhook config + event log
+│   │   ├── seo.go               # SEO data struct (description, canonical, JSON-LD)
+│   │   ├── page_content.go      # Managed page content (about, contact)
+│   │   ├── editorial_inbox.go   # Editorial inbox item + lifecycle
+│   │   └── media.go             # Media asset struct
 │   │
 │   ├── repo/
 │   │   ├── db.go                # Init SQLite connection + migrations auto-run
 │   │   ├── post_repo.go         # CRUD posts
 │   │   ├── category_repo.go     # CRUD categories
+│   │   ├── project_repo.go      # CRUD projects + updates/relations/showcase
 │   │   ├── server_repo.go       # CRUD servers
 │   │   ├── metric_repo.go       # Insert/query server metrics
+│   │   ├── command_repo.go      # Server command queue CRUD
 │   │   ├── tag_repo.go          # Tags + post_tags join table
 │   │   ├── user_repo.go         # Admin users
-│   │   └── audit_repo.go        # Audit log queries
+│   │   ├── audit_repo.go        # Audit log queries
+│   │   ├── webhook_repo.go      # Webhook configs + events
+│   │   ├── view_repo.go         # Post view tracking by IP hash
+│   │   ├── page_content_repo.go # Managed page content
+│   │   ├── editorial_inbox_repo.go # Editorial inbox CRUD
+│   │   └── media_repo.go        # Media asset metadata
 │   │
 │   ├── service/
-│   │   ├── blog.go              # Blog logic: slug generation, markdown render, pagination
-│   │   ├── monitor.go           # Server monitoring: agent tokens + metrics recording
+│   │   ├── blog.go              # Blog logic: slug, markdown render, pagination, view recording
+│   │   ├── project.go           # Project logic: lifecycle, timeline, relations, showcase
+│   │   ├── search.go            # Full-text search across posts/projects/pages
+│   │   ├── site_meta.go         # SEO: canonical URLs, JSON-LD, sitemap, LLMs.txt, OG images
+│   │   ├── page_content.go      # Managed page content (about, contact)
+│   │   ├── editorial_inbox.go   # Editorial inbox lifecycle + claim + fairness policy
+│   │   ├── monitor.go           # Server monitoring: agent tokens, metrics recording, webhook alerts
 │   │   ├── admin.go             # Admin auth/users/audit boundary
+│   │   ├── command_queue.go     # Server command queue lifecycle
+│   │   ├── webhook.go           # Webhook config + threshold evaluation + fire
+│   │   ├── media.go             # Media upload/storage
 │   │   └── seed.go              # Seed initial data (default categories, admin user)
 │   │
 │   ├── handler/
@@ -124,30 +146,42 @@ raevtar/
 │   │   ├── handlers.go          # Public page handlers render templ pages
 │   │   ├── render.go            # templ.Component HTML response helper
 │   │   ├── admin.go             # Admin panel handlers render templ views
-│   │   ├── auth.go              # API key + admin session auth
+│   │   ├── auth.go              # API key + admin session auth + CSRF
 │   │   ├── api.go               # REST API handlers (JSON)
 │   │   ├── hardening.go         # Request caps, generic 500s, login throttle
-│   │   ├── security.go          # Security headers + CSP
-│   │   └── rss.go               # RSS feed
+│   │   ├── security.go          # Security headers + CSP + trusted proxy CIDR
+│   │   ├── rss.go               # RSS feed
+│   │   └── og_image.go          # Dynamic SVG OG images for blog posts + projects
 │   │
 │   └── view/
 │       ├── layouts/
-│       │   └── base.templ       # HTML shell: <head>, nav, footer, CSS, self-hosted HTMX
+│       │   └── base.templ       # HTML shell: <head>, nav, footer, CSS, self-hosted HTMX, SEO meta
 │       ├── pages/
-│       │   ├── index.templ       # Landing page
-│       │   ├── blog_list.templ   # Blog listing dengan filter kategori
+│       │   ├── index.templ       # Landing page (featured projects, recent posts, server health)
+│       │   ├── blog_list.templ   # Blog listing dengan filter kategori + HTMX partial
 │       │   ├── blog_post.templ   # Single post (render markdown → HTML)
+│       │   ├── projects.templ    # Project archive with filters
+│       │   ├── project_detail.templ # Project detail + timeline/changelog/showcase
+│       │   ├── search.templ      # Search page (HTMX-powered partial results)
 │       │   ├── lab.templ         # Public-safe aggregate lab page
 │       │   ├── dashboard.templ   # Dashboard overview (HTMX auto-refresh)
-│       │   ├── server_detail.templ # Detail satu server
+│       │   ├── server_detail.templ # Detail satu server + chart extras
+│       │   ├── topics.templ      # Topic/index switchboard
+│       │   ├── about.templ       # About page (managed content)
+│       │   ├── contact.templ     # Contact page (managed content)
+│       │   ├── docs.templ        # Public-safe docs page
 │       │   └── not_found.templ   # Custom 404 page
 │       ├── admin/
 │       │   ├── layout.templ      # Admin shell + login page
 │       │   ├── pages.templ       # Admin dashboard/posts/servers/users/audit pages
-│       │   └── data.go           # Admin view data + presentation helpers
+│       │   ├── server_detail.templ # Admin server detail + commands + metrics
+│       │   ├── webhooks.templ    # Admin webhook config management
+│       │   └── data.go           # Admin view data + presentation helpers (722 lines)
 │       └── components/
 │           ├── nav.templ         # Navigasi bar
+│           ├── footer.templ      # Footer
 │           ├── post_card.templ   # Card ringkasan post (reusable)
+│           ├── project_card.templ # Card ringkasan project (reusable)
 │           ├── server_card.templ # Card status server (reusable)
 │           └── pagination.templ  # Pagination component
 │
@@ -187,29 +221,9 @@ raevtar/
 │ created_at │     │ content_md       │  ←  markdown
 │ updated_at │     │ excerpt          │  ←  ringkasan
 └────────────┘     │ published        │  ←  boolean
+                   │ cover_image_url  │
                    │ created_at       │
                    │ updated_at       │
-                   └──────────────────┘
-
-┌────────────┐     ┌──────────────────┐
-│  servers   │     │ server_metrics   │
-├────────────┤     ├──────────────────┤
-│ id (PK)    │◄────│ id (PK)          │
-│ name       │     │ server_id (FK)   │
-│ host       │     │ cpu_percent      │
-│ port       │     │ cpu_load_1       │
-│ tags       │     │ cpu_load_5       │
-│ token_hash │     │ cpu_load_15      │
-│ last_seen  │     │ cpu_cores        │
-│ created_at │     │ ram_used_mb      │
-└────────────┘     │ ram_total_mb     │
-                   │ disk_used_gb     │
-                   │ disk_total_gb    │
-                   │ temperature_c    │
-                   │ temp_available   │
-                   │ uptime_seconds   │
-                   │ online           │
-                   │ recorded_at      │
                    └──────────────────┘
 
 ┌────────────┐     ┌──────────────────┐
@@ -227,10 +241,68 @@ raevtar/
 │ id (PK)    │     │ id (PK)          │
 │ username   │     │ user             │
 │ role       │     │ action           │
-│ display_name     │ details          │
+│ display_name│     │ details          │
 │ created_at │     │ ip               │
 │ updated_at │     │ created_at       │
 └────────────┘     └──────────────────┘
+
+┌────────────┐     ┌──────────────────┐
+│  servers   │     │ server_metrics   │
+├────────────┤     ├──────────────────┤
+│ id (PK)    │◄────│ id (PK)          │
+│ name       │     │ server_id (FK)   │
+│ host       │     │ cpu_percent      │
+│ port       │     │ cpu_load_1/5/15  │
+│ tags       │     │ cpu_cores        │
+│ token_hash │     │ ram_used_mb      │
+│ last_seen  │     │ ram_total_mb     │
+│ created_at │     │ disk_used_gb     │
+└────────────┘     │ disk_total_gb    │
+                   │ temperature_c    │
+       │           │ uptime_seconds   │
+       │           │ online           │
+       ▼           │ recorded_at      │
+┌────────────┐     └──────────────────┘
+│server_cmds │
+├────────────┤     ┌──────────────────┐
+│ id (PK)    │     │   projects       │
+│ server_id  │     ├──────────────────┤
+│ command    │     │ id (PK)          │
+│ status     │     │ slug (UNIQUE)    │
+│ payload    │     │ title            │
+│ result     │     │ excerpt          │
+│ queued_at  │     │ content_md       │
+│ started_at │     │ state            │
+│ completed  │     │ featured         │
+└────────────┘     │ cover_image_url  │
+                   │ sort_order       │
+                   │ published        │
+                   └──────────────────┘
+
+┌──────────────┐       │
+│webhook_cfgs  │       │
+├──────────────┤       ▼
+│ id (PK)      │  ┌──────────────────┐
+│ name         │  │  webhook_events  │
+│ url          │  ├──────────────────┤
+│ secret       │  │ id (PK)          │
+│ enabled      │  │ webhook_id (FK)  │
+│ created_at   │  │ event_type       │
+└──────────────┘  │ server_id        │
+                  │ payload          │
+                  │ response_code    │
+                  │ response_body    │
+                  │ fired_at         │
+                  └──────────────────┘
+
+┌──────────────┐  ┌──────────────────┐
+│   post_views  │  │ page_content     │
+├──────────────┤  ├──────────────────┤
+│ id (PK)      │  │ page_key (PK)    │
+│ post_id (FK) │  │ title            │
+│ ip_hash      │  │ content_md       │
+│ viewed_at    │  │ updated_at       │
+└──────────────┘  └──────────────────┘
 ```
 
 ---
@@ -239,27 +311,66 @@ raevtar/
 
 | Method | Path | Handler | Keterangan |
 |--------|------|---------|------------|
-| GET | `/` | landing.Index | Landing page |
+| GET | `/` | landing.Index | Landing page (featured projects, recent posts, server health) |
+| GET | `/about` | about.Page | About page (managed content) |
 | GET | `/blog` | blog.List | Blog list (semua) |
 | GET | `/blog?category=ai-agent` | blog.List | Filter by kategori/topic |
 | GET | `/blog/{slug}` | blog.Detail | Single post |
+| GET | `/contact` | contact.Page | Contact page (managed content) |
 | GET | `/topics` | topics.Page | Public topic index / switchboard |
 | GET | `/blog/feed.xml` | rss.Feed | RSS feed |
+| GET | `/search` | search.Page | Public search page (HTMX partial) |
 | GET | `/lab` | lab.Page | Public-safe aggregate lab page |
+| GET | `/lab/node-status/{name}` | lab.NodeStatus | Node status shortcode (inline HTML embed) |
+| GET | `/projects` | projects.Page | Project archive with featured/state/sort filters |
+| GET | `/projects/{slug}` | projects.Detail | Project detail + timeline/changelog/relations/showcase |
+| GET | `/projects/{slug}/changelog` | projects.Changelog | Project changelog page |
 | GET | `/dashboard` | dashboard.Index | Public-safe server monitoring + Platform System Health |
 | GET | `/dashboard/{serverID}` | dashboard.Detail | Public-safe detail server |
 | GET | `/dashboard/{serverID}/live` | dashboard.DetailLive | HTMX fragment detail server, refresh 15s |
-| GET | `/admin/*` | admin.* | Admin panel session auth; content/topic/topology/setup/token area |
-| GET | `/api/v1/posts` | api.ListPosts | JSON posts |
-| POST | `/api/v1/posts` | api.CreatePost | JSON create (cron) |
-| GET | `/api/v1/categories` | api.ListCategories | JSON public topics/categories |
-| GET | `/api/v1/hoststats` | api.HostStats | Host CPU/RAM/disk/temp (Bearer auth) |
-| GET | `/api/v1/servers` | api.ListServers | JSON server status (Bearer auth) |
-| POST | `/api/v1/servers` | api.CreateServer | Register server + return one-time agent token |
-| GET | `/api/v1/servers/{id}` | api.GetServer | JSON detail server (Bearer auth) |
-| POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Record server metrics (agent token atau admin key) |
 | GET | `/docs` | public docs page | Public-safe docs untuk read-only API, route map, dan privacy boundary |
 | GET | `/lab/docs` | public docs page | Alias docs dari area lab |
+| GET | `/sitemap.xml` | meta.Sitemap | XML sitemap |
+| GET | `/llms.txt` | meta.LLMsTxt | LLM discovery text |
+| GET | `/robots.txt` | meta.Robots | Allow all robots |
+| GET | `/favicon.svg` | meta.Favicon | SVG favicon |
+| GET | `/uploads/{filename}` | media.Serve | Serve uploaded media |
+| GET | `/og-image/blog/{slug}` | og.Blog | Dynamic SVG OG image for blog post |
+| GET | `/og-image/project/{slug}` | og.Project | Dynamic SVG OG image for project |
+| | | | |
+| **Admin panel** (session auth) | | | |
+| GET/POST | `/admin/login` | admin.Login | Login page + POST login |
+| GET | `/admin/` | admin.Dashboard | Admin dashboard (stats) |
+| GET/POST | `/admin/editorial-inbox` | admin.Editorial | Manage editorial inbox |
+| GET/POST | `/admin/posts` | admin.Posts | Manage posts + preview |
+| GET/POST | `/admin/topics` | admin.Topics | Manage blog topics/categories |
+| GET/POST | `/admin/projects` | admin.Projects | Manage projects + updates/relations/showcase |
+| GET/POST | `/admin/pages` | admin.Pages | Manage static pages (about, contact) |
+| GET/POST | `/admin/media` | admin.Media | Manage media uploads |
+| GET/POST | `/admin/servers` | admin.Servers | Manage servers + detail + commands + token rotate |
+| GET/POST | `/admin/webhooks` | admin.Webhooks | Manage webhook configurations |
+| GET | `/admin/audit-log` | admin.Audit | Audit log |
+| GET/POST | `/admin/manage-users` | admin.Users | Manage admin users |
+| | | | |
+| **API v1** (JSON) | | | |
+| GET | `/api/v1/posts` | api.ListPosts | Public list posts |
+| POST | `/api/v1/posts` | api.CreatePost | Create post (admin key) |
+| GET | `/api/v1/search` | api.Search | Public search (q, scope, page, page_size) |
+| GET | `/api/v1/projects` | api.ListProjects | Public list projects (featured, state, sort) |
+| GET | `/api/v1/projects/{slug}/updates` | api.ListProjectUpdates | Public timeline |
+| GET | `/api/v1/projects/{slug}/changelog` | api.ListProjectChangelog | Public changelog |
+| GET | `/api/v1/projects/{slug}/relations` | api.ListProjectRelations | Public related content |
+| GET | `/api/v1/projects/{slug}/showcase` | api.ListProjectShowcase | Public showcase |
+| POST/PUT/DELETE | `/api/v1/projects[/...]` | api.ProjectCRUD | Project child resource CRUD (admin key) |
+| GET | `/api/v1/categories` | api.ListCategories | Public categories |
+| GET | `/api/v1/servers` | api.ListServers | Server list (admin key) |
+| POST | `/api/v1/servers` | api.CreateServer | Register + return one-time token (admin key) |
+| GET | `/api/v1/servers/{id}` | api.GetServer | Server detail (admin key) |
+| POST | `/api/v1/servers/{id}/ping` | api.RecordMetrics | Agent report metrics (agent token or admin key) |
+| GET | `/api/v1/servers/{id}/commands` | api.PendingCommands | Agent poll pending commands |
+| POST | `/api/v1/servers/{id}/commands/result` | api.ReportCommandResult | Agent report command result |
+| GET | `/api/v1/hoststats` | api.HostStats | Host resource snapshot (admin key) |
+| GET/POST | `/api/v1/editorial-inbox[/...]` | api.Editorial | Editorial inbox CRUD/claim/complete/fail (admin key) |
 
 Public docs dirender via Templ. `static/openapi.json` tetap tersedia sebagai public read-only spec dan sengaja tidak mendokumentasikan endpoint admin/server/agent setup.
 

@@ -1,0 +1,22 @@
+package pages
+
+import (
+	"raevtar/internal/view/components"
+	"fmt"
+)
+
+templ BlogListItems(data BlogListData) {
+	for i, post := range data.Posts {
+		if i == len(data.Posts)-1 && data.Page < data.TotalPages {
+			<div 
+				hx-get={ fmt.Sprintf("/blog?page=%d&category=%s&q=%s", data.Page+1, data.CurrentCat, data.Query) }
+				hx-trigger="revealed"
+				hx-swap="afterend"
+			>
+				@components.PostCardWithHighlight(post, data.Query)
+			</div>
+		} else {
+			@components.PostCardWithHighlight(post, data.Query)
+		}
+	}
+}

@@ -7,51 +7,35 @@ templ ProjectCard(project model.Project) {
 }
 
 templ ProjectCardWithHighlight(project model.Project, query string) {
-	<article class="rv-card-lift grid gap-5 bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] transition-all md:grid-cols-[minmax(0,1.15fr)_minmax(18rem,0.85fr)] md:items-stretch">
-		<div class="space-y-4">
-			<div class="flex flex-wrap items-center gap-2">
-				<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink">project log</span>
-				if project.Featured {
-					<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">featured lane</span>
-				}
-				<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ project.State }</span>
-				<span class="text-xs font-bold uppercase tracking-wide text-retro-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
-			</div>
-			<div>
-				<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Public build note</p>
-				<h3 class="text-2xl md:text-3xl font-black uppercase leading-[0.95] text-retro-ink mb-3">
-					<a href={ templ.URL("/projects/" + project.Slug) } class="text-retro-ink hover:bg-retro-wheat no-underline">@HighlightText(project.Title, query)</a>
-				</h3>
-				<p class="text-sm md:text-base font-bold leading-7 text-retro-muted max-w-2xl">@HighlightText(project.Excerpt, query)</p>
-			</div>
-			<div class="flex flex-wrap gap-2">
-				@TagBadges(project.Tags)
-			</div>
-			<div class="flex flex-wrap items-center justify-between gap-3 border-t-2 border-retro-ink pt-4">
-				<p class="text-xs font-bold uppercase tracking-wider text-retro-muted">Open full write-up, images, and implementation context.</p>
-				<a href={ templ.URL("/projects/" + project.Slug) } class="inline-flex items-center gap-1.5 px-4 py-2 border-2 border-retro-ink bg-retro-ink text-retro-cream font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] hover:bg-retro-ink transition-all">Open project &rarr;</a>
-			</div>
-		</div>
-		<div class="flex h-full flex-col gap-3">
+	<article class="nb-card grid gap-8 md:grid-cols-[1fr_1.5fr] items-center group">
+		<div class="relative">
 			if project.CoverImageURL != "" {
-				<img src={ project.CoverImageURL } alt={ project.Title } class="h-56 w-full object-cover border-2 border-retro-ink bg-retro-cream" loading="lazy"/>
+				<img src={ project.CoverImageURL } alt={ project.Title } class="w-full h-64 object-cover nb-border grayscale group-hover:grayscale-0 transition-all rounded" loading="lazy"/>
 			} else {
-				<div class="flex h-56 items-center justify-center border-2 border-dashed border-retro-ink bg-retro-cream px-6 text-center">
-					<div>
-						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">No cover image</p>
-						<p class="text-sm font-bold text-retro-ink">Project ships as text-first log.</p>
-					</div>
+				<div class="w-full h-64 nb-border bg-accent flex items-center justify-center rounded">
+					<span class="text-4xl font-head uppercase tracking-tighter opacity-20">No Image</span>
 				</div>
 			}
-			<div class="grid gap-2 sm:grid-cols-2">
-				<div class="border-2 border-retro-ink bg-retro-paper px-3 py-3">
-					<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">State</p>
-					<p class="text-sm font-black uppercase text-retro-ink">{ project.State }</p>
-				</div>
-				<div class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">
-					<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Tags</p>
-					<p class="text-sm font-black uppercase text-retro-ink">{ len(project.Tags) } linked notes</p>
-				</div>
+			<div class="absolute -bottom-3 -right-3 nb-badge nb-badge-sm bg-card text-card-foreground">
+				{ project.State }
+			</div>
+		</div>
+		<div class="space-y-4">
+			<div class="flex items-center gap-3">
+				<span class="text-xs font-black uppercase tracking-widest text-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
+				if project.Featured {
+					<span class="nb-badge nb-badge-sm bg-accent text-accent-foreground">Featured</span>
+				}
+			</div>
+			<h3 class="text-3xl font-head uppercase leading-none">
+				<a href={ templ.URL("/projects/" + project.Slug) } class="text-foreground no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">@HighlightText(project.Title, query)</a>
+			</h3>
+			<p class="font-bold text-muted line-clamp-3">@HighlightText(project.Excerpt, query)</p>
+			<div class="flex flex-wrap gap-2 pt-2">
+				@TagBadges(project.Tags)
+			</div>
+			<div class="pt-4">
+				<a href={ templ.URL("/projects/" + project.Slug) } class="nb-button nb-button-accent text-sm">Read More &rarr;</a>
 			</div>
 		</div>
 	</article>

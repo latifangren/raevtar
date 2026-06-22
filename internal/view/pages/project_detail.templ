@@ -5,46 +5,46 @@ import "raevtar/internal/view/components"
 templ ProjectDetail(data ProjectDetailData) {
 @page(data.Project.Title + " — Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<article class="mb-12">
-			<header class="full-width bg-retro-wheat border-b-2 border-retro-ink mb-10 overflow-hidden">
+			<header class="full-width bg-secondary border-b-2 border-foreground mb-10 overflow-hidden">
 				<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">
-					<a href="/projects" class="inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all">&larr; Back to projects</a>
+					<a href="/projects" class="inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">&larr; Back to projects</a>
 					<div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end">
 						<div>
-							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Project entry</p>
-							<h1 class="text-4xl md:text-6xl font-black uppercase leading-none text-retro-ink mb-5">{ data.Project.Title }</h1>
-							<p class="text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl mb-5">{ data.Project.Excerpt }</p>
+							<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Project entry</p>
+							<h1 class="text-4xl md:text-6xl font-head font-black uppercase leading-none text-foreground mb-5">{ data.Project.Title }</h1>
+							<p class="text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl mb-5">{ data.Project.Excerpt }</p>
 							<div class="flex flex-wrap gap-2 max-w-2xl">
-								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">Public write-up</span>
-								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">{ ProjectStateLabel(data.Project.State) }</span>
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground">Public write-up</span>
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-sageLight text-foreground">{ ProjectStateLabel(data.Project.State) }</span>
 								if data.Project.Featured {
-									<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">Featured build</span>
+									<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">Featured build</span>
 								}
-								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight text-retro-ink">Markdown body</span>
-								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">{ len(data.Project.Tags) } tags linked</span>
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-sageLight text-foreground">Markdown body</span>
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">{ len(data.Project.Tags) } tags linked</span>
 							</div>
 						</div>
 						<aside class="relative">
-							<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-retro-ink bg-retro-sageLight shadow-[4px_4px_0px_0px_#2D3748]"></div>
-							<div class="relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] -rotate-1">
-								<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-4">Project brief</p>
+							<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-foreground bg-retro-sageLight nb-shadow"></div>
+							<div class="relative bg-card border-2 border-foreground p-5 nb-shadow-lg -rotate-1">
+								<p class="text-xs font-black uppercase tracking-widest text-muted mb-4">Project brief</p>
 								<div class="grid gap-3 sm:grid-cols-2 mb-4">
-									<div class="border-2 border-retro-ink bg-retro-paper px-3 py-3">
-										<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Published</p>
-										<p class="text-sm font-black text-retro-ink">{ data.Project.CreatedAt.Format("Jan 2, 2006") }</p>
+									<div class="border-2 border-foreground bg-card px-3 py-3">
+										<p class="text-[11px] font-black uppercase tracking-widest text-muted mb-1">Published</p>
+										<p class="text-sm font-black text-foreground">{ data.Project.CreatedAt.Format("Jan 2, 2006") }</p>
 									</div>
-								<div class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">
-									<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">Format</p>
+								<div class="border-2 border-foreground bg-retro-sageLight px-3 py-3">
+									<p class="text-[11px] font-black uppercase tracking-widest text-muted mb-1">Format</p>
 									if data.Project.Featured {
-										<p class="text-sm font-black text-retro-ink">Featured build</p>
+										<p class="text-sm font-black text-foreground">Featured build</p>
 									} else {
-										<p class="text-sm font-black text-retro-ink">Long-form note</p>
+										<p class="text-sm font-black text-foreground">Long-form note</p>
 									}
 								</div>
 								</div>
 								<div class="flex flex-wrap gap-2 mb-4">
 									@components.TagBadges(data.Project.Tags)
 								</div>
-								<p class="text-xs font-bold leading-5 text-retro-muted">Same SSR renderer as public writing pages, tuned for project logs with optional cover image and tag context.</p>
+								<p class="text-xs font-bold leading-5 text-muted">Same SSR renderer as public writing pages, tuned for project logs with optional cover image and tag context.</p>
 							</div>
 						</aside>
 					</div>
@@ -52,35 +52,35 @@ templ ProjectDetail(data ProjectDetailData) {
 			</header>
 			<div class="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(18rem,0.28fr)]">
 				<div class="space-y-6">
-					<div class="bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+					<div class="bg-card border-2 border-foreground p-5 md:p-8 nb-shadow">
 						if data.Project.CoverImageURL != "" {
-							<img src={ data.Project.CoverImageURL } alt={ data.Project.Title } class="w-full max-h-[460px] object-cover border-2 border-retro-ink bg-retro-cream mb-6"/>
+							<img src={ data.Project.CoverImageURL } alt={ data.Project.Title } class="w-full max-h-[460px] object-cover border-2 border-foreground bg-background mb-6"/>
 						}
-						<div class="prose text-retro-ink max-w-none">@templ.Raw(data.Project.ContentHTML)</div>
+						<div class="prose text-foreground max-w-none">@templ.Raw(data.Project.ContentHTML)</div>
 					</div>
 					if len(data.ShowcaseItems) > 0 {
-						<section class="bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+						<section class="bg-card border-2 border-foreground p-5 md:p-8 nb-shadow">
 							<div class="flex items-center justify-between gap-3 mb-4">
 								<div>
-									<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Showcase</p>
-									<h2 class="text-2xl font-black uppercase text-retro-ink">Structured project artifacts</h2>
+									<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">Showcase</p>
+									<h2 class="text-2xl font-head font-black uppercase text-foreground">Structured project artifacts</h2>
 								</div>
 							</div>
 							<div class="grid gap-4">
 								for _, item := range data.ShowcaseItems {
-									<article class="border-2 border-retro-ink bg-retro-cream p-4">
+									<article class="border-2 border-foreground bg-background p-4">
 										<div class="flex flex-wrap items-center gap-2 mb-3">
-											<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">{ ProjectStateLabel(item.Kind) }</span>
+											<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground">{ ProjectStateLabel(item.Kind) }</span>
 											if item.ExternalURL != "" {
-												<a href={ templ.URL(item.ExternalURL) } class="text-xs font-black uppercase no-underline border-2 border-retro-ink bg-retro-wheat px-2.5 py-1 text-retro-ink">Open link</a>
+												<a href={ templ.URL(item.ExternalURL) } class="text-xs font-black uppercase no-underline border-2 border-foreground bg-retro-wheat px-2.5 py-1 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Open link</a>
 											}
 										</div>
-										<h3 class="text-xl font-black uppercase text-retro-ink mb-2">{ item.Title }</h3>
+										<h3 class="text-xl font-black uppercase text-foreground mb-2">{ item.Title }</h3>
 										if item.AssetURL != "" {
-											<img src={ item.AssetURL } alt={ item.Title } class="w-full max-h-[360px] object-cover border-2 border-retro-ink bg-retro-paper mb-3"/>
+											<img src={ item.AssetURL } alt={ item.Title } class="w-full max-h-[360px] object-cover border-2 border-foreground bg-card mb-3"/>
 										}
 										if item.BodyHTML != "" {
-											<div class="prose text-retro-ink max-w-none">@templ.Raw(item.BodyHTML)</div>
+											<div class="prose text-foreground max-w-none">@templ.Raw(item.BodyHTML)</div>
 										}
 									</article>
 								}
@@ -88,30 +88,30 @@ templ ProjectDetail(data ProjectDetailData) {
 						</section>
 					}
 					if len(data.Timeline) > 0 {
-						<section class="bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]">
+						<section class="bg-card border-2 border-foreground p-5 md:p-8 nb-shadow">
 							<div class="flex items-center justify-between gap-3 mb-4">
 								<div>
-									<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-1">Timeline</p>
-									<h2 class="text-2xl font-black uppercase text-retro-ink">Build log and milestones</h2>
+									<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">Timeline</p>
+									<h2 class="text-2xl font-head font-black uppercase text-foreground">Build log and milestones</h2>
 								</div>
 								if len(data.Changelog) > 0 {
-									<a href={ templ.URL("/projects/" + data.Project.Slug + "/changelog") } class="text-sm font-black no-underline border-2 border-retro-ink bg-retro-wheat px-3 py-2 text-retro-ink">Open full changelog &rarr;</a>
+									<a href={ templ.URL("/projects/" + data.Project.Slug + "/changelog") } class="text-sm font-black no-underline border-2 border-foreground bg-retro-wheat px-3 py-2 text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Open full changelog &rarr;</a>
 								}
 							</div>
 							<div class="space-y-4">
 								for _, item := range data.Timeline {
-									<article class="border-2 border-retro-ink bg-retro-cream p-4">
+									<article class="border-2 border-foreground bg-background p-4">
 										<div class="flex flex-wrap items-center justify-between gap-3 mb-2">
 											<div class="flex flex-wrap items-center gap-2">
-												<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink">{ ProjectStateLabel(item.Kind) }</span>
+												<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground">{ ProjectStateLabel(item.Kind) }</span>
 												if item.Pinned {
-													<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink">Pinned</span>
+													<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">Pinned</span>
 												}
 											</div>
-											<p class="text-xs font-mono font-bold text-retro-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
+											<p class="text-xs font-mono font-bold text-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
 										</div>
-										<h3 class="text-xl font-black uppercase text-retro-ink mb-2">{ item.Title }</h3>
-										<div class="prose text-retro-ink max-w-none">@templ.Raw(item.ContentHTML)</div>
+										<h3 class="text-xl font-black uppercase text-foreground mb-2">{ item.Title }</h3>
+										<div class="prose text-foreground max-w-none">@templ.Raw(item.ContentHTML)</div>
 									</article>
 								}
 							</div>
@@ -119,32 +119,32 @@ templ ProjectDetail(data ProjectDetailData) {
 					}
 				</div>
 				<aside class="space-y-4">
-					<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Reading lane</p>
-						<div class="space-y-3 text-sm font-bold text-retro-ink">
-							<p class="border-2 border-retro-ink bg-retro-cream px-3 py-3">Start with excerpt above, then skim badges for topic shape before diving into full body.</p>
-							<p class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3">Every section below is rendered server-side. No client-side editor shell required on public view.</p>
+					<div class="bg-card border-2 border-foreground p-5 nb-shadow">
+						<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">Reading lane</p>
+						<div class="space-y-3 text-sm font-bold text-foreground">
+							<p class="border-2 border-foreground bg-background px-3 py-3">Start with excerpt above, then skim badges for topic shape before diving into full body.</p>
+							<p class="border-2 border-foreground bg-retro-sageLight px-3 py-3">Every section below is rendered server-side. No client-side editor shell required on public view.</p>
 						</div>
 					</div>
-					<div class="bg-retro-blush border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-						<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Move next</p>
+					<div class="bg-retro-blush border-2 border-foreground p-5 nb-shadow">
+						<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">Move next</p>
 						<div class="grid gap-2">
-							<a href="/projects" class="border-2 border-retro-ink bg-retro-paper px-3 py-3 text-sm font-black no-underline hover:bg-retro-wheat">Back to archive &rarr;</a>
+							<a href="/projects" class="border-2 border-foreground bg-card px-3 py-3 text-sm font-black no-underline hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Back to archive &rarr;</a>
 							if len(data.Changelog) > 0 {
-								<a href={ templ.URL("/projects/" + data.Project.Slug + "/changelog") } class="border-2 border-retro-ink bg-retro-sageLight px-3 py-3 text-sm font-black no-underline hover:bg-retro-paper">Read changelog &rarr;</a>
+								<a href={ templ.URL("/projects/" + data.Project.Slug + "/changelog") } class="border-2 border-foreground bg-retro-sageLight px-3 py-3 text-sm font-black no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Read changelog &rarr;</a>
 							}
-							<a href="/about" class="border-2 border-retro-ink bg-retro-wheat px-3 py-3 text-sm font-black no-underline hover:bg-retro-paper">Read platform framing &rarr;</a>
+							<a href="/about" class="border-2 border-foreground bg-retro-wheat px-3 py-3 text-sm font-black no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Read platform framing &rarr;</a>
 						</div>
 					</div>
 					if len(data.RelatedItems) > 0 {
-						<div class="bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]">
-							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-3">Related context</p>
+						<div class="bg-card border-2 border-foreground p-5 nb-shadow">
+							<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">Related context</p>
 							<div class="grid gap-3">
 								for _, item := range data.RelatedItems {
-									<a href={ templ.URL(item.URL) } class="border-2 border-retro-ink bg-retro-cream p-3 no-underline hover:bg-retro-wheat">
-										<p class="text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1">{ ProjectStateLabel(item.RelationKind) }</p>
-										<p class="text-sm font-black text-retro-ink mb-1">{ item.Title }</p>
-										<p class="text-xs font-bold text-retro-muted">{ item.Excerpt }</p>
+									<a href={ templ.URL(item.URL) } class="border-2 border-foreground bg-background p-3 no-underline hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+										<p class="text-[11px] font-black uppercase tracking-widest text-muted mb-1">{ ProjectStateLabel(item.RelationKind) }</p>
+										<p class="text-sm font-black text-foreground mb-1">{ item.Title }</p>
+										<p class="text-xs font-bold text-muted">{ item.Excerpt }</p>
 									</a>
 								}
 							</div>

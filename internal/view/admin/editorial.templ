@@ -7,52 +7,52 @@ templ EditorialInbox(data EditorialInboxData) {
 		<div class="space-y-6">
 			@pageHeader("Editorial Inbox", CountText(len(data.Items))+" items")
 			<div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-				@metricCard("Queued", CountText(data.Counts[model.EditorialStatusQueued]), "awaiting approval", "text-retro-ink")
-				@metricCard("Approved", CountText(data.Counts[model.EditorialStatusApproved]), "ready for Hermes", "text-retro-sage")
+				@metricCard("Queued", CountText(data.Counts[model.EditorialStatusQueued]), "awaiting approval", "text-foreground")
+				@metricCard("Approved", CountText(data.Counts[model.EditorialStatusApproved]), "ready for Hermes", "text-success")
 				if data.Summary != nil {
-					@metricCard("Overdue", CountText(data.Summary.Overdue.ApprovedCount+data.Summary.Overdue.RunningCount), "approved + running overdue", "text-retro-ink")
+					@metricCard("Overdue", CountText(data.Summary.Overdue.ApprovedCount+data.Summary.Overdue.RunningCount), "approved + running overdue", "text-foreground")
 				} else {
-					@metricCard("Running", CountText(data.Counts[model.EditorialStatusRunning]), "Hermes in progress", "text-retro-ink")
+					@metricCard("Running", CountText(data.Counts[model.EditorialStatusRunning]), "Hermes in progress", "text-foreground")
 				}
-				@metricCard("Failed", CountText(data.Counts[model.EditorialStatusFailed]), "needs operator check", "text-retro-ink")
+				@metricCard("Failed", CountText(data.Counts[model.EditorialStatusFailed]), "needs operator check", "text-foreground")
 			</div>
-			<div class="bg-retro-paper border-2 border-retro-ink p-4 shadow-[4px_4px_0px_0px_#2D3748]">
+			<div class="bg-card nb-border p-4">
 				<div class="flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between">
 					<div>
-						<p class="text-xs font-black uppercase text-retro-muted">Secondary signals</p>
-						<p class="text-xs font-bold text-retro-muted mt-1">Lower-priority lifecycle counts stay visible without competing with operator actions.</p>
+						<p class="text-xs font-black uppercase text-muted">Secondary signals</p>
+						<p class="text-xs font-bold text-muted mt-1">Lower-priority lifecycle counts stay visible without competing with operator actions.</p>
 					</div>
 					<div class="flex flex-wrap gap-2">
-						<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink">running { CountText(data.Counts[model.EditorialStatusRunning]) }</span>
-						<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink">paused { CountText(data.Counts[model.EditorialStatusPaused]) }</span>
-						<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink">done { CountText(data.Counts[model.EditorialStatusDone]) }</span>
-						<span class="text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink">cancelled { CountText(data.Counts[model.EditorialStatusCancelled]) }</span>
+						<span class="text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground">running { CountText(data.Counts[model.EditorialStatusRunning]) }</span>
+						<span class="text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground">paused { CountText(data.Counts[model.EditorialStatusPaused]) }</span>
+						<span class="text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground">done { CountText(data.Counts[model.EditorialStatusDone]) }</span>
+						<span class="text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground">cancelled { CountText(data.Counts[model.EditorialStatusCancelled]) }</span>
 					</div>
 				</div>
 				if data.Summary != nil {
 					<div class="mt-3 grid gap-2 md:grid-cols-3">
-						<div class="border-2 border-retro-ink bg-retro-cream px-3 py-2">
-							<p class="text-[10px] font-black uppercase text-retro-muted">Fairness</p>
-							<p class="text-sm font-mono font-black text-retro-ink mt-1">{ CountText(data.Summary.Fairness.NonUrgentClaimStreak) }</p>
-							<p class="text-[11px] font-bold text-retro-muted mt-0.5">{ EditorialFairnessStateText(data.Summary.Fairness.NonUrgentClaimStreak, data.Summary.Fairness.AutonomousGapOpened) }</p>
+						<div class="border-2 border-foreground bg-background px-3 py-2">
+							<p class="text-[10px] font-black uppercase text-muted">Fairness</p>
+							<p class="text-sm font-mono font-black text-foreground mt-1">{ CountText(data.Summary.Fairness.NonUrgentClaimStreak) }</p>
+							<p class="text-[11px] font-bold text-muted mt-0.5">{ EditorialFairnessStateText(data.Summary.Fairness.NonUrgentClaimStreak, data.Summary.Fairness.AutonomousGapOpened) }</p>
 						</div>
-						<div class="border-2 border-retro-ink bg-retro-cream px-3 py-2">
-							<p class="text-[10px] font-black uppercase text-retro-muted">Publish analytics</p>
-							<p class="text-sm font-mono font-black text-retro-ink mt-1">{ CountText(data.Summary.Analytics.DoneCount) }</p>
-							<p class="text-[11px] font-bold text-retro-muted mt-0.5">done publishes tracked</p>
+						<div class="border-2 border-foreground bg-background px-3 py-2">
+							<p class="text-[10px] font-black uppercase text-muted">Publish analytics</p>
+							<p class="text-sm font-mono font-black text-foreground mt-1">{ CountText(data.Summary.Analytics.DoneCount) }</p>
+							<p class="text-[11px] font-bold text-muted mt-0.5">done publishes tracked</p>
 						</div>
-						<div class="border-2 border-retro-ink bg-retro-cream px-3 py-2">
-							<p class="text-[10px] font-black uppercase text-retro-muted">Status mix</p>
-							<p class="text-[11px] font-bold text-retro-muted mt-1">approved { CountText(data.Counts[model.EditorialStatusApproved]) } · queued { CountText(data.Counts[model.EditorialStatusQueued]) }</p>
-							<p class="text-[11px] font-bold text-retro-muted mt-0.5">failed { CountText(data.Counts[model.EditorialStatusFailed]) } · running { CountText(data.Counts[model.EditorialStatusRunning]) }</p>
+						<div class="border-2 border-foreground bg-background px-3 py-2">
+							<p class="text-[10px] font-black uppercase text-muted">Status mix</p>
+							<p class="text-[11px] font-bold text-muted mt-1">approved { CountText(data.Counts[model.EditorialStatusApproved]) } · queued { CountText(data.Counts[model.EditorialStatusQueued]) }</p>
+							<p class="text-[11px] font-bold text-muted mt-0.5">failed { CountText(data.Counts[model.EditorialStatusFailed]) } · running { CountText(data.Counts[model.EditorialStatusRunning]) }</p>
 						</div>
 					</div>
 				}
 			</div>
-			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto">
+			<div class="bg-card nb-border overflow-x-auto">
 				<table class="w-full min-w-[860px] text-left">
 					<thead>
-						<tr class="border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream">
+						<tr class="border-b-2 border-foreground text-xs uppercase bg-foreground text-primary-foreground">
 							<th class="py-3 px-4 font-bold">Item</th>
 							<th class="py-3 px-4 font-bold">Schedule</th>
 							<th class="py-3 px-4 font-bold">State</th>
@@ -61,20 +61,20 @@ templ EditorialInbox(data EditorialInboxData) {
 					</thead>
 					<tbody>
 						if len(data.Items) == 0 {
-							<tr><td colspan="4" class="py-8 text-center text-retro-muted font-bold text-sm">No editorial inbox items yet</td></tr>
+							<tr><td colspan="4" class="py-8 text-center text-muted font-bold text-sm">No editorial inbox items yet</td></tr>
 						} else {
 							for _, item := range data.Items {
-								<tr class="border-b-2 border-retro-ink align-top last:border-b-0">
+								<tr class="border-b-2 border-foreground align-top last:border-b-0">
 									<td class="py-3 px-4 max-w-sm">
 										<div class="flex flex-wrap items-center gap-2">
-											<p class="text-sm font-black text-retro-ink">{ item.SourceType }</p>
-											<span class={ "text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialModeBadgeClass(item.Mode) }>{ item.Mode }</span>
+											<p class="text-sm font-black text-foreground">{ item.SourceType }</p>
+											<span class={ "text-[10px] px-2 py-0.5 font-bold border-2 border-foreground font-mono", EditorialModeBadgeClass(item.Mode) }>{ item.Mode }</span>
 											if item.CategoryHint != "" {
-												<span class={ "text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(item.CategoryHint) }>{ item.CategoryHint }</span>
+												<span class={ "text-[10px] px-2 py-0.5 font-bold border-2 border-foreground font-mono", CategoryBadgeClass(item.CategoryHint) }>{ item.CategoryHint }</span>
 											}
 										</div>
-										<p class="mt-1 text-xs font-mono font-bold text-retro-muted break-all">{ item.SourceValue }</p>
-										<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-retro-muted">
+										<p class="mt-1 text-xs font-mono font-bold text-muted break-all">{ item.SourceValue }</p>
+										<div class="mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-muted">
 											if item.SourceType == "repo" {
 												<span>repo inbox</span>
 											} else {
@@ -82,42 +82,42 @@ templ EditorialInbox(data EditorialInboxData) {
 											}
 											<span>attempts { CountText(item.AttemptCount) }</span>
 											if item.PublishedPostID != nil {
-												<span class="font-mono text-retro-ink">post #{ IDText(*item.PublishedPostID) }</span>
+												<span class="font-mono text-foreground font-black">post #{ IDText(*item.PublishedPostID) }</span>
 											}
 										</div>
 										if item.PublishedPostID != nil {
-											<p class="text-[11px] font-bold text-retro-muted mt-2">Linked publish target retained in update form.</p>
+											<p class="text-[11px] font-bold text-muted mt-2">Linked publish target retained in update form.</p>
 										}
 										if item.Note != "" {
-											<p class="text-xs font-bold text-retro-muted mt-2 max-w-sm line-clamp-2">{ item.Note }</p>
+											<p class="text-xs font-bold text-muted mt-2 max-w-sm line-clamp-2">{ item.Note }</p>
 										}
 										if item.FailureNote != "" {
-											<div class="mt-2 border border-retro-ink/30 bg-retro-cream px-2 py-1.5">
-												<p class="text-[10px] font-black uppercase text-retro-muted">Failure</p>
-												<p class="text-xs font-bold text-retro-ink mt-0.5 max-w-sm">{ item.FailureNote }</p>
+											<div class="mt-2 border border-foreground/30 bg-background px-2 py-1.5">
+												<p class="text-[10px] font-black uppercase text-muted">Failure</p>
+												<p class="text-xs font-bold text-foreground mt-0.5 max-w-sm">{ item.FailureNote }</p>
 												if item.FailureMeta != "" {
-													<p class="text-[11px] font-mono font-bold text-retro-muted mt-1 truncate">meta kept in inline editor</p>
+													<p class="text-[11px] font-mono font-bold text-muted mt-1 truncate font-black">meta kept in inline editor</p>
 												}
 											</div>
 										}
 									</td>
-									<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted whitespace-nowrap">
-										<p class="text-[10px] font-black uppercase text-retro-muted mb-1">Start</p>
-										<div class="text-retro-ink">{ EditorialTimeText(item.NotBefore) }</div>
+									<td class="py-3 px-4 text-xs font-mono font-bold text-muted whitespace-nowrap">
+										<p class="text-[10px] font-black uppercase text-muted mb-1">Start</p>
+										<div class="text-foreground">{ EditorialTimeText(item.NotBefore) }</div>
 										if item.Deadline != nil {
-											<p class="text-[10px] font-black uppercase text-retro-muted mt-3 mb-1">Deadline</p>
+											<p class="text-[10px] font-black uppercase text-muted mt-3 mb-1">Deadline</p>
 											<div>until { EditorialTimeText(*item.Deadline) }</div>
-											<span class={ "inline-block mt-1 text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink", EditorialEscalationBadgeClass(item.Deadline, item.Status, data.Now) }>{ EditorialEscalationText(item.Deadline, item.Status, data.Now) }</span>
+											<span class={ "inline-block mt-1 text-[10px] px-2 py-0.5 font-bold border-2 border-foreground", EditorialEscalationBadgeClass(item.Deadline, item.Status, data.Now) }>{ EditorialEscalationText(item.Deadline, item.Status, data.Now) }</span>
 										} else {
-											<p class="text-[10px] font-black uppercase text-retro-muted mt-3 mb-1">Deadline</p>
+											<p class="text-[10px] font-black uppercase text-muted mt-3 mb-1">Deadline</p>
 											<div>-</div>
 										}
 									</td>
-									<td class="py-3 px-4 text-xs font-mono font-bold text-retro-muted whitespace-nowrap">
+									<td class="py-3 px-4 text-xs font-mono font-bold text-muted whitespace-nowrap">
 										<div class="flex flex-wrap items-center gap-2 mb-2">
-											<span class={ "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialStatusBadgeClass(item.Status) }>{ item.Status }</span>
+											<span class={ "text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono", EditorialStatusBadgeClass(item.Status) }>{ item.Status }</span>
 											if item.CategoryHint == "" {
-												<span class="text-[11px] font-bold text-retro-muted">no category hint</span>
+												<span class="text-[11px] font-bold text-muted">no category hint</span>
 											}
 										</div>
 										if item.ClaimedBy != "" {
@@ -146,7 +146,7 @@ templ EditorialInbox(data EditorialInboxData) {
 												<input type="hidden" name="mode" value={ item.Mode }/>
 												<div class="grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start">
 													<div class="space-y-2">
-														<select name="status" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink">
+														<select name="status" class="w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 														for _, status := range data.Statuses {
 															if status == item.Status {
 																<option value={ status } selected>{ status }</option>
@@ -155,24 +155,24 @@ templ EditorialInbox(data EditorialInboxData) {
 															}
 														}
 														</select>
-														<input type="number" name="published_post_id" min="1" value={ EditorialIDValuePtr(item.PublishedPostID) } placeholder="post id" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
-														<input type="text" name="failure_note" value={ item.FailureNote } placeholder="failure note" class="w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink"/>
+														<input type="number" name="published_post_id" min="1" value={ EditorialIDValuePtr(item.PublishedPostID) } placeholder="post id" class="w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
+														<input type="text" name="failure_note" value={ item.FailureNote } placeholder="failure note" class="w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 													</div>
-													<button type="submit" class="text-xs font-bold text-retro-ink hover:bg-retro-wheat px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap">Update</button>
+													<button type="submit" class="text-xs font-bold text-foreground hover:bg-secondary px-3 py-1.5 border-2 border-foreground bg-card cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Update</button>
 												</div>
-												<details class="border-2 border-retro-ink bg-retro-cream px-2 py-1.5">
-													<summary class="cursor-pointer text-[11px] font-black uppercase text-retro-muted">Failure meta</summary>
-													<textarea name="failure_meta" rows="2" class="mt-2 w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-mono font-bold text-retro-ink" placeholder="failure meta">{ item.FailureMeta }</textarea>
+												<details class="border-2 border-foreground bg-background px-2 py-1.5">
+													<summary class="cursor-pointer text-[11px] font-black uppercase text-muted">Failure meta</summary>
+													<textarea name="failure_meta" rows="2" class="mt-2 w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-mono font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" placeholder="failure meta">{ item.FailureMeta }</textarea>
 												</details>
 											</form>
 											<form method="POST" action={ templ.URL("/admin/editorial-inbox/delete/" + IDText(item.ID)) } class="mt-2" data-confirm="Delete this editorial inbox item?">
 												<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
-												<button type="submit" class="text-xs font-bold text-retro-ink hover:bg-retro-blush px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap">Delete</button>
+												<button type="submit" class="text-xs font-bold text-foreground hover:bg-destructive hover:text-white px-3 py-1.5 border-2 border-foreground bg-card cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Delete</button>
 											</form>
 										} else {
-											<div class="border-2 border-retro-ink bg-retro-cream px-3 py-2">
-												<p class="text-[10px] font-black uppercase text-retro-muted">Locked</p>
-												<p class="mt-1 text-xs font-bold text-retro-ink">{ EditorialItemLockedReason(item) }</p>
+											<div class="border-2 border-foreground bg-background px-3 py-2">
+												<p class="text-[10px] font-black uppercase text-muted">Locked</p>
+												<p class="mt-1 text-xs font-bold text-foreground">{ EditorialItemLockedReason(item) }</p>
 											</div>
 										}
 									</td>
@@ -182,28 +182,28 @@ templ EditorialInbox(data EditorialInboxData) {
 					</tbody>
 				</table>
 			</div>
-			<div class="bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-hidden">
+			<div class="bg-card nb-border overflow-hidden">
 				<details>
 					<summary class="cursor-pointer list-none px-6 py-4">
 						<div class="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
 							<div>
-								<h2 class="text-sm font-black uppercase text-retro-ink">Create inbox item</h2>
-								<p class="mt-1 text-xs font-bold text-retro-muted">Kasih repo, tema, atau catatan singkat. Hermes ambil dari inbox dulu sebelum autonomous.</p>
+								<h2 class="text-sm font-black uppercase text-foreground font-head">Create inbox item</h2>
+								<p class="mt-1 text-xs font-bold text-muted">Kasih repo, tema, atau catatan singkat. Hermes ambil dari inbox dulu sebelum autonomous.</p>
 							</div>
-							<span class="inline-flex items-center self-start border-2 border-retro-ink bg-retro-cream px-2.5 py-1 text-[11px] font-black uppercase text-retro-muted">Show form</span>
+							<span class="inline-flex items-center self-start border-2 border-foreground bg-background px-2.5 py-1 text-[11px] font-black uppercase text-muted">Show form</span>
 						</div>
 					</summary>
-					<div class="border-t-2 border-retro-ink px-6 py-5">
+					<div class="border-t-2 border-foreground px-6 py-5">
 						<form method="POST" action="/admin/editorial-inbox" class="space-y-4" data-confirm="Create this editorial inbox item?">
 							<input type="hidden" name="_csrf" value={ data.CSRFToken }/>
 							<div class="grid gap-3 md:grid-cols-2">
 								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Repo / link / tema</label>
-									<input type="text" name="source_value" required placeholder="https://github.com/... atau tema project" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink"/>
+									<label class="block text-sm font-bold text-muted mb-1">Repo / link / tema</label>
+									<input type="text" name="source_value" required placeholder="https://github.com/... atau tema project" class="w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 								</div>
 								<div>
-									<label class="block text-sm font-bold text-retro-muted mb-1">Category hint</label>
-									<select name="category_hint" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink">
+									<label class="block text-sm font-bold text-muted mb-1">Category hint</label>
+									<select name="category_hint" class="w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 										<option value="">None</option>
 										for _, category := range data.Categories {
 											<option value={ category.Slug }>{ category.Name }</option>
@@ -212,11 +212,11 @@ templ EditorialInbox(data EditorialInboxData) {
 								</div>
 							</div>
 							<div>
-								<label class="block text-sm font-bold text-retro-muted mb-1">Editor note</label>
-								<textarea name="note" rows="4" class="w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink" placeholder="Kasih angle, judul project, atau kenapa ini penting."></textarea>
+								<label class="block text-sm font-bold text-muted mb-1">Editor note</label>
+								<textarea name="note" rows="4" class="w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring" placeholder="Kasih angle, judul project, atau kenapa ini penting."></textarea>
 							</div>
 							<div class="flex justify-end">
-								<button type="submit" class="px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer">Create item</button>
+								<button type="submit" class="nb-button py-2 px-5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Create item</button>
 							</div>
 						</form>
 					</div>

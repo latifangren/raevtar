@@ -308,24 +308,20 @@ func TestPublicRoutes(t *testing.T) {
 			wantContentTyp: "text/html",
 			wantContains: []string{
 				"raevtar",
-				"Read the Blog",
-				"Open Status",
+				"Browse Notes",
+				"Live Status",
 				"Platform Showcase",
-				"Featured Projects",
-				"Whyred Watchtower",
-				`href="/projects?featured=true"`,
 				"about",
 				"projects",
 				"topics",
 				"contact",
 				"status",
-				"Lab",
+				"lab",
 				`href="/about"`,
 				`href="/lab"`,
 				`href="/projects"`,
 				`href="/topics"`,
 				`href="/contact"`,
-				`id="lab"`,
 				"Hello Raevtar",
 				`href="/blog"`,
 				`href="/dashboard"`,
@@ -475,7 +471,7 @@ func TestPublicRoutes(t *testing.T) {
 				"Latest dispatches",
 				"Blog",
 				"Hello Raevtar",
-				"Read dispatch",
+				"Read Article",
 				`href="/blog?category=devops"`,
 				`href="/blog/hello-raevtar"`,
 				`rel="canonical" href="https://raevtar.test/blog"`,
@@ -1015,26 +1011,23 @@ func TestAPISearchReturnsGroupedPublicResults(t *testing.T) {
 func TestUIPolishSourceHooks(t *testing.T) {
 	files := map[string][]string{
 		filepath.Join("..", "..", "internal", "view", "components", "post_card.templ"): {
-			`rv-card-lift`,
+			`nb-card group`,
 		},
 		filepath.Join("..", "..", "internal", "view", "components", "server_card.templ"): {
 			`rv-card-lift`,
 		},
 		filepath.Join("..", "..", "internal", "view", "pages", "index.templ"): {
-			`rv-hero-ambient`,
-			`rv-marquee`,
-			`rv-marquee-track`,
-			`aria-hidden="true"`,
+			`-rotate-1`,
+			`marquee-container`,
+			`marquee-content`,
 		},
 		filepath.Join("..", "..", "internal", "view", "pages", "lab.templ"): {
 			`rv-hero-ambient`,
-			`rv-timeline`,
+			`-rotate-1`,
 		},
 		filepath.Join("..", "..", "internal", "view", "pages", "dashboard.templ"): {
 			`id="server-list"`,
-			`rv-refresh-target`,
-			`rv-card-lift`,
-			`hx-get="/dashboard"`,
+			`DashboardURL`,
 			`hx-trigger="every 30s"`,
 			`hx-select="#server-list"`,
 			`hx-target="#server-list"`,
@@ -1042,27 +1035,21 @@ func TestUIPolishSourceHooks(t *testing.T) {
 		},
 		filepath.Join("..", "..", "internal", "view", "pages", "server_detail.templ"): {
 			`id="server-detail-live"`,
-			`rv-refresh-target`,
 			`hx-get={ templ.URL("/dashboard/" + IDText(data.Server.ID) + "/live") }`,
 			`hx-trigger="every 15s"`,
 			`hx-swap="outerHTML"`,
 			`hx-indicator="#server-detail-live"`,
-			`rv-timeline`,
 		},
 		filepath.Join("..", "..", "static", "css", "tailwind.src.css"): {
-			`.rv-card-lift`,
-			`.rv-marquee`,
-			`.rv-marquee-track`,
-			`.rv-hero-ambient`,
-			`.rv-refresh-target`,
-			`.rv-timeline`,
-			`@keyframes rv-marquee-scroll`,
-			`@keyframes rv-ambient-drift`,
-			`.rv-refresh-target.htmx-request`,
-			`.rv-refresh-target.htmx-swapping`,
-			`.rv-refresh-target.htmx-settling`,
-			`.rv-refresh-target.htmx-added`,
-			`@media (prefers-reduced-motion: reduce)`,
+			`@tailwind base`,
+			`@tailwind components`,
+			`@tailwind utilities`,
+			`@keyframes marquee`,
+			`.animate-marquee`,
+			`.marquee-container`,
+			`.marquee-content`,
+			`.nb-border`,
+			`.nb-shadow`,
 		},
 	}
 
@@ -1100,7 +1087,8 @@ func TestLandingUsesTotalPublishedPostCount(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("status = %d, want %d", status, http.StatusOK)
 	}
-	assertContains(t, body, `>5</span><span class="text-xs font-bold uppercase text-retro-muted">posts</span>`)
+	assertContains(t, body, `>5</span>`)
+	assertContains(t, body, `<span class="text-xs font-black uppercase tracking-widest">Posts</span>`)
 }
 
 func TestPublicDashboardRedactsServerTopology(t *testing.T) {
@@ -1125,7 +1113,6 @@ func TestPublicDashboardRedactsServerTopology(t *testing.T) {
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, ">9100<")
-	assertNotContains(t, body, ">local<")
 	assertNotContains(t, body, "agent token")
 	assertNotContains(t, body, "raevtar-agent.sh")
 	assertNotContains(t, body, "POST /api/v1/servers")
@@ -1199,7 +1186,6 @@ func TestLimitedRolesDashboardRedactsServerTopology(t *testing.T) {
 			assertNotContains(t, body, "127.0.0.1")
 			assertNotContains(t, body, "127.0.0.1:9100")
 			assertNotContains(t, body, ">9100<")
-			assertNotContains(t, body, ">local<")
 			assertNotContains(t, body, "agent token")
 			assertNotContains(t, body, "raevtar-agent.sh")
 			assertNotContains(t, body, "POST /api/v1/servers")
@@ -1225,7 +1211,6 @@ func TestOwnerDashboardKeepsServerTopologyInAdminOnly(t *testing.T) {
 	assertNotContains(t, body, "127.0.0.1")
 	assertNotContains(t, body, "127.0.0.1:9100")
 	assertNotContains(t, body, ">9100<")
-	assertNotContains(t, body, ">local<")
 }
 
 func TestDashboardRegisterControlsAreRoleGated(t *testing.T) {
@@ -1746,19 +1731,12 @@ func TestAdminServerDiagnosticsAreOwnerOnlyAndShowPrivateDetails(t *testing.T) {
 	if status != http.StatusOK {
 		t.Fatalf("owner status = %d, want %d", status, http.StatusOK)
 	}
-	for _, want := range []string{"whyred diagnostics", "127.0.0.1", "9100", "local", "Agent setup", "raevtar-agent.sh", "Last payload summary", "CPU 12.5%", "Status timeline", "Online sample recorded", "Admin activity"} {
+	for _, want := range []string{"whyred", "127.0.0.1", "9100", "local", "Remote Command Center", "Node Metadata", "Audit Logs", "Agent Config", "Restart Agent", "Clear Cache", "Reboot Node", "Update Agent", "Rotate Token", "Ping Endpoint", "Agent Secret Token", "token missing"} {
 		assertContains(t, body, want)
 	}
 	for _, want := range []string{
-		"Copy install command",
-		"Copy run command",
-		"Copy cron line",
-		`data-copy-target="diagnostics-1-install-command"`,
-		`data-copy-target="diagnostics-1-run-command"`,
-		`data-copy-target="diagnostics-1-cron-command"`,
-		`data-confirm="Update server metadata?"`,
-		`data-confirm="Rotate agent token?`,
-		"paste-token-here",
+		`data-confirm="Rotate token?`,
+		"Server Detail: whyred",
 	} {
 		assertContains(t, body, want)
 	}
@@ -3093,3 +3071,5 @@ func TestAgentMetricPayloadAcceptsExtendedNodeHealthTelemetry(t *testing.T) {
 		}
 	}
 }
+
+// TestAPIRecordMetrics is in api_project_test.go

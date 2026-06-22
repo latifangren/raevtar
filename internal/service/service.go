@@ -19,13 +19,15 @@ type Service struct {
 	Media     *MediaService
 	Monitor   *MonitorService
 	Admin     *AdminService
+	CommandQ  *CommandQueueService
+	Webhook   *WebhookService
 }
 
 func New(repos *repo.Repositories, cfg *config.Config) *Service {
 	blog := NewBlogService(repos)
 	projects := NewProjectService(repos)
 	pages := NewPageContentService(repos)
-	return &Service{
+	s := &Service{
 		repos:     repos,
 		Cfg:       cfg,
 		Blog:      blog,
@@ -37,5 +39,9 @@ func New(repos *repo.Repositories, cfg *config.Config) *Service {
 		Media:     NewMediaService(repos, cfg.MediaDir),
 		Monitor:   &MonitorService{repos: repos},
 		Admin:     &AdminService{repos: repos},
+		CommandQ:  NewCommandQueueService(repos),
+		Webhook:   NewWebhookService(repos),
 	}
+	s.Monitor.SetWebhook(s.Webhook)
+	return s
 }
