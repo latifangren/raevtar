@@ -9,7 +9,7 @@ env:
 before:
   hooks:
     - go run github.com/a-h/templ/cmd/templ@v0.3.906 generate
-    - npx --yes tailwindcss@3.4.19 -i static/css/tailwind.src.css -o static/css/style.css --minify
+    - npx tailwindcss@3.4.19 -i static/css/tailwind.src.css -o static/css/style.css --minify
 
 builds:
   - id: raevtar
