@@ -5,26 +5,6 @@
 # High-confidence manually curated instincts should be preserved alongside these.
 
 ---
-id: raevtar-commit-length
-trigger: "when writing a commit message"
-confidence: 0.6
-domain: git
-source: repo-analysis
-source_repo: https://github.com/latifangren/raevtar
----
-
-# Raevtar Commit Length
-
-## Action
-
-Write moderate-length commit messages (~62 characters)
-
-## Evidence
-
-- Average commit message length: 62 chars
-- Based on 19 commits
-
----
 id: raevtar-naming-files
 trigger: "when creating a new file"
 confidence: 0.8
@@ -62,7 +42,7 @@ Use relative imports for project files
 ## Evidence
 
 - Import analysis shows relative import pattern
-- Example: import { x } from '../lib/x'
+- Example: import ( "internal/service" )
 
 ---
 id: raevtar-export-style
@@ -77,12 +57,12 @@ source_repo: https://github.com/latifangren/raevtar
 
 ## Action
 
-Prefer named exports
+Capitalize first letter of functions, types, and variables that should be public. Lowercase = package-private.
 
 ## Evidence
 
 - Export pattern analysis
-- Dominant style: named
+- Dominant style: capitalized = exported
 
 ---
 id: raevtar-test-separate
@@ -93,40 +73,16 @@ source: repo-analysis
 source_repo: https://github.com/latifangren/raevtar
 ---
 
-# Raevtar Test Separate
+# Raevtar Test Same Directory
 
 ## Action
 
-Place tests in the tests/ or __tests__/ directory, mirroring src structure
+Place test files in the same directory as the code they test (Go standard: `*_test.go` alongside production code).
 
 ## Evidence
 
-- Separate test directory pattern detected
-- Tests live in dedicated test folders
-
----
-id: raevtar-workflow-feature-development
-trigger: "when implementing a new feature"
-confidence: 0.9
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/latifangren/raevtar
----
-
-# Raevtar Workflow Feature Development
-
-## Action
-
-Follow the feature-development workflow:
-1. Add feature implementation
-2. Add tests for feature
-3. Update documentation
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~14x per month
-- Files: internal/view/components/*, **/*.test.*, **/api/**
+- Go convention: tests live in same package directory
+- Pattern in files: internal/handler/handler_test.go, internal/service/service_test.go
 
 ---
 id: raevtar-workflow-feature-development-implementation-test-doc
@@ -156,57 +112,6 @@ Follow the feature-development-implementation-test-doc workflow:
 - Files: internal/handler/*.go, internal/model/*.go, internal/repo/*.go
 
 ---
-id: raevtar-workflow-test-coverage-phase
-trigger: "when doing test coverage phase"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/latifangren/raevtar
----
-
-# Raevtar Workflow Test Coverage Phase
-
-## Action
-
-Follow the test-coverage-phase workflow:
-1. Identify coverage gaps in repo, service, model, and handler code.
-2. Write new *_test.go files or add tests to existing ones in internal/repo/, internal/service/, internal/model/, internal/handler/.
-3. Fix minor bugs or test issues discovered during coverage expansion.
-4. Update .gitignore to exclude coverage artifacts if needed.
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: internal/repo/*_test.go, internal/service/*_test.go, internal/model/*_test.go
-
----
-id: raevtar-workflow-frontend-design-refresh
-trigger: "when doing frontend design refresh"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/latifangren/raevtar
----
-
-# Raevtar Workflow Frontend Design Refresh
-
-## Action
-
-Follow the frontend-design-refresh workflow:
-1. Update static/css/style.css and/or static/css/tailwind.src.css with new design tokens, patterns, or utilities.
-2. Modify tailwind.config.js for new colors, fonts, or scale.
-3. Update or refactor templates in internal/view/components/, internal/view/layouts/, internal/view/pages/, and their *_templ.go files.
-4. Add or update font files in static/fonts/ if changing typography.
-5. Test UI changes in browser and adjust as needed.
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: static/css/style.css, static/css/tailwind.src.css, tailwind.config.js
-
----
 id: raevtar-workflow-ci-cd-pipeline-setup-or-update
 trigger: "when doing ci cd pipeline setup or update"
 confidence: 0.55
@@ -229,30 +134,6 @@ Follow the ci-cd-pipeline-setup-or-update workflow:
 - Workflow detected from commit patterns
 - Frequency: ~1x per month
 - Files: .github/workflows/*.yml, .goreleaser.yaml
-
----
-id: raevtar-workflow-documentation-update
-trigger: "when doing documentation update"
-confidence: 0.6
-domain: workflow
-source: repo-analysis
-source_repo: https://github.com/latifangren/raevtar
----
-
-# Raevtar Workflow Documentation Update
-
-## Action
-
-Follow the documentation-update workflow:
-1. Edit README.md to reflect latest features and usage.
-2. Update or add docs/ARCHITECTURE.md, docs/PRD.md, docs/ROADMAP.md, and docs/CODEMAPS/* for architecture, planning, and navigation.
-3. Commit and push documentation changes.
-
-## Evidence
-
-- Workflow detected from commit patterns
-- Frequency: ~2x per month
-- Files: README.md, docs/ARCHITECTURE.md, docs/PRD.md
 
 ---
 id: raevtar-coding-filename-snake-case
@@ -283,16 +164,17 @@ source: repo-analysis
 source_repo: latifangren/raevtar
 ---
 
-# Raevtar Coding Function Camel Case
+# Raevtar Coding Function Naming
 
 ## Action
 
-Use camelCase for function names.
+Use PascalCase for exported functions, camelCase for unexported functions.
 
 ## Evidence
 
-- Pattern in Go codebase
-- Naming conventions: functions: camelCase
+- Go naming conventions
+- Exported: NewUserService(), GetPost()
+- Unexported: parseConfig(), getPostBySlug()
 
 ---
 id: raevtar-coding-class-pascal-case
@@ -362,15 +244,16 @@ source: repo-analysis
 source_repo: latifangren/raevtar
 ---
 
-# Raevtar Coding Export Named
+# Raevtar Coding Export Capitalization
 
 ## Action
 
-Use named exports.
+Capitalize first letter of exported names. Lowercase = package-private.
 
 ## Evidence
 
-- exportStyle: named
+- Go export rule: capitalized names are exported
+- Examples: type User struct, func NewService()
 
 ---
 id: raevtar-testing-test-file-naming

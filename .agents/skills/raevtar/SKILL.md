@@ -31,11 +31,15 @@ This skill teaches you the core development patterns, coding conventions, and wo
 
 ### Export Style
 
-- Use **named exports** for functions, types, and variables.
+- **Capitalize** the first letter of exported functions, types, and variables. Lowercase first letter = package-private.
   - Example:
     ```go
-    // Exported function
+    // Exported function (capitalized)
     func NewUserService() *UserService {
+        // ...
+    }
+    // Unexported function (lowercase)
+    func parseConfig() error {
         // ...
     }
     ```
