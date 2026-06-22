@@ -45,7 +45,7 @@ func BlogList(data BlogListData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-yellow border-b-4 border-retro-ink mb-10 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-12 md:py-16\"><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"nb-badge bg-retro-paper\">Blog</span> <span class=\"nb-badge bg-retro-sageLight\">Latest dispatches</span></div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Field Notes</p><h1 class=\"nb-h1 mb-5\">Project dispatches from small-machine lab.</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl\">Fresh notes on tools, automation, security, and infrastructure, filed as compact public logs.</p></div><div class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 nb-border bg-retro-blush nb-shadow\"></div><div class=\"relative bg-retro-paper nb-border p-5 nb-shadow rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-4\">topic switchboard</p><form method=\"get\" action=\"/blog\" class=\"grid gap-3 mb-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-accent nb-border-b mb-10 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-12 md:py-16\"><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"nb-badge bg-card\">Blog</span> <span class=\"nb-badge bg-success/20\">Latest dispatches</span></div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Field Notes</p><h1 class=\"nb-h1 font-head mb-5\">Project dispatches from small-machine lab.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">Fresh notes on tools, automation, security, and infrastructure, filed as compact public logs.</p></div><div class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 nb-border bg-destructive nb-shadow\" aria-hidden=\"true\"></div><div class=\"relative bg-card nb-border p-5 nb-shadow rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-4\">topic switchboard</p><form method=\"get\" action=\"/blog\" class=\"grid gap-3 mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -68,7 +68,7 @@ func BlogList(data BlogListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<label for=\"blog-search\" class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">Search notes</label><div class=\"flex gap-2\"><input id=\"blog-search\" type=\"search\" name=\"q\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<label for=\"blog-search\" class=\"text-xs font-black uppercase tracking-widest text-muted\">Search notes</label><div class=\"flex gap-2\"><input id=\"blog-search\" type=\"search\" name=\"q\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -81,7 +81,7 @@ func BlogList(data BlogListData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" placeholder=\"Cari judul, excerpt, isi...\" class=\"min-w-0 flex-1 nb-border bg-retro-cream px-3 py-2 text-sm font-bold text-retro-ink focus:bg-retro-paper outline-none\"> <button type=\"submit\" class=\"nb-button nb-button-primary py-2 px-4\">Go</button></div></form><div class=\"flex flex-wrap gap-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" placeholder=\"Cari judul, excerpt, isi...\" class=\"min-w-0 flex-1 nb-border bg-background px-3 py-2 text-sm font-bold text-foreground focus:bg-card outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <button type=\"submit\" class=\"nb-button nb-button-primary py-2 px-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Go</button></div></form><div class=\"flex flex-wrap gap-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -170,19 +170,19 @@ func BlogList(data BlogListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div></div></div></div></section><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-8\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Latest dispatches</p><h2 class=\"nb-h2 text-3xl\">Field Notes</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div></div></div></div></div></section><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-8\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Latest dispatches</p><h2 class=\"nb-h2 font-head text-3xl\">Field Notes</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Query != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<p class=\"text-sm font-bold text-retro-muted mt-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<p class=\"text-sm font-bold text-muted mt-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.ResultCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 53, Col: 85}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 53, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -195,7 +195,7 @@ func BlogList(data BlogListData) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(data.Query)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 53, Col: 112}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_list.templ`, Line: 53, Col: 106}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -206,22 +206,22 @@ func BlogList(data BlogListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><span class=\"nb-badge bg-retro-paper\">Blog</span></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</div><span class=\"nb-badge bg-card\">Blog</span></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Posts) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"bg-retro-paper nb-border p-8 text-center nb-shadow\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<div class=\"bg-card nb-border p-8 text-center nb-shadow\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if data.Query != "" {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<p class=\"text-retro-muted font-bold\">Belum ada hasil buat pencarian ini.</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<p class=\"text-muted font-bold\">Belum ada hasil buat pencarian ini.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<p class=\"text-retro-muted font-bold\">Belum ada postingan.</p>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<p class=\"text-muted font-bold\">Belum ada postingan.</p>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -244,12 +244,12 @@ func BlogList(data BlogListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if data.Page < data.TotalPages {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"text-xs font-black uppercase tracking-widest text-retro-muted animate-pulse\">Scrolling to load more...</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"text-xs font-black uppercase tracking-widest text-muted animate-pulse\">Scrolling to load more...</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else if len(data.Posts) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<p class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">You've reached the end of the notes.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<p class=\"text-xs font-black uppercase tracking-widest text-muted\">You've reached the end of the notes.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -290,9 +290,9 @@ func componentsPageHref(base string, params map[string]string) string {
 
 func categoryClass(active bool) string {
 	if active {
-		return "px-3 py-1.5 nb-border bg-retro-ink text-retro-cream font-bold text-sm no-underline nb-shadow"
+		return "px-3 py-1.5 nb-border bg-foreground text-background font-bold text-sm no-underline nb-shadow focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 	}
-	return "px-3 py-1.5 nb-border bg-retro-paper text-retro-ink font-bold text-sm no-underline hover:bg-retro-yellow transition-colors"
+	return "px-3 py-1.5 nb-border bg-card text-foreground font-bold text-sm no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
 }
 
 var _ = templruntime.GeneratedTemplate

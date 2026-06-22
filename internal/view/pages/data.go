@@ -528,11 +528,11 @@ func ReadMinutes(markdown string) string {
 func TagClass(name string) string {
 	switch name {
 	case "auto":
-		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sageLight text-retro-ink"
+		return "text-xs px-2 py-0.5 font-bold nb-border bg-success/20 text-foreground"
 	case "commissioned":
-		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-wheat text-retro-ink"
+		return "text-xs px-2 py-0.5 font-bold nb-border bg-secondary text-foreground"
 	default:
-		return "text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-paper text-retro-ink"
+		return "text-xs px-2 py-0.5 font-bold nb-border bg-card text-foreground"
 	}
 }
 

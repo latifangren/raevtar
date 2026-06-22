@@ -16,6 +16,8 @@ func InitSQLite(path string) *sqlx.DB {
 		panic(err)
 	}
 	db.SetMaxOpenConns(1) // SQLite write lock: 1 is enough
+	_, _ = db.Exec("PRAGMA synchronous = OFF")
+	_, _ = db.Exec("PRAGMA journal_mode = MEMORY")
 	return db
 }
 
@@ -286,6 +288,16 @@ func AutoMigrate(db *sqlx.DB) {
 
 	CREATE INDEX IF NOT EXISTS idx_webhook_events_webhook ON webhook_events(webhook_id);
 	CREATE INDEX IF NOT EXISTS idx_webhook_events_type ON webhook_events(event_type);
+
+	CREATE TABLE IF NOT EXISTS post_reading_sessions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		post_id INTEGER NOT NULL REFERENCES posts(id) ON DELETE CASCADE,
+		ip_hash TEXT NOT NULL,
+		seconds INTEGER NOT NULL DEFAULT 0,
+		updated_at DATETIME DEFAULT CURRENT_TIMESTAMP
+	);
+
+	CREATE UNIQUE INDEX IF NOT EXISTS idx_post_reading_sessions_uniq ON post_reading_sessions(post_id, ip_hash);
 	`
 	if _, err := db.Exec(schema); err != nil {
 		slog.Error("migration failed", "error", err)

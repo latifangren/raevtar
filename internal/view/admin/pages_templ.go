@@ -45,7 +45,7 @@ func Dashboard(data DashboardData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"space-y-6\"><div class=\"bg-retro-paper border-2 border-retro-ink p-6 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex items-start justify-between mb-4\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">Online Servers</p><div class=\"flex items-center gap-2 px-3 py-1.5 border-2 border-retro-ink bg-retro-paper\"><span class=\"relative flex h-3 w-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"space-y-6\"><div class=\"bg-card border-2 border-foreground p-6 md:p-8 nb-shadow\"><div class=\"flex items-start justify-between mb-4\"><p class=\"text-xs font-black uppercase tracking-widest text-muted\">Online Servers</p><div class=\"flex items-center gap-2 px-3 py-1.5 border-2 border-foreground bg-card\"><span class=\"relative flex h-3 w-3\" aria-hidden=\"true\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -71,7 +71,7 @@ func Dashboard(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			var templ_7745c5c3_Var5 = []any{"relative inline-flex h-3 w-3 border-2 border-retro-ink", HeroDotClass(data)}
+			var templ_7745c5c3_Var5 = []any{"relative inline-flex h-3 w-3 border-2 border-foreground", HeroDotClass(data)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var5...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -89,14 +89,14 @@ func Dashboard(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"></span></span> <span class=\"text-xs font-mono font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\"></span></span> <span class=\"text-xs font-mono font-bold text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.OnlineCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 18, Col: 92}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 18, Col: 93}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -109,33 +109,33 @@ func Dashboard(data DashboardData) templ.Component {
 			var templ_7745c5c3_Var8 string
 			templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 18, Col: 124}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 18, Col: 125}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span></div></div><div class=\"flex items-baseline gap-2\"><span class=\"text-5xl md:text-6xl font-black font-mono tracking-tight text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</span></div></div><div class=\"flex items-baseline gap-2\"><span class=\"text-5xl md:text-6xl font-black font-mono tracking-tight text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var9 string
 			templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.OnlineCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 22, Col: 120}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 22, Col: 121}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span> <span class=\"text-sm font-bold text-retro-muted lowercase\">/ ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</span> <span class=\"text-sm font-bold text-muted lowercase\">/ ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.ServerCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 23, Col: 95}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 23, Col: 89}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -180,15 +180,15 @@ func Dashboard(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = metricCard("Posts", CountText(data.PostCount), "total articles", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = metricCard("Posts", CountText(data.PostCount), "total articles", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = metricCard("Servers", CountText(data.ServerCount), "registered", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = metricCard("Servers", CountText(data.ServerCount), "registered", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = metricCard("Users", CountText(data.UserCount), "accounts", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = metricCard("Users", CountText(data.UserCount), "accounts", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -196,12 +196,12 @@ func Dashboard(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><div><div class=\"flex items-center justify-between mb-3\"><h2 class=\"text-sm font-black uppercase text-retro-ink\">Server Status</h2><a href=\"/admin/servers\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">Manage &rarr;</a></div><div class=\"space-y-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><div><div class=\"flex items-center justify-between mb-3\"><h2 class=\"text-sm font-black uppercase text-foreground\">Server Status</h2><a href=\"/admin/servers\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Manage &rarr;</a></div><div class=\"space-y-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Servers) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"p-6 text-center text-retro-muted font-bold text-sm bg-retro-paper border-2 border-retro-ink\">No servers registered</div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"p-6 text-center text-muted font-bold text-sm bg-card border-2 border-foreground\">No servers registered</div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -213,7 +213,7 @@ func Dashboard(data DashboardData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div><h2 class=\"text-sm font-black uppercase text-retro-ink mb-3\">Quick Actions</h2><div class=\"grid grid-cols-2 md:grid-cols-4 gap-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div><h2 class=\"text-sm font-black uppercase text-foreground mb-3\">Quick Actions</h2><div class=\"grid grid-cols-2 md:grid-cols-4 gap-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -249,7 +249,7 @@ func Dashboard(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div></div><div><h2 class=\"text-sm font-black uppercase text-retro-ink mb-3\">System Health</h2><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div></div><div><h2 class=\"text-sm font-black uppercase text-foreground mb-3\">System Health</h2><div class=\"grid grid-cols-1 md:grid-cols-3 gap-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -261,7 +261,7 @@ func Dashboard(data DashboardData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex items-center justify-between\"><p class=\"text-xs font-black uppercase text-retro-muted\">Temperature</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><div class=\"flex items-center justify-between\"><p class=\"text-xs font-black uppercase text-muted\">Temperature</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -351,19 +351,19 @@ func Users(data UsersData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Username</th><th class=\"py-3 px-4 font-bold\">Role</th><th class=\"py-3 px-4 font-bold\">Created</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "<div class=\"bg-card border-2 border-foreground nb-shadow overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-background\"><th class=\"py-3 px-4 font-bold\">Username</th><th class=\"py-3 px-4 font-bold\">Role</th><th class=\"py-3 px-4 font-bold\">Created</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, row := range data.Users {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<tr class=\"border-b-2 border-retro-ink last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 23, "<tr class=\"border-b-2 border-foreground last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-foreground\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var19 string
 				templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(row.User.Username)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 95, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 95, Col: 83}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 				if templ_7745c5c3_Err != nil {
@@ -373,7 +373,7 @@ func Users(data UsersData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var20 = []any{"text-xs px-1.5 py-0.5 font-bold border-2 border-retro-ink", RoleBadgeClass(row.User.Role)}
+				var templ_7745c5c3_Var20 = []any{"text-xs px-1.5 py-0.5 font-bold border-2 border-foreground", RoleBadgeClass(row.User.Role)}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var20...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -398,20 +398,20 @@ func Users(data UsersData) templ.Component {
 				var templ_7745c5c3_Var22 string
 				templ_7745c5c3_Var22, templ_7745c5c3_Err = templ.JoinStringErrs(row.User.Role)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 96, Col: 152}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 96, Col: 153}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var22))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</span></td><td class=\"py-3 px-4 text-sm font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</span></td><td class=\"py-3 px-4 text-sm font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var23 string
 				templ_7745c5c3_Var23, templ_7745c5c3_Err = templ.JoinStringErrs(row.User.CreatedAt.Format("2006-01-02"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 97, Col: 116}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 97, Col: 110}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var23))
 				if templ_7745c5c3_Err != nil {
@@ -448,7 +448,7 @@ func Users(data UsersData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"> <button type=\"submit\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer\">✕</button></form>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"> <button type=\"submit\" class=\"text-xs font-bold text-muted hover:bg-destructive px-2 py-1 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">✕</button></form>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -458,7 +458,7 @@ func Users(data UsersData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</tbody></table></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-sm font-black uppercase text-retro-ink mb-4\">Add New User</h2><form method=\"POST\" action=\"/admin/manage-users\" class=\"grid grid-cols-1 md:grid-cols-3 gap-3\" data-confirm=\"Create this user account?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "</tbody></table></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><h2 class=\"text-sm font-black uppercase text-foreground mb-4\">Add New User</h2><form method=\"POST\" action=\"/admin/manage-users\" class=\"grid grid-cols-1 md:grid-cols-3 gap-3\" data-confirm=\"Create this user account?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -471,7 +471,7 @@ func Users(data UsersData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\"> <input type=\"text\" name=\"username\" required placeholder=\"Username\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"password\" name=\"password\" required placeholder=\"Password (min 8 chars)\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <select name=\"role\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink\"><option value=\"\">Select role...</option> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 34, "\"> <input type=\"text\" name=\"username\" required placeholder=\"Username\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"password\" name=\"password\" required placeholder=\"Password (min 8 chars)\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <select name=\"role\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"\">Select role...</option> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -540,7 +540,7 @@ func Users(data UsersData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</select><div class=\"md:col-span-3 flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Add User</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</select><div class=\"md:col-span-3 flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-success text-background font-bold text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Add User</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -595,25 +595,25 @@ func Audit(data AuditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Time</th><th class=\"py-3 px-4 font-bold\">Action</th><th class=\"py-3 px-4 font-bold\">User</th><th class=\"py-3 px-4 font-bold\">Details</th><th class=\"py-3 px-4 font-bold\">IP</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "<div class=\"bg-card border-2 border-foreground nb-shadow overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-background\"><th class=\"py-3 px-4 font-bold\">Time</th><th class=\"py-3 px-4 font-bold\">Action</th><th class=\"py-3 px-4 font-bold\">User</th><th class=\"py-3 px-4 font-bold\">Details</th><th class=\"py-3 px-4 font-bold\">IP</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Logs) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<tr><td colspan=\"5\" class=\"py-8 text-center text-retro-muted font-bold text-sm\">No audit log entries yet</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "<tr><td colspan=\"5\" class=\"py-8 text-center text-muted font-bold text-sm\">No audit log entries yet</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
 				for _, log := range data.Logs {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<tr class=\"border-b-2 border-retro-ink text-xs last:border-b-0\"><td class=\"py-2.5 px-4 text-retro-muted font-mono font-bold whitespace-nowrap\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<tr class=\"border-b-2 border-foreground text-xs last:border-b-0\"><td class=\"py-2.5 px-4 text-muted font-mono font-bold whitespace-nowrap\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var33 string
 					templ_7745c5c3_Var33, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt.Format("02 Jan 15:04"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 155, Col: 126}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 155, Col: 120}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var33))
 					if templ_7745c5c3_Err != nil {
@@ -623,7 +623,7 @@ func Audit(data AuditData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var34 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", ActionBadgeClass(log.Action)}
+					var templ_7745c5c3_Var34 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono", ActionBadgeClass(log.Action)}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var34...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -648,46 +648,46 @@ func Audit(data AuditData) templ.Component {
 					var templ_7745c5c3_Var36 string
 					templ_7745c5c3_Var36, templ_7745c5c3_Err = templ.JoinStringErrs(log.Action)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 156, Col: 159}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 156, Col: 160}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var36))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</span></td><td class=\"py-2.5 px-4 font-bold text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 49, "</span></td><td class=\"py-2.5 px-4 font-bold text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var37 string
 					templ_7745c5c3_Var37, templ_7745c5c3_Err = templ.JoinStringErrs(log.User)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 157, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 157, Col: 69}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var37))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</td><td class=\"py-2.5 px-4 text-retro-muted font-bold max-w-xs truncate\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "</td><td class=\"py-2.5 px-4 text-muted font-bold max-w-xs truncate\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var38 string
 					templ_7745c5c3_Var38, templ_7745c5c3_Err = templ.JoinStringErrs(log.Details)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 158, Col: 91}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 158, Col: 85}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var38))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</td><td class=\"py-2.5 px-4 text-retro-muted font-mono\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</td><td class=\"py-2.5 px-4 text-muted font-mono\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var39 string
 					templ_7745c5c3_Var39, templ_7745c5c3_Err = templ.JoinStringErrs(log.IP)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 159, Col: 68}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 159, Col: 62}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var39))
 					if templ_7745c5c3_Err != nil {
@@ -754,7 +754,7 @@ func Media(data MediaData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<section class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-sm font-black uppercase text-retro-ink mb-4\">Upload image</h2><form method=\"POST\" action=\"/admin/media\" enctype=\"multipart/form-data\" class=\"grid gap-3 md:grid-cols-[1fr_auto] md:items-end\" data-confirm=\"Upload this image?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<section class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><h2 class=\"text-sm font-black uppercase text-foreground mb-4\">Upload image</h2><form method=\"POST\" action=\"/admin/media\" enctype=\"multipart/form-data\" class=\"grid gap-3 md:grid-cols-[1fr_auto] md:items-end\" data-confirm=\"Upload this image?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -767,18 +767,18 @@ func Media(data MediaData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Image file</label> <input type=\"file\" name=\"file\" accept=\"image/png,image/jpeg,image/gif,image/webp\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"></div><button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Upload</button></form></section><section class=\"grid gap-4 md:grid-cols-2 xl:grid-cols-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 56, "\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Image file</label> <input type=\"file\" name=\"file\" accept=\"image/png,image/jpeg,image/gif,image/webp\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-success text-background font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Upload</button></form></section><section class=\"grid gap-4 md:grid-cols-2 xl:grid-cols-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Assets) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"md:col-span-2 xl:col-span-3 bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-retro-muted font-bold\">No media uploaded yet.</p></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 57, "<div class=\"md:col-span-2 xl:col-span-3 bg-card border-2 border-foreground p-8 text-center nb-shadow\"><p class=\"text-muted font-bold\">No media uploaded yet.</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
 				for _, asset := range data.Assets {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<article class=\"bg-retro-paper border-2 border-retro-ink p-4 shadow-[4px_4px_0px_0px_#2D3748] space-y-3\"><img src=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 58, "<article class=\"bg-card border-2 border-foreground p-4 nb-shadow space-y-3\"><img src=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -804,27 +804,27 @@ func Media(data MediaData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" class=\"w-full h-40 object-cover border-2 border-retro-ink bg-retro-cream\" loading=\"lazy\"><div><p class=\"text-sm font-black text-retro-ink truncate\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 60, "\" class=\"w-full h-40 object-cover border-2 border-foreground bg-background\" loading=\"lazy\"><div><p class=\"text-sm font-black text-foreground truncate\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var45 string
 					templ_7745c5c3_Var45, templ_7745c5c3_Err = templ.JoinStringErrs(asset.OriginalName)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 193, Col: 82}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 193, Col: 83}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var45))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</p><p class=\"text-xs font-mono font-bold text-retro-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 61, "</p><p class=\"text-xs font-mono font-bold text-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var46 string
 					templ_7745c5c3_Var46, templ_7745c5c3_Err = templ.JoinStringErrs(asset.MimeType)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 194, Col: 80}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 194, Col: 74}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var46))
 					if templ_7745c5c3_Err != nil {
@@ -837,7 +837,7 @@ func Media(data MediaData) templ.Component {
 					var templ_7745c5c3_Var47 string
 					templ_7745c5c3_Var47, templ_7745c5c3_Err = templ.JoinStringErrs(BytesText(asset.SizeBytes))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 194, Col: 114}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 194, Col: 108}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var47))
 					if templ_7745c5c3_Err != nil {
@@ -916,19 +916,19 @@ func Posts(data PostsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Title</th><th class=\"py-3 px-4 font-bold\">Category</th><th class=\"py-3 px-4 font-bold\">Status</th><th class=\"py-3 px-4 font-bold text-right\">Views</th><th class=\"py-3 px-4 font-bold\">Date</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 67, "<div class=\"bg-card border-2 border-foreground nb-shadow overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-background\"><th class=\"py-3 px-4 font-bold\">Title</th><th class=\"py-3 px-4 font-bold\">Category</th><th class=\"py-3 px-4 font-bold\">Status</th><th class=\"py-3 px-4 font-bold text-right\">Views</th><th class=\"py-3 px-4 font-bold\">Date</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, post := range data.Posts {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<tr class=\"border-b-2 border-retro-ink last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-retro-ink max-w-[300px] truncate\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 68, "<tr class=\"border-b-2 border-foreground last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-foreground max-w-[300px] truncate\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var50 string
 				templ_7745c5c3_Var50, templ_7745c5c3_Err = templ.JoinStringErrs(post.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 227, Col: 98}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 227, Col: 99}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var50))
 				if templ_7745c5c3_Err != nil {
@@ -938,7 +938,7 @@ func Posts(data PostsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var51 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(post.CategorySlug)}
+				var templ_7745c5c3_Var51 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono", CategoryBadgeClass(post.CategorySlug)}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var51...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -963,13 +963,13 @@ func Posts(data PostsData) templ.Component {
 				var templ_7745c5c3_Var53 string
 				templ_7745c5c3_Var53, templ_7745c5c3_Err = templ.JoinStringErrs(post.CategorySlug)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 228, Col: 172}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 228, Col: 173}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var53))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</span></td><td class=\"py-3 px-4 text-xs font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 72, "</span></td><td class=\"py-3 px-4 text-xs font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -984,27 +984,27 @@ func Posts(data PostsData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</td><td class=\"py-3 px-4 text-right text-sm font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "</td><td class=\"py-3 px-4 text-right text-sm font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var54 string
-				templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(tern(data.ViewCounts != nil, PortText(data.ViewCounts[post.ID]), "0"))
+				templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(tern(data.ViewCounts != nil, CountText(data.ViewCounts[post.ID]), "0"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 236, Col: 157}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 236, Col: 152}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</td><td class=\"py-3 px-4 text-sm font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 76, "</td><td class=\"py-3 px-4 text-sm font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var55 string
 				templ_7745c5c3_Var55, templ_7745c5c3_Err = templ.JoinStringErrs(post.CreatedAt.Format("2006-01-02"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 237, Col: 112}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 237, Col: 106}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var55))
 				if templ_7745c5c3_Err != nil {
@@ -1023,7 +1023,7 @@ func Posts(data PostsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline\">Edit</a><form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 78, "\" class=\"text-xs font-bold text-muted hover:bg-secondary px-2 py-1 border-2 border-foreground bg-card no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Edit</a><form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1049,12 +1049,12 @@ func Posts(data PostsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\"> <button type=\"submit\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer\">✕</button></form></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 80, "\"> <button type=\"submit\" class=\"text-xs font-bold text-muted hover:bg-destructive px-2 py-1 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">✕</button></form></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</tbody></table></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-sm font-black uppercase text-retro-ink mb-4\">Create New Post</h2><form method=\"POST\" action=\"/admin/posts\" class=\"space-y-4\" data-confirm=\"Save this post?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 81, "</tbody></table></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><h2 class=\"text-sm font-black uppercase text-foreground mb-4\">Create New Post</h2><form method=\"POST\" action=\"/admin/posts\" class=\"space-y-4\" data-confirm=\"Save this post?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1067,7 +1067,7 @@ func Posts(data PostsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Post title\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Category</label> <select name=\"category_slug\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink\"><option value=\"\">Select category</option> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 82, "\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Post title\"></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Category</label> <select name=\"category_slug\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"\">Select category</option> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1103,7 +1103,7 @@ func Posts(data PostsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</select></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"15\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Write in Markdown...\"></textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase text-retro-muted\">Server preview</p><p class=\"text-xs font-bold text-retro-ink mt-1\">Renders current Markdown through the same Goldmark path used by public posts.</p><button type=\"button\" hx-post=\"/admin/posts/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-black text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Preview Markdown</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 86, "</select></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"15\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground font-mono placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Write in Markdown...\"></textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-foreground bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase text-muted\">Server preview</p><p class=\"text-xs font-bold text-foreground mt-1\">Renders current Markdown through the same Goldmark path used by public posts.</p><button type=\"button\" hx-post=\"/admin/posts/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-foreground bg-secondary text-foreground font-black text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Preview Markdown</button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1111,7 +1111,7 @@ func Posts(data PostsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Short public summary\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "</div><div><label class=\"block text-sm font-bold text-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Short public summary\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1119,7 +1119,7 @@ func Posts(data PostsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"auto, commissioned\"></div><div class=\"flex flex-wrap justify-end gap-2\"><button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Publish Post</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<div><label class=\"block text-sm font-bold text-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"auto, commissioned\"></div><div class=\"flex flex-wrap justify-end gap-2\"><button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-foreground bg-secondary text-foreground font-bold text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-foreground bg-success text-background font-bold text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Publish Post</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1166,20 +1166,20 @@ func PostEdit(data PostEditData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/posts\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">&larr; Posts</a><h1 class=\"text-xl font-black uppercase text-retro-ink mt-1\">Edit post</h1></div><span class=\"text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono\">slug: ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 89, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/posts\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Posts</a><h1 class=\"text-xl font-head font-black uppercase text-foreground mt-1\">Edit post</h1></div><span class=\"text-xs font-bold bg-card border-2 border-foreground px-2.5 py-1 font-mono\">slug: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var64 string
 			templ_7745c5c3_Var64, templ_7745c5c3_Err = templ.JoinStringErrs(data.Post.Slug)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 306, Col: 121}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 306, Col: 115}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var64))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "</span></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 90, "</span></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1205,7 +1205,7 @@ func PostEdit(data PostEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1218,7 +1218,7 @@ func PostEdit(data PostEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Category</label> <select name=\"category_slug\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 93, "\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Category</label> <select name=\"category_slug\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1287,20 +1287,20 @@ func PostEdit(data PostEditData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "</select></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"18\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 100, "</select></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"18\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground font-mono placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var72 string
 			templ_7745c5c3_Var72, templ_7745c5c3_Err = templ.JoinStringErrs(data.Post.ContentMD)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 329, Col: 262}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 329, Col: 280}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var72))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "</textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase text-retro-muted\">Server preview</p><p class=\"text-xs font-bold text-retro-ink mt-1\">Preview unsaved Markdown using the same Goldmark renderer as public posts.</p><button type=\"button\" hx-post=\"/admin/posts/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-black text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Preview Markdown</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 101, "</textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-foreground bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase text-muted\">Server preview</p><p class=\"text-xs font-bold text-foreground mt-1\">Preview unsaved Markdown using the same Goldmark renderer as public posts.</p><button type=\"button\" hx-post=\"/admin/posts/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-foreground bg-secondary text-foreground font-black text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Preview Markdown</button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1308,7 +1308,7 @@ func PostEdit(data PostEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "</div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 102, "</div><div><label class=\"block text-sm font-bold text-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1321,7 +1321,7 @@ func PostEdit(data PostEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 103, "\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1329,7 +1329,7 @@ func PostEdit(data PostEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 104, "<div><label class=\"block text-sm font-bold text-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1342,22 +1342,22 @@ func PostEdit(data PostEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div><div class=\"flex items-start justify-between gap-3 border-2 border-retro-ink bg-retro-cream px-4 py-3\"><div><p class=\"text-xs font-black uppercase text-retro-muted\">Current status</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 105, "\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div class=\"flex items-start justify-between gap-3 border-2 border-foreground bg-background px-4 py-3\"><div><p class=\"text-xs font-black uppercase text-muted\">Current status</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Post.Published {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<p class=\"text-sm font-mono font-black text-retro-ink\">Published</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 106, "<p class=\"text-sm font-mono font-black text-foreground\">Published</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<p class=\"text-sm font-mono font-black text-retro-ink\">Draft</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 107, "<p class=\"text-sm font-mono font-black text-foreground\">Draft</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</div><p class=\"max-w-md text-xs font-bold text-retro-muted\">Use Update to keep this status, or choose Draft/Publish to change it.</p></div><div class=\"flex flex-wrap justify-end gap-2\"><a href=\"/admin/posts\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline\">Cancel</a> <button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"update\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Update</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Publish</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 108, "</div><p class=\"max-w-md text-xs font-bold text-muted\">Use Update to keep this status, or choose Draft/Publish to change it.</p></div><div class=\"flex flex-wrap justify-end gap-2\"><a href=\"/admin/posts\" class=\"px-5 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Cancel</a> <button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-foreground bg-secondary text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"update\" class=\"px-5 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Update</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-foreground bg-success text-background font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Publish</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1412,19 +1412,19 @@ func Topics(data TopicsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "<div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Name</th><th class=\"py-3 px-4 font-bold\">Slug</th><th class=\"py-3 px-4 font-bold\">Posts</th><th class=\"py-3 px-4 font-bold\">Description</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 110, "<div class=\"bg-card border-2 border-foreground nb-shadow overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-background\"><th class=\"py-3 px-4 font-bold\">Name</th><th class=\"py-3 px-4 font-bold\">Slug</th><th class=\"py-3 px-4 font-bold\">Posts</th><th class=\"py-3 px-4 font-bold\">Description</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, topic := range data.Topics {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<tr class=\"border-b-2 border-retro-ink last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 111, "<tr class=\"border-b-2 border-foreground last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-foreground\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var77 string
 				templ_7745c5c3_Var77, templ_7745c5c3_Err = templ.JoinStringErrs(topic.Category.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 389, Col: 84}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 389, Col: 85}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var77))
 				if templ_7745c5c3_Err != nil {
@@ -1434,7 +1434,7 @@ func Topics(data TopicsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				var templ_7745c5c3_Var78 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(topic.Category.Slug)}
+				var templ_7745c5c3_Var78 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono", CategoryBadgeClass(topic.Category.Slug)}
 				templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var78...)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
@@ -1459,33 +1459,33 @@ func Topics(data TopicsData) templ.Component {
 				var templ_7745c5c3_Var80 string
 				templ_7745c5c3_Var80, templ_7745c5c3_Err = templ.JoinStringErrs(topic.Category.Slug)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 390, Col: 176}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 390, Col: 177}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var80))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "</span></td><td class=\"py-3 px-4 text-sm font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 115, "</span></td><td class=\"py-3 px-4 text-sm font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var81 string
 				templ_7745c5c3_Var81, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(topic.PostCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 391, Col: 103}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 391, Col: 97}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var81))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</td><td class=\"py-3 px-4 text-sm font-bold text-retro-muted max-w-[360px] truncate\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 116, "</td><td class=\"py-3 px-4 text-sm font-bold text-muted max-w-[360px] truncate\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var82 string
 				templ_7745c5c3_Var82, templ_7745c5c3_Err = templ.JoinStringErrs(topic.Category.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 392, Col: 116}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 392, Col: 110}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var82))
 				if templ_7745c5c3_Err != nil {
@@ -1504,7 +1504,7 @@ func Topics(data TopicsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline\">Edit</a> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 118, "\" class=\"text-xs font-bold text-muted hover:bg-secondary px-2 py-1 border-2 border-foreground bg-card no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Edit</a> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1535,7 +1535,7 @@ func Topics(data TopicsData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\"> <button type=\"submit\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer\">✕</button></form>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 121, "\"> <button type=\"submit\" class=\"text-xs font-bold text-muted hover:bg-destructive px-2 py-1 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">✕</button></form>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -1545,7 +1545,7 @@ func Topics(data TopicsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "</tbody></table></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex flex-wrap items-start justify-between gap-3 mb-5\"><div><h2 class=\"text-sm font-black uppercase text-retro-ink mb-1\">Create New Topic</h2><p class=\"text-sm font-bold text-retro-muted max-w-2xl\">Topics drive the /blog switchboard and public archive taxonomy. Keep slugs stable once posts start using them.</p></div><span class=\"text-xs font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight px-3 py-1 text-retro-ink\">blog taxonomy</span></div><form method=\"POST\" action=\"/admin/topics\" class=\"space-y-4\" data-confirm=\"Create this topic?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 123, "</tbody></table></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><div class=\"flex flex-wrap items-start justify-between gap-3 mb-5\"><div><h2 class=\"text-sm font-black uppercase text-foreground mb-1\">Create New Topic</h2><p class=\"text-sm font-bold text-muted max-w-2xl\">Topics drive the /blog switchboard and public archive taxonomy. Keep slugs stable once posts start using them.</p></div><span class=\"text-xs font-black uppercase tracking-widest border-2 border-foreground bg-success/20 px-3 py-1 text-foreground\">blog taxonomy</span></div><form method=\"POST\" action=\"/admin/topics\" class=\"space-y-4\" data-confirm=\"Create this topic?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1558,7 +1558,7 @@ func Topics(data TopicsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\"><div class=\"grid gap-4 lg:grid-cols-2\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Name</label> <input type=\"text\" name=\"name\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\" placeholder=\"Systems\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Slug</label> <input type=\"text\" name=\"slug\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\" placeholder=\"systems\"></div></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Description</label> <textarea name=\"description\" rows=\"3\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\" placeholder=\"Optional public-facing note for this topic.\"></textarea></div><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Slug policy</p><p class=\"text-xs font-bold leading-5 text-retro-ink\">Use lowercase kebab-case. Once posts are assigned to a topic, slug changes and delete are blocked to preserve public filter links.</p></div><div class=\"flex justify-end gap-2\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Create Topic</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 124, "\"><div class=\"grid gap-4 lg:grid-cols-2\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Name</label> <input type=\"text\" name=\"name\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Systems\"></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Slug</label> <input type=\"text\" name=\"slug\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"systems\"></div></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Description</label> <textarea name=\"description\" rows=\"3\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Optional public-facing note for this topic.\"></textarea></div><div class=\"border-2 border-foreground bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Slug policy</p><p class=\"text-xs font-bold leading-5 text-foreground\">Use lowercase kebab-case. Once posts are assigned to a topic, slug changes and delete are blocked to preserve public filter links.</p></div><div class=\"flex justify-end gap-2\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-success text-background font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Create Topic</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1605,20 +1605,20 @@ func TopicEdit(data TopicEditData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/topics\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">&larr; Topics</a><h1 class=\"text-xl font-black uppercase text-retro-ink mt-1\">Edit topic</h1></div><span class=\"text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono\">posts: ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 125, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/topics\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Topics</a><h1 class=\"text-xl font-head font-black uppercase text-foreground mt-1\">Edit topic</h1></div><span class=\"text-xs font-bold bg-card border-2 border-foreground px-2.5 py-1 font-mono\">posts: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var89 string
 			templ_7745c5c3_Var89, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 452, Col: 133}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 452, Col: 127}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var89))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "</span></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"space-y-4\"><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 126, "</span></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><div class=\"space-y-4\"><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1644,7 +1644,7 @@ func TopicEdit(data TopicEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Name</label> <input type=\"text\" name=\"name\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 128, "\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Name</label> <input type=\"text\" name=\"name\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1657,7 +1657,7 @@ func TopicEdit(data TopicEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Slug</label> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 129, "\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Slug</label> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1675,7 +1675,7 @@ func TopicEdit(data TopicEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "\" readonly class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-cream text-sm font-bold text-retro-muted font-mono\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 131, "\" readonly class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-muted font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1693,37 +1693,37 @@ func TopicEdit(data TopicEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 133, "\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "</div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Description</label> <textarea name=\"description\" rows=\"4\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 134, "</div><div><label class=\"block text-sm font-bold text-muted mb-1\">Description</label> <textarea name=\"description\" rows=\"4\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var95 string
 			templ_7745c5c3_Var95, templ_7745c5c3_Err = templ.JoinStringErrs(data.Category.Description)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 472, Col: 171}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 472, Col: 248}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var95))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "</textarea></div><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Usage safety</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 135, "</textarea></div><div class=\"border-2 border-foreground bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Usage safety</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.PostCount > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "<p class=\"text-xs font-bold leading-5 text-retro-ink\">This topic already powers public post filters. Slug is locked and delete is disabled while ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 136, "<p class=\"text-xs font-bold leading-5 text-foreground\">This topic already powers public post filters. Slug is locked and delete is disabled while ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var96 string
 				templ_7745c5c3_Var96, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.PostCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 477, Col: 180}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 477, Col: 181}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var96))
 				if templ_7745c5c3_Err != nil {
@@ -1734,7 +1734,7 @@ func TopicEdit(data TopicEditData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "<p class=\"text-xs font-bold leading-5 text-retro-ink\">No posts use this topic yet. You can still rename the slug or delete it safely.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 138, "<p class=\"text-xs font-bold leading-5 text-foreground\">No posts use this topic yet. You can still rename the slug or delete it safely.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1744,17 +1744,17 @@ func TopicEdit(data TopicEditData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if data.PostCount > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "<span class=\"text-xs font-bold text-retro-muted\">Delete disabled while posts still reference this topic.</span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 140, "<span class=\"text-xs font-bold text-muted\">Delete disabled while posts still reference this topic.</span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "<span class=\"text-xs font-bold text-retro-muted\">Unused topics can still be removed safely.</span>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 141, "<span class=\"text-xs font-bold text-muted\">Unused topics can still be removed safely.</span>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "<div class=\"flex gap-2\"><a href=\"/admin/topics\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline\">Cancel</a> <button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Update Topic</button></div></div></form>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 142, "<div class=\"flex gap-2\"><a href=\"/admin/topics\" class=\"px-5 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Cancel</a> <button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Update Topic</button></div></div></form>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1785,7 +1785,7 @@ func TopicEdit(data TopicEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "\"> <button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Delete Topic</button></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 145, "\"> <button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-destructive text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Delete Topic</button></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1845,79 +1845,79 @@ func Projects(data ProjectsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "<div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Title</th><th class=\"py-3 px-4 font-bold\">Status</th><th class=\"py-3 px-4 font-bold\">Order</th><th class=\"py-3 px-4 font-bold\">Date</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 148, "<div class=\"bg-card border-2 border-foreground nb-shadow overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-background\"><th class=\"py-3 px-4 font-bold\">Title</th><th class=\"py-3 px-4 font-bold\">Status</th><th class=\"py-3 px-4 font-bold\">Order</th><th class=\"py-3 px-4 font-bold\">Date</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, project := range data.Projects {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<tr class=\"border-b-2 border-retro-ink last:border-b-0\"><td class=\"py-3 px-4 max-w-[320px]\"><div class=\"space-y-1\"><p class=\"text-sm font-bold text-retro-ink truncate\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 149, "<tr class=\"border-b-2 border-foreground last:border-b-0\"><td class=\"py-3 px-4 max-w-[320px]\"><div class=\"space-y-1\"><p class=\"text-sm font-bold text-foreground truncate\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var101 string
 				templ_7745c5c3_Var101, templ_7745c5c3_Err = templ.JoinStringErrs(project.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 526, Col: 78}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 526, Col: 79}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var101))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "</p><p class=\"text-xs font-bold text-retro-muted truncate\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 150, "</p><p class=\"text-xs font-bold text-muted truncate\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var102 string
 				templ_7745c5c3_Var102, templ_7745c5c3_Err = templ.JoinStringErrs(project.Excerpt)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 527, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 527, Col: 76}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var102))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "</p></div></td><td class=\"py-3 px-4 text-xs font-mono font-bold text-retro-muted\"><div class=\"flex flex-wrap gap-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 151, "</p></div></td><td class=\"py-3 px-4 text-xs font-mono font-bold text-muted\"><div class=\"flex flex-wrap gap-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				if project.Published {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<span class=\"inline-flex px-2 py-1 border-2 border-retro-ink bg-retro-sageLight text-retro-ink uppercase tracking-wide\">published</span> ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 152, "<span class=\"inline-flex px-2 py-1 border-2 border-foreground bg-success/20 text-foreground uppercase tracking-wide\">published</span> ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				} else {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<span class=\"inline-flex px-2 py-1 border-2 border-retro-ink bg-retro-wheat text-retro-ink uppercase tracking-wide\">draft</span> ")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 153, "<span class=\"inline-flex px-2 py-1 border-2 border-foreground bg-secondary text-foreground uppercase tracking-wide\">draft</span> ")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 				if project.Featured {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "<span class=\"inline-flex px-2 py-1 border-2 border-retro-ink bg-retro-blush text-retro-ink uppercase tracking-wide\">featured</span>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 154, "<span class=\"inline-flex px-2 py-1 border-2 border-foreground bg-destructive text-foreground uppercase tracking-wide\">featured</span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "</div></td><td class=\"py-3 px-4 text-sm font-mono font-bold text-retro-muted\">#")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 155, "</div></td><td class=\"py-3 px-4 text-sm font-mono font-bold text-muted\">#")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var103 string
 				templ_7745c5c3_Var103, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(project.SortOrder))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 542, Col: 104}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 542, Col: 98}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var103))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "</td><td class=\"py-3 px-4 text-sm font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 156, "</td><td class=\"py-3 px-4 text-sm font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var104 string
 				templ_7745c5c3_Var104, templ_7745c5c3_Err = templ.JoinStringErrs(project.CreatedAt.Format("2006-01-02"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 543, Col: 114}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 543, Col: 108}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var104))
 				if templ_7745c5c3_Err != nil {
@@ -1936,7 +1936,7 @@ func Projects(data ProjectsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 158, "\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline\">Edit</a><form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 158, "\" class=\"text-xs font-bold text-muted hover:bg-secondary px-2 py-1 border-2 border-foreground bg-card no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Edit</a><form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -1962,12 +1962,12 @@ func Projects(data ProjectsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "\"> <button type=\"submit\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer\">✕</button></form></td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 160, "\"> <button type=\"submit\" class=\"text-xs font-bold text-muted hover:bg-destructive px-2 py-1 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">✕</button></form></td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "</tbody></table></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex flex-wrap items-start justify-between gap-3 mb-5\"><div><h2 class=\"text-sm font-black uppercase text-retro-ink mb-1\">Create New Project</h2><p class=\"text-sm font-bold text-retro-muted max-w-2xl\">Ship cleaner public cards by giving each project a tight title, short excerpt, optional cover image, and tags that map how readers should enter detail view.</p></div><span class=\"text-xs font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-sageLight px-3 py-1 text-retro-ink\">public-facing</span></div><form method=\"POST\" action=\"/admin/projects\" class=\"space-y-4\" data-confirm=\"Save this project?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 161, "</tbody></table></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><div class=\"flex flex-wrap items-start justify-between gap-3 mb-5\"><div><h2 class=\"text-sm font-black uppercase text-foreground mb-1\">Create New Project</h2><p class=\"text-sm font-bold text-muted max-w-2xl\">Ship cleaner public cards by giving each project a tight title, short excerpt, optional cover image, and tags that map how readers should enter detail view.</p></div><span class=\"text-xs font-black uppercase tracking-widest border-2 border-foreground bg-success/20 px-3 py-1 text-foreground\">public-facing</span></div><form method=\"POST\" action=\"/admin/projects\" class=\"space-y-4\" data-confirm=\"Save this project?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1980,7 +1980,7 @@ func Projects(data ProjectsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "\"><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(16rem,0.8fr)]\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Project title\"></div><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Card rhythm</p><p class=\"text-xs font-bold leading-5 text-retro-ink\">Keep title scan-friendly. Card list now gives more room to excerpt and metadata, so short punchy copy works best.</p></div></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"15\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Write project details in Markdown...\"></textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase text-retro-muted\">Server preview</p><p class=\"text-xs font-bold text-retro-ink mt-1\">Preview project Markdown using same public renderer path.</p><button type=\"button\" hx-post=\"/admin/projects/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-black text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Preview Markdown</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 162, "\"><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(16rem,0.8fr)]\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Project title\"></div><div class=\"border-2 border-foreground bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Card rhythm</p><p class=\"text-xs font-bold leading-5 text-foreground\">Keep title scan-friendly. Card list now gives more room to excerpt and metadata, so short punchy copy works best.</p></div></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"15\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground font-mono placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Write project details in Markdown...\"></textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-foreground bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase text-muted\">Server preview</p><p class=\"text-xs font-bold text-foreground mt-1\">Preview project Markdown using same public renderer path.</p><button type=\"button\" hx-post=\"/admin/projects/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-foreground bg-secondary text-foreground font-black text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Preview Markdown</button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1988,7 +1988,7 @@ func Projects(data ProjectsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, "</div><div class=\"grid gap-4 lg:grid-cols-2\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Short project summary\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Used on public archive cards and detail page intro.</p></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"oss, infrastructure\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Comma-separated badges for project cards and detail metadata.</p></div></div><div class=\"grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Project state</label> <select name=\"state\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink mb-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 163, "</div><div class=\"grid gap-4 lg:grid-cols-2\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Short project summary\"><p class=\"text-xs font-bold text-muted mt-2\">Used on public archive cards and detail page intro.</p></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"oss, infrastructure\"><p class=\"text-xs font-bold text-muted mt-2\">Comma-separated badges for project cards and detail metadata.</p></div></div><div class=\"grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,1.1fr)]\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Project state</label> <select name=\"state\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground mb-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2024,7 +2024,7 @@ func Projects(data ProjectsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 167, "</select><p class=\"text-xs font-bold text-retro-muted mt-2\">Public-facing lifecycle badge for archive and detail pages.</p></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Sort order</label> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Lower number shows earlier once featured lane is applied.</p></div><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3 lg:col-span-2\"><label class=\"flex items-start gap-3 cursor-pointer\"><input type=\"checkbox\" name=\"featured\" class=\"mt-1 h-4 w-4 accent-retro-ink\"> <span><span class=\"block text-sm font-black uppercase text-retro-ink\">Featured lane</span> <span class=\"block text-xs font-bold leading-5 text-retro-muted mt-1\">Featured projects rise above normal archive order and get public badge treatment.</span></span></label></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 167, "</select><p class=\"text-xs font-bold text-muted mt-2\">Public-facing lifecycle badge for archive and detail pages.</p></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Sort order</label> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 border-2 border-foreground bg-card text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-bold text-muted mt-2\">Lower number shows earlier once featured lane is applied.</p></div><div class=\"border-2 border-foreground bg-background px-4 py-3 lg:col-span-2\"><label class=\"flex items-start gap-3 cursor-pointer\"><input type=\"checkbox\" name=\"featured\" class=\"mt-1 h-4 w-4 accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <span><span class=\"block text-sm font-black uppercase text-foreground\">Featured lane</span> <span class=\"block text-xs font-bold leading-5 text-muted mt-1\">Featured projects rise above normal archive order and get public badge treatment.</span></span></label></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2032,7 +2032,7 @@ func Projects(data ProjectsData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 168, "<div class=\"flex flex-wrap justify-end gap-2\"><button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Publish Project</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 168, "<div class=\"flex flex-wrap justify-end gap-2\"><button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-foreground bg-secondary text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-foreground bg-success text-background font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Publish Project</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2079,20 +2079,20 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 169, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/projects\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">&larr; Projects</a><h1 class=\"text-xl font-black uppercase text-retro-ink mt-1\">Edit project</h1></div><span class=\"text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono\">slug: ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 169, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/projects\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Projects</a><h1 class=\"text-xl font-head font-black uppercase text-foreground mt-1\">Edit project</h1></div><span class=\"text-xs font-bold bg-card nb-border px-2.5 py-1 font-mono\">slug: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var113 string
 			templ_7745c5c3_Var113, templ_7745c5c3_Err = templ.JoinStringErrs(data.Project.Slug)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 644, Col: 124}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 644, Col: 101}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var113))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 170, "</span></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 170, "</span></div><div class=\"bg-card nb-border p-6 nb-shadow\"><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2118,7 +2118,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 172, "\"><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(16rem,0.8fr)]\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 172, "\"><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.2fr)_minmax(16rem,0.8fr)]\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Title</label> <input type=\"text\" name=\"title\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2131,20 +2131,20 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 173, "\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"></div><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Public surface</p><p class=\"text-xs font-bold leading-5 text-retro-ink\">Changes here affect project archive card, hero summary, and detail metadata in one pass.</p></div></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"18\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 173, "\" required class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div class=\"nb-border bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Public surface</p><p class=\"text-xs font-bold leading-5 text-foreground\">Changes here affect project archive card, hero summary, and detail metadata in one pass.</p></div></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Content (Markdown)</label> <textarea name=\"content\" rows=\"18\" required class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var117 string
 			templ_7745c5c3_Var117, templ_7745c5c3_Err = templ.JoinStringErrs(data.Project.ContentMD)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 661, Col: 183}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 661, Col: 243}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var117))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 174, "</textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><p class=\"text-xs font-black uppercase text-retro-muted\">Server preview</p><p class=\"text-xs font-bold text-retro-ink mt-1\">Preview unsaved Markdown using same renderer as public project pages.</p><button type=\"button\" hx-post=\"/admin/projects/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-black text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Preview Markdown</button></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 174, "</textarea></div><div class=\"grid gap-3 lg:grid-cols-[0.9fr_1.1fr] lg:items-start\"><div class=\"nb-border bg-background px-4 py-3\"><p class=\"text-xs font-black uppercase text-muted\">Server preview</p><p class=\"text-xs font-bold text-foreground mt-1\">Preview unsaved Markdown using same renderer as public project pages.</p><button type=\"button\" hx-post=\"/admin/projects/preview\" hx-include=\"closest form\" hx-target=\"#post-markdown-preview\" hx-swap=\"outerHTML\" class=\"mt-3 px-4 py-2 nb-border bg-secondary text-foreground font-black text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Preview Markdown</button></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2152,7 +2152,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 175, "</div><div class=\"grid gap-4 lg:grid-cols-2\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 175, "</div><div class=\"grid gap-4 lg:grid-cols-2\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Excerpt</label> <input type=\"text\" name=\"excerpt\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2165,7 +2165,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 176, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Keep this sharp. It now carries more visual weight on both archive and detail views.</p></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 176, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-bold text-muted mt-2\">Keep this sharp. It now carries more visual weight on both archive and detail views.</p></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Tags</label> <input type=\"text\" name=\"tags\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2178,7 +2178,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 177, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Shown as badges in hero brief and archive cards.</p></div></div><div class=\"grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)]\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Project state</label> <select name=\"state\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 177, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-bold text-muted mt-2\">Shown as badges in hero brief and archive cards.</p></div></div><div class=\"grid gap-4 lg:grid-cols-[minmax(0,0.9fr)_minmax(0,0.9fr)_minmax(0,1.2fr)]\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Project state</label> <select name=\"state\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2247,7 +2247,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 184, "</select><p class=\"text-xs font-bold text-retro-muted mt-2\">Shown as state badge on project archive and detail.</p></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Sort order</label> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 184, "</select><p class=\"text-xs font-bold text-muted mt-2\">Shown as state badge on project archive and detail.</p></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Sort order</label> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2260,22 +2260,22 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 185, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Lower number shows earlier once featured lane is applied.</p></div><div class=\"border-2 border-retro-ink bg-retro-cream px-4 py-3\"><label class=\"flex items-start gap-3 cursor-pointer\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 185, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-bold text-muted mt-2\">Lower number shows earlier once featured lane is applied.</p></div><div class=\"nb-border bg-background px-4 py-3\"><label class=\"flex items-start gap-3 cursor-pointer\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Project.Featured {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 186, "<input type=\"checkbox\" name=\"featured\" checked class=\"mt-1 h-4 w-4 accent-retro-ink\"> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 186, "<input type=\"checkbox\" name=\"featured\" checked class=\"mt-1 h-4 w-4 accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 187, "<input type=\"checkbox\" name=\"featured\" class=\"mt-1 h-4 w-4 accent-retro-ink\"> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 187, "<input type=\"checkbox\" name=\"featured\" class=\"mt-1 h-4 w-4 accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 188, "<span><span class=\"block text-sm font-black uppercase text-retro-ink\">Featured lane</span> <span class=\"block text-xs font-bold leading-5 text-retro-muted mt-1\">Featured projects rise above normal archive order and get public badge treatment.</span></span></label></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 188, "<span><span class=\"block text-sm font-black uppercase text-foreground\">Featured lane</span> <span class=\"block text-xs font-bold leading-5 text-muted mt-1\">Featured projects rise above normal archive order and get public badge treatment.</span></span></label></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2283,34 +2283,34 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 189, "<div class=\"flex items-start justify-between gap-3 border-2 border-retro-ink bg-retro-cream px-4 py-3\"><div><p class=\"text-xs font-black uppercase text-retro-muted\">Current status</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 189, "<div class=\"flex items-start justify-between gap-3 nb-border bg-background px-4 py-3\"><div><p class=\"text-xs font-black uppercase text-muted\">Current status</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Project.Published {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 190, "<p class=\"text-sm font-mono font-black text-retro-ink\">Published</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 190, "<p class=\"text-sm font-mono font-black text-foreground\">Published</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 191, "<p class=\"text-sm font-mono font-black text-retro-ink\">Draft</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 191, "<p class=\"text-sm font-mono font-black text-foreground\">Draft</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 192, "</div><div class=\"space-y-1 text-right\"><p class=\"max-w-md text-xs font-bold text-retro-muted\">Use Update to keep status, or Draft/Publish to change it.</p>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 192, "</div><div class=\"space-y-1 text-right\"><p class=\"max-w-md text-xs font-bold text-muted\">Use Update to keep status, or Draft/Publish to change it.</p>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Project.Featured {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 193, "<p class=\"text-xs font-black uppercase tracking-widest text-retro-ink\">featured lane active · order #")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 193, "<p class=\"text-xs font-black uppercase tracking-widest text-foreground\">featured lane active · order #")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var125 string
 				templ_7745c5c3_Var125, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.Project.SortOrder))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 729, Col: 144}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 729, Col: 145}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var125))
 				if templ_7745c5c3_Err != nil {
@@ -2321,7 +2321,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 195, "</div></div><div class=\"flex flex-wrap justify-end gap-2\"><a href=\"/admin/projects\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline\">Cancel</a> <button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"update\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Update</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Publish</button></div></form></div><div class=\"grid gap-6 xl:grid-cols-3\"><section class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] xl:col-span-2\"><div class=\"flex items-center justify-between gap-3 mb-4\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">Timeline</p><h2 class=\"text-lg font-black uppercase text-retro-ink\">Build log and changelog entries</h2></div></div><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 195, "</div></div><div class=\"flex flex-wrap justify-end gap-2\"><a href=\"/admin/projects\" class=\"px-5 py-2 nb-border bg-card text-foreground font-bold text-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Cancel</a> <button type=\"submit\" name=\"intent\" value=\"draft\" class=\"px-5 py-2 nb-border bg-secondary text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save Draft</button> <button type=\"submit\" name=\"intent\" value=\"update\" class=\"px-5 py-2 nb-border bg-card text-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Update</button> <button type=\"submit\" name=\"intent\" value=\"publish\" class=\"px-5 py-2 nb-border bg-success text-success-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Publish</button></div></form></div><div class=\"grid gap-6 xl:grid-cols-3\"><section class=\"bg-card nb-border p-5 nb-shadow xl:col-span-2\"><div class=\"flex items-center justify-between gap-3 mb-4\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Timeline</p><h2 class=\"text-lg font-head font-black uppercase text-foreground\">Build log and changelog entries</h2></div></div><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2347,7 +2347,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 197, "\"><div class=\"grid gap-3 md:grid-cols-2\"><input type=\"text\" name=\"title\" placeholder=\"Update title\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <select name=\"kind\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 197, "\"><div class=\"grid gap-3 md:grid-cols-2\"><input type=\"text\" name=\"title\" placeholder=\"Update title\" required class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <select name=\"kind\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2383,7 +2383,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 201, "</select></div><textarea name=\"content_md\" rows=\"6\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\" placeholder=\"Markdown update...\"></textarea><div class=\"grid gap-3 md:grid-cols-3\"><input type=\"datetime-local\" name=\"event_at\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><div class=\"flex gap-4 items-center border-2 border-retro-ink bg-retro-cream px-3 py-2\"><label class=\"text-xs font-black uppercase text-retro-ink\"><input type=\"checkbox\" name=\"published\" checked class=\"mr-2\">Published</label> <label class=\"text-xs font-black uppercase text-retro-ink\"><input type=\"checkbox\" name=\"pinned\" class=\"mr-2\">Pinned</label></div></div><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Add update</button></div></form><div class=\"space-y-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 201, "</select></div><textarea name=\"content_md\" rows=\"6\" required class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground font-mono placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Markdown update...\"></textarea><div class=\"grid gap-3 md:grid-cols-3\"><input type=\"datetime-local\" name=\"event_at\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><div class=\"flex gap-4 items-center nb-border bg-background px-3 py-2\"><label class=\"text-xs font-black uppercase text-foreground\"><input type=\"checkbox\" name=\"published\" checked class=\"mr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Published</label> <label class=\"text-xs font-black uppercase text-foreground\"><input type=\"checkbox\" name=\"pinned\" class=\"mr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Pinned</label></div></div><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 nb-border bg-success text-success-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Add update</button></div></form><div class=\"space-y-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2401,7 +2401,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 203, "\" class=\"border-2 border-retro-ink bg-retro-cream p-4 space-y-3\" data-confirm=\"Update timeline entry?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 203, "\" class=\"nb-border bg-background p-4 space-y-3\" data-confirm=\"Update timeline entry?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2440,7 +2440,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 206, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <select name=\"kind\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 206, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <select name=\"kind\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2509,14 +2509,14 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 						}
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 213, "</select></div><textarea name=\"content_md\" rows=\"4\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 213, "</select></div><textarea name=\"content_md\" rows=\"4\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var138 string
 				templ_7745c5c3_Var138, templ_7745c5c3_Err = templ.JoinStringErrs(item.ContentMD)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 787, Col: 170}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 787, Col: 230}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var138))
 				if templ_7745c5c3_Err != nil {
@@ -2535,7 +2535,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 215, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 215, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2548,7 +2548,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 216, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><div class=\"flex gap-4 items-center border-2 border-retro-ink bg-retro-paper px-3 py-2\"><label class=\"text-xs font-black uppercase text-retro-ink\"><input type=\"checkbox\" name=\"published\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 216, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><div class=\"flex gap-4 items-center nb-border bg-card px-3 py-2\"><label class=\"text-xs font-black uppercase text-foreground\"><input type=\"checkbox\" name=\"published\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2558,7 +2558,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 218, " class=\"mr-2\">Published</label> <label class=\"text-xs font-black uppercase text-retro-ink\"><input type=\"checkbox\" name=\"pinned\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 218, " class=\"mr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Published</label> <label class=\"text-xs font-black uppercase text-foreground\"><input type=\"checkbox\" name=\"pinned\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2568,20 +2568,20 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 220, " class=\"mr-2\">Pinned</label></div></div><div class=\"flex justify-between gap-3\"><p class=\"text-xs font-mono font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 220, " class=\"mr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Pinned</label></div></div><div class=\"flex justify-between gap-3\"><p class=\"text-xs font-mono font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var141 string
 				templ_7745c5c3_Var141, templ_7745c5c3_Err = templ.JoinStringErrs(item.EventAt.Format("Jan 2, 2006 15:04"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 797, Col: 107}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 797, Col: 101}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var141))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 221, "</p><div class=\"flex gap-2\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-xs cursor-pointer\">Save entry</button><form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 221, "</p><div class=\"flex gap-2\"><button type=\"submit\" class=\"px-4 py-2 nb-border bg-card text-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save entry</button><form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2620,12 +2620,12 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 224, "\"> <button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-xs cursor-pointer\">Delete</button></form></div></div></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 224, "\"> <button type=\"submit\" class=\"px-4 py-2 nb-border bg-destructive text-destructive-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Delete</button></form></div></div></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 225, "</div></section><section class=\"space-y-6\"><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">Related content</p><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 225, "</div></section><section class=\"space-y-6\"><div class=\"bg-card nb-border p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">Related content</p><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2651,7 +2651,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 227, "\"> <select name=\"target_type\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><option value=\"project\">Project</option> <option value=\"post\">Post</option></select> <input type=\"number\" name=\"target_id\" min=\"1\" placeholder=\"Target ID\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <select name=\"relation_kind\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 227, "\"> <select name=\"target_type\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"project\">Project</option> <option value=\"post\">Post</option></select> <input type=\"number\" name=\"target_id\" min=\"1\" placeholder=\"Target ID\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <select name=\"relation_kind\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2687,45 +2687,45 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 231, "</select> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-xs cursor-pointer\">Add relation</button></div></form><div class=\"space-y-2 mt-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 231, "</select> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 nb-border bg-success text-success-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Add relation</button></div></form><div class=\"space-y-2 mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, item := range data.RelatedItems {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 232, "<div class=\"border-2 border-retro-ink bg-retro-cream p-3\"><p class=\"text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 232, "<div class=\"nb-border bg-background p-3\"><p class=\"text-[11px] font-black uppercase tracking-widest text-muted mb-1\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var149 string
 				templ_7745c5c3_Var149, templ_7745c5c3_Err = templ.JoinStringErrs(ProjectStateLabel(item.RelationKind))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 832, Col: 129}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 832, Col: 123}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var149))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 233, "</p><p class=\"text-sm font-black text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 233, "</p><p class=\"text-sm font-black text-foreground\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var150 string
 				templ_7745c5c3_Var150, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 833, Col: 66}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 833, Col: 67}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var150))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 234, "</p><p class=\"text-xs font-bold text-retro-muted mb-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 234, "</p><p class=\"text-xs font-bold text-muted mb-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var151 string
 				templ_7745c5c3_Var151, templ_7745c5c3_Err = templ.JoinStringErrs(item.URL)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 834, Col: 70}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 834, Col: 64}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var151))
 				if templ_7745c5c3_Err != nil {
@@ -2770,12 +2770,12 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 238, "\"> <button type=\"submit\" class=\"px-3 py-1 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-xs cursor-pointer\">Delete</button></form></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 238, "\"> <button type=\"submit\" class=\"px-3 py-1 nb-border bg-destructive text-destructive-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Delete</button></form></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 239, "</div></div><div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">Showcase items</p><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 239, "</div></div><div class=\"bg-card nb-border p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">Showcase items</p><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2801,7 +2801,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 241, "\"> <select name=\"kind\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 241, "\"> <select name=\"kind\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2837,7 +2837,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 245, "</select> <input type=\"text\" name=\"title\" placeholder=\"Showcase title\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <textarea name=\"body_md\" rows=\"4\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\" placeholder=\"Markdown description...\"></textarea> <input type=\"text\" name=\"asset_url\" placeholder=\"Asset URL\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"text\" name=\"external_url\" placeholder=\"External URL\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><div class=\"grid gap-3 md:grid-cols-3\"><input type=\"text\" name=\"embed_provider\" placeholder=\"Embed provider\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"text\" name=\"embed_ref\" placeholder=\"Embed ref\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"></div><label class=\"text-xs font-black uppercase text-retro-ink\"><input type=\"checkbox\" name=\"published\" checked class=\"mr-2\">Published</label><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-xs cursor-pointer\">Add showcase item</button></div></form><div class=\"space-y-3 mt-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 245, "</select> <input type=\"text\" name=\"title\" placeholder=\"Showcase title\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <textarea name=\"body_md\" rows=\"4\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Markdown description...\"></textarea> <input type=\"text\" name=\"asset_url\" placeholder=\"Asset URL\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"external_url\" placeholder=\"External URL\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><div class=\"grid gap-3 md:grid-cols-3\"><input type=\"text\" name=\"embed_provider\" placeholder=\"Embed provider\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"embed_ref\" placeholder=\"Embed ref\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"0\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><label class=\"text-xs font-black uppercase text-foreground\"><input type=\"checkbox\" name=\"published\" checked class=\"mr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Published</label><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-4 py-2 nb-border bg-success text-success-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Add showcase item</button></div></form><div class=\"space-y-3 mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -2855,7 +2855,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 247, "\" class=\"border-2 border-retro-ink bg-retro-cream p-3 space-y-2\" data-confirm=\"Update showcase item?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 247, "\" class=\"nb-border bg-background p-3 space-y-2\" data-confirm=\"Update showcase item?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2894,7 +2894,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 250, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <select name=\"kind\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 250, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <select name=\"kind\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -2963,14 +2963,14 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 						}
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 257, "</select> <textarea name=\"body_md\" rows=\"3\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 257, "</select> <textarea name=\"body_md\" rows=\"3\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var167 string
 				templ_7745c5c3_Var167, templ_7745c5c3_Err = templ.JoinStringErrs(item.BodyMD)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 880, Col: 165}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 880, Col: 225}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var167))
 				if templ_7745c5c3_Err != nil {
@@ -2989,7 +2989,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 259, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"text\" name=\"external_url\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 259, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"external_url\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3002,7 +3002,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 260, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><div class=\"grid gap-3 md:grid-cols-3\"><input type=\"text\" name=\"embed_provider\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 260, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><div class=\"grid gap-3 md:grid-cols-3\"><input type=\"text\" name=\"embed_provider\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3015,7 +3015,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 261, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"text\" name=\"embed_ref\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 261, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"embed_ref\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3028,7 +3028,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 262, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 262, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"number\" name=\"sort_order\" min=\"0\" value=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3041,7 +3041,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 263, "\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"></div><label class=\"text-xs font-black uppercase text-retro-ink\"><input type=\"checkbox\" name=\"published\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 263, "\" class=\"w-full px-3 py-2 nb-border bg-card text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><label class=\"text-xs font-black uppercase text-foreground\"><input type=\"checkbox\" name=\"published\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3051,7 +3051,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 265, " class=\"mr-2\">Published</label><div class=\"flex justify-between gap-2\"><button type=\"submit\" class=\"px-3 py-1 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-xs cursor-pointer\">Save</button><form method=\"POST\" action=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 265, " class=\"mr-2 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Published</label><div class=\"flex justify-between gap-2\"><button type=\"submit\" class=\"px-3 py-1 nb-border bg-card text-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save</button><form method=\"POST\" action=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3090,7 +3090,7 @@ func ProjectEdit(data ProjectEditData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 268, "\"> <button type=\"submit\" class=\"px-3 py-1 border-2 border-retro-ink bg-retro-blush text-retro-ink font-bold text-xs cursor-pointer\">Delete</button></form></div></form>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 268, "\"> <button type=\"submit\" class=\"px-3 py-1 nb-border bg-destructive text-destructive-foreground font-bold text-xs cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Delete</button></form></div></form>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3150,32 +3150,32 @@ func Pages(data PagesData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 271, "<div class=\"bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex flex-wrap items-start justify-between gap-3\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Public copy control</p><h2 class=\"text-xl font-black uppercase text-retro-ink mb-2\">About and Contact stay SSR-first.</h2><p class=\"text-sm font-bold text-retro-ink max-w-3xl\">Use these editors for hero title, supporting summary, and Markdown body. Public pages keep retro framing from shared templates; this screen only shapes the content hierarchy inside that shell.</p></div><span class=\"text-xs font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper px-3 py-1 text-retro-ink\">copy + structure</span></div></div><div class=\"grid gap-4 md:grid-cols-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 271, "<div class=\"bg-secondary border-2 border-foreground p-5 nb-shadow\"><div class=\"flex flex-wrap items-start justify-between gap-3\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Public copy control</p><h2 class=\"text-xl font-black font-head uppercase text-foreground mb-2\">About and Contact stay SSR-first.</h2><p class=\"text-sm font-bold text-foreground max-w-3xl\">Use these editors for hero title, supporting summary, and Markdown body. Public pages keep retro framing from shared templates; this screen only shapes the content hierarchy inside that shell.</p></div><span class=\"text-xs font-black uppercase tracking-widest border-2 border-foreground bg-card px-3 py-1 text-foreground\">copy + structure</span></div></div><div class=\"grid gap-4 md:grid-cols-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			for _, page := range data.Pages {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 272, "<article class=\"rv-card-lift bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] space-y-4 transition-all\"><div class=\"flex items-start justify-between gap-3\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 272, "<article class=\"rv-card-lift bg-card border-2 border-foreground p-5 nb-shadow space-y-4 transition-all\"><div class=\"flex items-start justify-between gap-3\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var178 string
 				templ_7745c5c3_Var178, templ_7745c5c3_Err = templ.JoinStringErrs(page.Key)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 926, Col: 96}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 926, Col: 90}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var178))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 273, "</p><h2 class=\"text-2xl font-black uppercase text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 273, "</p><h2 class=\"text-2xl font-black font-head uppercase text-foreground\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var179 string
 				templ_7745c5c3_Var179, templ_7745c5c3_Err = templ.JoinStringErrs(page.Title)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 927, Col: 77}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 927, Col: 88}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var179))
 				if templ_7745c5c3_Err != nil {
@@ -3194,33 +3194,33 @@ func Pages(data PagesData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 275, "\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper no-underline\">Edit</a></div><p class=\"text-sm font-bold text-retro-muted\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 275, "\" class=\"text-xs font-bold text-muted hover:bg-secondary px-2 py-1 border-2 border-foreground bg-card no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Edit</a></div><p class=\"text-sm font-bold text-muted\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var181 string
 				templ_7745c5c3_Var181, templ_7745c5c3_Err = templ.JoinStringErrs(page.Summary)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 931, Col: 66}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 931, Col: 60}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var181))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 276, "</p><div class=\"grid gap-2 sm:grid-cols-2\"><div class=\"border-2 border-retro-ink bg-retro-cream px-3 py-3\"><p class=\"text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1\">Summary role</p><p class=\"text-sm font-bold text-retro-ink\">Hero support copy</p></div><div class=\"border-2 border-retro-ink bg-retro-sageLight px-3 py-3\"><p class=\"text-[11px] font-black uppercase tracking-widest text-retro-muted mb-1\">Last update</p><p class=\"text-sm font-mono font-bold text-retro-ink\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 276, "</p><div class=\"grid gap-2 sm:grid-cols-2\"><div class=\"border-2 border-foreground bg-background px-3 py-3\"><p class=\"text-[11px] font-black uppercase tracking-widest text-muted mb-1\">Summary role</p><p class=\"text-sm font-bold text-foreground\">Hero support copy</p></div><div class=\"border-2 border-foreground bg-success/20 px-3 py-3\"><p class=\"text-[11px] font-black uppercase tracking-widest text-muted mb-1\">Last update</p><p class=\"text-sm font-mono font-bold text-foreground\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var182 string
 				templ_7745c5c3_Var182, templ_7745c5c3_Err = templ.JoinStringErrs(page.UpdatedAt.Format("2006-01-02 15:04"))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 939, Col: 105}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 939, Col: 106}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var182))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 277, "</p></div></div><div class=\"flex items-center justify-between gap-3 border-t-2 border-retro-ink pt-3\"><p class=\"text-xs font-bold uppercase tracking-wider text-retro-muted\">Shared page shell stays intact.</p><a href=\"")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 277, "</p></div></div><div class=\"flex items-center justify-between gap-3 border-t-2 border-foreground pt-3\"><p class=\"text-xs font-bold uppercase tracking-wider text-muted\">Shared page shell stays intact.</p><a href=\"")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3233,7 +3233,7 @@ func Pages(data PagesData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 278, "\" class=\"inline-flex items-center gap-1 text-sm font-black no-underline border-2 border-retro-ink bg-retro-ink px-3 py-2 text-retro-cream shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Open editor &rarr;</a></div></article>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 278, "\" class=\"inline-flex items-center gap-1 text-sm font-black no-underline border-2 border-foreground bg-foreground px-3 py-2 text-primary-foreground nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Open editor &rarr;</a></div></article>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3285,33 +3285,33 @@ func PageEdit(data PageEditData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 280, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/pages\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">&larr; Pages</a><h1 class=\"text-xl font-black uppercase text-retro-ink mt-1\">Edit ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 280, "<div class=\"space-y-6\"><div class=\"flex items-center justify-between\"><div><a href=\"/admin/pages\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Pages</a><h1 class=\"text-xl font-head font-black uppercase text-foreground mt-1\">Edit ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var186 string
 			templ_7745c5c3_Var186, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.Key)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 959, Col: 86}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 959, Col: 97}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var186))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 281, " page</h1></div><span class=\"text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono\">key: ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 281, " page</h1></div><span class=\"text-xs font-bold bg-card border-2 border-foreground px-2.5 py-1 font-mono\">key: ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var187 string
 			templ_7745c5c3_Var187, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.Key)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 961, Col: 119}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 961, Col: 113}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var187))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 282, "</span></div><div class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 282, "</span></div><div class=\"bg-card border-2 border-foreground p-6 nb-shadow\"><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3337,7 +3337,7 @@ func PageEdit(data PageEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 284, "\"><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Hero title</label> <input type=\"text\" name=\"title\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 284, "\"><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Hero title</label> <input type=\"text\" name=\"title\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3350,15 +3350,15 @@ func PageEdit(data PageEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 285, "\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 285, "\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = editorNoteCard("Page role", "This editor changes copy only. Shared retro hero, navigation, and layout framing still come from public templates.", "bg-retro-cream").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = editorNoteCard("Page role", "This editor changes copy only. Shared retro hero, navigation, and layout framing still come from public templates.", "bg-background").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 286, "</div><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Summary</label> <input type=\"text\" name=\"summary\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 286, "</div><div class=\"grid gap-4 lg:grid-cols-[minmax(0,1.15fr)_minmax(16rem,0.85fr)]\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Summary</label> <input type=\"text\" name=\"summary\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3371,28 +3371,28 @@ func PageEdit(data PageEditData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 287, "\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink\"><p class=\"text-xs font-bold text-retro-muted mt-2\">Appears as supporting text beneath hero title on public page.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 287, "\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-bold text-muted mt-2\">Appears as supporting text beneath hero title on public page.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = editorNoteCard("Current page", data.Page.Key+" page content is rendered server-side and published immediately after save.", "bg-retro-sageLight").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = editorNoteCard("Current page", data.Page.Key+" page content is rendered server-side and published immediately after save.", "bg-success/20").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 288, "</div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Body (Markdown)</label> <textarea name=\"content\" rows=\"18\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 288, "</div><div><label class=\"block text-sm font-bold text-muted mb-1\">Body (Markdown)</label> <textarea name=\"content\" rows=\"18\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground font-mono focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var192 string
 			templ_7745c5c3_Var192, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.ContentMD)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 983, Col: 180}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 983, Col: 263}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var192))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 289, "</textarea><p class=\"text-xs font-bold text-retro-muted mt-2\">Use headings, lists, and links normally. Renderer matches public Markdown path used elsewhere in site.</p></div><div class=\"flex justify-end gap-2\"><a href=\"/admin/pages\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline\">Cancel</a> <button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Save Page</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 289, "</textarea><p class=\"text-xs font-bold text-muted mt-2\">Use headings, lists, and links normally. Renderer matches public Markdown path used elsewhere in site.</p></div><div class=\"flex justify-end gap-2\"><a href=\"/admin/pages\" class=\"px-5 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Cancel</a> <button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-success text-success-foreground font-bold text-sm nb-shadow cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Save Page</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3452,7 +3452,7 @@ func Servers(data ServersData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Servers) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 292, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xl font-black uppercase text-retro-ink mb-2\">No servers registered yet.</p><p class=\"text-sm font-bold text-retro-muted max-w-xl mx-auto mb-4\">Register the first node below, then copy the admin-only install, test run, and cron commands from its setup card.</p><a href=\"#register-server\" class=\"inline-flex items-center px-4 py-2 border-2 border-retro-ink bg-retro-wheat text-retro-ink text-sm font-black no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">Jump to registration form</a></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 292, "<div class=\"bg-card border-2 border-foreground p-8 text-center nb-shadow\"><p class=\"text-xl font-black font-head uppercase text-foreground mb-2\">No servers registered yet.</p><p class=\"text-sm font-bold text-muted max-w-xl mx-auto mb-4\">Register the first node below, then copy the admin-only install, test run, and cron commands from its setup card.</p><a href=\"#register-server\" class=\"inline-flex items-center px-4 py-2 border-2 border-foreground bg-secondary text-foreground text-sm font-black no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Jump to registration form</a></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -3464,7 +3464,7 @@ func Servers(data ServersData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 293, "</div><div id=\"register-server\" class=\"bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748] scroll-mt-6\"><h2 class=\"text-sm font-black uppercase text-retro-ink mb-4\">Register New Server</h2><form method=\"POST\" action=\"/admin/servers\" class=\"grid grid-cols-1 md:grid-cols-2 gap-3\" data-confirm=\"Register this server and issue a one-time agent token?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 293, "</div><div id=\"register-server\" class=\"bg-card border-2 border-foreground p-6 nb-shadow scroll-mt-6\"><h2 class=\"text-sm font-black font-head uppercase text-foreground mb-4\">Register New Server</h2><form method=\"POST\" action=\"/admin/servers\" class=\"grid grid-cols-1 md:grid-cols-2 gap-3\" data-confirm=\"Register this server and issue a one-time agent token?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3477,7 +3477,7 @@ func Servers(data ServersData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 294, "\"> <input type=\"text\" name=\"name\" placeholder=\"Server name\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"text\" name=\"host\" placeholder=\"Host or IP\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"number\" name=\"port\" placeholder=\"Port\" value=\"9100\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"> <input type=\"text\" name=\"tags\" placeholder=\"Tags (comma separated)\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"><div class=\"md:col-span-2 flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all cursor-pointer\">Register Server</button></div></form></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 294, "\"> <input type=\"text\" name=\"name\" placeholder=\"Server name\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"host\" placeholder=\"Host or IP\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"number\" name=\"port\" placeholder=\"Port\" value=\"9100\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"tags\" placeholder=\"Tags (comma separated)\" class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><div class=\"md:col-span-2 flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-foreground bg-success text-success-foreground font-bold text-sm nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring cursor-pointer\">Register Server</button></div></form></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3512,14 +3512,14 @@ func copyableCommandBlock(label string, copyLabel string, commandID string, comm
 			templ_7745c5c3_Var196 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 295, "<div><div class=\"flex items-center justify-between gap-3 mb-1\"><p class=\"text-xs font-black uppercase text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 295, "<div><div class=\"flex items-center justify-between gap-3 mb-1\"><p class=\"text-xs font-black uppercase text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var197 string
 		templ_7745c5c3_Var197, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1032, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1032, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var197))
 		if templ_7745c5c3_Err != nil {
@@ -3538,27 +3538,27 @@ func copyableCommandBlock(label string, copyLabel string, commandID string, comm
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 297, "\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-wheat px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 297, "\" class=\"text-xs font-bold text-muted hover:bg-secondary px-2 py-1 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var199 string
 		templ_7745c5c3_Var199, templ_7745c5c3_Err = templ.JoinStringErrs(copyLabel)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1033, Col: 197}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1033, Col: 265}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var199))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 298, "</button></div><pre class=\"overflow-x-auto border-2 border-retro-ink bg-retro-paper p-3 text-xs font-mono font-bold text-retro-ink\"><code id=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 298, "</button></div><pre class=\"overflow-x-auto border-2 border-foreground bg-card p-3 text-xs font-mono font-bold text-foreground\"><code id=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var200 string
 		templ_7745c5c3_Var200, templ_7745c5c3_Err = templ.JoinStringErrs(commandID)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1035, Col: 139}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1035, Col: 134}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var200))
 		if templ_7745c5c3_Err != nil {
@@ -3571,7 +3571,7 @@ func copyableCommandBlock(label string, copyLabel string, commandID string, comm
 		var templ_7745c5c3_Var201 string
 		templ_7745c5c3_Var201, templ_7745c5c3_Err = templ.JoinStringErrs(command)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1035, Col: 151}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1035, Col: 146}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var201))
 		if templ_7745c5c3_Err != nil {
@@ -3606,17 +3606,17 @@ func PostMarkdownPreview(contentHTML string, empty bool) templ.Component {
 			templ_7745c5c3_Var202 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 301, "<div id=\"post-markdown-preview\" class=\"min-h-40 border-2 border-retro-ink bg-retro-paper p-4 shadow-[3px_3px_0px_0px_#2D3748]\"><div class=\"mb-3 flex items-center justify-between gap-3 border-b-2 border-retro-ink pb-2\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">Markdown preview</p><span class=\"text-xs font-mono font-black border-2 border-retro-ink bg-retro-sageLight px-2 py-0.5 text-retro-ink\">Goldmark</span></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 301, "<div id=\"post-markdown-preview\" class=\"min-h-40 border-2 border-foreground bg-card p-4 nb-shadow\"><div class=\"mb-3 flex items-center justify-between gap-3 border-b-2 border-foreground pb-2\"><p class=\"text-xs font-black uppercase tracking-widest text-muted\">Markdown preview</p><span class=\"text-xs font-mono font-black border-2 border-foreground bg-success/20 px-2 py-0.5 text-foreground\">Goldmark</span></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if empty {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 302, "<div class=\"flex min-h-28 items-center justify-center border-2 border-dashed border-retro-ink bg-retro-cream px-4 py-6 text-center\"><p class=\"text-sm font-bold text-retro-muted\">Write Markdown, then preview without saving.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 302, "<div class=\"flex min-h-28 items-center justify-center border-2 border-dashed border-foreground bg-background px-4 py-6 text-center\"><p class=\"text-sm font-bold text-muted\">Write Markdown, then preview without saving.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 303, "<div class=\"prose text-retro-ink max-w-none\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 303, "<div class=\"prose text-foreground max-w-none\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -3658,7 +3658,7 @@ func coverImageSelect(selected string, assets []model.MediaAsset) templ.Componen
 			templ_7745c5c3_Var203 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 306, "<div><div class=\"flex items-center justify-between gap-3 mb-1\"><label class=\"block text-sm font-bold text-retro-muted\">Cover image</label> <a href=\"/admin/media\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">Open media library</a></div><select name=\"cover_image_url\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink\"><option value=\"\">No cover image</option> ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 306, "<div><div class=\"flex items-center justify-between gap-3 mb-1\"><label class=\"block text-sm font-bold text-muted\">Cover image</label> <a href=\"/admin/media\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Open media library</a></div><select name=\"cover_image_url\" class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"\">No cover image</option> ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -3756,27 +3756,27 @@ func pageHeader(title string, count string) templ.Component {
 			templ_7745c5c3_Var208 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 314, "<div class=\"flex items-center justify-between\"><div><a href=\"/admin\" class=\"text-xs font-bold no-underline hover:bg-retro-wheat\">&larr; Dashboard</a><h1 class=\"text-xl font-black uppercase text-retro-ink mt-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 314, "<div class=\"flex items-center justify-between\"><div><a href=\"/admin\" class=\"text-xs font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Dashboard</a><h1 class=\"text-xl font-black font-head uppercase text-foreground mt-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var209 string
 		templ_7745c5c3_Var209, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1078, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1078, Col: 82}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var209))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 315, "</h1></div><span class=\"text-xs font-bold bg-retro-paper border-2 border-retro-ink px-2.5 py-1 font-mono\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 315, "</h1></div><span class=\"text-xs font-bold bg-card border-2 border-foreground px-2.5 py-1 font-mono\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var210 string
 		templ_7745c5c3_Var210, templ_7745c5c3_Err = templ.JoinStringErrs(count)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1080, Col: 104}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1080, Col: 98}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var210))
 		if templ_7745c5c3_Err != nil {
@@ -3811,7 +3811,7 @@ func editorNoteCard(title string, body string, toneClass string) templ.Component
 			templ_7745c5c3_Var211 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		var templ_7745c5c3_Var212 = []any{"border-2 border-retro-ink px-4 py-3", toneClass}
+		var templ_7745c5c3_Var212 = []any{"border-2 border-foreground px-4 py-3", toneClass}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var212...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -3829,27 +3829,27 @@ func editorNoteCard(title string, body string, toneClass string) templ.Component
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 318, "\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 318, "\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var214 string
 		templ_7745c5c3_Var214, templ_7745c5c3_Err = templ.JoinStringErrs(title)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1086, Col: 87}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1086, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var214))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 319, "</p><p class=\"text-xs font-bold leading-5 text-retro-ink\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 319, "</p><p class=\"text-xs font-bold leading-5 text-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var215 string
 		templ_7745c5c3_Var215, templ_7745c5c3_Err = templ.JoinStringErrs(body)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1087, Col: 62}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1087, Col: 63}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var215))
 		if templ_7745c5c3_Err != nil {
@@ -3884,14 +3884,14 @@ func metricCard(label string, value string, caption string, valueClass string) t
 			templ_7745c5c3_Var216 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 321, "<div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase text-retro-muted mb-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 321, "<div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase text-muted mb-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var217 string
 		templ_7745c5c3_Var217, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1093, Col: 71}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1093, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var217))
 		if templ_7745c5c3_Err != nil {
@@ -3932,14 +3932,14 @@ func metricCard(label string, value string, caption string, valueClass string) t
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 325, "</p><p class=\"text-xs font-bold text-retro-muted mt-0.5\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 325, "</p><p class=\"text-xs font-bold text-muted mt-0.5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var221 string
 		templ_7745c5c3_Var221, templ_7745c5c3_Err = templ.JoinStringErrs(caption)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1095, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1095, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var221))
 		if templ_7745c5c3_Err != nil {
@@ -3987,27 +3987,27 @@ func quickLink(href string, label string, caption string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 328, "\" class=\"block bg-retro-paper border-2 border-retro-ink p-5 shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline group\"><p class=\"text-sm font-black text-retro-ink\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 328, "\" class=\"block bg-card border-2 border-foreground p-5 nb-shadow no-underline group focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-sm font-black font-head text-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var224 string
 		templ_7745c5c3_Var224, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1101, Col: 54}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1101, Col: 65}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var224))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 329, "</p><p class=\"text-xs font-bold text-retro-muted mt-0.5\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 329, "</p><p class=\"text-xs font-bold text-muted mt-0.5\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var225 string
 		templ_7745c5c3_Var225, templ_7745c5c3_Err = templ.JoinStringErrs(caption)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1102, Col: 64}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1102, Col: 58}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var225))
 		if templ_7745c5c3_Err != nil {
@@ -4042,11 +4042,11 @@ func serverStatusRow(server model.Server) templ.Component {
 			templ_7745c5c3_Var226 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 331, "<div class=\"flex items-center justify-between p-4 bg-retro-paper border-2 border-retro-ink\"><div class=\"flex items-center gap-3\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 331, "<div class=\"flex items-center justify-between p-4 bg-card border-2 border-foreground\"><div class=\"flex items-center gap-3\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var227 = []any{"inline-block w-3 h-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen)}
+		var templ_7745c5c3_Var227 = []any{"inline-block w-3 h-3 border-2 border-foreground", StatusDotClass(server.LastSeen)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var227...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -4064,27 +4064,27 @@ func serverStatusRow(server model.Server) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 333, "\"></span><div><p class=\"text-sm font-bold text-retro-ink\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 333, "\"></span><div><p class=\"text-sm font-bold text-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var229 string
 		templ_7745c5c3_Var229, templ_7745c5c3_Err = templ.JoinStringErrs(server.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1111, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1111, Col: 62}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var229))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 334, "</p><p class=\"text-xs font-mono text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 334, "</p><p class=\"text-xs font-mono text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var230 string
 		templ_7745c5c3_Var230, templ_7745c5c3_Err = templ.JoinStringErrs(server.Host)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1112, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1112, Col: 57}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var230))
 		if templ_7745c5c3_Err != nil {
@@ -4097,20 +4097,20 @@ func serverStatusRow(server model.Server) templ.Component {
 		var templ_7745c5c3_Var231 string
 		templ_7745c5c3_Var231, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(server.Port))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1112, Col: 89}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1112, Col: 83}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var231))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 336, "</p></div></div><div class=\"flex items-center gap-4\"><span class=\"text-xs font-mono text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 336, "</p></div></div><div class=\"flex items-center gap-4\"><span class=\"text-xs font-mono text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var232 string
 		templ_7745c5c3_Var232, templ_7745c5c3_Err = templ.JoinStringErrs(LastSeenShort(server.LastSeen))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1116, Col: 84}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1116, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var232))
 		if templ_7745c5c3_Err != nil {
@@ -4120,7 +4120,7 @@ func serverStatusRow(server model.Server) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var233 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink", StatusBadgeClass(server.LastSeen)}
+		var templ_7745c5c3_Var233 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground", StatusBadgeClass(server.LastSeen)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var233...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -4145,7 +4145,7 @@ func serverStatusRow(server model.Server) templ.Component {
 		var templ_7745c5c3_Var235 string
 		templ_7745c5c3_Var235, templ_7745c5c3_Err = templ.JoinStringErrs(StatusText(server.LastSeen))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1117, Col: 141}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1117, Col: 142}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var235))
 		if templ_7745c5c3_Err != nil {
@@ -4180,27 +4180,27 @@ func resourceCard(label string, usage string, percent float64, high float64, mid
 			templ_7745c5c3_Var236 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 341, "<div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex items-center justify-between mb-1.5\"><p class=\"text-xs font-black uppercase text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 341, "<div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><div class=\"flex items-center justify-between mb-1.5\"><p class=\"text-xs font-black uppercase text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var237 string
 		templ_7745c5c3_Var237, templ_7745c5c3_Err = templ.JoinStringErrs(label)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1125, Col: 67}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1125, Col: 61}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var237))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 342, "</p><p class=\"text-xs font-mono font-bold text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 342, "</p><p class=\"text-xs font-mono font-bold text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var238 string
 		templ_7745c5c3_Var238, templ_7745c5c3_Err = templ.JoinStringErrs(usage)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1126, Col: 66}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1126, Col: 60}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var238))
 		if templ_7745c5c3_Err != nil {
@@ -4213,13 +4213,13 @@ func resourceCard(label string, usage string, percent float64, high float64, mid
 		var templ_7745c5c3_Var239 string
 		templ_7745c5c3_Var239, templ_7745c5c3_Err = templ.JoinStringErrs(PercentText(percent))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1126, Col: 94}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1126, Col: 88}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var239))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 344, "</p></div><div class=\"w-full bg-retro-wheat border-2 border-retro-ink h-4 mt-1\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 344, "</p></div><div class=\"w-full bg-secondary border-2 border-foreground h-4 mt-1\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -4283,40 +4283,40 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 			templ_7745c5c3_Var243 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 348, "<div class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\"><div class=\"flex items-start justify-between mb-4\"><div class=\"flex items-center gap-3\"><div class=\"w-10 h-10 border-2 border-retro-ink bg-retro-ink flex items-center justify-center\"><span class=\"text-sm font-black text-retro-cream font-mono\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 348, "<div class=\"bg-card border-2 border-foreground p-5 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all\"><div class=\"flex items-start justify-between mb-4\"><div class=\"flex items-center gap-3\"><div class=\"w-10 h-10 border-2 border-foreground bg-foreground flex items-center justify-center\"><span class=\"text-sm font-black text-primary-foreground font-mono\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var244 string
 		templ_7745c5c3_Var244, templ_7745c5c3_Err = templ.JoinStringErrs(Initials(server.Name))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1139, Col: 88}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1139, Col: 95}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var244))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 349, "</span></div><div><p class=\"text-sm font-black text-retro-ink\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 349, "</span></div><div><p class=\"text-sm font-black font-head text-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var245 string
 		templ_7745c5c3_Var245, templ_7745c5c3_Err = templ.JoinStringErrs(server.Name)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1142, Col: 63}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1142, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var245))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 350, "</p><p class=\"text-xs font-mono font-bold text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 350, "</p><p class=\"text-xs font-mono font-bold text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var246 string
 		templ_7745c5c3_Var246, templ_7745c5c3_Err = templ.JoinStringErrs(server.Host)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1143, Col: 74}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1143, Col: 68}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var246))
 		if templ_7745c5c3_Err != nil {
@@ -4329,7 +4329,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 		var templ_7745c5c3_Var247 string
 		templ_7745c5c3_Var247, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(server.Port))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1143, Col: 100}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1143, Col: 94}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var247))
 		if templ_7745c5c3_Err != nil {
@@ -4361,7 +4361,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var250 = []any{"relative inline-flex h-3 w-3 border-2 border-retro-ink", StatusDotClass(server.LastSeen)}
+		var templ_7745c5c3_Var250 = []any{"relative inline-flex h-3 w-3 border-2 border-foreground", StatusDotClass(server.LastSeen)}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var250...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
@@ -4379,14 +4379,14 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 356, "\"></span></span> <span class=\"text-xs font-bold text-retro-ink\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 356, "\"></span></span> <span class=\"text-xs font-bold text-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var252 string
 		templ_7745c5c3_Var252, templ_7745c5c3_Err = templ.JoinStringErrs(StatusText(server.LastSeen))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1151, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1151, Col: 81}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var252))
 		if templ_7745c5c3_Err != nil {
@@ -4397,7 +4397,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 			return templ_7745c5c3_Err
 		}
 		for _, tag := range TagList(server.Tags) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 358, "<span class=\"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-wheat text-retro-ink font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 358, "<span class=\"text-xs px-2 py-0.5 font-bold border-2 border-foreground bg-secondary text-foreground font-mono\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -4415,7 +4415,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 360, "</div><div class=\"flex items-center gap-3 text-xs font-mono font-bold text-retro-muted\"><span>Last seen: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 360, "</div><div class=\"flex items-center gap-3 text-xs font-mono font-bold text-muted\"><span>Last seen: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -4441,7 +4441,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 362, "\" class=\"font-bold text-retro-muted hover:bg-retro-wheat px-2 py-0.5 border-2 border-retro-ink bg-retro-paper no-underline\">Diagnostics</a><form method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 362, "\" class=\"font-bold text-muted hover:bg-secondary px-2 py-0.5 border-2 border-foreground bg-card no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Diagnostics</a><form method=\"POST\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -4467,7 +4467,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 364, "\"> <button type=\"submit\" class=\"font-bold text-retro-muted hover:bg-retro-wheat px-2 py-0.5 border-2 border-retro-ink bg-retro-paper cursor-pointer\">Rotate token</button></form><form method=\"POST\" action=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 364, "\"> <button type=\"submit\" class=\"font-bold text-muted hover:bg-secondary px-2 py-0.5 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Rotate token</button></form><form method=\"POST\" action=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -4493,27 +4493,27 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 366, "\"> <button type=\"submit\" class=\"font-bold text-retro-muted hover:bg-retro-blush px-2 py-0.5 border-2 border-retro-ink bg-retro-paper cursor-pointer\">✕</button></form></div></div><div class=\"mt-4 border-2 border-retro-ink bg-retro-sageLight p-4 space-y-3\"><div class=\"flex items-center justify-between gap-3\"><div><p class=\"text-xs font-black uppercase text-retro-muted\">Agent install</p><p class=\"text-xs font-bold text-retro-ink\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 366, "\"> <button type=\"submit\" class=\"font-bold text-muted hover:bg-destructive hover:text-white px-2 py-0.5 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">✕</button></form></div></div><div class=\"mt-4 border-2 border-foreground bg-success/20 p-4 space-y-3\"><div class=\"flex items-center justify-between gap-3\"><div><p class=\"text-xs font-black uppercase text-muted\">Agent install</p><p class=\"text-xs font-bold text-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var260 string
 		templ_7745c5c3_Var260, templ_7745c5c3_Err = templ.JoinStringErrs(AgentTokenStatus(server))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1177, Col: 75}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1177, Col: 76}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var260))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 367, " · works over public URL, LAN IP, or tunnel.</p></div><span class=\"text-xs font-mono font-black border-2 border-retro-ink bg-retro-paper px-2 py-1\">ID ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 367, " · works over public URL, LAN IP, or tunnel.</p></div><span class=\"text-xs font-mono font-black border-2 border-foreground bg-card px-2 py-1\">ID ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var261 string
 		templ_7745c5c3_Var261, templ_7745c5c3_Err = templ.JoinStringErrs(IDText(server.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1179, Col: 120}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1179, Col: 114}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var261))
 		if templ_7745c5c3_Err != nil {
@@ -4524,7 +4524,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 			return templ_7745c5c3_Err
 		}
 		if generatedTokenServerID == server.ID && generatedAgentToken != "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 369, "<div class=\"border-2 border-retro-ink bg-retro-wheat p-4 shadow-[3px_3px_0px_0px_#2D3748]\"><div class=\"flex items-start justify-between gap-3 mb-2\"><div><p class=\"text-sm font-black uppercase text-retro-ink\">One-time agent token</p><p class=\"text-xs font-bold text-retro-muted\">Copy before leaving or reloading. It will not be shown again.</p></div><button type=\"button\" data-copy-target=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 369, "<div class=\"border-2 border-foreground bg-secondary p-4 nb-shadow\"><div class=\"flex items-start justify-between gap-3 mb-2\"><div><p class=\"text-sm font-black uppercase text-foreground\">One-time agent token</p><p class=\"text-xs font-bold text-muted\">Copy before leaving or reloading. It will not be shown again.</p></div><button type=\"button\" data-copy-target=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -4537,7 +4537,7 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 370, "\" class=\"shrink-0 text-xs font-black text-retro-ink hover:bg-retro-paper px-2 py-1 border-2 border-retro-ink bg-retro-wheat cursor-pointer\">Copy token</button></div><code id=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 370, "\" class=\"shrink-0 text-xs font-black text-foreground hover:bg-card px-2 py-1 border-2 border-foreground bg-secondary cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Copy token</button></div><code id=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -4550,14 +4550,14 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 371, "\" class=\"block text-xs font-mono font-black text-retro-ink break-all border-2 border-retro-ink bg-retro-paper p-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 371, "\" class=\"block text-xs font-mono font-black text-foreground break-all border-2 border-foreground bg-card p-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var264 string
 			templ_7745c5c3_Var264, templ_7745c5c3_Err = templ.JoinStringErrs(generatedAgentToken)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1190, Col: 195}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1190, Col: 190}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var264))
 			if templ_7745c5c3_Err != nil {
@@ -4611,14 +4611,14 @@ func serverCard(server model.Server, csrfToken string, agentURLExample string, g
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 377, "<p class=\"text-xs font-bold text-retro-muted\">Endpoint: ")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 377, "<p class=\"text-xs font-bold text-muted\">Endpoint: ")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var265 string
 		templ_7745c5c3_Var265, templ_7745c5c3_Err = templ.JoinStringErrs(AgentURL(server.ID))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1202, Col: 80}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/pages.templ`, Line: 1202, Col: 74}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var265))
 		if templ_7745c5c3_Err != nil {

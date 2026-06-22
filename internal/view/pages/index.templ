@@ -5,21 +5,21 @@ import "raevtar/internal/view/components"
 templ Index(data IndexData) {
 	@page("Raevtar", data.CurrentPath, data.Categories, data.SEO) {
 		<section class="mb-20 text-center">
-			<div class="inline-block nb-badge bg-retro-yellow mb-6">Available for Projects</div>
-			<h1 class="nb-h1 mb-8">
+			<div class="inline-block nb-badge bg-accent mb-6">Available for Projects</div>
+			<h1 class="nb-h1 font-head mb-8">
 				NOT EVERY WEBSITE HAS TO <br/>
-				<span class="bg-retro-yellow px-4 border-4 border-retro-ink inline-block transform -rotate-1">LOOK THE SAME!</span>
+				<span class="bg-accent px-4 nb-border inline-block transform -rotate-1">LOOK THE SAME!</span>
 			</h1>
-			<p class="text-xl md:text-2xl font-bold max-w-3xl mx-auto mb-10 text-retro-muted">
+			<p class="text-xl md:text-2xl font-bold max-w-3xl mx-auto mb-10 text-muted">
 				A bold, modern Go + Templ + HTMX platform for project notes, server monitoring, and automation.
 			</p>
 			<div class="flex flex-wrap justify-center gap-6">
-				<a href="/blog" class="nb-button nb-button-primary text-lg">Browse Notes</a>
-				<a href="/dashboard" class="nb-button nb-button-secondary text-lg">Live Status &rarr;</a>
+				<a href="/blog" class="nb-button nb-button-primary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Browse Notes</a>
+				<a href="/dashboard" class="nb-button nb-button-secondary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Live Status <span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 
-		<div class="marquee-container mb-20 -mx-4 md:-mx-8 lg:-mx-12">
+		<div class="marquee-container mb-20 -mx-4 md:-mx-8 lg:-mx-12" aria-hidden="true">
 			<div class="marquee-content">
 				<span class="text-2xl font-black uppercase tracking-tighter mx-8">GO 1.26</span>
 				<span class="text-2xl font-black uppercase tracking-tighter mx-8">HTMX REFRESH LOOPS</span>
@@ -36,40 +36,40 @@ templ Index(data IndexData) {
 		</div>
 
 		<section class="grid gap-8 md:grid-cols-3 mb-20">
-			<div class="nb-card hover:bg-retro-yellow transition-colors group">
-				<div class="h-12 w-12 nb-border bg-retro-ink text-retro-paper flex items-center justify-center font-black text-xl mb-6 group-hover:bg-retro-paper group-hover:text-retro-ink">01</div>
+			<div class="nb-card hover:bg-accent transition-colors group">
+				<div class="h-12 w-12 nb-border bg-foreground text-background flex items-center justify-center font-black text-xl mb-6 group-hover:bg-card group-hover:text-foreground">01</div>
 				<h3 class="text-2xl font-black uppercase mb-4">Project Log</h3>
-				<p class="font-bold text-retro-muted mb-6">Fresh research, tools, security notes, and devops logs stay readable from the public blog.</p>
-				<a href="/blog" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4">Browse posts &rarr;</a>
+				<p class="font-bold text-muted mb-6">Fresh research, tools, security notes, and devops logs stay readable from the public blog.</p>
+				<a href="/blog" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Browse posts <span aria-hidden="true">&rarr;</span></a>
 			</div>
-			<div class="nb-card bg-retro-yellow">
-				<div class="h-12 w-12 nb-border bg-retro-ink text-retro-paper flex items-center justify-center font-black text-xl mb-6">02</div>
+			<div class="nb-card bg-accent">
+				<div class="h-12 w-12 nb-border bg-foreground text-background flex items-center justify-center font-black text-xl mb-6">02</div>
 				<h3 class="text-2xl font-black uppercase mb-4">Monitor Grid</h3>
-				<p class="font-bold text-retro-ink mb-6">Server health gets compact cards with public-safe status summaries and direct drill-down links.</p>
-				<a href="/dashboard" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4">Open status &rarr;</a>
+				<p class="font-bold text-foreground mb-6">Server health gets compact cards with public-safe status summaries and direct drill-down links.</p>
+				<a href="/dashboard" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Open status <span aria-hidden="true">&rarr;</span></a>
 			</div>
-			<div class="nb-card hover:bg-retro-yellow transition-colors group">
-				<div class="h-12 w-12 nb-border bg-retro-ink text-retro-paper flex items-center justify-center font-black text-xl mb-6 group-hover:bg-retro-paper group-hover:text-retro-ink">03</div>
+			<div class="nb-card hover:bg-accent transition-colors group">
+				<div class="h-12 w-12 nb-border bg-foreground text-background flex items-center justify-center font-black text-xl mb-6 group-hover:bg-card group-hover:text-foreground">03</div>
 				<h3 class="text-2xl font-black uppercase mb-4">Automation API</h3>
-				<p class="font-bold text-retro-muted mb-6">Hermes can publish posts, ping monitors, and inspect categories through documented endpoints.</p>
-				<a href="/docs" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4">Read docs &rarr;</a>
+				<p class="font-bold text-muted mb-6">Hermes can publish posts, ping monitors, and inspect categories through documented endpoints.</p>
+				<a href="/docs" class="font-black uppercase tracking-widest text-sm underline decoration-4 underline-offset-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Read docs <span aria-hidden="true">&rarr;</span></a>
 			</div>
 		</section>
 
 		<section class="mb-20 nb-card !p-0 overflow-hidden">
 			<div class="grid lg:grid-cols-2">
-				<div class="bg-retro-ink text-retro-paper p-8 md:p-12 flex flex-col justify-center">
-					<div class="nb-badge bg-retro-yellow text-retro-ink border-retro-paper mb-6 self-start">Platform Showcase</div>
+				<div class="bg-foreground text-background p-8 md:p-12 flex flex-col justify-center">
+					<div class="nb-badge bg-accent text-foreground border-background mb-6 self-start">Platform Showcase</div>
 					<h2 class="text-4xl md:text-5xl font-black uppercase leading-none mb-6">Small server, loud interface.</h2>
 					<p class="text-lg font-bold opacity-80 mb-8">Raevtar is the public surface for a personal lab: notes on one side, machine telemetry on the other, plus API rails for automation.</p>
 					<div class="flex flex-wrap gap-3">
-						<span class="nb-badge bg-transparent border-retro-paper">Go 1.26</span>
-						<span class="nb-badge bg-transparent border-retro-paper">Templ</span>
-						<span class="nb-badge bg-transparent border-retro-paper">HTMX</span>
+						<span class="nb-badge bg-transparent border-background">Go 1.26</span>
+						<span class="nb-badge bg-transparent border-background">Templ</span>
+						<span class="nb-badge bg-transparent border-background">HTMX</span>
 					</div>
 				</div>
-				<div class="p-8 md:p-12 grid grid-cols-2 gap-6 bg-retro-paper">
-					<div class="nb-card bg-retro-yellow flex flex-col items-center justify-center text-center">
+				<div class="p-8 md:p-12 grid grid-cols-2 gap-6 bg-card">
+					<div class="nb-card bg-accent flex flex-col items-center justify-center text-center">
 						<span class="text-5xl font-black mb-2">{ PortText(data.PostCount) }</span>
 						<span class="text-xs font-black uppercase tracking-widest">Posts</span>
 					</div>
@@ -77,10 +77,10 @@ templ Index(data IndexData) {
 						<span class="text-5xl font-black mb-2">{ PortText(len(data.Categories)) }</span>
 						<span class="text-xs font-black uppercase tracking-widest">Topics</span>
 					</div>
-					<div class="nb-card col-span-2 bg-retro-ink text-retro-paper">
+					<div class="nb-card col-span-2 bg-foreground text-background">
 						<p class="font-mono text-sm mb-4 uppercase tracking-widest">System Status: Online</p>
-						<div class="w-full bg-retro-paper/20 h-4 nb-border border-retro-paper relative">
-							<div class="absolute inset-0 bg-retro-yellow w-3/4"></div>
+						<div class="w-full bg-card/20 h-4 nb-border border-background relative">
+							<div class="absolute inset-0 bg-accent w-3/4"></div>
 						</div>
 					</div>
 				</div>
@@ -90,8 +90,8 @@ templ Index(data IndexData) {
 		if len(data.Posts) > 0 {
 			<section class="mb-20">
 				<div class="flex items-center justify-between mb-8">
-					<h2 class="nb-h2 mb-0">Latest Posts</h2>
-					<a href="/blog" class="nb-button nb-button-secondary py-2 px-4 text-sm">View all</a>
+					<h2 class="nb-h2 font-head mb-0">Latest Posts</h2>
+					<a href="/blog" class="nb-button nb-button-secondary py-2 px-4 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">View all</a>
 				</div>
 				<div class="grid gap-8">
 					for _, post := range data.Posts {
@@ -101,10 +101,10 @@ templ Index(data IndexData) {
 			</section>
 		}
 
-		<section class="mb-20 bg-retro-yellow nb-border nb-shadow p-12 text-center">
-			<h2 class="nb-h2 mb-6">Build Faster with 200+ Blocks</h2>
+		<section class="mb-20 bg-accent nb-border nb-shadow p-12 text-center">
+			<h2 class="nb-h2 font-head mb-6">Build Faster with 200+ Blocks</h2>
 			<p class="text-xl font-bold mb-10 max-w-2xl mx-auto">Discover scalable UI components designed for landing pages, SaaS dashboards, and modern web apps.</p>
-			<a href="/projects" class="nb-button bg-retro-ink text-retro-paper">Explore Projects &rarr;</a>
+			<a href="/projects" class="nb-button bg-foreground text-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Explore Projects <span aria-hidden="true">&rarr;</span></a>
 		</section>
 	}
 }

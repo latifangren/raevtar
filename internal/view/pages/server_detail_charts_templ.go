@@ -34,7 +34,7 @@ func MetricCharts(metrics []model.ServerMetric) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"grid gap-6 md:grid-cols-2 mt-8\"><div class=\"nb-card bg-retro-paper p-5\"><h3 class=\"text-sm font-black uppercase text-retro-muted mb-4\">CPU Usage (%)</h3><canvas id=\"cpuChart\" class=\"w-full h-48\"></canvas></div><div class=\"nb-card bg-retro-paper p-5\"><h3 class=\"text-sm font-black uppercase text-retro-muted mb-4\">RAM Usage (MB)</h3><canvas id=\"ramChart\" class=\"w-full h-48\"></canvas></div></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"grid gap-6 md:grid-cols-2 mt-8\"><div class=\"nb-card bg-card p-5\"><h3 class=\"text-sm font-black uppercase text-muted mb-4\">CPU Usage (%)</h3><canvas id=\"cpuChart\" class=\"w-full h-48\" role=\"img\" aria-label=\"CPU Usage Chart\"></canvas></div><div class=\"nb-card bg-card p-5\"><h3 class=\"text-sm font-black uppercase text-muted mb-4\">RAM Usage (MB)</h3><canvas id=\"ramChart\" class=\"w-full h-48\" role=\"img\" aria-label=\"RAM Usage Chart\"></canvas></div></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

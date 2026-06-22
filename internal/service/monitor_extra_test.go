@@ -136,6 +136,7 @@ func TestMonitorServiceListMetrics(t *testing.T) {
 		if err != nil {
 			t.Fatalf("RecordMetrics %d: %v", i, err)
 		}
+		time.Sleep(2 * time.Millisecond) // ensure distinct timestamps
 	}
 
 	// Limit to 2 — should return newest 2 (DESC recorded_at)
@@ -393,6 +394,7 @@ func TestMonitorServiceGetRecentMetricsWithLimit(t *testing.T) {
 		if err != nil {
 			t.Fatalf("RecordMetrics %d: %v", i, err)
 		}
+		time.Sleep(2 * time.Millisecond)
 	}
 
 	// With limit=1, should return only 1 (the most recent)

@@ -41,46 +41,46 @@ func Contact(data ContactData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-sage border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-ink mb-2\">Contact</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-success border-b-2 border-foreground mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-foreground mb-2\">Contact</p><h1 class=\"font-head text-5xl md:text-7xl font-black uppercase leading-none text-foreground mb-5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 8, Col: 109}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 8, Col: 120}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Page.Summary)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 9, Col: 102}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 9, Col: 103}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p><p class=\"text-sm font-bold text-retro-ink mt-4 max-w-xl\">Public starting point anchored at ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p><p class=\"text-sm font-bold text-foreground mt-4 max-w-xl\">Public starting point anchored at ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Domain)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 10, Col: 110}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/contact.templ`, Line: 10, Col: 111}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, ", with operator-only channels and diagnostics deliberately kept outside public UI.</p></div></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink p-6 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"prose text-retro-ink max-w-none\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, ", with operator-only channels and diagnostics deliberately kept outside public UI.</p></div></section><section class=\"mb-12 bg-card border-2 border-foreground p-6 md:p-8 nb-shadow\"><div class=\"prose text-foreground max-w-none\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -88,7 +88,7 @@ func Contact(data ContactData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></section><section class=\"mb-12 grid gap-4 md:grid-cols-3\"><div class=\"bg-retro-wheat border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-2xl font-black uppercase mb-3\">Read the docs</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">Public API boundaries, monitoring visibility, and privacy rules are documented in one place before anyone needs deeper context.</p><a href=\"/docs\" class=\"text-sm font-black no-underline hover:bg-retro-paper\">Read the docs &rarr;</a></div><div class=\"bg-retro-sageLight border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-2xl font-black uppercase mb-3\">Browse topics</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">Category-backed browsing is quickest when you want to see what kinds of notes, projects, and recurring interests already live here.</p><a href=\"/topics\" class=\"text-sm font-black no-underline hover:bg-retro-wheat\">Open topics &rarr;</a></div><div class=\"bg-retro-blush border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><h2 class=\"text-2xl font-black uppercase mb-3\">Check status</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">Use the public status board for service visibility instead of expecting operator-only diagnostics or private host detail.</p><a href=\"/dashboard\" class=\"text-sm font-black no-underline hover:bg-retro-paper\">Open status &rarr;</a></div></section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">start points</p><h2 class=\"text-2xl font-black uppercase mb-4\">Best route depends on what you need.</h2><div class=\"grid gap-3 md:grid-cols-2 xl:grid-cols-4\"><a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">About for motive and stack &rarr;</a> <a href=\"/projects\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">Projects for public lanes &rarr;</a> <a href=\"/topics\" class=\"border-2 border-retro-ink bg-retro-paper p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-wheat\">Topics for writing trails &rarr;</a> <a href=\"/docs\" class=\"border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">Docs for route boundaries &rarr;</a></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</div></section><section class=\"mb-12 grid gap-4 md:grid-cols-3\"><div class=\"bg-secondary border-2 border-foreground p-5 nb-shadow\"><h2 class=\"font-head text-2xl font-black uppercase mb-3\">Read the docs</h2><p class=\"text-sm font-bold text-muted mb-4\">Public API boundaries, monitoring visibility, and privacy rules are documented in one place before anyone needs deeper context.</p><a href=\"/docs\" class=\"text-sm font-black no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Read the docs &rarr;</a></div><div class=\"bg-success/20 border-2 border-foreground p-5 nb-shadow\"><h2 class=\"font-head text-2xl font-black uppercase mb-3\">Browse topics</h2><p class=\"text-sm font-bold text-muted mb-4\">Category-backed browsing is quickest when you want to see what kinds of notes, projects, and recurring interests already live here.</p><a href=\"/topics\" class=\"text-sm font-black no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Open topics &rarr;</a></div><div class=\"bg-destructive border-2 border-foreground p-5 nb-shadow\"><h2 class=\"font-head text-2xl font-black uppercase mb-3\">Check status</h2><p class=\"text-sm font-bold text-muted mb-4\">Use the public status board for service visibility instead of expecting operator-only diagnostics or private host detail.</p><a href=\"/dashboard\" class=\"text-sm font-black no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Open status &rarr;</a></div></section><section class=\"mb-12 bg-card border-2 border-foreground p-6 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">start points</p><h2 class=\"font-head text-2xl font-black uppercase mb-4\">Best route depends on what you need.</h2><div class=\"grid gap-3 md:grid-cols-2 xl:grid-cols-4\"><a href=\"/about\" class=\"border-2 border-foreground bg-success/20 p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">About for motive and stack &rarr;</a> <a href=\"/projects\" class=\"border-2 border-foreground bg-secondary p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Projects for public lanes &rarr;</a> <a href=\"/topics\" class=\"border-2 border-foreground bg-card p-4 text-sm font-black text-foreground no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Topics for writing trails &rarr;</a> <a href=\"/docs\" class=\"border-2 border-foreground bg-destructive p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Docs for route boundaries &rarr;</a></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

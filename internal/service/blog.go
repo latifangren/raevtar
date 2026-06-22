@@ -442,3 +442,16 @@ func (s *BlogService) PostViewCount(postID int64) (int, error) {
 func (s *BlogService) AllPostViewCounts() (map[int64]int, error) {
 	return s.repos.View.CountAllPostViews()
 }
+
+// RecordPostReadTime records read time duration increment for a post.
+func (s *BlogService) RecordPostReadTime(postID int64, ipHash string, seconds int) error {
+	if seconds <= 0 {
+		return nil
+	}
+	return s.repos.View.IncrementPostReadTime(postID, ipHash, seconds)
+}
+
+// AllPostAverageReadTimes returns average read times (in seconds) keyed by post ID.
+func (s *BlogService) AllPostAverageReadTimes() (map[int64]int, error) {
+	return s.repos.View.AveragePostReadTimes()
+}

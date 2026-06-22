@@ -55,12 +55,12 @@ func TopProcessesTable(jsonStr string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"nb-card bg-retro-paper p-5 mt-8\"><h3 class=\"nb-h3 text-xl mb-4\">Top Processes</h3><div class=\"overflow-x-auto\"><table class=\"w-full text-left text-sm font-bold border-collapse\"><thead><tr class=\"nb-border-b bg-retro-yellow text-retro-ink\"><th class=\"p-2\">PID</th><th class=\"p-2\">User</th><th class=\"p-2 text-right\">CPU%</th><th class=\"p-2 text-right\">MEM%</th><th class=\"p-2\">Command</th></tr></thead> <tbody>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"nb-card bg-card p-5 mt-8\"><h3 class=\"nb-h3 text-xl mb-4\">Top Processes</h3><div class=\"overflow-x-auto\"><table class=\"w-full text-left text-sm font-bold border-collapse\"><thead><tr class=\"nb-border-b bg-accent text-foreground\"><th class=\"p-2\">PID</th><th class=\"p-2\">User</th><th class=\"p-2 text-right\">CPU%</th><th class=\"p-2 text-right\">MEM%</th><th class=\"p-2\">Command</th></tr></thead> <tbody>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, p := range parseProcesses(jsonStr) {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<tr class=\"nb-border-b hover:bg-retro-cream transition-colors\"><td class=\"p-2 font-mono\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<tr class=\"nb-border-b hover:bg-background transition-colors\"><td class=\"p-2 font-mono\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -144,7 +144,7 @@ func TopProcessesTable(jsonStr string) templ.Component {
 			}
 		}
 		if len(parseProcesses(jsonStr)) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<tr><td colspan=\"5\" class=\"p-8 text-center text-retro-muted\">No process data available in this sample.</td></tr>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<tr><td colspan=\"5\" class=\"p-8 text-center text-muted\">No process data available in this sample.</td></tr>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -178,13 +178,13 @@ func LogStream(logs string) templ.Component {
 			templ_7745c5c3_Var8 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"nb-card bg-retro-ink text-retro-wheat p-5 mt-8 font-mono text-xs overflow-hidden\"><div class=\"flex items-center justify-between mb-4 border-b border-retro-muted pb-2\"><h3 class=\"text-sm font-black uppercase text-retro-yellow\">Unified Log Stream (Read-only)</h3><span class=\"nb-badge bg-retro-yellow text-retro-ink text-[10px]\">Public Safe</span></div><div class=\"max-h-[300px] overflow-y-auto space-y-1 custom-scrollbar\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "<div class=\"nb-card bg-foreground text-secondary p-5 mt-8 font-mono text-xs overflow-hidden\"><div class=\"flex items-center justify-between mb-4 border-b border-muted pb-2\"><h3 class=\"text-sm font-black uppercase text-accent\">Unified Log Stream (Read-only)</h3><span class=\"nb-badge bg-accent text-foreground text-[10px]\">Public Safe</span></div><div class=\"max-h-[300px] overflow-y-auto space-y-1 custom-scrollbar\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		for _, line := range strings.Split(logs, "\n") {
 			if strings.TrimSpace(line) != "" {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"flex gap-2\"><span class=\"text-retro-sageLight opacity-50\">>></span> <span class=\"break-all\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "<div class=\"flex gap-2\"><span class=\"text-success opacity-50\" aria-hidden=\"true\">>></span> <span class=\"break-all\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -204,7 +204,7 @@ func LogStream(logs string) templ.Component {
 			}
 		}
 		if logs == "" {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"text-retro-muted italic\">Waiting for log snippets from node...</div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"text-muted italic\">Waiting for log snippets from node...</div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

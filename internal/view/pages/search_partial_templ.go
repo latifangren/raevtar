@@ -32,19 +32,19 @@ func SearchResults(data SearchData) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		if !data.Results.HasQuery {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-retro-paper nb-border p-8 text-center nb-shadow\"><p class=\"text-retro-muted font-bold\">Masukkan kata kunci dulu buat mulai cari.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"bg-card nb-border p-8 text-center nb-shadow\"><p class=\"text-muted font-bold\">Masukkan kata kunci dulu buat mulai cari.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 		} else if data.Results.Total == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"bg-retro-paper nb-border p-8 text-center nb-shadow\"><p class=\"text-retro-muted font-bold\">Tidak ada hasil buat \"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"bg-card nb-border p-8 text-center nb-shadow\"><p class=\"text-muted font-bold\">Tidak ada hasil buat \"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var2 string
 			templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(data.Results.Query)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/search_partial.templ`, Line: 12, Col: 83}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/search_partial.templ`, Line: 12, Col: 77}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
 			if templ_7745c5c3_Err != nil {
@@ -55,14 +55,14 @@ func SearchResults(data SearchData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		} else {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"flex flex-wrap gap-2 mb-6\"><span class=\"nb-badge bg-retro-paper\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"flex flex-wrap gap-2 mb-6\"><span class=\"nb-badge bg-card\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.Results.Total))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/search_partial.templ`, Line: 16, Col: 71}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/search_partial.templ`, Line: 16, Col: 64}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -134,7 +134,7 @@ func SearchResults(data SearchData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Results.Posts) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"mb-8\"><h2 class=\"nb-h2 text-2xl\">Posts</h2><div class=\"grid gap-4\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "<div class=\"mb-8\"><h2 class=\"nb-h2 text-2xl font-head\">Posts</h2><div class=\"grid gap-4\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -154,7 +154,7 @@ func SearchResults(data SearchData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Results.Projects) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"mb-8\"><h2 class=\"nb-h2 text-2xl\">Projects</h2><div class=\"grid gap-5 xl:grid-cols-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"mb-8\"><h2 class=\"nb-h2 text-2xl font-head\">Projects</h2><div class=\"grid gap-5 xl:grid-cols-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -174,7 +174,7 @@ func SearchResults(data SearchData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Results.Pages) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"mb-8\"><h2 class=\"nb-h2 text-2xl\">Pages</h2><div class=\"grid gap-4 md:grid-cols-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<div class=\"mb-8\"><h2 class=\"nb-h2 text-2xl font-head\">Pages</h2><div class=\"grid gap-4 md:grid-cols-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -192,7 +192,7 @@ func SearchResults(data SearchData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"nb-card no-underline hover:bg-retro-yellow transition-colors\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Page</p><h3 class=\"text-xl font-black uppercase text-retro-ink mb-2\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 21, "\" class=\"nb-card no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Page</p><h3 class=\"text-xl font-black uppercase text-foreground mb-2\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -200,7 +200,7 @@ func SearchResults(data SearchData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</h3><p class=\"text-sm font-bold text-retro-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 22, "</h3><p class=\"text-sm font-bold text-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

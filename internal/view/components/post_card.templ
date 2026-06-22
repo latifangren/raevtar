@@ -7,37 +7,37 @@ templ PostCard(post model.Post) {
 }
 
 templ PostCardWithHighlight(post model.Post, query string) {
-	<article class="nb-card group hover:bg-retro-yellow/10 transition-colors">
+	<article class="nb-card group">
 		<div class="flex flex-wrap items-center justify-between gap-4 mb-4">
 			<div class="flex items-center gap-3">
-				<div class="nb-badge bg-retro-yellow">{ post.CategoryName }</div>
-				<span class="text-xs font-black uppercase tracking-widest text-retro-muted">{ post.CreatedAt.Format("Jan 2, 2006") }</span>
+				<div class="nb-badge bg-accent text-accent-foreground">{ post.CategoryName }</div>
+				<span class="text-xs font-black uppercase tracking-widest text-muted">{ post.CreatedAt.Format("Jan 2, 2006") }</span>
 			</div>
 			<div class="flex gap-2">
 				@TagBadges(post.Tags)
 			</div>
 		</div>
-		<h3 class="text-3xl font-black uppercase leading-none mb-4">
-			<a href={ templ.URL("/blog/" + post.Slug) } class="text-retro-ink no-underline hover:bg-retro-yellow transition-colors">@HighlightText(post.Title, query)</a>
+		<h3 class="text-3xl font-head uppercase leading-none mb-4">
+			<a href={ templ.URL("/blog/" + post.Slug) } class="text-foreground no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">@HighlightText(post.Title, query)</a>
 		</h3>
-		<p class="font-bold text-retro-muted mb-6 line-clamp-2">@HighlightText(post.Excerpt, query)</p>
-		<a href={ templ.URL("/blog/" + post.Slug) } class="nb-button nb-button-secondary py-2 px-4 text-sm group-hover:bg-retro-yellow">Read Article &rarr;</a>
+		<p class="font-bold text-muted mb-6 line-clamp-2">@HighlightText(post.Excerpt, query)</p>
+		<a href={ templ.URL("/blog/" + post.Slug) } class="nb-button nb-button-primary text-sm">Read Article &rarr;</a>
 	</article>
 }
 
 templ TagBadges(tags []model.Tag) {
 	for _, tag := range tags {
-		<span class={ "nb-badge text-[10px] py-0 " + tagClass(tag.Slug) }>{ tag.Name }</span>
+		<span class={ "nb-badge nb-badge-sm " + tagClass(tag.Slug) }>{ tag.Name }</span>
 	}
 }
 
 func tagClass(slug string) string {
 	switch slug {
 	case "auto":
-		return "bg-retro-sageLight"
+		return "bg-success text-success-foreground"
 	case "commissioned":
-		return "bg-retro-blush"
+		return "bg-destructive text-destructive-foreground"
 	default:
-		return "bg-retro-paper"
+		return "bg-card text-card-foreground"
 	}
 }

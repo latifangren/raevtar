@@ -54,25 +54,25 @@ func ProjectChangelog(data ProjectChangelogData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"inline-flex items-center gap-1.5 mb-4 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:bg-retro-wheat\">&larr; Back to project</a><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Project changelog</p><h1 class=\"text-4xl md:text-5xl font-black uppercase leading-none text-retro-ink mb-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "\" class=\"inline-flex items-center gap-1.5 mb-4 px-4 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Back to project</a><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Project changelog</p><h1 class=\"text-4xl md:text-5xl font-head font-black uppercase leading-none text-foreground mb-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Project.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 9, Col: 111}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 9, Col: 122}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1><p class=\"text-base font-bold text-retro-muted max-w-2xl\">Release notes, build log milestones, and public-facing change entries for this project.</p></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</h1><p class=\"text-base font-bold text-muted max-w-2xl\">Release notes, build log milestones, and public-facing change entries for this project.</p></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Changelog) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"bg-retro-paper border-2 border-retro-ink p-8 text-center shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xl font-black uppercase text-retro-ink mb-2\">No changelog entries yet.</p><p class=\"text-sm font-bold text-retro-muted\">Project detail page still carries full write-up while changelog fills over time.</p></div>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"bg-card border-2 border-foreground p-8 text-center nb-shadow\"><p class=\"text-xl font-black uppercase text-foreground mb-2\">No changelog entries yet.</p><p class=\"text-sm font-bold text-muted\">Project detail page still carries full write-up while changelog fills over time.</p></div>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -82,14 +82,14 @@ func ProjectChangelog(data ProjectChangelogData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 				for _, item := range data.Changelog {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<article class=\"bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex flex-wrap items-center justify-between gap-3 mb-3\"><div class=\"flex flex-wrap items-center gap-2\"><span class=\"text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-blush text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<article class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><div class=\"flex flex-wrap items-center justify-between gap-3 mb-3\"><div class=\"flex flex-wrap items-center gap-2\"><span class=\"text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(ProjectStateLabel(item.Kind))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 23, Col: 166}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 23, Col: 168}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -100,38 +100,38 @@ func ProjectChangelog(data ProjectChangelogData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.Pinned {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<span class=\"text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink\">Pinned</span>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<span class=\"text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-wheat text-foreground\">Pinned</span>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><p class=\"text-xs font-mono font-bold text-retro-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</div><p class=\"text-xs font-mono font-bold text-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(item.EventAt.Format("Jan 2, 2006 15:04"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 28, Col: 106}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 28, Col: 100}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</p></div><h2 class=\"text-2xl font-black uppercase text-retro-ink mb-3\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</p></div><h2 class=\"text-2xl font-head font-black uppercase text-foreground mb-3\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(item.Title)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 30, Col: 81}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_changelog.templ`, Line: 30, Col: 92}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</h2><div class=\"prose text-retro-ink max-w-none\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</h2><div class=\"prose text-foreground max-w-none\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

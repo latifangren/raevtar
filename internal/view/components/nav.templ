@@ -3,19 +3,26 @@ package components
 import "raevtar/internal/model"
 
 templ Nav(categories []model.Category, currentPath string) {
-	<nav class="sticky top-4 z-50 flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-4 px-6 mb-12 bg-retro-paper border-4 border-retro-ink shadow-[6px_6px_0px_0px_#000000] max-w-6xl mx-auto rounded-none">
-		<a href="/" class="text-xl sm:text-2xl font-black text-retro-ink hover:bg-retro-yellow no-underline uppercase tracking-tighter">raevtar</a>
-		<div class="h-8 w-1 bg-retro-ink mx-2"></div>
-		<a href="/about" class={ navClass(currentPath == "/about") }>about</a>
-		<a href="/blog" class={ navClass(currentPath == "/blog") }>blog</a>
-		<a href="/projects" class={ navClass(isProjectsPath(currentPath)) }>projects</a>
-		<a href="/search" class={ navClass(currentPath == "/search") }>search</a>
-		<a href="/topics" class={ navClass(currentPath == "/topics") }>topics</a>
-		<a href="/lab" class={ navClass(currentPath == "/lab") }>lab</a>
-		<a href="/docs" class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
-		<a href="/contact" class={ navClass(currentPath == "/contact") }>contact</a>
-		<a href="/dashboard" class={ navClass(isDashboardPath(currentPath)) }>status</a>
+	<nav class="sticky top-4 z-50 flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-4 px-6 mb-12 bg-card nb-border nb-shadow max-w-6xl mx-auto" aria-label="Main navigation">
+		<a href="/" class="text-xl sm:text-2xl font-head text-foreground hover:bg-accent no-underline uppercase tracking-tighter">raevtar</a>
+		<div class="h-8 w-px bg-foreground mx-2" aria-hidden="true"></div>
+		<a href="/about" aria-current={ ariaCurrent(currentPath == "/about") } class={ navClass(currentPath == "/about") }>about</a>
+		<a href="/blog" aria-current={ ariaCurrent(currentPath == "/blog") } class={ navClass(currentPath == "/blog") }>blog</a>
+		<a href="/projects" aria-current={ ariaCurrent(isProjectsPath(currentPath)) } class={ navClass(isProjectsPath(currentPath)) }>projects</a>
+		<a href="/search" aria-current={ ariaCurrent(currentPath == "/search") } class={ navClass(currentPath == "/search") }>search</a>
+		<a href="/topics" aria-current={ ariaCurrent(currentPath == "/topics") } class={ navClass(currentPath == "/topics") }>topics</a>
+		<a href="/lab" aria-current={ ariaCurrent(currentPath == "/lab") } class={ navClass(currentPath == "/lab") }>lab</a>
+		<a href="/docs" aria-current={ ariaCurrent(currentPath == "/docs" || currentPath == "/lab/docs") } class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
+		<a href="/contact" aria-current={ ariaCurrent(currentPath == "/contact") } class={ navClass(currentPath == "/contact") }>contact</a>
+		<a href="/dashboard" aria-current={ ariaCurrent(isDashboardPath(currentPath)) } class={ navClass(isDashboardPath(currentPath)) }>status</a>
 	</nav>
+}
+
+func ariaCurrent(active bool) string {
+	if active {
+		return "page"
+	}
+	return ""
 }
 
 func isDashboardPath(path string) bool {
@@ -27,9 +34,9 @@ func isProjectsPath(path string) bool {
 }
 
 func navClass(active bool) string {
-	base := "text-sm font-black uppercase tracking-widest no-underline transition-all px-2 py-1 "
+	base := "text-sm font-black uppercase tracking-widest no-underline transition-all px-2 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring "
 	if active {
-		return base + "bg-retro-yellow text-retro-ink border-2 border-retro-ink shadow-[2px_2px_0px_0px_#000000]"
+		return base + "bg-foreground text-background"
 	}
-	return base + "text-retro-ink hover:bg-retro-yellow/50"
+	return base + "text-foreground hover:bg-accent/50"
 }

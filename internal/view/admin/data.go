@@ -66,6 +66,7 @@ type PostsData struct {
 	Categories  []model.Category
 	MediaAssets []model.MediaAsset
 	ViewCounts  map[int64]int
+	ReadTimes   map[int64]int
 }
 
 type PostEditData struct {
@@ -719,4 +720,17 @@ func tern[T any](cond bool, a, b T) T {
 		return a
 	}
 	return b
+}
+
+// FormatReadTime formats seconds into a readable string "Xm Ys" or "Zs".
+func FormatReadTime(seconds int) string {
+	if seconds <= 0 {
+		return "-"
+	}
+	m := seconds / 60
+	s := seconds % 60
+	if m > 0 {
+		return strconv.Itoa(m) + "m " + strconv.Itoa(s) + "s"
+	}
+	return strconv.Itoa(s) + "s"
 }

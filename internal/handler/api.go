@@ -1,8 +1,10 @@
 package handler
 
 import (
+	"crypto/sha256"
 	"crypto/subtle"
 	"database/sql"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"net/http"
@@ -12,6 +14,38 @@ import (
 	"raevtar/internal/model"
 	"raevtar/internal/service"
 )
+
+func (h *Handler) apiRecordPostReadTime(w http.ResponseWriter, r *http.Request) {
+	postID, err := strconv.ParseInt(r.PathValue("id"), 10, 64)
+	if err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid post id"})
+		return
+	}
+
+	var req struct {
+		Seconds int `json:"seconds"`
+	}
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid json payload"})
+		return
+	}
+
+	// security/correctness limits: pings must report standard heartbeats
+	if req.Seconds <= 0 || req.Seconds > 60 {
+		writeJSON(w, http.StatusBadRequest, map[string]string{"error": "invalid seconds value"})
+		return
+	}
+
+	hash := sha256.Sum256([]byte(clientIP(r)))
+	ipHash := hex.EncodeToString(hash[:8])
+
+	if err := h.svc.Blog.RecordPostReadTime(postID, ipHash, req.Seconds); err != nil {
+		internalServerJSON(w, r, err)
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
+}
 
 func (h *Handler) apiListPosts(w http.ResponseWriter, r *http.Request) {
 	cat := r.URL.Query().Get("category")

@@ -53,23 +53,23 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex gap-2\"><a href=\"/admin/servers\" class=\"nb-button py-2 px-4 text-xs\">Back to List</a></div></div><div class=\"grid gap-6 lg:grid-cols-[1fr_0.5fr]\"><div class=\"space-y-6\"><div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Remote Command Center</h3><p class=\"text-sm font-bold text-retro-muted mb-6\">Safe management actions for this node. Commands are queued and picked up by the agent.</p><div class=\"grid gap-4 sm:grid-cols-2\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"flex gap-2\"><a href=\"/admin/servers\" class=\"nb-button py-2 px-4 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Back to List</a></div></div><div class=\"grid gap-6 lg:grid-cols-[1fr_0.5fr]\"><div class=\"space-y-6\"><div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Remote Command Center</h3><p class=\"text-sm font-bold text-muted mb-6\">Safe management actions for this node. Commands are queued and picked up by the agent.</p><div class=\"grid gap-4 sm:grid-cols-2\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "RESTART_AGENT", "Restart Agent", "bg-retro-yellow", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "RESTART_AGENT", "Restart Agent", "bg-accent text-foreground", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "CLEAR_CACHE", "Clear Cache", "bg-retro-wheat", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "CLEAR_CACHE", "Clear Cache", "bg-secondary text-secondary-foreground", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "REBOOT_NODE", "Reboot Node", "bg-retro-blush", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "REBOOT_NODE", "Reboot Node", "bg-destructive text-destructive-foreground", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "UPDATE_AGENT", "Update Agent", "bg-retro-sage", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = remoteCommandButton(data.Server.ID, "UPDATE_AGENT", "Update Agent", "bg-success text-success-foreground", data.CSRFToken).Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -78,19 +78,19 @@ func ServerDetail(data ServerDetailData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Commands) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mt-6\"><h4 class=\"text-sm font-black uppercase text-retro-ink mb-3\">Recent Commands</h4><div class=\"overflow-x-auto border-2 border-retro-ink bg-retro-paper\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-2 px-3 font-bold\">Command</th><th class=\"py-2 px-3 font-bold\">Status</th><th class=\"py-2 px-3 font-bold\">Result</th><th class=\"py-2 px-3 font-bold\">Time</th></tr></thead> <tbody>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<div class=\"mt-6\"><h4 class=\"text-sm font-black uppercase text-foreground mb-3\">Recent Commands</h4><div class=\"overflow-x-auto nb-border bg-card\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-primary-foreground\"><th class=\"py-2 px-3 font-bold\">Command</th><th class=\"py-2 px-3 font-bold\">Status</th><th class=\"py-2 px-3 font-bold\">Result</th><th class=\"py-2 px-3 font-bold\">Time</th></tr></thead> <tbody>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				for _, cmd := range data.Commands {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<tr class=\"border-b-2 border-retro-ink text-xs last:border-b-0\"><td class=\"py-2 px-3 font-mono font-bold text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<tr class=\"border-b-2 border-foreground text-xs last:border-b-0\"><td class=\"py-2 px-3 font-mono font-bold text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var3 string
 					templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(cmd.Command)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 46, Col: 83}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 46, Col: 84}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 					if templ_7745c5c3_Err != nil {
@@ -100,7 +100,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var4 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono",
+					var templ_7745c5c3_Var4 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono",
 						CommandStatusBadgeClass(string(cmd.Status))}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var4...)
 					if templ_7745c5c3_Err != nil {
@@ -132,14 +132,14 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></td><td class=\"py-2 px-3 text-retro-muted font-bold max-w-[200px] truncate\" title=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</span></td><td class=\"py-2 px-3 text-muted font-bold max-w-[200px] truncate\" title=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(cmd.Result)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 53, Col: 103}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 53, Col: 97}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -152,20 +152,20 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					var templ_7745c5c3_Var8 string
 					templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(tern(cmd.Result != "", cmd.Result, "—"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 53, Col: 149}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 53, Col: 143}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td><td class=\"py-2 px-3 text-retro-muted font-mono font-bold whitespace-nowrap\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td><td class=\"py-2 px-3 text-muted font-mono font-bold whitespace-nowrap\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var9 string
 					templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(cmd.QueuedAt.Format("02 Jan 15:04"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 54, Col: 127}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 54, Col: 121}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 					if templ_7745c5c3_Err != nil {
@@ -181,77 +181,77 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div><div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Node Metadata</h3><div class=\"grid gap-4 sm:grid-cols-2\"><div><p class=\"text-xs font-black uppercase text-retro-muted mb-1\">Host</p><p class=\"text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "</div><div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Node Metadata</h3><div class=\"grid gap-4 sm:grid-cols-2\"><div><p class=\"text-xs font-black uppercase text-muted mb-1\">Host</p><p class=\"text-sm font-bold text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(data.Server.Host)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 69, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 69, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</p></div><div><p class=\"text-xs font-black uppercase text-retro-muted mb-1\">Port</p><p class=\"text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</p></div><div><p class=\"text-xs font-black uppercase text-muted mb-1\">Port</p><p class=\"text-sm font-bold text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var11 string
 			templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.Server.Port))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 73, Col: 80}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 73, Col: 81}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</p></div><div><p class=\"text-xs font-black uppercase text-retro-muted mb-1\">Tags</p><p class=\"text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</p></div><div><p class=\"text-xs font-black uppercase text-muted mb-1\">Tags</p><p class=\"text-sm font-bold text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var12 string
 			templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(data.Server.Tags)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 77, Col: 70}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 77, Col: 71}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</p></div><div><p class=\"text-xs font-black uppercase text-retro-muted mb-1\">Token Status</p><p class=\"text-sm font-bold text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "</p></div><div><p class=\"text-xs font-black uppercase text-muted mb-1\">Token Status</p><p class=\"text-sm font-bold text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var13 string
 			templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(AgentTokenStatus(*data.Server))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 81, Col: 84}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 81, Col: 85}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</p></div></div></div><div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Audit Logs</h3><div class=\"overflow-x-auto border-2 border-retro-ink bg-retro-paper\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Time</th><th class=\"py-3 px-4 font-bold\">Action</th><th class=\"py-3 px-4 font-bold\">User</th><th class=\"py-3 px-4 font-bold\">Details</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "</p></div></div></div><div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Audit Logs</h3><div class=\"overflow-x-auto nb-border bg-card\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-primary-foreground\"><th class=\"py-3 px-4 font-bold\">Time</th><th class=\"py-3 px-4 font-bold\">Action</th><th class=\"py-3 px-4 font-bold\">User</th><th class=\"py-3 px-4 font-bold\">Details</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Logs) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<tr><td colspan=\"4\" class=\"py-8 text-center text-retro-muted font-bold text-sm\">No audit logs for this server</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, "<tr><td colspan=\"4\" class=\"py-8 text-center text-muted font-bold text-sm\">No audit logs for this server</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
 				for _, log := range data.Logs {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<tr class=\"border-b-2 border-retro-ink text-xs last:border-b-0\"><td class=\"py-2.5 px-4 text-retro-muted font-mono font-bold whitespace-nowrap\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 20, "<tr class=\"border-b-2 border-foreground text-xs last:border-b-0\"><td class=\"py-2.5 px-4 text-muted font-mono font-bold whitespace-nowrap\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(log.CreatedAt.Format("02 Jan 15:04"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 104, Col: 129}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 104, Col: 123}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -261,7 +261,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var15 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", ActionBadgeClass(log.Action)}
+					var templ_7745c5c3_Var15 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono", ActionBadgeClass(log.Action)}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -286,33 +286,33 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					var templ_7745c5c3_Var17 string
 					templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(log.Action)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 105, Col: 162}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 105, Col: 163}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></td><td class=\"py-2.5 px-4 font-bold text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "</span></td><td class=\"py-2.5 px-4 font-bold text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var18 string
 					templ_7745c5c3_Var18, templ_7745c5c3_Err = templ.JoinStringErrs(log.User)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 106, Col: 71}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 106, Col: 72}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var18))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td><td class=\"py-2.5 px-4 text-retro-muted font-bold max-w-xs truncate\" title=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</td><td class=\"py-2.5 px-4 text-muted font-bold max-w-xs truncate\" title=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var19 string
 					templ_7745c5c3_Var19, templ_7745c5c3_Err = templ.JoinStringErrs(log.Details)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 107, Col: 100}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 107, Col: 94}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var19))
 					if templ_7745c5c3_Err != nil {
@@ -325,7 +325,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					var templ_7745c5c3_Var20 string
 					templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(log.Details)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 107, Col: 116}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/server_detail.templ`, Line: 107, Col: 110}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 					if templ_7745c5c3_Err != nil {
@@ -337,7 +337,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</tbody></table></div></div></div><div class=\"space-y-6\"><div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Agent Config</h3><div class=\"space-y-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "</tbody></table></div></div></div><div class=\"space-y-6\"><div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Agent Config</h3><div class=\"space-y-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -345,7 +345,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"p-3 bg-retro-ink text-retro-wheat rounded-sm overflow-hidden\"><p class=\"text-[10px] font-bold uppercase mb-2 text-retro-yellow\">Agent Secret Token</p><p class=\"text-xs font-mono break-all opacity-80\">********************************</p><p class=\"text-[10px] mt-2 italic\">Token is hashed. Rotate to get a new one.</p></div><form method=\"POST\" action=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 29, "<div class=\"p-3 bg-foreground text-secondary rounded-sm overflow-hidden border-2 border-foreground\"><p class=\"text-[10px] font-bold uppercase mb-2 text-accent\">Agent Secret Token</p><p class=\"text-xs font-mono break-all opacity-80\">********************************</p><p class=\"text-[10px] mt-2 italic\">Token is hashed. Rotate to get a new one.</p></div><form method=\"POST\" action=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -371,7 +371,7 @@ func ServerDetail(data ServerDetailData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"> <button type=\"submit\" class=\"w-full nb-button nb-button-secondary py-2 text-xs\">Rotate Token</button></form></div></div><div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Agent Setup</h3><p class=\"text-sm font-bold text-retro-muted mb-4\">Copy these commands to install and run the agent on the target server.</p><div class=\"space-y-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 31, "\"> <button type=\"submit\" class=\"w-full nb-button nb-button-secondary py-2 text-xs focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Rotate Token</button></form></div></div><div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Agent Setup</h3><p class=\"text-sm font-bold text-muted mb-4\">Copy these commands to install and run the agent on the target server.</p><div class=\"space-y-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -478,7 +478,7 @@ func remoteCommandButton(serverID int64, command, label, color, csrf string) tem
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		var templ_7745c5c3_Var28 = []any{"w-full nb-button py-3 text-sm font-black uppercase tracking-widest", color}
+		var templ_7745c5c3_Var28 = []any{"w-full nb-button py-3 text-sm font-black uppercase tracking-widest focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring", color}
 		templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var28...)
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err

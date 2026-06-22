@@ -3,6 +3,7 @@ package handler
 import (
 	"net/http"
 	"testing"
+	"time"
 
 	"raevtar/internal/model"
 )
@@ -38,6 +39,7 @@ func TestPublicServerDetailShowsSafeExtendedNodeHealth(t *testing.T) {
 func TestPublicServerDetailDoesNotRenderHistoricalSampleRows(t *testing.T) {
 	app := newPublicTestApp(t)
 	recordExtendedPublicMetric(t, app)
+	time.Sleep(2 * time.Millisecond)
 	if err := app.svc.Monitor.RecordMetrics(app.serverID, model.ServerMetric{
 		CPUPercent:           77.7,
 		CPULoad1:             1.1,

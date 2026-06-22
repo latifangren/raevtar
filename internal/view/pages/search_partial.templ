@@ -4,16 +4,16 @@ import "raevtar/internal/view/components"
 
 templ SearchResults(data SearchData) {
 	if !data.Results.HasQuery {
-		<div class="bg-retro-paper nb-border p-8 text-center nb-shadow">
-			<p class="text-retro-muted font-bold">Masukkan kata kunci dulu buat mulai cari.</p>
+		<div class="bg-card nb-border p-8 text-center nb-shadow">
+			<p class="text-muted font-bold">Masukkan kata kunci dulu buat mulai cari.</p>
 		</div>
 	} else if data.Results.Total == 0 {
-		<div class="bg-retro-paper nb-border p-8 text-center nb-shadow">
-			<p class="text-retro-muted font-bold">Tidak ada hasil buat "{ data.Results.Query }".</p>
+		<div class="bg-card nb-border p-8 text-center nb-shadow">
+			<p class="text-muted font-bold">Tidak ada hasil buat "{ data.Results.Query }".</p>
 		</div>
 	} else {
 		<div class="flex flex-wrap gap-2 mb-6">
-			<span class="nb-badge bg-retro-paper">{ PortText(data.Results.Total) } total hits</span>
+			<span class="nb-badge bg-card">{ PortText(data.Results.Total) } total hits</span>
 			if data.Results.PostCount > 0 {
 				<span class="nb-badge bg-retro-yellow">{ PortText(data.Results.PostCount) } posts</span>
 			}
@@ -27,7 +27,7 @@ templ SearchResults(data SearchData) {
 		
 		if len(data.Results.Posts) > 0 {
 			<div class="mb-8">
-				<h2 class="nb-h2 text-2xl">Posts</h2>
+				<h2 class="nb-h2 text-2xl font-head">Posts</h2>
 				<div class="grid gap-4">
 					for _, post := range data.Results.Posts {
 						@components.PostCardWithHighlight(post, data.Results.Query)
@@ -38,7 +38,7 @@ templ SearchResults(data SearchData) {
 		
 		if len(data.Results.Projects) > 0 {
 			<div class="mb-8">
-				<h2 class="nb-h2 text-2xl">Projects</h2>
+				<h2 class="nb-h2 text-2xl font-head">Projects</h2>
 				<div class="grid gap-5 xl:grid-cols-2">
 					for _, project := range data.Results.Projects {
 						@components.ProjectCardWithHighlight(project, data.Results.Query)
@@ -49,13 +49,13 @@ templ SearchResults(data SearchData) {
 		
 		if len(data.Results.Pages) > 0 {
 			<div class="mb-8">
-				<h2 class="nb-h2 text-2xl">Pages</h2>
+				<h2 class="nb-h2 text-2xl font-head">Pages</h2>
 				<div class="grid gap-4 md:grid-cols-2">
 					for _, page := range data.Results.Pages {
-						<a href={ templ.URL(searchPageHref(page.Key)) } class="nb-card no-underline hover:bg-retro-yellow transition-colors">
-							<p class="text-xs font-black uppercase tracking-widest text-retro-muted mb-2">Page</p>
-							<h3 class="text-xl font-black uppercase text-retro-ink mb-2">@components.HighlightText(page.Title, data.Results.Query)</h3>
-							<p class="text-sm font-bold text-retro-muted">@components.HighlightText(page.Summary, data.Results.Query)</p>
+						<a href={ templ.URL(searchPageHref(page.Key)) } class="nb-card no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
+							<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Page</p>
+							<h3 class="text-xl font-black uppercase text-foreground mb-2">@components.HighlightText(page.Title, data.Results.Query)</h3>
+							<p class="text-sm font-bold text-muted">@components.HighlightText(page.Summary, data.Results.Query)</p>
 						</a>
 					}
 				</div>

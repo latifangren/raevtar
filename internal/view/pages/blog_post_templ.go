@@ -41,66 +41,66 @@ func BlogPost(data BlogPostData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"mb-12\"><header class=\"full-width bg-retro-sage border-b-2 border-retro-ink mb-10 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-12 md:py-16\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-retro-ink bg-retro-paper text-retro-ink font-bold text-sm no-underline shadow-[3px_3px_0px_0px_#2D3748] hover:shadow-[1px_1px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all\">&larr; Back to blog</a><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><p class=\"text-xs font-black uppercase tracking-widest text-retro-ink mb-2\">Signal brief</p><h1 class=\"text-4xl md:text-6xl font-black uppercase leading-none text-retro-ink mb-5\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"mb-12\"><header class=\"full-width bg-success border-b-2 border-foreground mb-10 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-12 md:py-16\"><a href=\"/blog\" class=\"inline-flex items-center gap-1.5 mb-6 px-4 py-2 nb-border bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><span aria-hidden=\"true\">&larr;</span> Back to blog</a><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><p class=\"text-xs font-black uppercase tracking-widest text-foreground mb-2\">Signal brief</p><h1 class=\"text-4xl md:text-6xl font-black font-head uppercase leading-none text-foreground mb-5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Post.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 12, Col: 111}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 12, Col: 122}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(data.Post.Excerpt)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 13, Col: 104}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 13, Col: 105}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><aside class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 border-2 border-retro-ink bg-retro-wheat shadow-[4px_4px_0px_0px_#2D3748]\"></div><div class=\"relative bg-retro-paper border-2 border-retro-ink p-5 shadow-[8px_8px_0px_0px_#2D3748] -rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-4\">Filed under</p><div class=\"flex items-center gap-2 mb-4 flex-wrap\"><span class=\"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink bg-retro-sage text-retro-cream\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</p></div><aside class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 nb-border bg-secondary nb-shadow\" aria-hidden=\"true\"></div><div class=\"relative bg-card nb-border p-5 nb-shadow-lg -rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-4\">Filed under</p><div class=\"flex items-center gap-2 mb-4 flex-wrap\"><span class=\"text-xs px-2 py-0.5 font-bold nb-border bg-success text-background\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(data.Post.CategoryName)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 20, Col: 134}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 20, Col: 114}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"text-xs font-bold text-retro-muted\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"text-xs font-bold text-muted\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(data.Post.CreatedAt.Format("Jan 2, 2006"))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 21, Col: 101}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 21, Col: 95}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-xs font-bold text-retro-muted\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-xs font-bold text-muted\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var7 string
 			templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(ReadMinutes(data.Post.ContentMD))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 22, Col: 92}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/blog_post.templ`, Line: 22, Col: 86}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 			if templ_7745c5c3_Err != nil {
@@ -147,7 +147,7 @@ func BlogPost(data BlogPostData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></aside></div></div></header><div class=\"max-w-4xl mx-auto bg-retro-paper border-2 border-retro-ink p-5 md:p-8 shadow-[4px_4px_0px_0px_#2D3748]\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</div></div></aside></div></div></header><div class=\"max-w-4xl mx-auto bg-card nb-border p-5 md:p-8 nb-shadow\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -178,12 +178,12 @@ func BlogPost(data BlogPostData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"w-full max-h-[460px] object-cover border-2 border-retro-ink bg-retro-cream mb-6\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "\" class=\"w-full max-h-[460px] object-cover nb-border bg-background mb-6\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"prose text-retro-ink\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "<div class=\"prose text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -191,7 +191,7 @@ func BlogPost(data BlogPostData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div class=\"mt-8 pt-4 border-t-2 border-retro-ink\"><a href=\"/blog\" class=\"font-bold no-underline hover:bg-retro-wheat\">&larr; Back to blog</a></div></article>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</div></div><div class=\"mt-8 pt-4 border-t-2 border-foreground\"><a href=\"/blog\" class=\"font-bold no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><span aria-hidden=\"true\">&larr;</span> Back to blog</a></div></article>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

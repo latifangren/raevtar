@@ -41,14 +41,14 @@ func Topics(data TopicsData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-retro-wheat border-b-2 border-retro-ink mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">Topics</p><h1 class=\"text-5xl md:text-7xl font-black uppercase leading-none text-retro-ink mb-5\">Browse the archive by category.</h1><p class=\"text-base md:text-lg font-bold text-retro-ink opacity-80 max-w-2xl\">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p><p class=\"text-sm font-bold text-retro-muted mt-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"full-width bg-secondary border-b-2 border-foreground mb-12 overflow-hidden\"><div class=\"max-w-5xl mx-auto px-4 py-14 md:py-20\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Topics</p><h1 class=\"text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5\">Browse the archive by category.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p><p class=\"text-sm font-bold text-muted mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(data.PostCount))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 10, Col: 81}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 10, Col: 75}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -61,13 +61,13 @@ func Topics(data TopicsData) templ.Component {
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(PortText(len(data.Categories)))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 10, Col: 139}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 10, Col: 133}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " topics.</p><div class=\"flex flex-wrap gap-2 mt-3 max-w-xl\"><a href=\"/projects\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-paper text-retro-ink no-underline hover:bg-retro-wheat\">projects</a> <a href=\"/docs\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-retro-ink bg-retro-wheat text-retro-ink no-underline hover:bg-retro-paper\">docs</a></div></div></section><section class=\"mb-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, " topics.</p><div class=\"flex flex-wrap gap-2 mt-3 max-w-xl\"><a href=\"/projects\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground no-underline hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">projects</a> <a href=\"/docs\" class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-wheat text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">docs</a></div></div></section><section class=\"mb-12 grid gap-4 md:grid-cols-2 xl:grid-cols-3\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -85,38 +85,38 @@ func Topics(data TopicsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-retro-paper border-2 border-retro-ink p-5 shadow-[4px_4px_0px_0px_#2D3748] hover:shadow-[2px_2px_0px_0px_#2D3748] hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-2\">topic</p><h2 class=\"text-2xl font-black uppercase text-retro-ink mb-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-card border-2 border-foreground p-5 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">topic</p><h2 class=\"text-2xl font-head font-black uppercase text-foreground mb-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var6 string
 				templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(category.Name)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 21, Col: 82}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 21, Col: 93}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h2><p class=\"text-sm font-bold text-retro-muted mb-4\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</h2><p class=\"text-sm font-bold text-muted mb-4\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(category.Description)
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 22, Col: 78}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/topics.templ`, Line: 22, Col: 72}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</p><span class=\"text-sm font-black text-retro-ink\">Open posts &rarr;</span></a>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 7, "</p><span class=\"text-sm font-black text-foreground\">Open posts &rarr;</span></a>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</section><section class=\"mb-12 bg-retro-paper border-2 border-retro-ink p-6 shadow-[4px_4px_0px_0px_#2D3748]\"><p class=\"text-xs font-black uppercase tracking-widest text-retro-muted mb-3\">next stops</p><div class=\"grid gap-3 md:grid-cols-3\"><a href=\"/projects\" class=\"border-2 border-retro-ink bg-retro-wheat p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">See how topics fit inside public project lanes &rarr;</a> <a href=\"/about\" class=\"border-2 border-retro-ink bg-retro-sageLight p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">Read why public writing sits next to monitoring &rarr;</a> <a href=\"/contact\" class=\"border-2 border-retro-ink bg-retro-blush p-4 text-sm font-black text-retro-ink no-underline hover:bg-retro-paper\">Use topic context before reaching elsewhere &rarr;</a></div></section>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</section><section class=\"mb-12 bg-card border-2 border-foreground p-6 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">next stops</p><div class=\"grid gap-3 md:grid-cols-3\"><a href=\"/projects\" class=\"border-2 border-foreground bg-retro-wheat p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">See how topics fit inside public project lanes &rarr;</a> <a href=\"/about\" class=\"border-2 border-foreground bg-retro-sageLight p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Read why public writing sits next to monitoring &rarr;</a> <a href=\"/contact\" class=\"border-2 border-foreground bg-retro-blush p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Use topic context before reaching elsewhere &rarr;</a></div></section>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

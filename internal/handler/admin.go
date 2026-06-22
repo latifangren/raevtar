@@ -175,6 +175,7 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	viewCounts, _ := h.svc.Blog.AllPostViewCounts()
+	readTimes, _ := h.svc.Blog.AllPostAverageReadTimes()
 	renderHTML(w, r, adminview.Posts(adminview.PostsData{
 		CurrentPath: r.URL.Path,
 		CSRFToken:   csrfTokenForRequest(r),
@@ -182,6 +183,7 @@ func (h *Handler) adminPosts(w http.ResponseWriter, r *http.Request) {
 		Categories:  categories,
 		MediaAssets: mediaAssets,
 		ViewCounts:  viewCounts,
+		ReadTimes:   readTimes,
 	}))
 }
 

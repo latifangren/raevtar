@@ -10,32 +10,32 @@ templ ProjectCardWithHighlight(project model.Project, query string) {
 	<article class="nb-card grid gap-8 md:grid-cols-[1fr_1.5fr] items-center group">
 		<div class="relative">
 			if project.CoverImageURL != "" {
-				<img src={ project.CoverImageURL } alt={ project.Title } class="w-full h-64 object-cover nb-border grayscale group-hover:grayscale-0 transition-all" loading="lazy"/>
+				<img src={ project.CoverImageURL } alt={ project.Title } class="w-full h-64 object-cover nb-border grayscale group-hover:grayscale-0 transition-all rounded" loading="lazy"/>
 			} else {
-				<div class="w-full h-64 nb-border bg-retro-yellow flex items-center justify-center">
-					<span class="text-4xl font-black uppercase tracking-tighter opacity-20">No Image</span>
+				<div class="w-full h-64 nb-border bg-accent flex items-center justify-center rounded">
+					<span class="text-4xl font-head uppercase tracking-tighter opacity-20">No Image</span>
 				</div>
 			}
-			<div class="absolute -bottom-4 -right-4 nb-badge bg-retro-paper">
+			<div class="absolute -bottom-3 -right-3 nb-badge nb-badge-sm bg-card text-card-foreground">
 				{ project.State }
 			</div>
 		</div>
 		<div class="space-y-4">
 			<div class="flex items-center gap-3">
-				<span class="text-xs font-black uppercase tracking-widest text-retro-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
+				<span class="text-xs font-black uppercase tracking-widest text-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
 				if project.Featured {
-					<span class="nb-badge bg-retro-yellow text-[10px] py-0">Featured</span>
+					<span class="nb-badge nb-badge-sm bg-accent text-accent-foreground">Featured</span>
 				}
 			</div>
-			<h3 class="text-3xl font-black uppercase leading-none">
-				<a href={ templ.URL("/projects/" + project.Slug) } class="text-retro-ink no-underline hover:bg-retro-yellow transition-colors">@HighlightText(project.Title, query)</a>
+			<h3 class="text-3xl font-head uppercase leading-none">
+				<a href={ templ.URL("/projects/" + project.Slug) } class="text-foreground no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">@HighlightText(project.Title, query)</a>
 			</h3>
-			<p class="font-bold text-retro-muted line-clamp-3">@HighlightText(project.Excerpt, query)</p>
+			<p class="font-bold text-muted line-clamp-3">@HighlightText(project.Excerpt, query)</p>
 			<div class="flex flex-wrap gap-2 pt-2">
 				@TagBadges(project.Tags)
 			</div>
 			<div class="pt-4">
-				<a href={ templ.URL("/projects/" + project.Slug) } class="nb-button nb-button-primary py-2 px-4 text-sm">Read More &rarr;</a>
+				<a href={ templ.URL("/projects/" + project.Slug) } class="nb-button nb-button-accent text-sm">Read More &rarr;</a>
 			</div>
 		</div>
 	</article>

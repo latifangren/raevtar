@@ -27,12 +27,12 @@ func parseProcesses(jsonStr string) []ProcessInfo {
 }
 
 templ TopProcessesTable(jsonStr string) {
-	<div class="nb-card bg-retro-paper p-5 mt-8">
+	<div class="nb-card bg-card p-5 mt-8">
 		<h3 class="nb-h3 text-xl mb-4">Top Processes</h3>
 		<div class="overflow-x-auto">
 			<table class="w-full text-left text-sm font-bold border-collapse">
 				<thead>
-					<tr class="nb-border-b bg-retro-yellow text-retro-ink">
+					<tr class="nb-border-b bg-accent text-foreground">
 						<th class="p-2">PID</th>
 						<th class="p-2">User</th>
 						<th class="p-2 text-right">CPU%</th>
@@ -42,7 +42,7 @@ templ TopProcessesTable(jsonStr string) {
 				</thead>
 				<tbody>
 					for _, p := range parseProcesses(jsonStr) {
-						<tr class="nb-border-b hover:bg-retro-cream transition-colors">
+						<tr class="nb-border-b hover:bg-background transition-colors">
 							<td class="p-2 font-mono">{ p.PID }</td>
 							<td class="p-2">{ p.User }</td>
 							<td class="p-2 text-right font-mono">{ p.CPU }</td>
@@ -52,7 +52,7 @@ templ TopProcessesTable(jsonStr string) {
 					}
 					if len(parseProcesses(jsonStr)) == 0 {
 						<tr>
-							<td colspan="5" class="p-8 text-center text-retro-muted">No process data available in this sample.</td>
+							<td colspan="5" class="p-8 text-center text-muted">No process data available in this sample.</td>
 						</tr>
 					}
 				</tbody>
@@ -62,22 +62,22 @@ templ TopProcessesTable(jsonStr string) {
 }
 
 templ LogStream(logs string) {
-	<div class="nb-card bg-retro-ink text-retro-wheat p-5 mt-8 font-mono text-xs overflow-hidden">
-		<div class="flex items-center justify-between mb-4 border-b border-retro-muted pb-2">
-			<h3 class="text-sm font-black uppercase text-retro-yellow">Unified Log Stream (Read-only)</h3>
-			<span class="nb-badge bg-retro-yellow text-retro-ink text-[10px]">Public Safe</span>
+	<div class="nb-card bg-foreground text-secondary p-5 mt-8 font-mono text-xs overflow-hidden">
+		<div class="flex items-center justify-between mb-4 border-b border-muted pb-2">
+			<h3 class="text-sm font-black uppercase text-accent">Unified Log Stream (Read-only)</h3>
+			<span class="nb-badge bg-accent text-foreground text-[10px]">Public Safe</span>
 		</div>
 		<div class="max-h-[300px] overflow-y-auto space-y-1 custom-scrollbar">
 			for _, line := range strings.Split(logs, "\n") {
 				if strings.TrimSpace(line) != "" {
 					<div class="flex gap-2">
-						<span class="text-retro-sageLight opacity-50">>></span>
+						<span class="text-success opacity-50" aria-hidden="true">>></span>
 						<span class="break-all">{ line }</span>
 					</div>
 				}
 			}
 			if logs == "" {
-				<div class="text-retro-muted italic">Waiting for log snippets from node...</div>
+				<div class="text-muted italic">Waiting for log snippets from node...</div>
 			}
 		</div>
 	</div>

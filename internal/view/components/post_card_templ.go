@@ -60,27 +60,27 @@ func PostCardWithHighlight(post model.Post, query string) templ.Component {
 			templ_7745c5c3_Var2 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"nb-card group hover:bg-retro-yellow/10 transition-colors\"><div class=\"flex flex-wrap items-center justify-between gap-4 mb-4\"><div class=\"flex items-center gap-3\"><div class=\"nb-badge bg-retro-yellow\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"nb-card group\"><div class=\"flex flex-wrap items-center justify-between gap-4 mb-4\"><div class=\"flex items-center gap-3\"><div class=\"nb-badge bg-accent text-accent-foreground\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var3 string
 		templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(post.CategoryName)
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 13, Col: 61}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 13, Col: 78}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-xs font-black uppercase tracking-widest text-retro-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-xs font-black uppercase tracking-widest text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(post.CreatedAt.Format("Jan 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 14, Col: 118}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 14, Col: 112}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -94,7 +94,7 @@ func PostCardWithHighlight(post model.Post, query string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div><h3 class=\"text-3xl font-black uppercase leading-none mb-4\"><a href=\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</div></div><h3 class=\"text-3xl font-head uppercase leading-none mb-4\"><a href=\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -107,7 +107,7 @@ func PostCardWithHighlight(post model.Post, query string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"text-retro-ink no-underline hover:bg-retro-yellow transition-colors\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"text-foreground no-underline hover:bg-accent transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -115,7 +115,7 @@ func PostCardWithHighlight(post model.Post, query string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</a></h3><p class=\"font-bold text-retro-muted mb-6 line-clamp-2\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</a></h3><p class=\"font-bold text-muted mb-6 line-clamp-2\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -136,7 +136,7 @@ func PostCardWithHighlight(post model.Post, query string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"nb-button nb-button-secondary py-2 px-4 text-sm group-hover:bg-retro-yellow\">Read Article &rarr;</a></article>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "\" class=\"nb-button nb-button-primary text-sm\">Read Article &rarr;</a></article>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -166,7 +166,7 @@ func TagBadges(tags []model.Tag) templ.Component {
 		}
 		ctx = templ.ClearChildren(ctx)
 		for _, tag := range tags {
-			var templ_7745c5c3_Var8 = []any{"nb-badge text-[10px] py-0 " + tagClass(tag.Slug)}
+			var templ_7745c5c3_Var8 = []any{"nb-badge nb-badge-sm " + tagClass(tag.Slug)}
 			templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var8...)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
@@ -191,7 +191,7 @@ func TagBadges(tags []model.Tag) templ.Component {
 			var templ_7745c5c3_Var10 string
 			templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(tag.Name)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 30, Col: 78}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 30, Col: 73}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 			if templ_7745c5c3_Err != nil {
@@ -209,11 +209,11 @@ func TagBadges(tags []model.Tag) templ.Component {
 func tagClass(slug string) string {
 	switch slug {
 	case "auto":
-		return "bg-retro-sageLight"
+		return "bg-success text-success-foreground"
 	case "commissioned":
-		return "bg-retro-blush"
+		return "bg-destructive text-destructive-foreground"
 	default:
-		return "bg-retro-paper"
+		return "bg-card text-card-foreground"
 	}
 }
 

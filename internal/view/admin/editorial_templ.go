@@ -55,76 +55,76 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = metricCard("Queued", CountText(data.Counts[model.EditorialStatusQueued]), "awaiting approval", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = metricCard("Queued", CountText(data.Counts[model.EditorialStatusQueued]), "awaiting approval", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = metricCard("Approved", CountText(data.Counts[model.EditorialStatusApproved]), "ready for Hermes", "text-retro-sage").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = metricCard("Approved", CountText(data.Counts[model.EditorialStatusApproved]), "ready for Hermes", "text-success").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if data.Summary != nil {
-				templ_7745c5c3_Err = metricCard("Overdue", CountText(data.Summary.Overdue.ApprovedCount+data.Summary.Overdue.RunningCount), "approved + running overdue", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = metricCard("Overdue", CountText(data.Summary.Overdue.ApprovedCount+data.Summary.Overdue.RunningCount), "approved + running overdue", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
-				templ_7745c5c3_Err = metricCard("Running", CountText(data.Counts[model.EditorialStatusRunning]), "Hermes in progress", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+				templ_7745c5c3_Err = metricCard("Running", CountText(data.Counts[model.EditorialStatusRunning]), "Hermes in progress", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = metricCard("Failed", CountText(data.Counts[model.EditorialStatusFailed]), "needs operator check", "text-retro-ink").Render(ctx, templ_7745c5c3_Buffer)
+			templ_7745c5c3_Err = metricCard("Failed", CountText(data.Counts[model.EditorialStatusFailed]), "needs operator check", "text-foreground").Render(ctx, templ_7745c5c3_Buffer)
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div class=\"bg-retro-paper border-2 border-retro-ink p-4 shadow-[4px_4px_0px_0px_#2D3748]\"><div class=\"flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between\"><div><p class=\"text-xs font-black uppercase text-retro-muted\">Secondary signals</p><p class=\"text-xs font-bold text-retro-muted mt-1\">Lower-priority lifecycle counts stay visible without competing with operator actions.</p></div><div class=\"flex flex-wrap gap-2\"><span class=\"text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink\">running ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "</div><div class=\"bg-card nb-border p-4\"><div class=\"flex flex-col gap-3 lg:flex-row lg:items-start lg:justify-between\"><div><p class=\"text-xs font-black uppercase text-muted\">Secondary signals</p><p class=\"text-xs font-bold text-muted mt-1\">Lower-priority lifecycle counts stay visible without competing with operator actions.</p></div><div class=\"flex flex-wrap gap-2\"><span class=\"text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground\">running ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusRunning]))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 26, Col: 168}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 26, Col: 169}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink\">paused ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "</span> <span class=\"text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground\">paused ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var4 string
 			templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusPaused]))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 27, Col: 166}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 27, Col: 167}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink\">done ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "</span> <span class=\"text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground\">done ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var5 string
 			templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusDone]))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 28, Col: 162}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 28, Col: 163}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span> <span class=\"text-xs px-2.5 py-1 font-bold border-2 border-retro-ink bg-retro-cream text-retro-ink\">cancelled ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</span> <span class=\"text-xs px-2.5 py-1 font-bold border-2 border-foreground bg-background text-foreground\">cancelled ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusCancelled]))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 29, Col: 172}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 29, Col: 173}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -135,53 +135,53 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if data.Summary != nil {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"mt-3 grid gap-2 md:grid-cols-3\"><div class=\"border-2 border-retro-ink bg-retro-cream px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-retro-muted\">Fairness</p><p class=\"text-sm font-mono font-black text-retro-ink mt-1\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "<div class=\"mt-3 grid gap-2 md:grid-cols-3\"><div class=\"border-2 border-foreground bg-background px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-muted\">Fairness</p><p class=\"text-sm font-mono font-black text-foreground mt-1\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var7 string
 				templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Summary.Fairness.NonUrgentClaimStreak))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 36, Col: 122}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 36, Col: 123}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</p><p class=\"text-[11px] font-bold text-retro-muted mt-0.5\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "</p><p class=\"text-[11px] font-bold text-muted mt-0.5\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var8 string
 				templ_7745c5c3_Var8, templ_7745c5c3_Err = templ.JoinStringErrs(EditorialFairnessStateText(data.Summary.Fairness.NonUrgentClaimStreak, data.Summary.Fairness.AutonomousGapOpened))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 37, Col: 179}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 37, Col: 173}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var8))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</p></div><div class=\"border-2 border-retro-ink bg-retro-cream px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-retro-muted\">Publish analytics</p><p class=\"text-sm font-mono font-black text-retro-ink mt-1\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "</p></div><div class=\"border-2 border-foreground bg-background px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-muted\">Publish analytics</p><p class=\"text-sm font-mono font-black text-foreground mt-1\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var9 string
 				templ_7745c5c3_Var9, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Summary.Analytics.DoneCount))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 41, Col: 112}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 41, Col: 113}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var9))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p><p class=\"text-[11px] font-bold text-retro-muted mt-0.5\">done publishes tracked</p></div><div class=\"border-2 border-retro-ink bg-retro-cream px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-retro-muted\">Status mix</p><p class=\"text-[11px] font-bold text-retro-muted mt-1\">approved ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</p><p class=\"text-[11px] font-bold text-muted mt-0.5\">done publishes tracked</p></div><div class=\"border-2 border-foreground bg-background px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-muted\">Status mix</p><p class=\"text-[11px] font-bold text-muted mt-1\">approved ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var10 string
 				templ_7745c5c3_Var10, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusApproved]))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 46, Col: 126}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 46, Col: 120}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var10))
 				if templ_7745c5c3_Err != nil {
@@ -194,20 +194,20 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 				var templ_7745c5c3_Var11 string
 				templ_7745c5c3_Var11, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusQueued]))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 46, Col: 192}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 46, Col: 186}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var11))
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p><p class=\"text-[11px] font-bold text-retro-muted mt-0.5\">failed ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</p><p class=\"text-[11px] font-bold text-muted mt-0.5\">failed ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 				var templ_7745c5c3_Var12 string
 				templ_7745c5c3_Var12, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusFailed]))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 47, Col: 124}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 47, Col: 118}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var12))
 				if templ_7745c5c3_Err != nil {
@@ -220,7 +220,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 				var templ_7745c5c3_Var13 string
 				templ_7745c5c3_Var13, templ_7745c5c3_Err = templ.JoinStringErrs(CountText(data.Counts[model.EditorialStatusRunning]))
 				if templ_7745c5c3_Err != nil {
-					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 47, Col: 192}
+					return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 47, Col: 186}
 				}
 				_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var13))
 				if templ_7745c5c3_Err != nil {
@@ -231,25 +231,25 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div><div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full min-w-[860px] text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Item</th><th class=\"py-3 px-4 font-bold\">Schedule</th><th class=\"py-3 px-4 font-bold\">State</th><th class=\"py-3 px-4 font-bold\">Action</th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "</div><div class=\"bg-card nb-border overflow-x-auto\"><table class=\"w-full min-w-[860px] text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-primary-foreground\"><th class=\"py-3 px-4 font-bold\">Item</th><th class=\"py-3 px-4 font-bold\">Schedule</th><th class=\"py-3 px-4 font-bold\">State</th><th class=\"py-3 px-4 font-bold\">Action</th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Items) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<tr><td colspan=\"4\" class=\"py-8 text-center text-retro-muted font-bold text-sm\">No editorial inbox items yet</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 17, "<tr><td colspan=\"4\" class=\"py-8 text-center text-muted font-bold text-sm\">No editorial inbox items yet</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
 				for _, item := range data.Items {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<tr class=\"border-b-2 border-retro-ink align-top last:border-b-0\"><td class=\"py-3 px-4 max-w-sm\"><div class=\"flex flex-wrap items-center gap-2\"><p class=\"text-sm font-black text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 18, "<tr class=\"border-b-2 border-foreground align-top last:border-b-0\"><td class=\"py-3 px-4 max-w-sm\"><div class=\"flex flex-wrap items-center gap-2\"><p class=\"text-sm font-black text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var14 string
 					templ_7745c5c3_Var14, templ_7745c5c3_Err = templ.JoinStringErrs(item.SourceType)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 70, Col: 73}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 70, Col: 74}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var14))
 					if templ_7745c5c3_Err != nil {
@@ -259,7 +259,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var15 = []any{"text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialModeBadgeClass(item.Mode)}
+					var templ_7745c5c3_Var15 = []any{"text-[10px] px-2 py-0.5 font-bold border-2 border-foreground font-mono", EditorialModeBadgeClass(item.Mode)}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var15...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -284,7 +284,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 					var templ_7745c5c3_Var17 string
 					templ_7745c5c3_Var17, templ_7745c5c3_Err = templ.JoinStringErrs(item.Mode)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 71, Col: 146}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 71, Col: 147}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var17))
 					if templ_7745c5c3_Err != nil {
@@ -295,7 +295,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.CategoryHint != "" {
-						var templ_7745c5c3_Var18 = []any{"text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", CategoryBadgeClass(item.CategoryHint)}
+						var templ_7745c5c3_Var18 = []any{"text-[10px] px-2 py-0.5 font-bold border-2 border-foreground font-mono", CategoryBadgeClass(item.CategoryHint)}
 						templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var18...)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
@@ -320,7 +320,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						var templ_7745c5c3_Var20 string
 						templ_7745c5c3_Var20, templ_7745c5c3_Err = templ.JoinStringErrs(item.CategoryHint)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 73, Col: 158}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 73, Col: 159}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var20))
 						if templ_7745c5c3_Err != nil {
@@ -331,20 +331,20 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><p class=\"mt-1 text-xs font-mono font-bold text-retro-muted break-all\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 26, "</div><p class=\"mt-1 text-xs font-mono font-bold text-muted break-all\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var21 string
 					templ_7745c5c3_Var21, templ_7745c5c3_Err = templ.JoinStringErrs(item.SourceValue)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 76, Col: 99}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 76, Col: 93}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var21))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</p><div class=\"mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-retro-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 27, "</p><div class=\"mt-2 flex flex-wrap gap-x-3 gap-y-1 text-[11px] font-bold text-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -390,14 +390,14 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.PublishedPostID != nil {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<span class=\"font-mono text-retro-ink\">post #")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 33, "<span class=\"font-mono text-foreground font-black\">post #")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var24 string
 						templ_7745c5c3_Var24, templ_7745c5c3_Err = templ.JoinStringErrs(IDText(*item.PublishedPostID))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 85, Col: 88}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 85, Col: 100}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var24))
 						if templ_7745c5c3_Err != nil {
@@ -413,20 +413,20 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.PublishedPostID != nil {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<p class=\"text-[11px] font-bold text-retro-muted mt-2\">Linked publish target retained in update form.</p>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 36, "<p class=\"text-[11px] font-bold text-muted mt-2\">Linked publish target retained in update form.</p>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
 					if item.Note != "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<p class=\"text-xs font-bold text-retro-muted mt-2 max-w-sm line-clamp-2\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 37, "<p class=\"text-xs font-bold text-muted mt-2 max-w-sm line-clamp-2\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var25 string
 						templ_7745c5c3_Var25, templ_7745c5c3_Err = templ.JoinStringErrs(item.Note)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 92, Col: 95}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 92, Col: 89}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var25))
 						if templ_7745c5c3_Err != nil {
@@ -438,14 +438,14 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						}
 					}
 					if item.FailureNote != "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"mt-2 border border-retro-ink/30 bg-retro-cream px-2 py-1.5\"><p class=\"text-[10px] font-black uppercase text-retro-muted\">Failure</p><p class=\"text-xs font-bold text-retro-ink mt-0.5 max-w-sm\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 39, "<div class=\"mt-2 border border-foreground/30 bg-background px-2 py-1.5\"><p class=\"text-[10px] font-black uppercase text-muted\">Failure</p><p class=\"text-xs font-bold text-foreground mt-0.5 max-w-sm\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var26 string
 						templ_7745c5c3_Var26, templ_7745c5c3_Err = templ.JoinStringErrs(item.FailureNote)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 97, Col: 90}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 97, Col: 91}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var26))
 						if templ_7745c5c3_Err != nil {
@@ -456,7 +456,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 							return templ_7745c5c3_Err
 						}
 						if item.FailureMeta != "" {
-							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<p class=\"text-[11px] font-mono font-bold text-retro-muted mt-1 truncate\">meta kept in inline editor</p>")
+							templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "<p class=\"text-[11px] font-mono font-bold text-muted mt-1 truncate font-black\">meta kept in inline editor</p>")
 							if templ_7745c5c3_Err != nil {
 								return templ_7745c5c3_Err
 							}
@@ -466,14 +466,14 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</td><td class=\"py-3 px-4 text-xs font-mono font-bold text-retro-muted whitespace-nowrap\"><p class=\"text-[10px] font-black uppercase text-retro-muted mb-1\">Start</p><div class=\"text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 43, "</td><td class=\"py-3 px-4 text-xs font-mono font-bold text-muted whitespace-nowrap\"><p class=\"text-[10px] font-black uppercase text-muted mb-1\">Start</p><div class=\"text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var27 string
 					templ_7745c5c3_Var27, templ_7745c5c3_Err = templ.JoinStringErrs(EditorialTimeText(item.NotBefore))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 106, Col: 73}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 106, Col: 74}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var27))
 					if templ_7745c5c3_Err != nil {
@@ -484,7 +484,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.Deadline != nil {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<p class=\"text-[10px] font-black uppercase text-retro-muted mt-3 mb-1\">Deadline</p><div>until ")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 45, "<p class=\"text-[10px] font-black uppercase text-muted mt-3 mb-1\">Deadline</p><div>until ")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -501,7 +501,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						var templ_7745c5c3_Var29 = []any{"inline-block mt-1 text-[10px] px-2 py-0.5 font-bold border-2 border-retro-ink", EditorialEscalationBadgeClass(item.Deadline, item.Status, data.Now)}
+						var templ_7745c5c3_Var29 = []any{"inline-block mt-1 text-[10px] px-2 py-0.5 font-bold border-2 border-foreground", EditorialEscalationBadgeClass(item.Deadline, item.Status, data.Now)}
 						templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var29...)
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
@@ -526,7 +526,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						var templ_7745c5c3_Var31 string
 						templ_7745c5c3_Var31, templ_7745c5c3_Err = templ.JoinStringErrs(EditorialEscalationText(item.Deadline, item.Status, data.Now))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 110, Col: 239}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 110, Col: 240}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var31))
 						if templ_7745c5c3_Err != nil {
@@ -537,16 +537,16 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 							return templ_7745c5c3_Err
 						}
 					} else {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<p class=\"text-[10px] font-black uppercase text-retro-muted mt-3 mb-1\">Deadline</p><div>-</div>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 50, "<p class=\"text-[10px] font-black uppercase text-muted mt-3 mb-1\">Deadline</p><div>-</div>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</td><td class=\"py-3 px-4 text-xs font-mono font-bold text-retro-muted whitespace-nowrap\"><div class=\"flex flex-wrap items-center gap-2 mb-2\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 51, "</td><td class=\"py-3 px-4 text-xs font-mono font-bold text-muted whitespace-nowrap\"><div class=\"flex flex-wrap items-center gap-2 mb-2\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					var templ_7745c5c3_Var32 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono", EditorialStatusBadgeClass(item.Status)}
+					var templ_7745c5c3_Var32 = []any{"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono", EditorialStatusBadgeClass(item.Status)}
 					templ_7745c5c3_Err = templ.RenderCSSItems(ctx, templ_7745c5c3_Buffer, templ_7745c5c3_Var32...)
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
@@ -571,7 +571,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 					var templ_7745c5c3_Var34 string
 					templ_7745c5c3_Var34, templ_7745c5c3_Err = templ.JoinStringErrs(item.Status)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 118, Col: 148}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 118, Col: 149}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var34))
 					if templ_7745c5c3_Err != nil {
@@ -582,7 +582,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.CategoryHint == "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<span class=\"text-[11px] font-bold text-retro-muted\">no category hint</span>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 55, "<span class=\"text-[11px] font-bold text-muted\">no category hint</span>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -788,7 +788,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\"><div class=\"grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start\"><div class=\"space-y-2\"><select name=\"status\" class=\"w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 75, "\"><div class=\"grid gap-2 sm:grid-cols-[minmax(0,1fr)_auto] sm:items-start\"><div class=\"space-y-2\"><select name=\"status\" class=\"w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -870,7 +870,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\" placeholder=\"post id\" class=\"w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink\"> <input type=\"text\" name=\"failure_note\" value=\"")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 83, "\" placeholder=\"post id\" class=\"w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <input type=\"text\" name=\"failure_note\" value=\"")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -883,14 +883,14 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" placeholder=\"failure note\" class=\"w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-bold text-retro-ink\"></div><button type=\"submit\" class=\"text-xs font-bold text-retro-ink hover:bg-retro-wheat px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap\">Update</button></div><details class=\"border-2 border-retro-ink bg-retro-cream px-2 py-1.5\"><summary class=\"cursor-pointer text-[11px] font-black uppercase text-retro-muted\">Failure meta</summary> <textarea name=\"failure_meta\" rows=\"2\" class=\"mt-2 w-full px-2 py-1 border-2 border-retro-ink bg-retro-paper text-xs font-mono font-bold text-retro-ink\" placeholder=\"failure meta\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 84, "\" placeholder=\"failure note\" class=\"w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><button type=\"submit\" class=\"text-xs font-bold text-foreground hover:bg-secondary px-3 py-1.5 border-2 border-foreground bg-card cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Update</button></div><details class=\"border-2 border-foreground bg-background px-2 py-1.5\"><summary class=\"cursor-pointer text-[11px] font-black uppercase text-muted\">Failure meta</summary> <textarea name=\"failure_meta\" rows=\"2\" class=\"mt-2 w-full px-2 py-1 border-2 border-foreground bg-background text-xs font-mono font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"failure meta\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var54 string
 						templ_7745c5c3_Var54, templ_7745c5c3_Err = templ.JoinStringErrs(item.FailureMeta)
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 165, Col: 211}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 165, Col: 294}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var54))
 						if templ_7745c5c3_Err != nil {
@@ -922,19 +922,19 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"> <button type=\"submit\" class=\"text-xs font-bold text-retro-ink hover:bg-retro-blush px-3 py-1.5 border-2 border-retro-ink bg-retro-paper cursor-pointer whitespace-nowrap\">Delete</button></form>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 87, "\"> <button type=\"submit\" class=\"text-xs font-bold text-foreground hover:bg-destructive hover:text-white px-3 py-1.5 border-2 border-foreground bg-card cursor-pointer whitespace-nowrap focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Delete</button></form>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					} else {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<div class=\"border-2 border-retro-ink bg-retro-cream px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-retro-muted\">Locked</p><p class=\"mt-1 text-xs font-bold text-retro-ink\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 88, "<div class=\"border-2 border-foreground bg-background px-3 py-2\"><p class=\"text-[10px] font-black uppercase text-muted\">Locked</p><p class=\"mt-1 text-xs font-bold text-foreground\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 						var templ_7745c5c3_Var57 string
 						templ_7745c5c3_Var57, templ_7745c5c3_Err = templ.JoinStringErrs(EditorialItemLockedReason(item))
 						if templ_7745c5c3_Err != nil {
-							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 175, Col: 94}
+							return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/editorial.templ`, Line: 175, Col: 95}
 						}
 						_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var57))
 						if templ_7745c5c3_Err != nil {
@@ -951,7 +951,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</tbody></table></div><div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-hidden\"><details><summary class=\"cursor-pointer list-none px-6 py-4\"><div class=\"flex flex-col gap-3 md:flex-row md:items-start md:justify-between\"><div><h2 class=\"text-sm font-black uppercase text-retro-ink\">Create inbox item</h2><p class=\"mt-1 text-xs font-bold text-retro-muted\">Kasih repo, tema, atau catatan singkat. Hermes ambil dari inbox dulu sebelum autonomous.</p></div><span class=\"inline-flex items-center self-start border-2 border-retro-ink bg-retro-cream px-2.5 py-1 text-[11px] font-black uppercase text-retro-muted\">Show form</span></div></summary><div class=\"border-t-2 border-retro-ink px-6 py-5\"><form method=\"POST\" action=\"/admin/editorial-inbox\" class=\"space-y-4\" data-confirm=\"Create this editorial inbox item?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 91, "</tbody></table></div><div class=\"bg-card nb-border overflow-hidden\"><details><summary class=\"cursor-pointer list-none px-6 py-4\"><div class=\"flex flex-col gap-3 md:flex-row md:items-start md:justify-between\"><div><h2 class=\"text-sm font-black uppercase text-foreground font-head\">Create inbox item</h2><p class=\"mt-1 text-xs font-bold text-muted\">Kasih repo, tema, atau catatan singkat. Hermes ambil dari inbox dulu sebelum autonomous.</p></div><span class=\"inline-flex items-center self-start border-2 border-foreground bg-background px-2.5 py-1 text-[11px] font-black uppercase text-muted\">Show form</span></div></summary><div class=\"border-t-2 border-foreground px-6 py-5\"><form method=\"POST\" action=\"/admin/editorial-inbox\" class=\"space-y-4\" data-confirm=\"Create this editorial inbox item?\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -964,7 +964,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\"><div class=\"grid gap-3 md:grid-cols-2\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Repo / link / tema</label> <input type=\"text\" name=\"source_value\" required placeholder=\"https://github.com/... atau tema project\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Category hint</label> <select name=\"category_hint\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink focus:outline-none focus:ring-2 focus:ring-retro-ink\"><option value=\"\">None</option> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 92, "\"><div class=\"grid gap-3 md:grid-cols-2\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Repo / link / tema</label> <input type=\"text\" name=\"source_value\" required placeholder=\"https://github.com/... atau tema project\" class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Category hint</label> <select name=\"category_hint\" class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><option value=\"\">None</option> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -1000,7 +1000,7 @@ func EditorialInbox(data EditorialInboxData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "</select></div></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Editor note</label> <textarea name=\"note\" rows=\"4\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Kasih angle, judul project, atau kenapa ini penting.\"></textarea></div><div class=\"flex justify-end\"><button type=\"submit\" class=\"px-5 py-2 border-2 border-retro-ink bg-retro-sage text-retro-cream font-bold text-sm shadow-[3px_3px_0px_0px_#2D3748] cursor-pointer\">Create item</button></div></form></div></details></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 96, "</select></div></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Editor note</label> <textarea name=\"note\" rows=\"4\" class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Kasih angle, judul project, atau kenapa ini penting.\"></textarea></div><div class=\"flex justify-end\"><button type=\"submit\" class=\"nb-button py-2 px-5 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Create item</button></div></form></div></details></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

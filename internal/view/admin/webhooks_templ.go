@@ -49,7 +49,7 @@ func Webhooks(data WebhooksData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Create Webhook</h3><form method=\"POST\" action=\"/admin/webhooks\" class=\"space-y-4\"><input type=\"hidden\" name=\"_csrf\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "<div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Create Webhook</h3><form method=\"POST\" action=\"/admin/webhooks\" class=\"space-y-4\"><input type=\"hidden\" name=\"_csrf\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -62,38 +62,38 @@ func Webhooks(data WebhooksData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Name</label> <input type=\"text\" name=\"name\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"e.g. Slack Alerts\"></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Secret (for HMAC signing, optional)</label> <input type=\"text\" name=\"secret\" class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"Shared secret for X-Webhook-Signature-256\"></div></div><div><label class=\"block text-sm font-bold text-retro-muted mb-1\">Payload URL</label> <input type=\"url\" name=\"url\" required class=\"w-full px-3 py-2 border-2 border-retro-ink bg-retro-paper text-sm font-bold text-retro-ink placeholder:text-retro-muted focus:outline-none focus:ring-2 focus:ring-retro-ink\" placeholder=\"https://hooks.example.com/alerts\"></div><div class=\"flex items-center gap-3\"><input type=\"checkbox\" name=\"enabled\" value=\"1\" checked id=\"webhook-enabled\" class=\"w-4 h-4 border-2 border-retro-ink\"> <label for=\"webhook-enabled\" class=\"text-sm font-bold text-retro-muted\">Enabled</label></div><button type=\"submit\" class=\"nb-button py-2 px-6 text-sm\">Add Webhook</button></form></div><div class=\"bg-retro-paper border-2 border-retro-ink shadow-[4px_4px_0px_0px_#2D3748] overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-retro-ink text-xs uppercase bg-retro-ink text-retro-cream\"><th class=\"py-3 px-4 font-bold\">Name</th><th class=\"py-3 px-4 font-bold\">URL</th><th class=\"py-3 px-4 font-bold\">Status</th><th class=\"py-3 px-4 font-bold\">Created</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 3, "\"><div class=\"grid gap-4 sm:grid-cols-2\"><div><label class=\"block text-sm font-bold text-muted mb-1\">Name</label> <input type=\"text\" name=\"name\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"e.g. Slack Alerts\"></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Secret (for HMAC signing, optional)</label> <input type=\"text\" name=\"secret\" class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"Shared secret for X-Webhook-Signature-256\"></div></div><div><label class=\"block text-sm font-bold text-muted mb-1\">Payload URL</label> <input type=\"url\" name=\"url\" required class=\"w-full px-3 py-2 border-2 border-foreground bg-background text-sm font-bold text-foreground placeholder:text-muted focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\" placeholder=\"https://hooks.example.com/alerts\"></div><div class=\"flex items-center gap-3\"><input type=\"checkbox\" name=\"enabled\" value=\"1\" checked id=\"webhook-enabled\" class=\"w-4 h-4 border-2 border-foreground bg-background focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"> <label for=\"webhook-enabled\" class=\"text-sm font-bold text-muted cursor-pointer\">Enabled</label></div><button type=\"submit\" class=\"nb-button py-2 px-6 text-sm focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Add Webhook</button></form></div><div class=\"bg-card nb-border overflow-x-auto\"><table class=\"w-full text-left\"><thead><tr class=\"border-b-2 border-foreground text-xs uppercase bg-foreground text-primary-foreground\"><th class=\"py-3 px-4 font-bold\">Name</th><th class=\"py-3 px-4 font-bold\">URL</th><th class=\"py-3 px-4 font-bold\">Status</th><th class=\"py-3 px-4 font-bold\">Created</th><th class=\"py-3 px-4\"></th></tr></thead> <tbody>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			if len(data.Webhooks) == 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<tr><td colspan=\"5\" class=\"py-8 text-center text-retro-muted font-bold text-sm\">No webhooks configured</td></tr>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<tr><td colspan=\"5\" class=\"py-8 text-center text-muted font-bold text-sm\">No webhooks configured</td></tr>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else {
 				for _, wh := range data.Webhooks {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<tr class=\"border-b-2 border-retro-ink last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-retro-ink\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<tr class=\"border-b-2 border-foreground last:border-b-0\"><td class=\"py-3 px-4 text-sm font-bold text-foreground\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var4 string
 					templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(wh.Name)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 51, Col: 73}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 51, Col: 74}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</td><td class=\"py-3 px-4 text-xs font-mono font-bold text-retro-muted max-w-[300px] truncate\" title=\"")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "</td><td class=\"py-3 px-4 text-xs font-mono font-bold text-muted max-w-[300px] truncate\" title=\"")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var5 string
 					templ_7745c5c3_Var5, templ_7745c5c3_Err = templ.JoinStringErrs(wh.URL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 52, Col: 113}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 52, Col: 107}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var5))
 					if templ_7745c5c3_Err != nil {
@@ -106,7 +106,7 @@ func Webhooks(data WebhooksData) templ.Component {
 					var templ_7745c5c3_Var6 string
 					templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(wh.URL)
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 52, Col: 124}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 52, Col: 118}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 					if templ_7745c5c3_Err != nil {
@@ -117,24 +117,24 @@ func Webhooks(data WebhooksData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if wh.Enabled {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono bg-retro-sage text-retro-cream\">enabled</span>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 9, "<span class=\"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono bg-success text-success-foreground\">enabled</span>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					} else {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"text-xs px-2 py-0.5 font-bold border-2 border-retro-ink font-mono bg-retro-paper text-retro-muted\">disabled</span>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 10, "<span class=\"text-xs px-2 py-0.5 font-bold border-2 border-foreground font-mono bg-card text-muted\">disabled</span>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td><td class=\"py-3 px-4 text-sm font-mono font-bold text-retro-muted\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 11, "</td><td class=\"py-3 px-4 text-sm font-mono font-bold text-muted\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 					var templ_7745c5c3_Var7 string
 					templ_7745c5c3_Var7, templ_7745c5c3_Err = templ.JoinStringErrs(wh.CreatedAt.Format("2006-01-02"))
 					if templ_7745c5c3_Err != nil {
-						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 60, Col: 111}
+						return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/admin/webhooks.templ`, Line: 60, Col: 105}
 					}
 					_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var7))
 					if templ_7745c5c3_Err != nil {
@@ -166,13 +166,13 @@ func Webhooks(data WebhooksData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"> <button type=\"submit\" class=\"text-xs font-bold text-retro-muted hover:bg-retro-blush px-2 py-1 border-2 border-retro-ink bg-retro-paper cursor-pointer\">Delete</button></form></td></tr>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 14, "\"> <button type=\"submit\" class=\"text-xs font-bold text-muted hover:bg-destructive hover:text-destructive-foreground px-2 py-1 border-2 border-foreground bg-card cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Delete</button></form></td></tr>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</tbody></table></div><div class=\"nb-card bg-retro-paper p-6\"><h3 class=\"nb-h3 text-xl mb-4\">Alert Thresholds</h3><p class=\"text-sm font-bold text-retro-muted\">Webhooks fire automatically when any server metric exceeds these thresholds:</p><ul class=\"mt-3 space-y-2 text-sm font-bold text-retro-ink\"><li class=\"flex items-center gap-2\">• CPU Usage: <span class=\"font-mono bg-retro-wheat px-2 py-0.5 border-2 border-retro-ink\">&gt; 90%</span></li><li class=\"flex items-center gap-2\">• RAM Usage: <span class=\"font-mono bg-retro-wheat px-2 py-0.5 border-2 border-retro-ink\">&gt; 90%</span></li><li class=\"flex items-center gap-2\">• Disk Usage: <span class=\"font-mono bg-retro-wheat px-2 py-0.5 border-2 border-retro-ink\">&gt; 90%</span></li></ul><p class=\"text-xs text-retro-muted mt-4 font-bold\">Payloads are POSTed as JSON with HMAC-SHA256 signature via <code class=\"font-mono bg-retro-ink text-retro-wheat px-1\">X-Webhook-Signature-256</code> header when a secret is configured.</p></div></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "</tbody></table></div><div class=\"nb-card bg-card p-6\"><h3 class=\"nb-h3 font-head text-xl mb-4\">Alert Thresholds</h3><p class=\"text-sm font-bold text-muted\">Webhooks fire automatically when any server metric exceeds these thresholds:</p><ul class=\"mt-3 space-y-2 text-sm font-bold text-foreground\"><li class=\"flex items-center gap-2\">• CPU Usage: <span class=\"font-mono bg-secondary px-2 py-0.5 border-2 border-foreground\">&gt; 90%</span></li><li class=\"flex items-center gap-2\">• RAM Usage: <span class=\"font-mono bg-secondary px-2 py-0.5 border-2 border-foreground\">&gt; 90%</span></li><li class=\"flex items-center gap-2\">• Disk Usage: <span class=\"font-mono bg-secondary px-2 py-0.5 border-2 border-foreground\">&gt; 90%</span></li></ul><p class=\"text-xs text-muted mt-4 font-bold\">Payloads are POSTed as JSON with HMAC-SHA256 signature via <code class=\"font-mono bg-foreground text-secondary px-1\">X-Webhook-Signature-256</code> header when a secret is configured.</p></div></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
