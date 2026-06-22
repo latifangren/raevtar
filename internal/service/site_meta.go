@@ -48,12 +48,13 @@ func (s *SiteMetaService) DefaultSEO(path string) model.SEOData {
 	return model.SEOData{
 		Description:  defaultSEODescription,
 		CanonicalURL: s.CanonicalURL(canonicalPath),
+		SiteDomain:   s.domain,
 	}
 }
 
 func (s *SiteMetaService) HomeSEO() model.SEOData {
 	seo := s.DefaultSEO("/")
-	seo.Description = "Raevtar — personal blog, server status board, docs, projects, and automation hooks running on postmarketOS."
+	seo.Description = "Raevtar — personal blog, server status board, docs, projects, and automation hooks."
 	seo.JSONLD = model.MustJSONLD(map[string]any{
 		"@context":    "https://schema.org",
 		"@type":       "WebSite",

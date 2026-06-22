@@ -4,6 +4,8 @@ TEMPL_VERSION=v0.3.906
 TEMPL=go run github.com/a-h/templ/cmd/templ@$(TEMPL_VERSION)
 TAILWIND_VERSION=3.4.19
 TAILWIND=npx --yes tailwindcss@$(TAILWIND_VERSION)
+RAEVTAR_USER?=latif
+RAEVTAR_HOME?=$(HOME)/raevtar
 
 all: build
 
@@ -38,4 +40,12 @@ clean:
 db-reset:
 	rm -f $(DB_PATH)
 
-.PHONY: all css build test run dev templ-gen migrate seed clean db-reset
+generate-service:
+	sed 's|{{RAEVTAR_USER}}|$(RAEVTAR_USER)|g; s|{{RAEVTAR_HOME}}|$(RAEVTAR_HOME)|g' raevtar.service.tmpl > raevtar.service
+
+install-service: generate-service
+	@echo "==> Install raevtar.service to /etc/systemd/system/ (requires sudo) =="
+	sudo cp raevtar.service /etc/systemd/system/raevtar.service
+	sudo systemctl daemon-reload
+
+.PHONY: all css build test run dev templ-gen migrate seed clean db-reset generate-service install-service

@@ -7,6 +7,7 @@ type SEOData struct {
 	CanonicalURL string
 	ImageURL     string
 	JSONLD       string
+	SiteDomain   string
 }
 
 func MustJSONLD(value any) string {

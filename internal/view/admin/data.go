@@ -188,11 +188,14 @@ func AgentURL(serverID int64) string {
 	return "$RAEVTAR_URL/api/v1/servers/" + IDText(serverID) + "/ping"
 }
 
-func AgentRunCommand(serverID int64, url, token string) string {
+func AgentRunCommand(serverID int64, url, token, agentDir string) string {
 	if token == "" {
 		token = "paste-token-here"
 	}
-	return "RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " /usr/local/bin/raevtar-agent.sh"
+	if agentDir == "" {
+		agentDir = "/usr/local/bin"
+	}
+	return "RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " " + agentDir + "/raevtar-agent.sh"
 }
 
 func AgentBootstrapCommand(serverID int64, url, token string) string {
@@ -203,16 +206,22 @@ func AgentBootstrapCommand(serverID int64, url, token string) string {
 	return "curl -fsSL " + url + "/api/v1/bootstrap/" + IDText(serverID) + "/" + token + " | sh"
 }
 
-func AgentInstallCommand(url string) string {
+func AgentInstallCommand(url, agentDir string) string {
 	url = strings.TrimRight(url, "/")
-	return "sudo install -d /usr/local/bin && curl -fsSL " + url + "/static/agent/raevtar-agent.sh | sudo tee /usr/local/bin/raevtar-agent.sh >/dev/null && sudo chmod +x /usr/local/bin/raevtar-agent.sh"
+	if agentDir == "" {
+		agentDir = "/usr/local/bin"
+	}
+	return "sudo install -d " + agentDir + " && curl -fsSL " + url + "/static/agent/raevtar-agent.sh | sudo tee " + agentDir + "/raevtar-agent.sh >/dev/null && sudo chmod +x " + agentDir + "/raevtar-agent.sh"
 }
 
-func AgentCronLine(serverID int64, url, token string) string {
+func AgentCronLine(serverID int64, url, token, agentDir string) string {
 	if token == "" {
 		token = "paste-token-here"
 	}
-	return "*/1 * * * * RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " /usr/local/bin/raevtar-agent.sh >/dev/null 2>&1"
+	if agentDir == "" {
+		agentDir = "/usr/local/bin"
+	}
+	return "*/1 * * * * RAEVTAR_URL=" + url + " RAEVTAR_SERVER_ID=" + IDText(serverID) + " RAEVTAR_AGENT_TOKEN=" + token + " " + agentDir + "/raevtar-agent.sh >/dev/null 2>&1"
 }
 
 func ServerMetricCountText(metrics []model.ServerMetric) string {

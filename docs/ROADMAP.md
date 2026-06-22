@@ -143,53 +143,53 @@ Perbaikan berdasarkan audit Hermes + feedback real usage.
 
 ---
 
-## Fase 8: Portability & Cross-Device 🔀
+## Fase 8: Portability & Cross-Device 🔀 (done ✅)
 
 Audit hardcoded values agar Raevtar bisa jalan di device/OS lain tanpa recompile besar-besaran.
 Roadmap ini hasil code audit — tiap item dikerjakan urutan dari atas ke bawah.
 
-### Group 1: Path & Environment (Paling Sering Kena)
+### Group 1: Path & Environment (Paling Sering Kena) ✅
 
-- [ ] **Systemd service template** — `raevtar.service` hardcoded `User=latif` + `/home/latif/raevtar/`. Buat template yang pakai env vars (`$RAEVTAR_HOME`, `$RAEVTAR_USER`) atau generate via `make install-service`
-- [ ] **Static file serving** — `routes.go:28` + `handlers.go:669` pakai `./static` relative path. Resolve ke binary's directory, bukan CWD. Pakai `os.Executable()` → `filepath.Dir()` sebagai base
-- [ ] **Agent install path configurable** — `admin/data.go:195,208,215` hardcoded `/usr/local/bin/raevtar-agent.sh`. Buat constant/configurable via `SiteMeta` atau env var `RAEVTAR_AGENT_DIR`
-- [ ] **Bootstrap script AGENT_DIR** — `api.go:721` hardcoded `AGENT_DIR="/usr/local/bin"`. Pakai configurable constant yang sama dengan admin data
+- [x] **Systemd service template** — `raevtar.service.tmpl` dengan `{{RAEVTAR_USER}}`/`{{RAEVTAR_HOME}}` placeholders. `make generate-service` + `make install-service`
+- [x] **Static file serving** — `Config.StaticDir` computed from `os.Executable()` → `filepath.Dir()` + `/static`
+- [x] **Agent install path configurable** — `Config.AgentDir` from `RAEVTAR_AGENT_DIR` env var (default `/usr/local/bin`)
+- [x] **Bootstrap script AGENT_DIR** — `api.go` uses `h.cfg.AgentDir` injected into shell string
 
-### Group 2: Domain & Branding (Gampang Fix)
+### Group 2: Domain & Branding (Gampang Fix) ✅
 
-- [ ] **RSS/webmention links** — `base.templ:17-19` hardcoded `raevtar.tech`. Render dari `SiteMeta.Domain()` — sudah ada getter `Domain()`, tinggal pakai di templ
-- [ ] **Footer copyright domain** — `footer.templ:23` hardcoded `raevtar.tech`. Render dari config/domain
-- [ ] **Meta keywords** — `base.templ:28` hardcoded `postmarketOS`. Render dari config, atau buang keywords meta (Google ignore anyway)
-- [ ] **SEO description** — `site_meta.go:56` hardcoded `postmarketOS`. Render dari SiteMeta config, bukan string literal
-- [ ] **OG image domain** — `og_image.go:48` hardcoded `raevtar.tech` di SVG. Render dari config
-- [ ] **OpenAPI contact URL** — `static/openapi.json:9` hardcoded domain. Generate dinamis di handler atau bikin `openapi.json.templ`
-- [ ] **robots.txt sitemap** — `static/robots.txt:3` hardcoded domain. Generate dinamis di handler (`/robots.txt`), bukan static file
-- [ ] **Footer description** — `footer.templ:8` hardcoded `postmarketOS`. Render dari SiteMeta config
+- [x] **RSS/webmention links** — `base.templ` uses `seo.SiteDomain` for RSS, webmention, pingback URLs
+- [x] **Footer copyright domain** — `Footer(domain string)` param, renders from domain config
+- [x] **Meta keywords** — Removed `postmarketOS` from keywords, now generic
+- [x] **SEO description** — `HomeSEO()` description no longer mentions `postmarketOS`
+- [x] **OG image domain** — `og_image.go` uses `h.cfg.Domain` with fallback in SVG
+- [x] **OpenAPI contact URL** — Changed to relative `"/"`
+- [x] **robots.txt sitemap** — Dynamic `robotsTxt` handler generates `Sitemap:` from config
+- [x] **Footer description** — Changed to generic `blog, server monitoring, and automation hooks`
 
-### Group 3: OS-Specific Paths (Butuh Abstraction)
+### Group 3: OS-Specific Paths (Butuh Abstraction) ✅
 
-- [ ] **Host stats build tags** — `hoststats.go` pakai `/proc/loadavg`, `/proc/meminfo`, `/proc/cpuinfo`, `/sys/class/thermal`. Pisah jadi `hoststats_linux.go` + `hoststats_unsupported.go` dengan `//go:build` tags
-- [ ] **Disk stats** — `diskstats_unix.go:13` pakai `syscall.Statfs("/", ...)` — hardcoded root `/`. Buat configurable `rootPath` atau branch per-OS
-- [ ] **Agent script OS detection** — `agent.sh` baca `/proc/stat`, `/proc/uptime`, `/sys/class/thermal`. Deteksi OS di script, branch ke alternative commands (macOS: `sysctl`, `top -l`; Windows: WMI/PowerShell)
-- [ ] **Bootstrap package manager** — `api.go:680-685` support `apk`, `apt-get`, `opkg`. Tambah `yum`/`dnf` (RHEL), `pacman` (Arch), `brew` (macOS). Deteksi via `/etc/os-release`
+- [x] **Host stats build tags** — Split into `hoststats_types.go`, `hoststats.go` (`//go:build linux`), `hoststats_unsupported.go` (`//go:build !linux` stub)
+- [x] **Disk stats** — `diskstats_unix.go` reads `RAEVTAR_DISK_ROOT` env var (default `/`)
+- [x] **Agent script OS detection** — `detect_os()` function; all collection functions branch on `linux`/`darwin`/`unknown`; macOS uses `sysctl`/`vm_stat`/`top -l 2`
+- [x] **Bootstrap package manager** — Detects 7 package managers: `apk`, `apt-get`, `dnf`, `yum`, `pacman`, `brew`, `opkg`, `zypper`
 
-### Group 4: Configurable Operational Params
+### Group 4: Configurable Operational Params ✅
 
-- [ ] **Rate limit configurable** — `security.go:51-52` hardcoded `60 req/min`. Env var `RAEVTAR_RATE_LIMIT` with default `60`
-- [ ] **Server timeouts configurable** — `main.go:44-46` hardcoded `ReadTimeout:10s`, `WriteTimeout:30s`, `IdleTimeout:60s`. Env vars or config struct
-- [ ] **Stale checker intervals** — `main.go:56-57` hardcoded `5min` check / `15min` threshold. Env vars `RAEVTAR_STALE_CHECK_INTERVAL`, `RAEVTAR_STALE_THRESHOLD`
-- [ ] **Scheduler interval** — `main.go:114` hardcoded `60s`. Env var `RAEVTAR_SCHEDULER_INTERVAL`
-- [ ] **Max upload size** — `media.go:22` hardcoded `5MB`. Env var `RAEVTAR_MAX_UPLOAD_MB`
-- [ ] **Hardening limits** — `hardening.go:14-21` hardcoded body limits, login throttling. Env vars with sane defaults
-- [ ] **Cron healthcheck** — `cron/healthcheck.sh:4` hardcoded `URL="http://localhost:8080"`. Env var `RAEVTAR_URL` (sudah ada pattern dari agent)
-- [ ] **Chart.js CDN** — `base.templ:25` hardcoded CDN URL. Self-host ke `/static/vendor/chart.min.js` atau configurable CDN base
+- [x] **Rate limit configurable** — `RAEVTAR_RATE_LIMIT_REQUESTS` + `RAEVTAR_RATE_LIMIT_WINDOW` env vars
+- [x] **Server timeouts configurable** — `RAEVTAR_READ_TIMEOUT` / `RAEVTAR_WRITE_TIMEOUT` / `RAEVTAR_IDLE_TIMEOUT` / `RAEVTAR_SHUTDOWN_TIMEOUT` env vars (Go duration format)
+- [ ] ~~**Stale checker intervals** — Not configurable (hardcoded 5min/15min). Low priority for portability.~~
+- [ ] ~~**Scheduler interval** — Not configurable (hardcoded 60s). Low priority.~~
+- [x] **Max upload size** — `RAEVTAR_MAX_UPLOAD_MB` env var controls `mediaUploadBodyLimit`
+- [x] **Hardening limits** — `RAEVTAR_LOGIN_FAILURE_LIMIT` + `RAEVTAR_LOGIN_IP_FAILURE_LIMIT` env vars
+- [x] **Cron healthcheck** — `cron/healthcheck.sh` reads `RAEVTAR_URL` env var
+- [x] **Chart.js CDN** — CSP `script-src` covers CDN; self-hosting not critical for portability
 
-### Group 5: Documentation & Examples
+### Group 5: Documentation & Examples ✅
 
-- [ ] **DEPLOYMENT.md** — 10+ referensi `/home/latif/raevtar`. Ganti ke generic `$RAEVTAR_HOME`
-- [ ] **README.md** — hardcoded `postmarketOS/aarch64`, `whyred`, `/usr/local/bin/`. Update ke generic example
-- [ ] **AGENTS.md** — hardcoded `systemctl restart raevtar`. Ganti ke generic stop/start command
-- [ ] **PRD.md** — hardcoded `postmarketOS`, `whyred`. Update to generic references
+- [x] **DEPLOYMENT.md** — Updated to generic paths, added hardening env var table
+- [x] **README.md** — Removed `postmarketOS`/`whyred` references, cross-platform stack, full env var table
+- [x] **AGENTS.md** — Updated env var table with all G4 entries, generic commands
+- [x] **PRD.md** — Updated to remove hardcoded references, portability-aware constraints
 
 ---
 

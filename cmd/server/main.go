@@ -41,9 +41,9 @@ func main() {
 	srv := &http.Server{
 		Addr:         cfg.Addr,
 		Handler:      handler.WithSecurityHeaders(r),
-		ReadTimeout:  10 * time.Second,
-		WriteTimeout: 30 * time.Second,
-		IdleTimeout:  60 * time.Second,
+		ReadTimeout:  cfg.ReadTimeout,
+		WriteTimeout: cfg.WriteTimeout,
+		IdleTimeout:  cfg.IdleTimeout,
 	}
 
 	// Start scheduler for scheduled post publishing
@@ -73,7 +73,7 @@ func main() {
 	sig := <-quit
 	slog.Info("shutting down", "signal", sig)
 
-	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), 15*time.Second)
+	shutdownCtx, shutdownCancel := context.WithTimeout(context.Background(), cfg.ShutdownTimeout)
 	defer shutdownCancel()
 
 	if err := srv.Shutdown(shutdownCtx); err != nil {

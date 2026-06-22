@@ -1,45 +1,15 @@
+//go:build linux
+
 package handler
 
 import (
-	"encoding/json"
 	"math"
-	"net/http"
 	"os"
 	"strconv"
 	"strings"
 )
 
-// HostStats holds live system metrics for the local host.
-type HostStats struct {
-	CPU           CPUStats  `json:"cpu"`
-	RAM           RAMStats  `json:"ram"`
-	Disk          DiskStats `json:"disk"`
-	Temp          float64   `json:"temp"`
-	TempAvailable bool      `json:"temp_available"`
-}
-
-type CPUStats struct {
-	Load1  float64 `json:"load1"`
-	Load5  float64 `json:"load5"`
-	Load15 float64 `json:"load15"`
-	Cores  int     `json:"cores"`
-}
-
-type RAMStats struct {
-	Total     uint64  `json:"total"`
-	Available uint64  `json:"available"`
-	Used      uint64  `json:"used"`
-	Percent   float64 `json:"percent"`
-}
-
-type DiskStats struct {
-	Total   uint64  `json:"total"`
-	Free    uint64  `json:"free"`
-	Used    uint64  `json:"used"`
-	Percent float64 `json:"percent"`
-}
-
-// collectHostStats reads /proc + sysfs for live system metrics.
+// collectHostStats reads /proc + sysfs for live system metrics (Linux only).
 func collectHostStats() HostStats {
 	var s HostStats
 
@@ -123,28 +93,4 @@ func readTemp() (float64, bool) {
 		return math.Round(val/100) / 10, true
 	}
 	return 0, false
-}
-
-// apiHostStats returns live system stats as JSON (for HTMX polling).
-func (h *Handler) apiHostStats(w http.ResponseWriter, r *http.Request) {
-	stats := collectHostStats()
-	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(stats); err != nil {
-		logHandlerError(r, err)
-	}
-}
-
-// formatBytes converts kB to human-readable string (e.g. "7.2 GB").
-func formatBytes(kb uint64) string {
-	const unit = 1024
-	if kb < unit {
-		return strconv.FormatUint(kb, 10) + " KB"
-	}
-	div, exp := uint64(unit), 0
-	for n := kb / unit; n >= unit; n /= unit {
-		div *= unit
-		exp++
-	}
-	val := float64(kb) / float64(div)
-	return strconv.FormatFloat(math.Round(val*10)/10, 'f', 1, 64) + " " + []string{"MB", "GB", "TB"}[exp]
 }

@@ -1,6 +1,6 @@
 # Architecture Codemap
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-23
 
 ## System Overview
 
@@ -89,7 +89,9 @@ User Request → Chi Router → Middleware (RateLimit, Logger, Recoverer)
 | Dashboard | `/dashboard` | None | Public server monitoring |
 | Admin Panel | `/admin` | Session | Content & system management |
 | API v1 | `/api/v1` | Bearer (write) | Programmatic access |
+| API Docs | `/docs/api` | None | Public API reference page |
 | RSS Feed | `/blog/feed.xml` | None | Blog syndication |
+| Webmention | `/webmention` | None | Receive-only IndieWeb |
 | Static | `/static/*` | None | CSS, JS, assets |
 
 ## External Dependencies

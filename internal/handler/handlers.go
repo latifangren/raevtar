@@ -666,7 +666,7 @@ func round1(value float64) float64 {
 
 func (h *Handler) serveStatic(filename string) http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "./static/"+filename)
+		http.ServeFile(w, r, h.cfg.StaticDir+"/"+filename)
 	}
 }
 

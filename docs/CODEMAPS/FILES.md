@@ -1,6 +1,6 @@
 # File Map
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-23
 
 ## Root
 
@@ -25,8 +25,11 @@ F:\GITHUB\raevtar\
 │   │   ├── hardening.go         # Request body limits, login throttling, error helpers
 │   │   ├── render.go            # renderHTML() Templ helper
 │   │   ├── editorial.go         # Editorial inbox admin handlers
-│   │   ├── hoststats.go         # collectHostStats() from /proc (CPU, RAM, disk, temp)
-│   │   ├── discovery.go         # sitemap.xml + llms.txt generation
+│   │   ├── hoststats.go         # collectHostStats() from /proc (CPU, RAM, disk, temp) — Linux build tag
+│   │   ├── hoststats_handler.go # apiHostStats() JSON handler + formatBytes()
+│   │   ├── hoststats_types.go   # HostStats, CPUStats, RAMStats, DiskStats structs
+│   │   ├── hoststats_unsupported.go # Stub for non-Linux platforms
+│   │   ├── discovery.go         # sitemap.xml + llms.txt + robots.txt generation
 │   │   ├── rss.go               # RSS 2.0 feed for /blog/feed.xml
 │   │   ├── og_image.go          # SVG OG image generation for blog posts + projects
 │   │   ├── middleware_test.go   # Rate limit + security middleware tests
@@ -131,8 +134,10 @@ F:\GITHUB\raevtar\
 │       │   ├── project_changelog.templ  # Full changelog page
 │       │   ├── contact.templ            # Contact page
 │       │   ├── lab.templ                # Lab landing
-│       │   ├── docs.templ               # Documentation hub
-│       │   ├── dashboard.templ          # Server monitoring dashboard
+│   │   ├── docs.templ               # Documentation hub
+│   │   ├── api_docs.go              # API docs JSON response examples
+│   │   ├── api_docs.templ           # API reference page (/docs/api)
+│   │   ├── dashboard.templ          # Server monitoring dashboard
 │       │   ├── server_detail.templ      # Server detail view
 │       │   ├── server_detail_charts.templ   # Charts partial
 │       │   ├── server_detail_extras.templ   # Extras partial
@@ -173,7 +178,6 @@ F:\GITHUB\raevtar\
 │   ├── agent/
 │   │   └── raevtar-agent.sh             # Monitoring agent script
 │   ├── favicon.svg                      # Site favicon
-│   ├── robots.txt                       # Robots exclusion
 │   └── openapi.json                     # API specification
 ├── cron/
 │   ├── agent-ping.sh                    # Cron-based agent ping
@@ -200,7 +204,8 @@ F:\GITHUB\raevtar\
 ├── go.sum                               # Go dependency checksums
 ├── package.json                         # Node deps (Tailwind CLI)
 ├── tailwind.config.js                   # Tailwind CSS configuration
-├── raevtar.service                      # Systemd service file
+├── raevtar.service                      # Systemd service file (generated from template)
+├── raevtar.service.tmpl                 # Systemd service template with placeholders
 ├── AGENTS.md                            # Instructions for AI agents
 └── README.md                            # Project README
 ```
@@ -211,12 +216,12 @@ F:\GITHUB\raevtar\
 |------|-------|---------|
 | `handler/admin.go` | 1255 | Admin panel handlers (largest file) |
 | `handler/handlers.go` | 692 | Public page handlers |
-| `handler/api.go` | 657 | API v1 JSON handlers |
+| `handler/api.go` | 833 | API v1 JSON handlers |
 | `service/project.go` | 625 | Project business logic |
 | `service/editorial_inbox.go` | 506 | Editorial inbox logic |
 | `service/blog.go` | 444 | Blog business logic |
 | `repo/db.go` | 411 | DB init, migration, repo aggregate |
-| `view/pages/data.go` | 612 | Page data structs |
+| `view/pages/data.go` | 620 | Page data structs |
 | `view/admin/data.go` | 722 | Admin data structs |
 
 ## Related Areas

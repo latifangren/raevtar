@@ -681,8 +681,18 @@ if command -v apk >/dev/null 2>&1; then
 	OS="alpine (apk)"; PKG_INSTALL="apk add --no-cache"
 elif command -v apt-get >/dev/null 2>&1; then
 	OS="debian/ubuntu (apt)"; PKG_INSTALL="apt-get install -y"
+elif command -v dnf >/dev/null 2>&1; then
+	OS="fedora/rhel (dnf)"; PKG_INSTALL="dnf install -y"
+elif command -v yum >/dev/null 2>&1; then
+	OS="centos/rhel (yum)"; PKG_INSTALL="yum install -y"
+elif command -v pacman >/dev/null 2>&1; then
+	OS="arch (pacman)"; PKG_INSTALL="pacman -S --noconfirm"
+elif command -v brew >/dev/null 2>&1; then
+	OS="macos (homebrew)"; PKG_INSTALL="brew install"
 elif command -v opkg >/dev/null 2>&1; then
 	OS="openwrt (opkg)"; PKG_INSTALL="opkg install"
+elif command -v zypper >/dev/null 2>&1; then
+	OS="suse (zypper)"; PKG_INSTALL="zypper install -y"
 else
 	echo "[!] Unknown package manager. Dependencies may be missing."
 	echo "    Install curl manually and re-run this script."
@@ -718,7 +728,7 @@ echo ""
 
 # Step 3: Install agent script
 echo "[3/5] Installing agent script..."
-AGENT_DIR="/usr/local/bin"
+AGENT_DIR="` + h.cfg.AgentDir + `"
 AGENT_PATH="${AGENT_DIR}/raevtar-agent.sh"
 mkdir -p "${AGENT_DIR}"
 if curl -fsSL -o "${AGENT_PATH}" "${RAEVTAR_URL}/static/agent/raevtar-agent.sh"; then

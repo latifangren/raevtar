@@ -4,8 +4,10 @@ import (
 	"fmt"
 	"log/slog"
 	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
+	"time"
 )
 
 type Config struct {
@@ -19,9 +21,26 @@ type Config struct {
 	MediaDir          string
 	IsProduction      bool // production mode — stricter checks
 	TrustedProxyCIDRs []string
+	StaticDir         string // absolute path to static/ directory
+	AgentDir          string // agent install dir, default "/usr/local/bin"
+
+	// Hardening / rate limits
+	RateLimitRequests   int           // max requests per window (default 60)
+	RateLimitWindow     time.Duration // window duration (default 1m)
+	ReadTimeout         time.Duration // HTTP read timeout (default 10s)
+	WriteTimeout        time.Duration // HTTP write timeout (default 30s)
+	IdleTimeout         time.Duration // HTTP idle timeout (default 60s)
+	ShutdownTimeout     time.Duration // graceful shutdown timeout (default 15s)
+	MaxUploadMB         int           // max upload size in MB (default 6)
+	LoginFailureLimit   int           // max login failures per user/IP combo (default 5)
+	LoginIPFailureLimit int           // max login failures per IP (default 20)
 }
 
 func Load() *Config {
+	// Compute StaticDir from binary location so it's not CWD-dependent
+	execPath, _ := os.Executable()
+	staticDir := filepath.Join(filepath.Dir(execPath), "static")
+
 	cfg := &Config{
 		Addr:              getEnv("RAEVTAR_ADDR", ":8080"),
 		DatabasePath:      getEnv("RAEVTAR_DB", expandHome("~/.raevtar/data.db")),
@@ -33,6 +52,19 @@ func Load() *Config {
 		MediaDir:          getEnv("RAEVTAR_MEDIA_DIR", expandHome("~/.raevtar/uploads")),
 		IsProduction:      os.Getenv("RAEVTAR_ENV") == "production",
 		TrustedProxyCIDRs: parseCSV(os.Getenv("RAEVTAR_TRUSTED_PROXY_CIDRS")),
+		StaticDir:         getEnv("RAEVTAR_STATIC_DIR", staticDir),
+		AgentDir:          getEnv("RAEVTAR_AGENT_DIR", "/usr/local/bin"),
+
+		// Hardening / rate limits
+		RateLimitRequests:   getEnvInt("RAEVTAR_RATE_LIMIT_REQUESTS", 60),
+		RateLimitWindow:     getEnvDuration("RAEVTAR_RATE_LIMIT_WINDOW", 60*time.Second),
+		ReadTimeout:         getEnvDuration("RAEVTAR_READ_TIMEOUT", 10*time.Second),
+		WriteTimeout:        getEnvDuration("RAEVTAR_WRITE_TIMEOUT", 30*time.Second),
+		IdleTimeout:         getEnvDuration("RAEVTAR_IDLE_TIMEOUT", 60*time.Second),
+		ShutdownTimeout:     getEnvDuration("RAEVTAR_SHUTDOWN_TIMEOUT", 15*time.Second),
+		MaxUploadMB:         getEnvInt("RAEVTAR_MAX_UPLOAD_MB", 6),
+		LoginFailureLimit:   getEnvInt("RAEVTAR_LOGIN_FAILURE_LIMIT", 5),
+		LoginIPFailureLimit: getEnvInt("RAEVTAR_LOGIN_IP_FAILURE_LIMIT", 20),
 	}
 
 	if cfg.AdminKey == "" {
@@ -110,6 +142,15 @@ func getEnvInt(key string, fallback int) int {
 	if v := os.Getenv(key); v != "" {
 		if i, err := strconv.Atoi(v); err == nil {
 			return i
+		}
+	}
+	return fallback
+}
+
+func getEnvDuration(key string, fallback time.Duration) time.Duration {
+	if v := os.Getenv(key); v != "" {
+		if d, err := time.ParseDuration(v); err == nil {
+			return d
 		}
 	}
 	return fallback

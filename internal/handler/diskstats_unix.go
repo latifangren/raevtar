@@ -4,13 +4,25 @@ package handler
 
 import (
 	"math"
+	"os"
 	"syscall"
 )
+
+// DiskRootPath is the filesystem path to check for disk stats.
+// Override via RAEVTAR_DISK_ROOT env var.
+var DiskRootPath string
+
+func init() {
+	DiskRootPath = os.Getenv("RAEVTAR_DISK_ROOT")
+	if DiskRootPath == "" {
+		DiskRootPath = "/"
+	}
+}
 
 func collectDiskStats() DiskStats {
 	var s DiskStats
 	var stat syscall.Statfs_t
-	if err := syscall.Statfs("/", &stat); err != nil {
+	if err := syscall.Statfs(DiskRootPath, &stat); err != nil {
 		return s
 	}
 	totalKB := stat.Blocks * uint64(stat.Bsize) / 1024

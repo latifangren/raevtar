@@ -48,8 +48,19 @@ var limiter = &rateLimiter{
 
 var trustedProxyNets []*net.IPNet
 
-const maxRequests = 60 // max requests per window
-const windowDuration = 1 * time.Minute
+var maxRequests = 60                 // max requests per window — set via initRateLimiter
+var windowDuration = 1 * time.Minute // window duration — set via initRateLimiter
+
+// initRateLimiter configures the rate limiter from the application config.
+// Called once at startup from handler.New().
+func initRateLimiter(cfg *config.Config) {
+	if cfg.RateLimitRequests > 0 {
+		maxRequests = cfg.RateLimitRequests
+	}
+	if cfg.RateLimitWindow > 0 {
+		windowDuration = cfg.RateLimitWindow
+	}
+}
 
 // RateLimit is a middleware that limits requests per IP.
 // Returns 429 Too Many Requests if exceeded.

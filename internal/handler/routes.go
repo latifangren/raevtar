@@ -18,16 +18,18 @@ type Handler struct {
 func New(svc *service.Service, cfg *config.Config) http.Handler {
 	h := &Handler{svc: svc, cfg: cfg}
 	configureTrustedProxies(cfg)
+	initRateLimiter(cfg)
+	initHardening(cfg)
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(RateLimit)
 
-	// static files
-	fs := http.FileServer(http.Dir("./static"))
+	// static files (resolve relative to binary, not CWD)
+	fs := http.FileServer(http.Dir(h.cfg.StaticDir))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
-	r.Get("/robots.txt", h.serveStatic("robots.txt"))
+	r.Get("/robots.txt", h.robotsTxt)
 	r.Get("/favicon.svg", h.serveStatic("favicon.svg"))
 	r.Get("/llms.txt", h.llmsTxt)
 	r.Get("/sitemap.xml", h.sitemapXML)

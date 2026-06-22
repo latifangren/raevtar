@@ -2,7 +2,7 @@
 #
 # raevtar-agent.sh — Monitoring agent for Raevtar
 # Collects system metrics and reports to Raevtar server.
-# Also polls for pending remote commands.
+# Supports Linux (full) and macOS (via sysctl/top).
 #
 # Usage:
 #   RAEVTAR_URL=https://raevtar.tech RAEVTAR_SERVER_ID=1 RAEVTAR_AGENT_TOKEN=abc123 ./raevtar-agent.sh
@@ -34,27 +34,49 @@ if [ -z "${TOKEN}" ]; then
 	exit 1
 fi
 
+# --- Detect OS ---
+detect_os() {
+	case "$(uname -s)" in
+		Linux*)  echo "linux"  ;;
+		Darwin*) echo "darwin" ;;
+		*)       echo "unknown" ;;
+	esac
+}
+
+OS="$(detect_os)"
 info "Raevtar Agent starting"
 detail "Server ID : ${SERVER_ID}"
 detail "Server URL: ${RAEVTAR_URL}"
+detail "OS        : ${OS}"
 detail ""
 
 # --- CPU percent ---
 cpu_percent() {
-	if [ ! -r /proc/stat ]; then
-		warn "/proc/stat not found — skipping CPU"
-		echo "0.0"
-		return
-	fi
-	read _ user nice system idle iowait irq softirq steal _ < /proc/stat
-	idle_all=$((idle + iowait))
-	non_idle=$((user + nice + system + irq + softirq + steal))
-	total=$((idle_all + non_idle))
-	if [ "${total}" -le 0 ]; then
-		echo "0.0"
-		return
-	fi
-	awk "BEGIN { printf \"%.1f\", (${non_idle} / ${total}) * 100 }"
+	case "${OS}" in
+		linux)
+			if [ ! -r /proc/stat ]; then
+				warn "/proc/stat not found — skipping CPU"
+				echo "0.0"
+				return
+			fi
+			read _ user nice system idle iowait irq softirq steal _ < /proc/stat
+			idle_all=$((idle + iowait))
+			non_idle=$((user + nice + system + irq + softirq + steal))
+			total=$((idle_all + non_idle))
+			if [ "${total}" -le 0 ]; then
+				echo "0.0"
+				return
+			fi
+			awk "BEGIN { printf \"%.1f\", (${non_idle} / ${total}) * 100 }"
+			;;
+		darwin)
+			# Get CPU usage from top sampling (macOS doesn't expose /proc/stat)
+			top -l 2 -n 0 2>/dev/null | awk '/CPU usage/ { if (n++ == 0) next; print $3 }' | tr -d '%' || echo "0.0"
+			;;
+		*)
+			echo "0.0"
+			;;
+	esac
 }
 
 CPU="$(cpu_percent)"
@@ -63,11 +85,21 @@ detail ""
 
 # --- CPU load ---
 cpu_load_values() {
-	if [ ! -r /proc/loadavg ]; then
-		echo "0 0 0"
-		return
-	fi
-	awk '{ printf "%.2f %.2f %.2f", $1, $2, $3 }' /proc/loadavg
+	case "${OS}" in
+		linux)
+			if [ ! -r /proc/loadavg ]; then
+				echo "0 0 0"
+				return
+			fi
+			awk '{ printf "%.2f %.2f %.2f", $1, $2, $3 }' /proc/loadavg
+			;;
+		darwin)
+			sysctl -n vm.loadavg 2>/dev/null | awk '{ printf "%.2f %.2f %.2f", $1, $2, $3 }' || echo "0 0 0"
+			;;
+		*)
+			echo "0 0 0"
+			;;
+	esac
 }
 
 set -- $(cpu_load_values)
@@ -79,14 +111,24 @@ detail ""
 
 # --- CPU cores ---
 cpu_cores() {
-	cores="$(getconf _NPROCESSORS_ONLN 2>/dev/null || true)"
-	case "${cores}" in
-		''|*[!0-9]*) cores=0 ;;
+	case "${OS}" in
+		linux)
+			cores="$(getconf _NPROCESSORS_ONLN 2>/dev/null || true)"
+			case "${cores}" in
+				''|*[!0-9]*) cores=0 ;;
+			esac
+			if [ "${cores}" -eq 0 ] && [ -r /proc/cpuinfo ]; then
+				cores="$(awk '/^processor[[:space:]]*:/ { count++ } END { print count + 0 }' /proc/cpuinfo)"
+			fi
+			echo "${cores}"
+			;;
+		darwin)
+			sysctl -n hw.ncpu 2>/dev/null || echo "0"
+			;;
+		*)
+			getconf _NPROCESSORS_ONLN 2>/dev/null || echo "0"
+			;;
 	esac
-	if [ "${cores}" -eq 0 ] && [ -r /proc/cpuinfo ]; then
-		cores="$(awk '/^processor[[:space:]]*:/ { count++ } END { print count + 0 }' /proc/cpuinfo)"
-	fi
-	echo "${cores}"
 }
 
 CPU_CORES="$(cpu_cores)"
@@ -95,19 +137,39 @@ detail ""
 
 # --- RAM ---
 ram_values() {
-	if [ ! -r /proc/meminfo ]; then
-		echo "0 0"
-		return
-	fi
-	awk '
-		/^MemTotal:/ { total=$2 }
-		/^MemAvailable:/ { available=$2 }
-		END {
-			if (total == "") total = 0
-			if (available == "") available = total
-			printf "%d %d", (total - available) / 1024, total / 1024
-		}
-	' /proc/meminfo
+	case "${OS}" in
+		linux)
+			if [ ! -r /proc/meminfo ]; then
+				echo "0 0"
+				return
+			fi
+			awk '
+				/^MemTotal:/ { total=$2 }
+				/^MemAvailable:/ { available=$2 }
+				END {
+					if (total == "") total = 0
+					if (available == "") available = total
+					printf "%d %d", (total - available) / 1024, total / 1024
+				}
+			' /proc/meminfo
+			;;
+		darwin)
+			# macOS: hw.memsize in bytes, vm_stat pages in bytes
+			total_bytes=$(sysctl -n hw.memsize 2>/dev/null || echo "0")
+			page_size=$(sysctl -n hw.pagesize 2>/dev/null || echo "4096")
+			# Get free + inactive + speculative from vm_stat (in pages)
+			vm_free=$(vm_stat 2>/dev/null | awk '/Pages free/ { gsub(/\./,"",$NF); print $NF }' || echo "0")
+			vm_inactive=$(vm_stat 2>/dev/null | awk '/Pages inactive/ { gsub(/\./,"",$NF); print $NF }' || echo "0")
+			vm_active=$(vm_stat 2>/dev/null | awk '/Pages active/ { gsub(/\./,"",$NF); print $NF }' || echo "0")
+			total_mb=$((total_bytes / 1048576))
+			available_mb=$(( (vm_free + vm_inactive) * page_size / 1048576 ))
+			used_mb=$((vm_active * page_size / 1048576))
+			echo "${used_mb} ${total_mb}"
+			;;
+		*)
+			echo "0 0"
+			;;
+	esac
 }
 
 set -- $(ram_values)
@@ -122,7 +184,17 @@ detail ""
 
 # --- Disk ---
 disk_values() {
-	df -Pk / 2>/dev/null | awk 'NR==2 { printf "%.2f %.2f", $(NF - 3) / 1048576, $(NF - 4) / 1048576 }' || echo "0 0"
+	case "${OS}" in
+		linux)
+			df -Pk / 2>/dev/null | awk 'NR==2 { printf "%.2f %.2f", $(NF - 3) / 1048576, $(NF - 4) / 1048576 }' || echo "0 0"
+			;;
+		darwin)
+			df -Pk / 2>/dev/null | awk 'NR==2 { printf "%.2f %.2f", $(NF - 3) / 1048576, $(NF - 4) / 1048576 }' || echo "0 0"
+			;;
+		*)
+			echo "0 0"
+			;;
+	esac
 }
 
 set -- $(disk_values)
@@ -133,16 +205,27 @@ detail ""
 
 # --- Temperature ---
 temperature_values() {
-	for zone in /sys/class/thermal/thermal_zone*/temp; do
-		if [ -r "${zone}" ]; then
-			temperature="$(awk '/^-?[0-9]+([.][0-9]+)?$/ { printf "%.2f", $1 / 1000 }' "${zone}")"
-			if [ -n "${temperature}" ]; then
-				echo "${temperature} true"
-				return
-			fi
-		fi
-	done
-	echo "0 false"
+	case "${OS}" in
+		linux)
+			for zone in /sys/class/thermal/thermal_zone*/temp; do
+				if [ -r "${zone}" ]; then
+					temperature="$(awk '/^-?[0-9]+([.][0-9]+)?$/ { printf "%.2f", $1 / 1000 }' "${zone}")"
+					if [ -n "${temperature}" ]; then
+						echo "${temperature} true"
+						return
+					fi
+				fi
+			done
+			echo "0 false"
+			;;
+		darwin)
+			# macOS: no standard thermal zone; try powermetrics (needs sudo, skip)
+			echo "0 false"
+			;;
+		*)
+			echo "0 false"
+			;;
+	esac
 }
 
 set -- $(temperature_values)
@@ -157,7 +240,24 @@ detail ""
 
 # --- Uptime ---
 uptime_seconds() {
-	awk '{ print int($1) }' /proc/uptime 2>/dev/null || echo "0"
+	case "${OS}" in
+		linux)
+			awk '{ print int($1) }' /proc/uptime 2>/dev/null || echo "0"
+			;;
+		darwin)
+			# macOS: kern.boottime is seconds since epoch
+			boot_sec=$(sysctl -n kern.boottime 2>/dev/null | awk '{ print $4 }' | tr -d ',')
+			now=$(date +%s)
+			if [ -n "${boot_sec}" ] && [ "${boot_sec}" -gt 0 ] 2>/dev/null; then
+				echo $((now - boot_sec))
+			else
+				echo "0"
+			fi
+			;;
+		*)
+			echo "0"
+			;;
+	esac
 }
 
 UPTIME="$(uptime_seconds)"
