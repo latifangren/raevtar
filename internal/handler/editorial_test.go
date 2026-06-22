@@ -524,3 +524,24 @@ func TestAPICompleteEditorialInboxClaim(t *testing.T) {
 		t.Fatalf("published_post_id = %v, want %d", completedItem.PublishedPostID, post.ID)
 	}
 }
+
+// ---------- API list editorial inbox ----------
+
+func TestAPIListEditorialInbox(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/editorial-inbox", nil)
+	req.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var items []model.EditorialInboxItem
+	if err := json.NewDecoder(rr.Body).Decode(&items); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+}

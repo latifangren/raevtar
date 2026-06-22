@@ -663,3 +663,410 @@ func TestAdminCreateProjectUpdateRequiresCSRF(t *testing.T) {
 		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusForbidden, rr.Body.String())
 	}
 }
+
+// =============================================================================
+// Topic/User/Category form tests
+// =============================================================================
+
+func TestAdminUpdateTopicForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	cats, err := app.svc.Blog.ListCategories()
+	if err != nil {
+		t.Fatalf("list categories: %v", err)
+	}
+	var catID int64
+	for _, c := range cats {
+		if c.Slug == "devops" {
+			catID = c.ID
+			break
+		}
+	}
+	if catID == 0 {
+		t.Fatalf("seed category not found")
+	}
+
+	// Keep slug unchanged — the seed category has posts so slug cannot change.
+	form := url.Values{
+		"_csrf":       {csrf},
+		"name":        {"DevOps Updated"},
+		"slug":        {"devops"},
+		"description": {"Updated description"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/topics/update/"+strconv.FormatInt(catID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/topics" {
+		t.Fatalf("Location = %q, want /admin/topics", got)
+	}
+
+	cat, _, err := app.svc.Blog.GetCategoryByID(catID)
+	if err != nil {
+		t.Fatalf("get category: %v", err)
+	}
+	if cat.Name != "DevOps Updated" {
+		t.Fatalf("category name = %q, want %q", cat.Name, "DevOps Updated")
+	}
+	if cat.Slug != "devops" {
+		t.Fatalf("category slug = %q, want %q", cat.Slug, "devops")
+	}
+}
+
+func TestAdminDeleteTopicForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	cat, err := app.svc.Blog.CreateCategory(model.Category{
+		Slug:        "delete-me",
+		Name:        "Delete Me",
+		Description: "Will be deleted.",
+	})
+	if err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+
+	form := url.Values{"_csrf": {csrf}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/topics/delete/"+strconv.FormatInt(cat.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/topics" {
+		t.Fatalf("Location = %q, want /admin/topics", got)
+	}
+
+	_, _, err = app.svc.Blog.GetCategoryByID(cat.ID)
+	if err == nil {
+		t.Fatalf("category should have been deleted")
+	}
+}
+
+// =============================================================================
+// Post deletion and intent tests
+// =============================================================================
+
+func TestAdminDeletePostForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	posts, _, err := app.svc.Blog.ListAllPosts(1, 9999)
+	if err != nil {
+		t.Fatalf("list posts: %v", err)
+	}
+	var postID int64
+	for _, p := range posts {
+		if p.Title == "Hello Raevtar" {
+			postID = p.ID
+			break
+		}
+	}
+	if postID == 0 {
+		t.Fatalf("seed post not found")
+	}
+
+	form := url.Values{"_csrf": {csrf}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/delete/"+strconv.FormatInt(postID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/posts" {
+		t.Fatalf("Location = %q, want /admin/posts", got)
+	}
+
+	_, err = app.svc.Blog.GetPostByID(postID)
+	if err == nil {
+		t.Fatalf("post should have been deleted")
+	}
+}
+
+func TestAdminUpdatePostFormWithPublishIntent(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	// Create a draft post first
+	draftPost, err := app.svc.Blog.CreatePost(model.PostCreate{
+		Title:        "Draft To Publish",
+		ContentMD:    "# Draft\n\nContent to be published.",
+		Excerpt:      "Draft post for publish intent test.",
+		CategorySlug: "devops",
+		Published:    false,
+	})
+	if err != nil {
+		t.Fatalf("create draft post: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":         {csrf},
+		"title":         {"Draft To Publish"},
+		"category_slug": {"devops"},
+		"content":       {"# Draft\n\nUpdated content."},
+		"excerpt":       {"Updated via publish intent."},
+		"intent":        {"publish"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(draftPost.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/posts" {
+		t.Fatalf("Location = %q, want /admin/posts", got)
+	}
+
+	updated, err := app.svc.Blog.GetPostByID(draftPost.ID)
+	if err != nil {
+		t.Fatalf("get post: %v", err)
+	}
+	if !updated.Published {
+		t.Fatalf("post should be published after publish intent")
+	}
+	if updated.Title != "Draft To Publish" {
+		t.Fatalf("post title = %q, want %q", updated.Title, "Draft To Publish")
+	}
+}
+
+func TestAdminUpdatePostFormWithDraftIntent(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	// The seed post "Hello Raevtar" is published = true
+	posts, _, err := app.svc.Blog.ListAllPosts(1, 9999)
+	if err != nil {
+		t.Fatalf("list posts: %v", err)
+	}
+	var postID int64
+	for _, p := range posts {
+		if p.Title == "Hello Raevtar" {
+			postID = p.ID
+			break
+		}
+	}
+	if postID == 0 {
+		t.Fatalf("seed post not found")
+	}
+
+	form := url.Values{
+		"_csrf":         {csrf},
+		"title":         {"Hello Raevtar"},
+		"category_slug": {"devops"},
+		"content":       {"# Hello Raevtar\n\nUnpublished via draft intent."},
+		"excerpt":       {"Unpublished via draft intent."},
+		"intent":        {"draft"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(postID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/posts" {
+		t.Fatalf("Location = %q, want /admin/posts", got)
+	}
+
+	updated, err := app.svc.Blog.GetPostByID(postID)
+	if err != nil {
+		t.Fatalf("get post: %v", err)
+	}
+	if updated.Published {
+		t.Fatalf("post should be unpublished after draft intent")
+	}
+}
+
+func TestAdminUpdatePostFormWithInvalidIntent(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	// The seed post "Hello Raevtar" is published = true.
+	// An invalid intent should preserve the current published state.
+	posts, _, err := app.svc.Blog.ListAllPosts(1, 9999)
+	if err != nil {
+		t.Fatalf("list posts: %v", err)
+	}
+	var postID int64
+	for _, p := range posts {
+		if p.Title == "Hello Raevtar" {
+			postID = p.ID
+			break
+		}
+	}
+	if postID == 0 {
+		t.Fatalf("seed post not found")
+	}
+
+	form := url.Values{
+		"_csrf":         {csrf},
+		"title":         {"Hello Raevtar"},
+		"category_slug": {"devops"},
+		"content":       {"# Hello Raevtar\n\nInvalid intent preserves publish state."},
+		"excerpt":       {"Invalid intent test."},
+		"intent":        {"invalid-intent-value"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/update/"+strconv.FormatInt(postID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	// Invalid intent does not produce an error — it preserves current published state.
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/posts" {
+		t.Fatalf("Location = %q, want /admin/posts", got)
+	}
+
+	updated, err := app.svc.Blog.GetPostByID(postID)
+	if err != nil {
+		t.Fatalf("get post: %v", err)
+	}
+	if !updated.Published {
+		t.Fatalf("post should remain published after invalid intent")
+	}
+}
+
+// =============================================================================
+// Server form tests
+// =============================================================================
+
+func TestAdminCreateServerForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	form := url.Values{
+		"_csrf": {csrf},
+		"name":  {"test-server"},
+		"host":  {"192.168.1.100"},
+		"port":  {"9090"},
+		"tags":  {"testing,monitoring"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/servers" {
+		t.Fatalf("Location = %q, want /admin/servers", got)
+	}
+
+	servers, err := app.svc.Monitor.ListServers()
+	if err != nil {
+		t.Fatalf("list servers: %v", err)
+	}
+	var found bool
+	for _, s := range servers {
+		if s.Name == "test-server" && s.Host == "192.168.1.100" && s.Port == 9090 {
+			found = true
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("created server not found in listing")
+	}
+}
+
+func TestAdminDeleteServerForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	server, err := app.svc.Monitor.CreateServer("to-delete", "10.0.0.1", 8080, "delete-me")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	form := url.Values{"_csrf": {csrf}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers/delete/"+strconv.FormatInt(server.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/servers" {
+		t.Fatalf("Location = %q, want /admin/servers", got)
+	}
+
+	_, err = app.svc.Monitor.GetServer(server.ID)
+	if err == nil {
+		t.Fatalf("server should have been deleted")
+	}
+}
+
+// =============================================================================
+// Preview tests
+// =============================================================================
+
+func TestAdminPreviewPost(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	form := url.Values{
+		"_csrf":   {csrf},
+		"content": {"# Post Preview\n\n- **bold**\n- _italic_"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	body := rr.Body.String()
+	assertContains(t, body, "<h1>Post Preview</h1>")
+	assertContains(t, body, "<strong>bold</strong>")
+	assertContains(t, body, "<em>italic</em>")
+
+	// Blank content should return empty preview message
+	form.Set("content", "   ")
+	req = httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr = httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("blank preview status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	assertContains(t, rr.Body.String(), "Write Markdown, then preview without saving.")
+}
+
+func TestAdminPreviewPostWithContentMD(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	// adminPreviewPost tries content first, then content_md.
+	form := url.Values{
+		"_csrf":      {csrf},
+		"content_md": {"# Fallback Preview\n\nContent from content_md field."},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts/preview", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	body := rr.Body.String()
+	assertContains(t, body, "<h1>Fallback Preview</h1>")
+	assertContains(t, body, "Content from content_md field.")
+}

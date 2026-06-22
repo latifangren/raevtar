@@ -723,6 +723,73 @@ func TestAPIUpdateProject(t *testing.T) {
 
 // ---------- standalone record metrics ----------
 
+// ---------- project relation error paths ----------
+
+func TestAPICreateProjectRelation_ErrorPaths(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	// invalid projectID (non-numeric)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/projects/abc/relations", strings.NewReader(`{"target_type":"post","target_id":1,"relation_kind":"related"}`))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("invalid projectID status = %d, want %d; body: %s", rr.Code, http.StatusBadRequest, rr.Body.String())
+	}
+	var payload map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&payload); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if payload["error"] != "invalid id" {
+		t.Fatalf("error = %q, want %q", payload["error"], "invalid id")
+	}
+
+	// invalid JSON body
+	proj, err := app.svc.Projects.GetPublishedProject("whyred-watchtower")
+	if err != nil {
+		t.Fatalf("get project: %v", err)
+	}
+	req2 := httptest.NewRequest(http.MethodPost, "/api/v1/projects/"+strconv.FormatInt(proj.ID, 10)+"/relations", strings.NewReader(`{invalid`))
+	req2.Header.Set("Authorization", "Bearer admin-key")
+	req2.Header.Set("Content-Type", "application/json")
+	testRequestCounter++
+	req2.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr2 := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr2, req2)
+	if rr2.Code != http.StatusBadRequest {
+		t.Fatalf("invalid JSON status = %d, want %d; body: %s", rr2.Code, http.StatusBadRequest, rr2.Body.String())
+	}
+	var payload2 map[string]string
+	if err := json.NewDecoder(rr2.Body).Decode(&payload2); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if payload2["error"] != "invalid JSON" {
+		t.Fatalf("error = %q, want %q", payload2["error"], "invalid JSON")
+	}
+}
+
+func TestAPIDeleteProjectRelation_NotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	// Service treats non-existent relation as no-op success → returns 200.
+	req := httptest.NewRequest(http.MethodDelete, "/api/v1/projects/relations/99999", nil)
+	req.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	assertContains(t, rr.Body.String(), `"status":"ok"`)
+}
+
+// ---------- standalone record metrics ----------
+
 func TestAPIRecordMetrics(t *testing.T) {
 	app := newPublicTestApp(t)
 

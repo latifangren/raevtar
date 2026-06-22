@@ -370,3 +370,84 @@ func TestMonitorServicePingServer(t *testing.T) {
 		t.Fatalf("ping metric online = false, want true")
 	}
 }
+
+// -- GetRecentMetricsWithLimit -----------------------------------------------
+
+func TestMonitorServiceGetRecentMetricsWithLimit(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("limit-test", "10.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	for i := 0; i < 3; i++ {
+		err = state.svc.Monitor.RecordMetrics(server.ID, model.ServerMetric{
+			CPUPercent:    float64(10 * (i + 1)),
+			RAMUsedMB:     512,
+			RAMTotalMB:    2048,
+			DiskUsedGB:    25.0,
+			UptimeSeconds: 3600,
+			Online:        true,
+		})
+		if err != nil {
+			t.Fatalf("RecordMetrics %d: %v", i, err)
+		}
+	}
+
+	// With limit=1, should return only 1 (the most recent)
+	limited, err := state.svc.Monitor.GetRecentMetrics(server.ID, 1)
+	if err != nil {
+		t.Fatalf("GetRecentMetrics limit 1: %v", err)
+	}
+	if len(limited) != 1 {
+		t.Fatalf("limited metrics len = %d, want 1", len(limited))
+	}
+
+	// With limit <= 0 (default), should return up to 20
+	defaulted, err := state.svc.Monitor.GetRecentMetrics(server.ID, 0)
+	if err != nil {
+		t.Fatalf("GetRecentMetrics default limit: %v", err)
+	}
+	if len(defaulted) != 3 {
+		t.Fatalf("default limited metrics len = %d, want 3", len(defaulted))
+	}
+}
+
+// -- RotateAgentToken --------------------------------------------------------
+
+func TestMonitorServiceRotateAgentToken(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("rotate-srv", "10.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	// Rotate and verify new token
+	token, err := state.svc.Monitor.RotateAgentToken(server.ID)
+	if err != nil {
+		t.Fatalf("RotateAgentToken: %v", err)
+	}
+	if token == "" {
+		t.Fatalf("expected non-empty token")
+	}
+	if !state.svc.Monitor.VerifyAgentToken(server.ID, token) {
+		t.Fatalf("newly rotated token should verify")
+	}
+}
+
+// -- VerifyAgentTokenNotFound ------------------------------------------------
+
+func TestMonitorServiceVerifyAgentTokenNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	if state.svc.Monitor.VerifyAgentToken(99999, "some-random-token") {
+		t.Fatalf("expected false for non-existent server")
+	}
+
+	// Empty token should also return false
+	if state.svc.Monitor.VerifyAgentToken(99999, "") {
+		t.Fatalf("expected false for empty token on non-existent server")
+	}
+}

@@ -6,6 +6,9 @@ import (
 	"path/filepath"
 	"strings"
 	"testing"
+
+	"raevtar/internal/config"
+	"raevtar/internal/repo"
 )
 
 func TestMediaServiceUploadAndGetAsset(t *testing.T) {
@@ -207,3 +210,68 @@ func TestMediaServiceUploadEmptyInput(t *testing.T) {
 	}
 }
 
+func TestMediaUploadWithInvalidMIME(t *testing.T) {
+	state := newTestServices(t)
+
+	// PNG extension but text content — passes ext check, fails MIME check
+	_, err := state.svc.Media.Upload(MediaUpload{
+		OriginalName: "test.png",
+		Reader:       bytes.NewReader([]byte("this is not an image file")),
+	})
+	if err == nil {
+		t.Fatalf("expected error for invalid MIME content")
+	}
+	if !strings.Contains(err.Error(), "unsupported image content") {
+		t.Fatalf("err = %v, want 'unsupported image content'", err)
+	}
+}
+
+func TestMediaUploadEmptyFile(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Media.Upload(MediaUpload{
+		OriginalName: "test.png",
+		Reader:       bytes.NewReader([]byte{}),
+	})
+	if err == nil {
+		t.Fatalf("expected error for empty file")
+	}
+	if !strings.Contains(err.Error(), "empty file") {
+		t.Fatalf("err = %v, want 'empty file'", err)
+	}
+}
+
+func TestNewMediaServiceEmptyDir(t *testing.T) {
+	cfg := &config.Config{
+		DatabasePath: filepath.Join(t.TempDir(), "raevtar_test.db"),
+		Domain:       "raevtar.test",
+		AdminUser:    "admin",
+		MediaDir:     filepath.Join(t.TempDir(), "uploads"),
+	}
+	db := repo.InitSQLite(cfg.DatabasePath)
+	t.Cleanup(func() { _ = db.Close() })
+	repo.AutoMigrate(db)
+
+	// Call NewMediaService directly with empty dir to exercise default branch
+	svc := NewMediaService(repo.New(db), "")
+	if svc == nil {
+		t.Fatalf("NewMediaService with empty dir returned nil")
+	}
+}
+
+func TestMediaServiceFilePathInvalidName(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Media.FilePath("../evil-path")
+	if err == nil {
+		t.Fatalf("expected error for path-traversal name")
+	}
+	if !strings.Contains(err.Error(), "invalid media path") {
+		t.Fatalf("err = %v, want 'invalid media path'", err)
+	}
+
+	_, err = state.svc.Media.FilePath("")
+	if err == nil {
+		t.Fatalf("expected error for empty name")
+	}
+}

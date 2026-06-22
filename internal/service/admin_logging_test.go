@@ -363,7 +363,6 @@ func TestAdminServiceDeleteServerNotFound(t *testing.T) {
 	}
 }
 
-
 // ── LogPostUpdated ──────────────────────────────────────────────────────────
 
 func TestAdminServiceLogPostUpdated(t *testing.T) {
@@ -701,8 +700,41 @@ func TestAdminServiceLogEditorialInboxDeleted(t *testing.T) {
 	}
 }
 
+// ── LogAuditWithServerContext ────────────────────────────────────────────────
 
+func TestAdminServiceLogAuditWithServerContext(t *testing.T) {
+	state := newTestServices(t)
 
+	server, err := state.svc.Monitor.CreateServer("audit-srv", "10.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
 
+	details := "rotated agent token for server id: " + strconv.FormatInt(server.ID, 10)
+	if err := state.svc.Admin.LogAudit("admin", "ROTATE_AGENT_TOKEN", details, "10.0.0.1"); err != nil {
+		t.Fatalf("LogAudit: %v", err)
+	}
 
+	// Look up via ListServerAuditLogs
+	logs, err := state.svc.Admin.ListServerAuditLogs(server.ID, 10)
+	if err != nil {
+		t.Fatalf("ListServerAuditLogs: %v", err)
+	}
 
+	var found bool
+	for _, log := range logs {
+		if log.Action == "ROTATE_AGENT_TOKEN" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "server id: "+strconv.FormatInt(server.ID, 10)) {
+				t.Fatalf("details = %q, want containing server id", log.Details)
+			}
+			if log.IP != "10.0.0.1" {
+				t.Fatalf("IP = %q, want 10.0.0.1", log.IP)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("ROTATE_AGENT_TOKEN audit entry with server context not found")
+	}
+}

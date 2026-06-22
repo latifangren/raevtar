@@ -687,3 +687,54 @@ func createEditorialInboxItemViaAPI(t *testing.T, app *publicTestApp, sourceValu
 	}
 	return &item
 }
+
+// ---------- API create server with invalid JSON ----------
+
+func TestAPICreateServerWithInvalidJSON(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers", strings.NewReader(`{invalid json`))
+	req.Header.Set("Authorization", "Bearer admin-key")
+	req.Header.Set("Content-Type", "application/json")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusBadRequest, rr.Body.String())
+	}
+	var payload map[string]string
+	if err := json.NewDecoder(rr.Body).Decode(&payload); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if payload["error"] != "invalid JSON" {
+		t.Fatalf("error = %q, want %q", payload["error"], "invalid JSON")
+	}
+}
+
+// ---------- API list posts ----------
+
+func TestAPIListPosts(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/posts", nil)
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var posts []model.Post
+	if err := json.NewDecoder(rr.Body).Decode(&posts); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if len(posts) == 0 {
+		t.Fatalf("expected at least one seeded post")
+	}
+	if posts[0].Title != "Hello Raevtar" {
+		t.Fatalf("post title = %q, want %q", posts[0].Title, "Hello Raevtar")
+	}
+}

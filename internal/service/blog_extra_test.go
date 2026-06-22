@@ -2,8 +2,8 @@
 
 import (
 	"errors"
-	"strings"
 	"strconv"
+	"strings"
 	"testing"
 
 	"raevtar/internal/model"
@@ -299,7 +299,6 @@ func TestBlogServiceRenderMarkdownEdgeCases(t *testing.T) {
 	}
 }
 
-
 // -- RecordPostView ----------------------------------------------------------
 
 func TestBlogServiceRecordPostView(t *testing.T) {
@@ -419,3 +418,115 @@ func TestBlogServiceAllPostViewCountsEmpty(t *testing.T) {
 	}
 }
 
+// -- UpdateCategory -----------------------------------------------------------
+
+func TestBlogServiceUpdateCategory(t *testing.T) {
+	state := newTestServices(t)
+
+	cat, err := callCreateCategory(t, state, model.Category{
+		Slug:        "update-test",
+		Name:        "Original Name",
+		Description: "Original description",
+	})
+	if err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+
+	updated, err := callUpdateCategory(t, state, cat.ID, model.Category{
+		Slug:        "update-test",
+		Name:        "Updated Name",
+		Description: "Updated description",
+	})
+	if err != nil {
+		t.Fatalf("UpdateCategory: %v", err)
+	}
+	if updated.ID != cat.ID {
+		t.Fatalf("updated id = %d, want %d", updated.ID, cat.ID)
+	}
+	if updated.Name != "Updated Name" {
+		t.Fatalf("updated name = %q, want Updated Name", updated.Name)
+	}
+	if updated.Description != "Updated description" {
+		t.Fatalf("updated description = %q, want Updated description", updated.Description)
+	}
+	if updated.Slug != "update-test" {
+		t.Fatalf("updated slug = %q, want update-test", updated.Slug)
+	}
+
+	// Verify via repo
+	stored, err := state.repos.Category.GetBySlug("update-test")
+	if err != nil {
+		t.Fatalf("get updated category: %v", err)
+	}
+	if stored.Name != "Updated Name" {
+		t.Fatalf("stored name = %q, want Updated Name", stored.Name)
+	}
+	if stored.Description != "Updated description" {
+		t.Fatalf("stored description = %q, want Updated description", stored.Description)
+	}
+}
+
+// -- DeleteCategoryWithPost ---------------------------------------------------
+
+func TestBlogServiceDeleteCategoryWithPost(t *testing.T) {
+	state := newTestServices(t)
+
+	cat, err := callCreateCategory(t, state, model.Category{
+		Slug: "cat-with-post",
+		Name: "Category With Post",
+	})
+	if err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+
+	post, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: cat.Slug,
+		Title:        "Post In Category",
+		ContentMD:    "# Post In Category",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post in category: %v", err)
+	}
+
+	// Delete category should fail while post exists
+	err = state.svc.Blog.DeleteCategory(cat.ID)
+	if err == nil {
+		t.Fatalf("expected DeleteCategory to fail when category has posts")
+	}
+	if !errors.Is(err, ErrCategoryInUse) {
+		t.Fatalf("err = %v, want ErrCategoryInUse", err)
+	}
+
+	// Move post to a different category (devops is seeded)
+	_, err = state.svc.Blog.UpdatePost(post.ID, model.PostUpdate{
+		CategorySlug: "devops",
+		Title:        "Post In Category",
+		ContentMD:    "# Post In Category",
+		Excerpt:      "Moved to devops",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("update post to devops category: %v", err)
+	}
+
+	// Now delete should succeed
+	if err := state.svc.Blog.DeleteCategory(cat.ID); err != nil {
+		t.Fatalf("DeleteCategory after removing post: %v", err)
+	}
+
+	// Verify post now belongs to devops
+	reloaded, err := state.svc.Blog.GetPost(post.Slug)
+	if err != nil {
+		t.Fatalf("get post after category delete: %v", err)
+	}
+	if reloaded.CategorySlug != "devops" {
+		t.Fatalf("post category_slug after delete = %q, want devops", reloaded.CategorySlug)
+	}
+
+	// Verify category is deleted
+	_, _, err = state.svc.Blog.GetCategoryByID(cat.ID)
+	if err == nil {
+		t.Fatalf("expected deleted category lookup to fail")
+	}
+}

@@ -457,3 +457,96 @@ func TestEditorialInboxServiceGetAnalytics(t *testing.T) {
 		t.Fatalf("expected by_mode analytics entries")
 	}
 }
+
+// -- DeleteInboxItemNotFound -------------------------------------------------
+
+func TestEditorialInboxDeleteInboxItemNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Editorial.DeleteInboxItem(99999)
+	if err == nil {
+		t.Fatalf("expected error for deleting non-existent inbox item")
+	}
+	if !errors.Is(err, ErrEditorialInboxNotFound) {
+		t.Fatalf("err = %v, want ErrEditorialInboxNotFound", err)
+	}
+}
+
+// -- sortReadyItems -----------------------------------------------------------
+
+func TestEditorialInboxSortReadyItems(t *testing.T) {
+	now := time.Now().UTC().Truncate(time.Minute)
+	past := now.Add(-1 * time.Hour)
+
+	// High priority item
+	high := model.EditorialInboxItem{
+		ID:        1,
+		Priority:  90,
+		NotBefore: past,
+		Status:    model.EditorialStatusApproved,
+		CreatedAt: now.Add(-30 * time.Minute),
+	}
+
+	// Low priority item
+	low := model.EditorialInboxItem{
+		ID:        2,
+		Priority:  10,
+		NotBefore: past,
+		Status:    model.EditorialStatusApproved,
+		CreatedAt: now.Add(-30 * time.Minute),
+	}
+
+	items := []model.EditorialInboxItem{low, high}
+	sortReadyItems(items, now)
+
+	if len(items) != 2 {
+		t.Fatalf("items len = %d, want 2", len(items))
+	}
+	if items[0].ID != high.ID {
+		t.Fatalf("first item id = %d (priority %d), want id %d (priority %d)",
+			items[0].ID, items[0].Priority, high.ID, high.Priority)
+	}
+	if items[1].ID != low.ID {
+		t.Fatalf("second item id = %d (priority %d), want id %d (priority %d)",
+			items[1].ID, items[1].Priority, low.ID, low.Priority)
+	}
+
+	// Test overdue items sort before non-overdue regardless of priority
+	overdue := model.EditorialInboxItem{
+		ID:        3,
+		Priority:  5,
+		NotBefore: past,
+		Deadline:  &past,
+		Status:    model.EditorialStatusApproved,
+		CreatedAt: now.Add(-30 * time.Minute),
+	}
+
+	items = []model.EditorialInboxItem{high, overdue}
+	sortReadyItems(items, now)
+
+	if items[0].ID != overdue.ID {
+		t.Fatalf("overdue item (id=%d) should sort before high priority (id=%d), first = %d",
+			overdue.ID, high.ID, items[0].ID)
+	}
+}
+
+// -- editorialRetryBackoff ---------------------------------------------------
+
+func TestEditorialRetryBackoff(t *testing.T) {
+	tests := []struct {
+		attemptCount int
+		want         time.Duration
+	}{
+		{attemptCount: 0, want: 15 * time.Minute},
+		{attemptCount: 1, want: 15 * time.Minute},
+		{attemptCount: 2, want: 1 * time.Hour},
+		{attemptCount: 5, want: 6 * time.Hour},
+	}
+
+	for _, tt := range tests {
+		got := editorialRetryBackoff(tt.attemptCount)
+		if got != tt.want {
+			t.Fatalf("editorialRetryBackoff(%d) = %v, want %v", tt.attemptCount, got, tt.want)
+		}
+	}
+}

@@ -2,6 +2,7 @@ package service
 
 import (
 	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -654,9 +655,9 @@ func TestProjectServiceUpdateProjectShowcaseNotFound(t *testing.T) {
 	state := newTestServices(t)
 
 	_, err := state.svc.Projects.UpdateProjectShowcase(9999, model.ProjectShowcaseItemUpdate{
-		Kind:      model.ProjectShowcaseKindLink,
-		Title:     "Ghost Showcase",
-		BodyMD:    "Missing",
+		Kind:   model.ProjectShowcaseKindLink,
+		Title:  "Ghost Showcase",
+		BodyMD: "Missing",
 	})
 	if err == nil {
 		t.Fatalf("expected error for updating nonexistent showcase")
@@ -717,6 +718,473 @@ func TestProjectServiceDeleteProjectShowcaseNotFound(t *testing.T) {
 }
 
 // -- DeleteProjectRelation ---------------------------------------------------
+
+// -- DeleteProject -----------------------------------------------------------
+
+func TestProjectServiceDeleteProject(t *testing.T) {
+	state := newTestServices(t)
+
+	project, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Temp Project",
+		ContentMD: "# Temp",
+		Excerpt:   "Will be deleted",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	if err := state.svc.Projects.DeleteProject(project.ID); err != nil {
+		t.Fatalf("delete project: %v", err)
+	}
+
+	if _, err := state.svc.Projects.GetProjectByID(project.ID); err == nil {
+		t.Fatalf("expected GetProjectByID to fail after delete")
+	}
+}
+
+func TestProjectServiceDeleteProjectDoesNotExist(t *testing.T) {
+	state := newTestServices(t)
+
+	err := state.svc.Projects.DeleteProject(9999)
+	if err == nil {
+		t.Fatalf("expected error for deleting non-existent project")
+	}
+	if !errors.Is(err, ErrProjectNotFound) {
+		t.Fatalf("err = %v, want ErrProjectNotFound", err)
+	}
+}
+
+// -- RenderMarkdown ----------------------------------------------------------
+
+func TestProjectServiceRenderMarkdown(t *testing.T) {
+	state := newTestServices(t)
+
+	html, err := state.svc.Projects.RenderMarkdown("# Hello Project")
+	if err != nil {
+		t.Fatalf("RenderMarkdown: %v", err)
+	}
+	if html == "" {
+		t.Fatalf("expected non-empty HTML output")
+	}
+	if !strings.Contains(html, "<h1") || !strings.Contains(html, "Hello Project") {
+		t.Fatalf("html = %q, want h1 with Hello Project", html)
+	}
+
+	// Bold and italic
+	html, err = state.svc.Projects.RenderMarkdown("**bold** and *italic*")
+	if err != nil {
+		t.Fatalf("RenderMarkdown emphasis: %v", err)
+	}
+	if !strings.Contains(html, "<strong>bold</strong>") || !strings.Contains(html, "<em>italic</em>") {
+		t.Fatalf("emphasis html = %q, want strong/em tags", html)
+	}
+
+	// Link
+	html, err = state.svc.Projects.RenderMarkdown("[link](https://example.com)")
+	if err != nil {
+		t.Fatalf("RenderMarkdown link: %v", err)
+	}
+	if !strings.Contains(html, `href="https://example.com"`) {
+		t.Fatalf("link html = %q, want anchor with href", html)
+	}
+}
+
+func TestProjectServiceRenderMarkdownWithShortcode(t *testing.T) {
+	state := newTestServices(t)
+
+	// The [[server-status:...]] shortcode should be replaced with an HTMX div
+	html, err := state.svc.Projects.RenderMarkdown("before [[server-status:node-1]] after")
+	if err != nil {
+		t.Fatalf("RenderMarkdown with shortcode: %v", err)
+	}
+	if strings.Contains(html, "[[server-status:node-1]]") {
+		t.Fatalf("shortcode syntax should have been replaced in output: %q", html)
+	}
+	if !strings.Contains(html, "node-1") {
+		t.Fatalf("shortcode html = %q, want node-1 in output", html)
+	}
+	if !strings.Contains(html, "Loading node status: node-1") {
+		t.Fatalf("shortcode html = %q, want \"Loading node status: node-1\" in output (shortcode was processed)", html)
+	}
+}
+
+func TestProjectServiceRenderMarkdownEmpty(t *testing.T) {
+	state := newTestServices(t)
+
+	html, err := state.svc.Projects.RenderMarkdown("")
+	if err != nil {
+		t.Fatalf("RenderMarkdown empty: %v", err)
+	}
+	if html != "" {
+		t.Fatalf("expected empty HTML for empty input, got %q", html)
+	}
+}
+
+// -- GetResolvedProjectRelations --------------------------------------------
+
+func TestProjectServiceGetResolvedProjectRelations(t *testing.T) {
+	state := newTestServices(t)
+
+	projA, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Alpha Project",
+		ContentMD: "# Alpha",
+		Excerpt:   "First project",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create alpha project: %v", err)
+	}
+
+	projB, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Beta Project",
+		ContentMD: "# Beta",
+		Excerpt:   "Second project",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create beta project: %v", err)
+	}
+
+	_, err = state.svc.Projects.CreateProjectRelation(projA.ID, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     projB.ID,
+		RelationKind: model.ContentRelationKindRelated,
+	})
+	if err != nil {
+		t.Fatalf("create relation: %v", err)
+	}
+
+	views, err := state.svc.Projects.GetResolvedProjectRelations(projA.ID, false)
+	if err != nil {
+		t.Fatalf("GetResolvedProjectRelations: %v", err)
+	}
+	if len(views) != 1 {
+		t.Fatalf("views len = %d, want 1", len(views))
+	}
+	if views[0].Title != "Beta Project" {
+		t.Fatalf("view title = %q, want Beta Project", views[0].Title)
+	}
+	if views[0].Slug != projB.Slug {
+		t.Fatalf("view slug = %q, want %q", views[0].Slug, projB.Slug)
+	}
+	if views[0].Excerpt != "Second project" {
+		t.Fatalf("view excerpt = %q, want Second project", views[0].Excerpt)
+	}
+	if views[0].URL != "/projects/"+projB.Slug {
+		t.Fatalf("view url = %q, want /projects/%s", views[0].URL, projB.Slug)
+	}
+}
+
+// -- CreateProjectRelation with SortOrder -----------------------------------
+
+func TestProjectServiceCreateRelationWithOrder(t *testing.T) {
+	state := newTestServices(t)
+
+	projA, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Source Project",
+		ContentMD: "# Source",
+		Excerpt:   "Source",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create source project: %v", err)
+	}
+
+	projB, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Target Project",
+		ContentMD: "# Target",
+		Excerpt:   "Target",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create target project: %v", err)
+	}
+
+	wantOrder := 5
+	rel, err := state.svc.Projects.CreateProjectRelation(projA.ID, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     projB.ID,
+		RelationKind: model.ContentRelationKindRelated,
+		SortOrder:    wantOrder,
+	})
+	if err != nil {
+		t.Fatalf("create relation with order: %v", err)
+	}
+	if rel.SortOrder != wantOrder {
+		t.Fatalf("relation sort_order = %d, want %d", rel.SortOrder, wantOrder)
+	}
+
+	// Verify via ListProjectRelations
+	relations, err := state.svc.Projects.ListProjectRelations(projA.ID)
+	if err != nil {
+		t.Fatalf("list relations: %v", err)
+	}
+	if len(relations) != 1 {
+		t.Fatalf("relations len = %d, want 1", len(relations))
+	}
+	if relations[0].SortOrder != wantOrder {
+		t.Fatalf("listed sort_order = %d, want %d", relations[0].SortOrder, wantOrder)
+	}
+}
+
+// -- CreateProjectRelation edge cases ---------------------------------------
+
+func TestProjectServiceCreateRelationSelfRelation(t *testing.T) {
+	state := newTestServices(t)
+
+	proj, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Self Relation Test",
+		ContentMD: "# Self",
+		Excerpt:   "Self relation",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	_, err = state.svc.Projects.CreateProjectRelation(proj.ID, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     proj.ID,
+		RelationKind: model.ContentRelationKindRelated,
+	})
+	if err == nil {
+		t.Fatalf("expected error for self-relation")
+	}
+	if !errors.Is(err, ErrInvalidContentRelation) {
+		t.Fatalf("err = %v, want ErrInvalidContentRelation", err)
+	}
+}
+
+func TestProjectServiceCreateRelationInvalidTarget(t *testing.T) {
+	state := newTestServices(t)
+
+	proj, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Invalid Target Test",
+		ContentMD: "# Invalid",
+		Excerpt:   "Invalid target",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	// Invalid target type
+	_, err = state.svc.Projects.CreateProjectRelation(proj.ID, model.ContentRelationCreate{
+		TargetType:   "invalid-type",
+		TargetID:     999,
+		RelationKind: "related",
+	})
+	if err == nil {
+		t.Fatalf("expected error for invalid target type")
+	}
+	if !errors.Is(err, ErrInvalidContentRelation) {
+		t.Fatalf("err = %v, want ErrInvalidContentRelation", err)
+	}
+
+	// Invalid relation kind
+	_, err = state.svc.Projects.CreateProjectRelation(proj.ID, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     999,
+		RelationKind: "invalid-kind",
+	})
+	if err == nil {
+		t.Fatalf("expected error for invalid relation kind")
+	}
+}
+
+func TestProjectServiceCreateRelationProjectNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Projects.CreateProjectRelation(9999, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     1,
+		RelationKind: model.ContentRelationKindRelated,
+	})
+	if err == nil {
+		t.Fatalf("expected error for non-existent source project")
+	}
+	if !errors.Is(err, ErrProjectNotFound) {
+		t.Fatalf("err = %v, want ErrProjectNotFound", err)
+	}
+}
+
+// -- CreateProjectShowcase ---------------------------------------------------
+
+func TestProjectServiceCreateProjectShowcase(t *testing.T) {
+	state := newTestServices(t)
+
+	proj, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Showcase Project",
+		ContentMD: "# Showcase",
+		Excerpt:   "Showcase test",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	showcase, err := state.svc.Projects.CreateProjectShowcase(proj.ID, model.ProjectShowcaseItemCreate{
+		Kind:      model.ProjectShowcaseKindImage,
+		Title:     "Demo Screenshot",
+		BodyMD:    "Application demo screenshot",
+		AssetURL:  "/static/uploads/demo.png",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("CreateProjectShowcase: %v", err)
+	}
+	if showcase.ID == 0 {
+		t.Fatalf("showcase id = 0, want persisted id")
+	}
+	if showcase.Title != "Demo Screenshot" {
+		t.Fatalf("showcase title = %q, want Demo Screenshot", showcase.Title)
+	}
+	if showcase.AssetURL != "/static/uploads/demo.png" {
+		t.Fatalf("showcase asset_url = %q, want /static/uploads/demo.png", showcase.AssetURL)
+	}
+	if showcase.Kind != model.ProjectShowcaseKindImage {
+		t.Fatalf("showcase kind = %q, want %q", showcase.Kind, model.ProjectShowcaseKindImage)
+	}
+	if !showcase.Published {
+		t.Fatalf("showcase published = false, want true")
+	}
+
+	// Verify via list
+	items, err := state.svc.Projects.ListProjectShowcase(proj.ID, false)
+	if err != nil {
+		t.Fatalf("list project showcase: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("showcase items len = %d, want 1", len(items))
+	}
+	if items[0].ID != showcase.ID {
+		t.Fatalf("listed id = %d, want %d", items[0].ID, showcase.ID)
+	}
+	if items[0].AssetURL != "/static/uploads/demo.png" {
+		t.Fatalf("listed asset_url = %q, want /static/uploads/demo.png", items[0].AssetURL)
+	}
+}
+
+func TestProjectServiceCreateShowcaseProjectNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Projects.CreateProjectShowcase(9999, model.ProjectShowcaseItemCreate{
+		Kind:  model.ProjectShowcaseKindImage,
+		Title: "Ghost Showcase",
+	})
+	if err == nil {
+		t.Fatalf("expected error for non-existent project")
+	}
+	if !errors.Is(err, ErrProjectNotFound) {
+		t.Fatalf("err = %v, want ErrProjectNotFound", err)
+	}
+}
+
+func TestProjectServiceCreateShowcaseInvalidInput(t *testing.T) {
+	state := newTestServices(t)
+
+	proj, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Invalid Showcase Input",
+		ContentMD: "# Invalid",
+		Excerpt:   "Invalid showcase",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	// Missing title
+	_, err = state.svc.Projects.CreateProjectShowcase(proj.ID, model.ProjectShowcaseItemCreate{
+		Kind:  model.ProjectShowcaseKindLink,
+		Title: "",
+	})
+	if err == nil {
+		t.Fatalf("expected error for missing title")
+	}
+	if !errors.Is(err, ErrInvalidProjectShowcase) {
+		t.Fatalf("err = %v, want ErrInvalidProjectShowcase", err)
+	}
+
+	// Invalid kind
+	_, err = state.svc.Projects.CreateProjectShowcase(proj.ID, model.ProjectShowcaseItemCreate{
+		Kind:  "invalid-kind",
+		Title: "Valid Title",
+	})
+	if err == nil {
+		t.Fatalf("expected error for invalid showcase kind")
+	}
+	if !errors.Is(err, ErrInvalidProjectShowcase) {
+		t.Fatalf("err = %v, want ErrInvalidProjectShowcase", err)
+	}
+}
+
+// -- ListAllProjectsWithFilter -----------------------------------------------
+
+func TestProjectServiceListAllProjectsWithFilter(t *testing.T) {
+	state := newTestServices(t)
+
+	// Create a published project
+	_, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Published Project",
+		ContentMD: "# Published",
+		Excerpt:   "Published excerpt",
+		Published: true,
+		State:     model.ProjectStateActive,
+	})
+	if err != nil {
+		t.Fatalf("create published project: %v", err)
+	}
+
+	// Create a draft (unpublished) project
+	_, err = state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Draft Project",
+		ContentMD: "# Draft",
+		Excerpt:   "Draft excerpt",
+		Published: false,
+		State:     model.ProjectStatePlanning,
+	})
+	if err != nil {
+		t.Fatalf("create draft project: %v", err)
+	}
+
+	// ListAllProjects returns all regardless of published status
+	projects, total, err := state.svc.Projects.ListAllProjects(1, 10, ProjectListOptions{})
+	if err != nil {
+		t.Fatalf("ListAllProjects: %v", err)
+	}
+	if total != 2 || len(projects) != 2 {
+		t.Fatalf("total=%d len=%d, want 2/2", total, len(projects))
+	}
+
+	var foundPublished, foundDraft bool
+	for _, p := range projects {
+		if p.Title == "Published Project" && p.Published {
+			foundPublished = true
+		}
+		if p.Title == "Draft Project" && !p.Published {
+			foundDraft = true
+		}
+	}
+	if !foundPublished {
+		t.Fatalf("published project not found in ListAllProjects results")
+	}
+	if !foundDraft {
+		t.Fatalf("draft project not found in ListAllProjects results")
+	}
+
+	// Filter by state = planning (should return only the draft)
+	planning, planningTotal, err := state.svc.Projects.ListAllProjects(1, 10, ProjectListOptions{State: model.ProjectStatePlanning})
+	if err != nil {
+		t.Fatalf("ListAllProjects with state filter: %v", err)
+	}
+	if planningTotal != 1 || len(planning) != 1 {
+		t.Fatalf("planning filter total=%d len=%d, want 1/1", planningTotal, len(planning))
+	}
+	if planning[0].Title != "Draft Project" {
+		t.Fatalf("planning filter title = %q, want Draft Project", planning[0].Title)
+	}
+}
 
 func TestProjectServiceDeleteProjectRelation(t *testing.T) {
 	state := newTestServices(t)

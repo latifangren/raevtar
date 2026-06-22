@@ -309,3 +309,62 @@ func TestProjectDetail(t *testing.T) {
 	assertContains(t, body, "Whyred Watchtower")
 	assertContains(t, body, "Back to projects")
 }
+
+// ---------- contact page ----------
+
+func TestContactPage(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/contact", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Contact")
+	assertContains(t, body, "Raevtar keeps contact intentionally lightweight.")
+}
+
+// ---------- topics page ----------
+
+func TestTopicsPage(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/topics", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Topics")
+	assertContains(t, body, "Browse the archive by category.")
+}
+
+// ---------- static file serving ----------
+
+func TestServeStatic(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	// The static file server uses http.Dir("./static") which resolves
+	// relative to the test runner's working directory (package dir).
+	// During go test, htmx.min.js may not be reachable via that path,
+	// but the route MUST match (FileServer 404 = text/plain, NOT
+	// page404 which returns text/html).
+	req := httptest.NewRequest(http.MethodGet, "/static/js/htmx.min.js", nil)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusNotFound {
+		t.Fatalf("status = %d, want 404; body: %s", rr.Code, rr.Body.String())
+	}
+	ct := rr.Header().Get("Content-Type")
+	if !strings.HasPrefix(ct, "text/plain") {
+		t.Fatalf("Content-Type = %q, want text/plain (FileServer), got %q", ct, rr.Body.String())
+	}
+}
+
+// ---------- 404 page ----------
+
+func TestPage404(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/nonexistent-route-xyz", nil)
+	if status != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusNotFound, body)
+	}
+	assertContains(t, body, "Halaman gak ketemu")
+	assertContains(t, body, "Balik ke Beranda")
+}
