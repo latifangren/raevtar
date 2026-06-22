@@ -2,14 +2,28 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ─────────────── Fonts ─────────────── */
+@font-face {
+  font-family: 'Archivo Black';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url('/static/fonts/archivo-black.woff2') format('woff2');
+}
+
 :root {
   --retro-cream: #F5F2ED;
   --retro-paper: #FFFFFF;
   --retro-ink: #000000;
   --retro-yellow: #FACC15;
   --retro-muted: #6B7280;
+  --retro-sage: #6A9B7D;
+  --retro-wheat: #EFE2B8;
+  --retro-blush: #E9B7A5;
+  --retro-sageLight: #DDEBDD;
 }
 
+/* ─────────────── Base ─────────────── */
 body {
   background: var(--retro-cream);
   color: var(--retro-ink);
@@ -17,52 +31,108 @@ body {
   overflow-x: clip;
 }
 
-/* Neo-Brutalist Components */
+/* ─────────────── Neo-Brutalist Components ─────────────── */
 .nb-border {
-  border: 4px solid var(--retro-ink);
+  border: 2px solid var(--retro-ink);
+}
+
+.nb-border-b {
+  border-bottom: 2px solid var(--retro-ink);
 }
 
 .nb-shadow {
-  box-shadow: 4px 4px 0px 0px var(--retro-ink);
+  box-shadow: 3px 3px 0px 0px var(--retro-ink);
 }
 
 .nb-shadow-lg {
-  box-shadow: 8px 8px 0px 0px var(--retro-ink);
-}
-
-.nb-card {
-  @apply bg-retro-paper nb-border nb-shadow p-6 transition-all;
-}
-
-.nb-card:hover {
-  transform: translate(-2px, -2px);
   box-shadow: 6px 6px 0px 0px var(--retro-ink);
 }
 
-.nb-button {
-  @apply inline-flex items-center justify-center px-6 py-3 nb-border nb-shadow font-black uppercase tracking-widest transition-all;
+/* Card — RETROUI pattern: shadow shrinks on interaction */
+.nb-card {
+  @apply bg-card text-card-foreground nb-border nb-shadow p-6 transition-all duration-200;
+}
+.nb-card:hover {
+  box-shadow: 1px 1px 0px 0px var(--retro-ink);
+  transform: translate(2px, 2px);
 }
 
+/* Button base — RETROUI pattern */
+.nb-button {
+  @apply inline-flex items-center justify-center gap-2 px-4 py-1.5 text-base
+         nb-border nb-shadow font-black uppercase tracking-widest
+         transition-all duration-200 cursor-pointer
+         disabled:opacity-60 disabled:cursor-not-allowed
+         focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring;
+}
+.nb-button:hover {
+  box-shadow: 1px 1px 0px 0px var(--retro-ink);
+  transform: translate(2px, 2px);
+}
+.nb-button:active {
+  box-shadow: none;
+  transform: translate(3px, 3px);
+}
+
+/* Button variants */
 .nb-button-primary {
-  @apply bg-retro-yellow text-retro-ink;
+  @apply bg-primary text-primary-foreground;
+}
+.nb-button-primary:hover {
+  @apply bg-primary-hover;
 }
 
 .nb-button-secondary {
-  @apply bg-retro-paper text-retro-ink;
+  @apply bg-card text-card-foreground;
 }
 
-.nb-button:hover {
-  transform: translate(-2px, -2px);
-  box-shadow: 6px 6px 0px 0px var(--retro-ink);
+.nb-button-accent {
+  @apply bg-accent text-accent-foreground;
+}
+.nb-button-accent:hover {
+  @apply bg-accent-hover;
 }
 
-.nb-button:active {
-  transform: translate(0px, 0px);
-  box-shadow: 2px 2px 0px 0px var(--retro-ink);
+.nb-button-destructive {
+  @apply bg-destructive text-destructive-foreground;
+}
+.nb-button-destructive:hover {
+  @apply bg-destructive-hover;
 }
 
+/* Button sizes */
+.nb-button-sm {
+  @apply px-3 py-1 text-xs;
+}
+
+.nb-button-lg {
+  @apply px-6 py-3 text-lg;
+}
+
+/* Badge */
 .nb-badge {
-  @apply inline-block px-3 py-1 nb-border text-xs font-black uppercase tracking-widest;
+  @apply inline-flex items-center px-2.5 py-1.5 text-sm font-semibold nb-border rounded;
+}
+
+.nb-badge-sm {
+  @apply px-2 py-1 text-xs;
+}
+
+.nb-badge-lg {
+  @apply px-3 py-2 text-base;
+}
+
+/* Badge variants */
+.nb-badge-outline {
+  @apply bg-transparent;
+}
+
+.nb-badge-solid {
+  @apply bg-foreground text-background;
+}
+
+.nb-badge-surface {
+  @apply bg-primary text-primary-foreground;
 }
 
 /* Typography */
@@ -74,20 +144,24 @@ body {
   @apply text-3xl md:text-4xl font-black uppercase tracking-tight leading-tight mb-4;
 }
 
-/* Prose styles */
+.nb-h3 {
+  @apply text-xl md:text-2xl font-bold tracking-tight mb-3;
+}
+
+/* Prose content */
 .prose { max-width: 100%; overflow-wrap: break-word; }
 .prose h1 { @apply nb-h1; }
 .prose h2 { @apply nb-h2; }
 .prose p { margin-bottom: 1rem; line-height: 1.7; }
 .prose code {
-  @apply bg-retro-yellow px-2 py-0.5 border-2 border-retro-ink font-mono text-sm;
+  @apply bg-accent px-2 py-0.5 border-2 border-foreground font-mono text-sm rounded;
 }
 .prose pre {
-  @apply bg-retro-paper p-4 border-4 border-retro-ink nb-shadow mb-4 overflow-x-auto;
+  @apply bg-card p-4 nb-border nb-shadow mb-4 overflow-x-auto rounded;
 }
 .prose pre code { background: none; padding: 0; border: none; box-shadow: none; white-space: pre; }
 
-/* Custom Animations */
+/* ─────────────── Animations ─────────────── */
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -98,9 +172,34 @@ body {
 }
 
 .marquee-container {
-  @apply overflow-hidden whitespace-nowrap border-y-4 border-retro-ink bg-retro-ink text-retro-paper py-3;
+  @apply overflow-hidden whitespace-nowrap border-y-2 border-foreground bg-foreground text-background py-3;
 }
 
 .marquee-content {
   @apply inline-block animate-marquee;
+}
+
+/* ─────────────── Custom utilities ─────────────── */
+.custom-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--retro-ink) var(--retro-cream);
+}
+.custom-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: var(--retro-cream);
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: var(--retro-ink);
+  border: 1px solid var(--retro-cream);
+}
+
+/* Shadow lift — mobile card hover pattern */
+.rv-card-lift {
+  transition: all 0.15s ease;
+}
+.rv-card-lift:hover {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0px 0px var(--retro-ink);
 }
