@@ -9,6 +9,7 @@ import (
 	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"raevtar/internal/model"
 	"raevtar/internal/service"
@@ -369,6 +370,86 @@ func TestAdminEditorialInboxUpdateNotFound(t *testing.T) {
 		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusNotFound, rr.Body.String())
 	}
 	assertContains(t, rr.Body.String(), "not found")
+}
+
+// ---------- Admin editorial inbox form tests ----------
+
+func TestAdminCreateEditorialInboxForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrfToken := loginAsAdmin(t, app)
+
+	form := url.Values{
+		"source_type":  {"manual"},
+		"source_value": {"test"},
+		"not_before":   {"2026-01-01T00:00"},
+		"mode":         {"scheduled_assignment"},
+		"priority":     {"50"},
+		"note":         {"#Test\n\nManual editorial item."},
+		"_csrf":        {csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/editorial-inbox", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/editorial-inbox" {
+		t.Fatalf("Location = %q, want /admin/editorial-inbox", got)
+	}
+}
+
+func TestAdminUpdateEditorialInboxForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrfToken := loginAsAdmin(t, app)
+
+	// Create item via service layer
+	item, err := app.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/form-update",
+		Priority:    30,
+		NotBefore:   time.Date(2026, 1, 1, 0, 0, 0, 0, time.UTC),
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create inbox item: %v", err)
+	}
+
+	// Update via form
+	updateForm := url.Values{
+		"source_type":  {"repo"},
+		"source_value": {"https://github.com/example/form-updated"},
+		"mode":         {"scheduled_assignment"},
+		"status":       {"approved"},
+		"note":         {"Updated note via form."},
+		"not_before":   {"2026-06-25T10:00"},
+		"priority":     {"75"},
+		"_csrf":        {csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/editorial-inbox/update/"+strconv.FormatInt(item.ID, 10), strings.NewReader(updateForm.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/editorial-inbox" {
+		t.Fatalf("Location = %q, want /admin/editorial-inbox", got)
+	}
+
+	// Verify update
+	updated, err := app.svc.Editorial.GetInboxItem(item.ID)
+	if err != nil {
+		t.Fatalf("get updated item: %v", err)
+	}
+	if updated.Note != "Updated note via form." {
+		t.Fatalf("note = %q, want %q", updated.Note, "Updated note via form.")
+	}
 }
 
 // ---------- Editorial inbox API endpoint tests ----------

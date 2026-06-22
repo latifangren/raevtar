@@ -598,6 +598,357 @@ func TestItoa64(t *testing.T) {
 		})
 	}
 }
+
+// =============================================================================
+// Additional admin form tests for uncovered functions
+// =============================================================================
+
+func TestAdminUpdateProjectForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	project, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Update Form Target",
+		ContentMD: "# Original",
+		Excerpt:   "Original excerpt",
+		Published: true,
+		SortOrder: 10,
+		Tags:      []string{"test"},
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":   {csrf},
+		"title":   {"Update Form Target Updated"},
+		"content": {"# Updated content"},
+		"excerpt": {"Updated excerpt"},
+		"state":   {"active"},
+		"tags":    {"test,updated"},
+		"intent":  {"update"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/update/"+strconv.FormatInt(project.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/projects" {
+		t.Fatalf("Location = %q, want /admin/projects", got)
+	}
+
+	updated, err := app.svc.Projects.GetProjectByID(project.ID)
+	if err != nil {
+		t.Fatalf("get project: %v", err)
+	}
+	if updated.Title != "Update Form Target Updated" {
+		t.Fatalf("title = %q, want %q", updated.Title, "Update Form Target Updated")
+	}
+}
+
+func TestAdminDeleteProjectForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	project, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Delete Form Target",
+		ContentMD: "# Delete me",
+		Excerpt:   "Will be deleted",
+		Published: false,
+		SortOrder: 20,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	form := url.Values{"_csrf": {csrf}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/delete/"+strconv.FormatInt(project.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/projects" {
+		t.Fatalf("Location = %q, want /admin/projects", got)
+	}
+
+	_, err = app.svc.Projects.GetProjectByID(project.ID)
+	if err == nil {
+		t.Fatalf("project should have been deleted")
+	}
+}
+
+func TestAdminCreateProjectRelationForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	related, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Relation Sibling",
+		ContentMD: "# Sibling",
+		Excerpt:   "Related project",
+		Published: true,
+		SortOrder: 5,
+	})
+	if err != nil {
+		t.Fatalf("create sibling project: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":         {csrf},
+		"target_id":     {strconv.FormatInt(related.ID, 10)},
+		"target_type":   {"project"},
+		"relation_kind": {"related"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/1/relations", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/projects/edit/1" {
+		t.Fatalf("Location = %q, want /admin/projects/edit/1", got)
+	}
+}
+
+func TestAdminDeleteProjectRelationForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	_, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Sibling For Delete",
+		ContentMD: "# Sibling",
+		State:     "active",
+	})
+	if err != nil {
+		t.Fatalf("create sibling project: %v", err)
+	}
+	rel, err := app.svc.Projects.CreateProjectRelation(1, model.ContentRelationCreate{
+		TargetType:   "project",
+		TargetID:     2,
+		RelationKind: "related",
+	})
+	if err != nil {
+		t.Fatalf("create relation: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":      {csrf},
+		"project_id": {"1"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/relations/delete/"+strconv.FormatInt(rel.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+}
+
+func TestAdminCreateProjectShowcaseForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	form := url.Values{
+		"_csrf":     {csrf},
+		"kind":      {"image"},
+		"title":     {"Showcase Image"},
+		"body_md":   {"A showcase description."},
+		"asset_url": {"https://example.com/img.png"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/1/showcase", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/projects/edit/1" {
+		t.Fatalf("Location = %q, want /admin/projects/edit/1", got)
+	}
+}
+
+func TestAdminUpdateProjectShowcaseForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	item, err := app.svc.Projects.CreateProjectShowcase(1, model.ProjectShowcaseItemCreate{
+		Kind:      "image",
+		Title:     "Original Showcase",
+		BodyMD:    "# Original",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create showcase: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":      {csrf},
+		"project_id": {"1"},
+		"kind":       {"image"},
+		"title":      {"Updated Showcase Title"},
+		"body_md":    {"# Updated body"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/showcase/update/"+strconv.FormatInt(item.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+}
+
+func TestAdminDeleteProjectShowcaseForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	item, err := app.svc.Projects.CreateProjectShowcase(1, model.ProjectShowcaseItemCreate{
+		Kind:      "image",
+		Title:     "Showcase To Delete",
+		BodyMD:    "# Delete me",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create showcase: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":      {csrf},
+		"project_id": {"1"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/showcase/delete/"+strconv.FormatInt(item.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+}
+
+func TestAdminDeleteProjectUpdateForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	update, err := app.svc.Projects.CreateProjectUpdate(1, model.ProjectUpdateEntryCreate{
+		Kind:      "changelog",
+		Title:     "Update To Delete",
+		ContentMD: "# Delete me",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create update: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf":      {csrf},
+		"project_id": {"1"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/projects/updates/delete/"+strconv.FormatInt(update.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/projects/edit/1" {
+		t.Fatalf("Location = %q, want /admin/projects/edit/1", got)
+	}
+}
+
+func TestAdminUpdateServerForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	server, err := app.svc.Monitor.CreateServer("update-me", "10.0.0.1", 8080, "test")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	form := url.Values{
+		"_csrf": {csrf},
+		"name":  {"updated-server"},
+		"host":  {"10.0.0.2"},
+		"port":  {"9090"},
+		"tags":  {"updated,monitor"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers/update/"+strconv.FormatInt(server.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/servers/"+strconv.FormatInt(server.ID, 10) {
+		t.Fatalf("Location = %q, want /admin/servers/%d", got, server.ID)
+	}
+
+	updated, err := app.svc.Monitor.GetServer(server.ID)
+	if err != nil {
+		t.Fatalf("get server: %v", err)
+	}
+	if updated.Name != "updated-server" {
+		t.Fatalf("server name = %q, want %q", updated.Name, "updated-server")
+	}
+	if updated.Host != "10.0.0.2" {
+		t.Fatalf("server host = %q, want %q", updated.Host, "10.0.0.2")
+	}
+}
+
+func TestAdminDeleteWebhookForm(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	wh, err := app.svc.Webhook.CreateConfig("Delete Test", "https://hooks.example.com/delete", "secret", true)
+	if err != nil {
+		t.Fatalf("create webhook: %v", err)
+	}
+
+	form := url.Values{"_csrf": {csrf}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/webhooks/delete/"+strconv.FormatInt(wh.ID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/webhooks" {
+		t.Fatalf("Location = %q, want /admin/webhooks", got)
+	}
+
+	cfgs, err := app.svc.Webhook.ListConfigs()
+	if err != nil {
+		t.Fatalf("list webhooks: %v", err)
+	}
+	for _, cfg := range cfgs {
+		if cfg.ID == wh.ID {
+			t.Fatalf("webhook should have been deleted")
+		}
+	}
+}
+
 func TestAdminUpdateProjectShowsEditPageAfterUpdate(t *testing.T) {
 	app := newPublicTestApp(t)
 	sessionCookie, csrf := loginSession(t, app)
@@ -662,6 +1013,25 @@ func TestAdminCreateProjectUpdateRequiresCSRF(t *testing.T) {
 	if rr.Code != http.StatusForbidden {
 		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusForbidden, rr.Body.String())
 	}
+}
+func TestAdminCreatePostWithEmptyTitle(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+	form := url.Values{
+		"_csrf":         {csrf},
+		"title":         {""},
+		"category_slug": {"devops"},
+		"content":       {"# Missing title"},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/posts", strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusBadRequest, rr.Body.String())
+	}
+	assertContains(t, rr.Body.String(), "title, category_slug, and content required")
 }
 
 // =============================================================================
@@ -748,6 +1118,38 @@ func TestAdminDeleteTopicForm(t *testing.T) {
 	if err == nil {
 		t.Fatalf("category should have been deleted")
 	}
+}
+
+func TestAdminDeleteTopic(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrf := loginSession(t, app)
+
+	// devops category exists from seed data and has posts assigned
+	cats, err := app.svc.Blog.ListCategories()
+	if err != nil {
+		t.Fatalf("list categories: %v", err)
+	}
+	var catID int64
+	for _, c := range cats {
+		if c.Slug == "devops" {
+			catID = c.ID
+			break
+		}
+	}
+	if catID == 0 {
+		t.Fatalf("devops category not found")
+	}
+
+	form := url.Values{"_csrf": {csrf}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/topics/delete/"+strconv.FormatInt(catID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+	if rr.Code != http.StatusBadRequest {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusBadRequest, rr.Body.String())
+	}
+	assertContains(t, rr.Body.String(), "category in use")
 }
 
 // =============================================================================

@@ -715,6 +715,9 @@ func TestAPICreateServerWithInvalidJSON(t *testing.T) {
 
 // ---------- API list posts ----------
 
+// (TestAPIUpdateProjectShowcase, TestAPIDeleteProjectShowcase, and
+// TestAPIUpdateProject already exist in api_project_test.go)
+
 func TestAPIListPosts(t *testing.T) {
 	app := newPublicTestApp(t)
 
