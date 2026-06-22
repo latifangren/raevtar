@@ -1,6 +1,7 @@
-﻿package service
+package service
 
 import (
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -8,7 +9,7 @@ import (
 	"raevtar/internal/model"
 )
 
-// ── CreateServer ────────────────────────────────────────────────────────────
+// -- CreateServer ------------------------------------------------------------
 
 func TestMonitorServiceCreateServer(t *testing.T) {
 	state := newTestServices(t)
@@ -58,7 +59,7 @@ func TestMonitorServiceDuplicateName(t *testing.T) {
 	}
 }
 
-// ── RecordMetrics ───────────────────────────────────────────────────────────
+// -- RecordMetrics -----------------------------------------------------------
 
 func TestMonitorServiceRecordMetrics(t *testing.T) {
 	state := newTestServices(t)
@@ -161,7 +162,7 @@ func TestMonitorServiceListMetrics(t *testing.T) {
 	}
 }
 
-// ── DeleteServer ────────────────────────────────────────────────────────────
+// -- DeleteServer ------------------------------------------------------------
 
 func TestMonitorServiceDeleteServer(t *testing.T) {
 	state := newTestServices(t)
@@ -197,5 +198,175 @@ func TestMonitorServiceDeleteServer(t *testing.T) {
 	_, err = state.svc.Monitor.GetServer(server.ID)
 	if err == nil {
 		t.Fatalf("expected GetServer for deleted server to fail")
+	}
+}
+
+// -- CreateServerWithAgentToken ----------------------------------------------
+
+func TestMonitorServiceCreateServerWithAgentToken(t *testing.T) {
+	state := newTestServices(t)
+
+	server, token, err := state.svc.Monitor.CreateServerWithAgentToken("agent-node", "10.0.0.1", 9100, "agent")
+	if err != nil {
+		t.Fatalf("CreateServerWithAgentToken: %v", err)
+	}
+	if server == nil {
+		t.Fatalf("CreateServerWithAgentToken returned nil server")
+	}
+	if server.ID == 0 {
+		t.Fatalf("server ID = 0, want non-zero")
+	}
+	if server.Name != "agent-node" {
+		t.Fatalf("server name = %q, want agent-node", server.Name)
+	}
+	if server.AgentTokenHash == "" {
+		t.Fatalf("server agent_token_hash is empty")
+	}
+	if token == "" {
+		t.Fatalf("expected non-empty agent token")
+	}
+	if !state.svc.Monitor.VerifyAgentToken(server.ID, token) {
+		t.Fatalf("generated token should verify against server hash")
+	}
+
+	servers, err := state.svc.Monitor.ListServers()
+	if err != nil {
+		t.Fatalf("ListServers: %v", err)
+	}
+	if len(servers) != 1 {
+		t.Fatalf("servers len = %d, want 1", len(servers))
+	}
+	if servers[0].Name != "agent-node" {
+		t.Fatalf("listed server name = %q, want agent-node", servers[0].Name)
+	}
+}
+
+// -- GetServerByName --------------------------------------------------------
+
+func TestMonitorServiceGetServerByName(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("by-name", "10.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("CreateServer: %v", err)
+	}
+
+	fetched, err := state.svc.Monitor.GetServerByName("by-name")
+	if err != nil {
+		t.Fatalf("GetServerByName: %v", err)
+	}
+	if fetched.ID != server.ID {
+		t.Fatalf("fetched server id = %d, want %d", fetched.ID, server.ID)
+	}
+	if fetched.Host != "10.0.0.1" {
+		t.Fatalf("fetched host = %q, want 10.0.0.1", fetched.Host)
+	}
+	if fetched.Port != 9100 {
+		t.Fatalf("fetched port = %d, want 9100", fetched.Port)
+	}
+}
+
+func TestMonitorServiceGetServerByNameNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Monitor.GetServerByName("nonexistent-server")
+	if err == nil {
+		t.Fatalf("GetServerByName for nonexistent server should fail")
+	}
+}
+
+// -- UpdateServer ----------------------------------------------------------
+
+func TestMonitorServiceUpdateServer(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("original-name", "10.0.0.1", 9100, "original")
+	if err != nil {
+		t.Fatalf("CreateServer: %v", err)
+	}
+
+	updated, err := state.svc.Monitor.UpdateServer(server.ID, "new-name", "10.0.0.2", 9200, "updated,tags")
+	if err != nil {
+		t.Fatalf("UpdateServer: %v", err)
+	}
+	if updated.Name != "new-name" {
+		t.Fatalf("updated name = %q, want new-name", updated.Name)
+	}
+	if updated.Host != "10.0.0.2" {
+		t.Fatalf("updated host = %q, want 10.0.0.2", updated.Host)
+	}
+	if updated.Port != 9200 {
+		t.Fatalf("updated port = %d, want 9200", updated.Port)
+	}
+	if updated.Tags != "updated,tags" {
+		t.Fatalf("updated tags = %q, want updated,tags", updated.Tags)
+	}
+
+	// Verify via GetServer
+	fetched, err := state.svc.Monitor.GetServer(server.ID)
+	if err != nil {
+		t.Fatalf("GetServer after update: %v", err)
+	}
+	if fetched.Name != "new-name" {
+		t.Fatalf("fetched name = %q, want new-name", fetched.Name)
+	}
+	if fetched.Host != "10.0.0.2" {
+		t.Fatalf("fetched host = %q, want 10.0.0.2", fetched.Host)
+	}
+	if fetched.Port != 9200 {
+		t.Fatalf("fetched port = %d, want 9200", fetched.Port)
+	}
+}
+
+func TestMonitorServiceUpdateServerRejectsEmptyInput(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("validate", "10.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("CreateServer: %v", err)
+	}
+
+	_, err = state.svc.Monitor.UpdateServer(server.ID, "", "10.0.0.2", 9200, "tags")
+	if err == nil {
+		t.Fatalf("expected error for empty name")
+	}
+
+	_, err = state.svc.Monitor.UpdateServer(server.ID, "valid-name", "", 9200, "tags")
+	if err == nil {
+		t.Fatalf("expected error for empty host")
+	}
+
+	_, err = state.svc.Monitor.UpdateServer(server.ID, "valid-name", "10.0.0.2", 0, "tags")
+	if err == nil {
+		t.Fatalf("expected error for zero port")
+	}
+}
+
+func TestMonitorServiceUpdateServerNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Monitor.UpdateServer(9999, "ghost", "10.0.0.1", 9100, "test")
+	if err == nil {
+		t.Fatalf("expected error for updating nonexistent server")
+	}
+	if !errors.Is(err, ErrServerNotFound) {
+		t.Fatalf("err = %v, want ErrServerNotFound", err)
+	}
+}
+
+// -- PingServer ------------------------------------------------------------
+
+func TestMonitorServicePingServer(t *testing.T) {
+	state := newTestServices(t)
+
+	metric, err := state.svc.Monitor.PingServer("10.0.0.1", 9100)
+	if err != nil {
+		t.Fatalf("PingServer: %v", err)
+	}
+	if metric == nil {
+		t.Fatalf("PingServer returned nil metric")
+	}
+	if !metric.Online {
+		t.Fatalf("ping metric online = false, want true")
 	}
 }

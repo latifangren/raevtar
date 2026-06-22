@@ -3,12 +3,13 @@
 import (
 	"errors"
 	"strings"
+	"strconv"
 	"testing"
 
 	"raevtar/internal/model"
 )
 
-// ── ListCategories ──────────────────────────────────────────────────────────
+// -- ListCategories ----------------------------------------------------------
 
 func TestBlogServiceListCategories(t *testing.T) {
 	state := newTestServices(t)
@@ -36,7 +37,7 @@ func TestBlogServiceListCategories(t *testing.T) {
 	}
 }
 
-// ── GetCategoryByID ─────────────────────────────────────────────────────────
+// -- GetCategoryByID ---------------------------------------------------------
 
 func TestBlogServiceGetCategoryByID(t *testing.T) {
 	state := newTestServices(t)
@@ -82,7 +83,7 @@ func TestBlogServiceGetCategoryByIDNotFound(t *testing.T) {
 	}
 }
 
-// ── PostCountForCategory ────────────────────────────────────────────────────
+// -- PostCountForCategory ----------------------------------------------------
 
 func TestBlogServicePostCountForCategory(t *testing.T) {
 	state := newTestServices(t)
@@ -121,7 +122,7 @@ func TestBlogServicePostCountForCategory(t *testing.T) {
 	}
 }
 
-// ── DeleteCategory ──────────────────────────────────────────────────────────
+// -- DeleteCategory ----------------------------------------------------------
 
 func TestBlogServiceDeleteCategory(t *testing.T) {
 	state := newTestServices(t)
@@ -197,7 +198,7 @@ func TestBlogServiceDeleteCategoryNotFound(t *testing.T) {
 	}
 }
 
-// ── uniqueSlug edge cases ──────────────────────────────────────────────────
+// -- uniqueSlug edge cases --------------------------------------------------
 
 func TestUniqueSlugEdgeCases(t *testing.T) {
 	state := newTestServices(t)
@@ -222,7 +223,7 @@ func TestUniqueSlugEdgeCases(t *testing.T) {
 		t.Fatalf("create first collision post: %v", err)
 	}
 
-	// First collision → -2 suffix
+	// First collision ? -2 suffix
 	slug2, err := state.svc.Blog.uniqueSlug("Edge Case Title")
 	if err != nil {
 		t.Fatalf("uniqueSlug first collision: %v", err)
@@ -242,7 +243,7 @@ func TestUniqueSlugEdgeCases(t *testing.T) {
 		t.Fatalf("create second collision post: %v", err)
 	}
 
-	// Second collision → -3 suffix
+	// Second collision ? -3 suffix
 	slug3, err := state.svc.Blog.uniqueSlug("Edge Case Title")
 	if err != nil {
 		t.Fatalf("uniqueSlug second collision: %v", err)
@@ -252,7 +253,7 @@ func TestUniqueSlugEdgeCases(t *testing.T) {
 	}
 }
 
-// ── RenderMarkdown edge cases ───────────────────────────────────────────────
+// -- RenderMarkdown edge cases -----------------------------------------------
 
 func TestBlogServiceRenderMarkdownEdgeCases(t *testing.T) {
 	state := newTestServices(t)
@@ -297,3 +298,124 @@ func TestBlogServiceRenderMarkdownEdgeCases(t *testing.T) {
 		t.Fatalf("shortcode html = %q, want node-1 in output (replacement occurred)", html)
 	}
 }
+
+
+// -- RecordPostView ----------------------------------------------------------
+
+func TestBlogServiceRecordPostView(t *testing.T) {
+	state := newTestServices(t)
+
+	post, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "View Test Post",
+		ContentMD:    "# View Test",
+		Excerpt:      "View test",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+
+	if err := state.svc.Blog.RecordPostView(post.ID, "abc123hash"); err != nil {
+		t.Fatalf("RecordPostView: %v", err)
+	}
+}
+
+// -- PostViewCount -----------------------------------------------------------
+
+func TestBlogServicePostViewCount(t *testing.T) {
+	state := newTestServices(t)
+
+	post, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "View Count Post",
+		ContentMD:    "# View Count",
+		Excerpt:      "View count test",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+
+	count, err := state.svc.Blog.PostViewCount(post.ID)
+	if err != nil {
+		t.Fatalf("PostViewCount before recording: %v", err)
+	}
+	if count != 0 {
+		t.Fatalf("count before recording = %d, want 0", count)
+	}
+
+	if err := state.svc.Blog.RecordPostView(post.ID, "hash-1"); err != nil {
+		t.Fatalf("RecordPostView 1: %v", err)
+	}
+
+	count, err = state.svc.Blog.PostViewCount(post.ID)
+	if err != nil {
+		t.Fatalf("PostViewCount after recording: %v", err)
+	}
+	if count != 1 {
+		t.Fatalf("count after recording = %d, want 1", count)
+	}
+}
+
+// -- AllPostViewCounts -------------------------------------------------------
+
+func TestBlogServiceAllPostViewCounts(t *testing.T) {
+	state := newTestServices(t)
+
+	postA, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Post A Views",
+		ContentMD:    "# Post A",
+		Excerpt:      "Post A excerpt",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post A: %v", err)
+	}
+
+	postB, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "tools",
+		Title:        "Post B Views",
+		ContentMD:    "# Post B",
+		Excerpt:      "Post B excerpt",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post B: %v", err)
+	}
+
+	for i := 0; i < 3; i++ {
+		if err := state.svc.Blog.RecordPostView(postA.ID, "hash-a-"+strconv.Itoa(i)); err != nil {
+			t.Fatalf("RecordPostView post A %d: %v", i, err)
+		}
+	}
+	if err := state.svc.Blog.RecordPostView(postB.ID, "hash-b-1"); err != nil {
+		t.Fatalf("RecordPostView post B: %v", err)
+	}
+
+	views, err := state.svc.Blog.AllPostViewCounts()
+	if err != nil {
+		t.Fatalf("AllPostViewCounts: %v", err)
+	}
+
+	if views[postA.ID] != 3 {
+		t.Fatalf("post A views = %d, want 3", views[postA.ID])
+	}
+	if views[postB.ID] != 1 {
+		t.Fatalf("post B views = %d, want 1", views[postB.ID])
+	}
+}
+
+func TestBlogServiceAllPostViewCountsEmpty(t *testing.T) {
+	state := newTestServices(t)
+
+	views, err := state.svc.Blog.AllPostViewCounts()
+	if err != nil {
+		t.Fatalf("AllPostViewCounts empty: %v", err)
+	}
+	if len(views) != 0 {
+		t.Fatalf("views len = %d, want 0", len(views))
+	}
+}
+

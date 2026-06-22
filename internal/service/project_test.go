@@ -470,3 +470,304 @@ func TestProjectServiceGetResolvedRelations(t *testing.T) {
 		t.Fatalf("all views len = %d, want 2", len(allViews))
 	}
 }
+
+// -- UpdateProjectUpdate -----------------------------------------------------
+
+func TestProjectServiceUpdateProjectUpdate(t *testing.T) {
+	state := newTestServices(t)
+	proj := createTestProject(t, state)
+
+	update, err := state.svc.Projects.CreateProjectUpdate(proj.ID, model.ProjectUpdateEntryCreate{
+		Kind:      model.ProjectUpdateKindChangelog,
+		Title:     "Original Title",
+		ContentMD: "## Original\n\nContent",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project update: %v", err)
+	}
+
+	updated, err := state.svc.Projects.UpdateProjectUpdate(update.ID, model.ProjectUpdateEntryUpdate{
+		Kind:      model.ProjectUpdateKindChangelog,
+		Title:     "Updated Title",
+		ContentMD: "## Updated\n\nNew content",
+		Published: false,
+	})
+	if err != nil {
+		t.Fatalf("UpdateProjectUpdate: %v", err)
+	}
+	if updated.ID != update.ID {
+		t.Fatalf("updated id = %d, want %d", updated.ID, update.ID)
+	}
+	if updated.Title != "Updated Title" {
+		t.Fatalf("updated title = %q, want Updated Title", updated.Title)
+	}
+	if updated.ContentMD != "## Updated\n\nNew content" {
+		t.Fatalf("updated content_md = %q, want updated content", updated.ContentMD)
+	}
+	if updated.Published {
+		t.Fatalf("updated published = true, want false")
+	}
+	if updated.ContentHTML == "" {
+		t.Fatalf("updated content_html is empty (should be rendered)")
+	}
+
+	// Verify via list
+	updates, err := state.svc.Projects.ListProjectUpdates(proj.ID, false, nil, 10)
+	if err != nil {
+		t.Fatalf("list project updates after update: %v", err)
+	}
+	if len(updates) != 1 {
+		t.Fatalf("updates len = %d, want 1", len(updates))
+	}
+	if updates[0].Title != "Updated Title" {
+		t.Fatalf("listed update title = %q, want Updated Title", updates[0].Title)
+	}
+}
+
+func TestProjectServiceUpdateProjectUpdateNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Projects.UpdateProjectUpdate(9999, model.ProjectUpdateEntryUpdate{
+		Kind:      model.ProjectUpdateKindChangelog,
+		Title:     "Ghost Update",
+		ContentMD: "## Missing",
+	})
+	if err == nil {
+		t.Fatalf("expected error for updating nonexistent update")
+	}
+	if !errors.Is(err, ErrProjectUpdateNotFound) {
+		t.Fatalf("err = %v, want ErrProjectUpdateNotFound", err)
+	}
+}
+
+// -- DeleteProjectUpdate -----------------------------------------------------
+
+func TestProjectServiceDeleteProjectUpdate(t *testing.T) {
+	state := newTestServices(t)
+	proj := createTestProject(t, state)
+
+	update, err := state.svc.Projects.CreateProjectUpdate(proj.ID, model.ProjectUpdateEntryCreate{
+		Kind:      model.ProjectUpdateKindTimeline,
+		Title:     "Delete Me Update",
+		ContentMD: "## Delete\n\nMe",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project update: %v", err)
+	}
+
+	// Verify it exists
+	updates, err := state.svc.Projects.ListProjectUpdates(proj.ID, false, nil, 10)
+	if err != nil {
+		t.Fatalf("list project updates before delete: %v", err)
+	}
+	if len(updates) != 1 {
+		t.Fatalf("updates before delete = %d, want 1", len(updates))
+	}
+
+	if err := state.svc.Projects.DeleteProjectUpdate(update.ID); err != nil {
+		t.Fatalf("DeleteProjectUpdate: %v", err)
+	}
+
+	updates, err = state.svc.Projects.ListProjectUpdates(proj.ID, false, nil, 10)
+	if err != nil {
+		t.Fatalf("list project updates after delete: %v", err)
+	}
+	if len(updates) != 0 {
+		t.Fatalf("updates after delete = %d, want 0", len(updates))
+	}
+}
+
+func TestProjectServiceDeleteProjectUpdateNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	err := state.svc.Projects.DeleteProjectUpdate(9999)
+	if err == nil {
+		t.Fatalf("expected error for deleting nonexistent update")
+	}
+	if !errors.Is(err, ErrProjectUpdateNotFound) {
+		t.Fatalf("err = %v, want ErrProjectUpdateNotFound", err)
+	}
+}
+
+// -- UpdateProjectShowcase ---------------------------------------------------
+
+func TestProjectServiceUpdateProjectShowcase(t *testing.T) {
+	state := newTestServices(t)
+	proj := createTestProject(t, state)
+
+	showcase, err := state.svc.Projects.CreateProjectShowcase(proj.ID, model.ProjectShowcaseItemCreate{
+		Kind:        model.ProjectShowcaseKindLink,
+		Title:       "Original Showcase",
+		BodyMD:      "Original description",
+		ExternalURL: "https://original.example.com",
+		Published:   true,
+	})
+	if err != nil {
+		t.Fatalf("create project showcase: %v", err)
+	}
+
+	updated, err := state.svc.Projects.UpdateProjectShowcase(showcase.ID, model.ProjectShowcaseItemUpdate{
+		Kind:        model.ProjectShowcaseKindLink,
+		Title:       "Updated Showcase",
+		BodyMD:      "Updated description",
+		ExternalURL: "https://updated.example.com",
+		Published:   false,
+	})
+	if err != nil {
+		t.Fatalf("UpdateProjectShowcase: %v", err)
+	}
+	if updated.ID != showcase.ID {
+		t.Fatalf("updated id = %d, want %d", updated.ID, showcase.ID)
+	}
+	if updated.Title != "Updated Showcase" {
+		t.Fatalf("updated title = %q, want Updated Showcase", updated.Title)
+	}
+	if updated.BodyMD != "Updated description" {
+		t.Fatalf("updated body_md = %q, want Updated description", updated.BodyMD)
+	}
+	if updated.ExternalURL != "https://updated.example.com" {
+		t.Fatalf("updated external_url = %q, want https://updated.example.com", updated.ExternalURL)
+	}
+	if updated.Published {
+		t.Fatalf("updated published = true, want false")
+	}
+	if updated.BodyHTML == "" {
+		t.Fatalf("updated body_html is empty (should be rendered)")
+	}
+
+	// Verify via list
+	items, err := state.svc.Projects.ListProjectShowcase(proj.ID, false)
+	if err != nil {
+		t.Fatalf("list project showcase after update: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("showcase items len = %d, want 1", len(items))
+	}
+	if items[0].Title != "Updated Showcase" {
+		t.Fatalf("listed showcase title = %q, want Updated Showcase", items[0].Title)
+	}
+}
+
+func TestProjectServiceUpdateProjectShowcaseNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	_, err := state.svc.Projects.UpdateProjectShowcase(9999, model.ProjectShowcaseItemUpdate{
+		Kind:      model.ProjectShowcaseKindLink,
+		Title:     "Ghost Showcase",
+		BodyMD:    "Missing",
+	})
+	if err == nil {
+		t.Fatalf("expected error for updating nonexistent showcase")
+	}
+	if !errors.Is(err, ErrProjectShowcaseNotFound) {
+		t.Fatalf("err = %v, want ErrProjectShowcaseNotFound", err)
+	}
+}
+
+// -- DeleteProjectShowcase ---------------------------------------------------
+
+func TestProjectServiceDeleteProjectShowcase(t *testing.T) {
+	state := newTestServices(t)
+	proj := createTestProject(t, state)
+
+	showcase, err := state.svc.Projects.CreateProjectShowcase(proj.ID, model.ProjectShowcaseItemCreate{
+		Kind:     model.ProjectShowcaseKindImage,
+		Title:    "Delete Me Showcase",
+		BodyMD:   "To be deleted",
+		AssetURL: "/static/uploads/delete.png",
+	})
+	if err != nil {
+		t.Fatalf("create project showcase: %v", err)
+	}
+
+	// Verify it exists
+	items, err := state.svc.Projects.ListProjectShowcase(proj.ID, false)
+	if err != nil {
+		t.Fatalf("list project showcase before delete: %v", err)
+	}
+	if len(items) != 1 {
+		t.Fatalf("showcase items before delete = %d, want 1", len(items))
+	}
+
+	if err := state.svc.Projects.DeleteProjectShowcase(showcase.ID); err != nil {
+		t.Fatalf("DeleteProjectShowcase: %v", err)
+	}
+
+	items, err = state.svc.Projects.ListProjectShowcase(proj.ID, false)
+	if err != nil {
+		t.Fatalf("list project showcase after delete: %v", err)
+	}
+	if len(items) != 0 {
+		t.Fatalf("showcase items after delete = %d, want 0", len(items))
+	}
+}
+
+func TestProjectServiceDeleteProjectShowcaseNotFound(t *testing.T) {
+	state := newTestServices(t)
+
+	err := state.svc.Projects.DeleteProjectShowcase(9999)
+	if err == nil {
+		t.Fatalf("expected error for deleting nonexistent showcase")
+	}
+	if !errors.Is(err, ErrProjectShowcaseNotFound) {
+		t.Fatalf("err = %v, want ErrProjectShowcaseNotFound", err)
+	}
+}
+
+// -- DeleteProjectRelation ---------------------------------------------------
+
+func TestProjectServiceDeleteProjectRelation(t *testing.T) {
+	state := newTestServices(t)
+
+	projA, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Source Project",
+		ContentMD: "# Source",
+		Excerpt:   "Source project",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create source project: %v", err)
+	}
+
+	projB, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Target Project",
+		ContentMD: "# Target",
+		Excerpt:   "Target project",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create target project: %v", err)
+	}
+
+	rel, err := state.svc.Projects.CreateProjectRelation(projA.ID, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     projB.ID,
+		RelationKind: model.ContentRelationKindRelated,
+	})
+	if err != nil {
+		t.Fatalf("create project relation: %v", err)
+	}
+
+	// Verify it exists
+	relations, err := state.svc.Projects.ListProjectRelations(projA.ID)
+	if err != nil {
+		t.Fatalf("list project relations before delete: %v", err)
+	}
+	if len(relations) != 1 {
+		t.Fatalf("relations before delete = %d, want 1", len(relations))
+	}
+
+	if err := state.svc.Projects.DeleteProjectRelation(rel.ID); err != nil {
+		t.Fatalf("DeleteProjectRelation: %v", err)
+	}
+
+	relations, err = state.svc.Projects.ListProjectRelations(projA.ID)
+	if err != nil {
+		t.Fatalf("list project relations after delete: %v", err)
+	}
+	if len(relations) != 0 {
+		t.Fatalf("relations after delete = %d, want 0", len(relations))
+	}
+}

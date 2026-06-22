@@ -156,3 +156,79 @@ func TestPageContentServiceUpdatePageEmptyKey(t *testing.T) {
 		t.Fatalf("err = %v, want error containing 'key'", err)
 	}
 }
+
+// ── ListPages ──────────────────────────────────────────────────────────────
+
+func TestPageContentServiceListPages(t *testing.T) {
+	state := newTestServices(t)
+
+	pages, err := state.svc.Pages.ListPages()
+	if err != nil {
+		t.Fatalf("ListPages: %v", err)
+	}
+	if len(pages) < 2 {
+		t.Fatalf("pages len = %d, want at least 2 (seeded about + contact)", len(pages))
+	}
+
+	// Verify seeded pages are present
+	found := map[string]bool{}
+	for _, p := range pages {
+		found[p.Key] = true
+	}
+	if !found[model.PageKeyAbout] {
+		t.Fatalf("ListPages missing seeded about page")
+	}
+	if !found[model.PageKeyContact] {
+		t.Fatalf("ListPages missing seeded contact page")
+	}
+	// Verify about page has rendered HTML
+	for _, p := range pages {
+		if p.Key == model.PageKeyAbout {
+			if p.ContentHTML == "" {
+				t.Fatalf("about page content_html is empty (should be rendered)")
+			}
+		}
+	}
+}
+
+func TestPageContentServiceListPagesIncludesNewPages(t *testing.T) {
+	state := newTestServices(t)
+
+	// Create a new page via UpdatePage (Upsert)
+	_, err := state.svc.Pages.UpdatePage(model.PageContent{
+		Key:       "custom-page",
+		Title:     "Custom Page",
+		Summary:   "A custom page created after seed",
+		ContentMD: "# Custom\n\nContent.",
+	})
+	if err != nil {
+		t.Fatalf("UpdatePage custom page: %v", err)
+	}
+
+	pages, err := state.svc.Pages.ListPages()
+	if err != nil {
+		t.Fatalf("ListPages after add: %v", err)
+	}
+	if len(pages) < 3 {
+		t.Fatalf("pages len = %d, want at least 3 (seeded 2 + custom)", len(pages))
+	}
+
+	found := false
+	for _, p := range pages {
+		if p.Key == "custom-page" {
+			found = true
+			if p.Title != "Custom Page" {
+				t.Fatalf("custom page title = %q, want Custom Page", p.Title)
+			}
+			if p.ContentHTML == "" {
+				t.Fatalf("custom page content_html is empty (should be rendered)")
+			}
+			if p.Summary != "A custom page created after seed" {
+				t.Fatalf("custom page summary = %q, want summary text", p.Summary)
+			}
+		}
+	}
+	if !found {
+		t.Fatalf("ListPages missing custom-page")
+	}
+}

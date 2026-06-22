@@ -3071,3 +3071,5 @@ func TestAgentMetricPayloadAcceptsExtendedNodeHealthTelemetry(t *testing.T) {
 		}
 	}
 }
+
+// TestAPIRecordMetrics is in api_project_test.go

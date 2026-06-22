@@ -905,3 +905,196 @@ func TestAdminDeleteMissingProject(t *testing.T) {
 	}
 	assertContains(t, rr.Body.String(), "project not found")
 }
+// =============================================================================
+// Admin topic edit (GET)
+// =============================================================================
+
+// TestAdminEditTopicGet verifies the topic edit form renders for an existing
+// category with its name, slug, and CSRF field.
+func TestAdminEditTopicGet(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, _ := loginAsAdmin(t, app)
+
+	cats, err := app.svc.Blog.ListCategories()
+	if err != nil {
+		t.Fatalf("list categories: %v", err)
+	}
+	var catID int64
+	for _, c := range cats {
+		if c.Slug == "devops" {
+			catID = c.ID
+			break
+		}
+	}
+	if catID == 0 {
+		t.Fatalf("seed category not found")
+	}
+
+	status, body := getBody(t, app, "/admin/topics/edit/"+strconv.FormatInt(catID, 10), sessionCookie)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Edit Topic")
+	assertContains(t, body, "DevOps")
+	assertContains(t, body, `name="_csrf"`)
+}
+
+// TestAdminEditTopicNotFound verifies that GET /admin/topics/edit/{id} with a
+// non-existent ID returns 404.
+func TestAdminEditTopicNotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, _ := loginAsAdmin(t, app)
+
+	status, body := getBody(t, app, "/admin/topics/edit/99999", sessionCookie)
+	if status != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusNotFound, body)
+	}
+	assertContains(t, body, "topic not found")
+}
+
+// =============================================================================
+// Admin post edit (GET)
+// =============================================================================
+
+// TestAdminEditPostGet verifies the post edit form renders for an existing post
+// with its title, intent buttons, and CSRF field.
+func TestAdminEditPostGet(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, _ := loginAsAdmin(t, app)
+
+	post, err := app.svc.Blog.GetPost("hello-raevtar")
+	if err != nil {
+		t.Fatalf("get seed post: %v", err)
+	}
+
+	status, body := getBody(t, app, "/admin/posts/edit/"+strconv.FormatInt(post.ID, 10), sessionCookie)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Edit post")
+	assertContains(t, body, "Hello Raevtar")
+	assertContains(t, body, `name="_csrf"`)
+	assertContains(t, body, `name="intent" value="draft"`)
+	assertContains(t, body, `name="intent" value="update"`)
+	assertContains(t, body, `name="intent" value="publish"`)
+}
+
+// TestAdminEditPostNotFound verifies that GET /admin/posts/edit/{id} with a
+// non-existent ID returns 404.
+func TestAdminEditPostNotFound(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, _ := loginAsAdmin(t, app)
+
+	status, body := getBody(t, app, "/admin/posts/edit/99999", sessionCookie)
+	if status != http.StatusNotFound {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusNotFound, body)
+	}
+	assertContains(t, body, "post not found")
+}
+
+// =============================================================================
+// Admin server detail (GET)
+// =============================================================================
+
+// TestAdminServerDetail verifies the admin server detail page renders with
+// server metadata, command center, audit logs, and CSRF field.
+func TestAdminServerDetail(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, _ := loginAsAdmin(t, app)
+
+	path := "/admin/servers/" + strconv.FormatInt(app.serverID, 10)
+	status, body := getBody(t, app, path, sessionCookie)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Server Detail")
+	assertContains(t, body, "whyred")
+	assertContains(t, body, "Node Metadata")
+	assertContains(t, body, "Remote Command Center")
+	assertContains(t, body, "Audit Logs")
+	assertContains(t, body, `name="_csrf"`)
+}
+
+// =============================================================================
+// Admin server mutations (POST)
+// =============================================================================
+
+// TestAdminUpdateServer verifies that POSTing valid update data to an existing
+// server returns a 303 redirect and updates the server record.
+func TestAdminUpdateServer(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrfToken := loginAsAdmin(t, app)
+
+	form := url.Values{
+		"name":  {"whyred-updated"},
+		"host":  {"127.0.0.1"},
+		"port":  {"9100"},
+		"tags":  {"local,updated"},
+		"_csrf": {csrfToken},
+	}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers/update/"+strconv.FormatInt(app.serverID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	wantLoc := "/admin/servers/" + strconv.FormatInt(app.serverID, 10)
+	if got := rr.Header().Get("Location"); got != wantLoc {
+		t.Fatalf("Location = %q, want %q", got, wantLoc)
+	}
+
+	// Verify the server was updated
+	server, err := app.svc.Monitor.GetServer(app.serverID)
+	if err != nil {
+		t.Fatalf("get server: %v", err)
+	}
+	if server.Name != "whyred-updated" {
+		t.Fatalf("server name = %q, want %q", server.Name, "whyred-updated")
+	}
+	if server.Host != "127.0.0.1" {
+		t.Fatalf("server host = %q, want %q", server.Host, "127.0.0.1")
+	}
+	if server.Port != 9100 {
+		t.Fatalf("server port = %d, want %d", server.Port, 9100)
+	}
+	if server.Tags != "local,updated" {
+		t.Fatalf("server tags = %q, want %q", server.Tags, "local,updated")
+	}
+}
+
+// TestAdminRotateServerToken verifies that POSTing to rotate the agent token
+// returns a 303 redirect and updates the server's token hash.
+func TestAdminRotateServerToken(t *testing.T) {
+	app := newPublicTestApp(t)
+	sessionCookie, csrfToken := loginAsAdmin(t, app)
+
+	form := url.Values{"_csrf": {csrfToken}}
+	req := httptest.NewRequest(http.MethodPost, "/admin/servers/rotate-token/"+strconv.FormatInt(app.serverID, 10), strings.NewReader(form.Encode()))
+	req.Header.Set("Content-Type", "application/x-www-form-urlencoded")
+	req.AddCookie(sessionCookie)
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusSeeOther {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusSeeOther, rr.Body.String())
+	}
+	if got := rr.Header().Get("Location"); got != "/admin/servers" {
+		t.Fatalf("Location = %q, want /admin/servers", got)
+	}
+
+	// Verify the server now has a non-empty token hash
+	server, err := app.svc.Monitor.GetServer(app.serverID)
+	if err != nil {
+		t.Fatalf("get server: %v", err)
+	}
+	if server.AgentTokenHash == "" {
+		t.Fatalf("expected non-empty agent token hash after rotation")
+	}
+}

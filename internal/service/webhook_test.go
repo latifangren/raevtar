@@ -1,4 +1,4 @@
-package service
+﻿package service
 
 import (
 	"testing"
@@ -281,3 +281,102 @@ func TestWebhookServiceEvaluateAndFireNoConfigs(t *testing.T) {
 		t.Fatalf("events len = %d, want 0 (no configs defined)", len(events))
 	}
 }
+
+
+
+// ── formatAlertValue ────────────────────────────────────────────────────────
+
+func TestFormatAlertValueCPUHigh(t *testing.T) {
+	metric := model.ServerMetric{CPUPercent: 95.3}
+	got := formatAlertValue(metric, "cpu_high")
+	want := "95.3%"
+	if got != want {
+		t.Fatalf("formatAlertValue(cpu_high) = %q, want %q", got, want)
+	}
+}
+
+func TestFormatAlertValueRAMHighWithTotal(t *testing.T) {
+	metric := model.ServerMetric{RAMUsedMB: 512, RAMTotalMB: 2048}
+	got := formatAlertValue(metric, "ram_high")
+	want := "25.0% (512/2048 MB)"
+	if got != want {
+		t.Fatalf("formatAlertValue(ram_high with total) = %q, want %q", got, want)
+	}
+}
+
+func TestFormatAlertValueRAMHighWithoutTotal(t *testing.T) {
+	metric := model.ServerMetric{RAMUsedMB: 1024, RAMTotalMB: 0}
+	got := formatAlertValue(metric, "ram_high")
+	want := "1024 MB used"
+	if got != want {
+		t.Fatalf("formatAlertValue(ram_high no total) = %q, want %q", got, want)
+	}
+}
+
+func TestFormatAlertValueDiskHighWithTotal(t *testing.T) {
+	metric := model.ServerMetric{DiskUsedGB: 25.5, DiskTotalGB: 100}
+	got := formatAlertValue(metric, "disk_high")
+	want := "25.5% (25.5/100.0 GB)"
+	if got != want {
+		t.Fatalf("formatAlertValue(disk_high with total) = %q, want %q", got, want)
+	}
+}
+
+func TestFormatAlertValueDiskHighWithoutTotal(t *testing.T) {
+	metric := model.ServerMetric{DiskUsedGB: 50.5, DiskTotalGB: 0}
+	got := formatAlertValue(metric, "disk_high")
+	want := "50.5 GB used"
+	if got != want {
+		t.Fatalf("formatAlertValue(disk_high no total) = %q, want %q", got, want)
+	}
+}
+
+func TestFormatAlertValueDefault(t *testing.T) {
+	metric := model.ServerMetric{}
+	got := formatAlertValue(metric, "unknown_alert")
+	if got != "" {
+		t.Fatalf("formatAlertValue(default) = %q, want empty string", got)
+	}
+}
+
+// ── IDText ───────────────────────────────────────────────────────────────────
+
+func TestIDText(t *testing.T) {
+	tests := []struct {
+		input int64
+		want  string
+	}{
+		{input: 0, want: "0"},
+		{input: 1, want: "1"},
+		{input: 42, want: "42"},
+		{input: 999, want: "999"},
+		{input: 1234567890, want: "1234567890"},
+	}
+	for _, tt := range tests {
+		got := IDText(tt.input)
+		if got != tt.want {
+			t.Fatalf("IDText(%d) = %q, want %q", tt.input, got, tt.want)
+		}
+	}
+}
+
+// ── CountText ────────────────────────────────────────────────────────────────
+
+func TestCountText(t *testing.T) {
+	tests := []struct {
+		input int
+		want  string
+	}{
+		{input: 0, want: "0"},
+		{input: 1, want: "1"},
+		{input: 42, want: "42"},
+		{input: 999, want: "999"},
+	}
+	for _, tt := range tests {
+		got := CountText(tt.input)
+		if got != tt.want {
+			t.Fatalf("CountText(%d) = %q, want %q", tt.input, got, tt.want)
+		}
+	}
+}
+

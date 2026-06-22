@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/http/httptest"
@@ -368,4 +369,158 @@ func TestAdminEditorialInboxUpdateNotFound(t *testing.T) {
 		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusNotFound, rr.Body.String())
 	}
 	assertContains(t, rr.Body.String(), "not found")
+}
+
+// ---------- Editorial inbox API endpoint tests ----------
+
+func TestAPIEditorialInboxSummary(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	req := httptest.NewRequest(http.MethodGet, "/api/v1/editorial-inbox/summary", nil)
+	req.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+	var summary model.EditorialInboxSummary
+	if err := json.NewDecoder(rr.Body).Decode(&summary); err != nil {
+		t.Fatalf("decode summary: %v", err)
+	}
+}
+
+func TestAPICreateEditorialInbox(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	payload := `{"source_type":"repo","source_value":"https://github.com/example/test","priority":50,"not_before":"2025-01-01T00:00:00Z","mode":"scheduled_assignment","status":"approved"}`
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox", strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusCreated {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusCreated, rr.Body.String())
+	}
+	var item model.EditorialInboxItem
+	if err := json.NewDecoder(rr.Body).Decode(&item); err != nil {
+		t.Fatalf("decode: %v", err)
+	}
+	if item.SourceValue != "https://github.com/example/test" {
+		t.Fatalf("source_value = %q, want %q", item.SourceValue, "https://github.com/example/test")
+	}
+	if item.Status != "approved" {
+		t.Fatalf("status = %q, want %q", item.Status, "approved")
+	}
+}
+
+func TestAPIClaimEditorialInbox(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	createPayload := "{\"source_type\":\"repo\",\"source_value\":\"https://github.com/example/claim-test\",\"priority\":90,\"not_before\":\"2025-01-01T00:00:00Z\",\"mode\":\"scheduled_assignment\",\"status\":\"approved\"}"
+	createReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox", strings.NewReader(createPayload))
+	createReq.Header.Set("Content-Type", "application/json")
+	createReq.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	createReq.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	createRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(createRR, createReq)
+	if createRR.Code != http.StatusCreated {
+		t.Fatalf("create status = %d, want %d; body: %s", createRR.Code, http.StatusCreated, createRR.Body.String())
+	}
+
+	claimReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/claim", strings.NewReader("{\"worker\":\"test-worker\"}"))
+	claimReq.Header.Set("Content-Type", "application/json")
+	claimReq.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	claimReq.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	claimRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(claimRR, claimReq)
+
+	if claimRR.Code != http.StatusOK {
+		t.Fatalf("claim status = %d, want %d; body: %s", claimRR.Code, http.StatusOK, claimRR.Body.String())
+	}
+	var result model.EditorialInboxClaimResult
+	if err := json.NewDecoder(claimRR.Body).Decode(&result); err != nil {
+		t.Fatalf("decode claim result: %v", err)
+	}
+	if result.ClaimToken == "" {
+		t.Fatal("claim_token is empty")
+	}
+	if result.Item == nil || result.Item.ID == 0 {
+		t.Fatal("claim result item is nil or has zero ID")
+	}
+}
+
+func TestAPICompleteEditorialInboxClaim(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	post, err := app.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Editorial Complete Test Post",
+		ContentMD:    "# Test",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+
+	createPayload := "{\"source_type\":\"repo\",\"source_value\":\"https://github.com/example/complete-test\",\"priority\":90,\"not_before\":\"2025-01-01T00:00:00Z\",\"mode\":\"scheduled_assignment\",\"status\":\"approved\"}"
+	createReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox", strings.NewReader(createPayload))
+	createReq.Header.Set("Content-Type", "application/json")
+	createReq.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	createReq.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	createRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(createRR, createReq)
+	if createRR.Code != http.StatusCreated {
+		t.Fatalf("create status = %d, want %d; body: %s", createRR.Code, http.StatusCreated, createRR.Body.String())
+	}
+	var createdItem model.EditorialInboxItem
+	if err := json.NewDecoder(createRR.Body).Decode(&createdItem); err != nil {
+		t.Fatalf("decode created item: %v", err)
+	}
+
+	claimReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/claim", strings.NewReader("{\"worker\":\"test-worker\"}"))
+	claimReq.Header.Set("Content-Type", "application/json")
+	claimReq.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	claimReq.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	claimRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(claimRR, claimReq)
+	if claimRR.Code != http.StatusOK {
+		t.Fatalf("claim status = %d, want %d; body: %s", claimRR.Code, http.StatusOK, claimRR.Body.String())
+	}
+	var claimResult model.EditorialInboxClaimResult
+	if err := json.NewDecoder(claimRR.Body).Decode(&claimResult); err != nil {
+		t.Fatalf("decode claim: %v", err)
+	}
+
+	completePayload := "{\"claim_token\":\"" + claimResult.ClaimToken + "\",\"published_post_id\":" + strconv.FormatInt(post.ID, 10) + "}"
+	completeReq := httptest.NewRequest(http.MethodPost, "/api/v1/editorial-inbox/"+strconv.FormatInt(createdItem.ID, 10)+"/complete", strings.NewReader(completePayload))
+	completeReq.Header.Set("Content-Type", "application/json")
+	completeReq.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	completeReq.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	completeRR := httptest.NewRecorder()
+	app.handler.ServeHTTP(completeRR, completeReq)
+
+	if completeRR.Code != http.StatusOK {
+		t.Fatalf("complete status = %d, want %d; body: %s", completeRR.Code, http.StatusOK, completeRR.Body.String())
+	}
+	var completedItem model.EditorialInboxItem
+	if err := json.NewDecoder(completeRR.Body).Decode(&completedItem); err != nil {
+		t.Fatalf("decode completed item: %v", err)
+	}
+	if completedItem.Status != "done" {
+		t.Fatalf("status = %q, want %q", completedItem.Status, "done")
+	}
+	if completedItem.PublishedPostID == nil || *completedItem.PublishedPostID != post.ID {
+		t.Fatalf("published_post_id = %v, want %d", completedItem.PublishedPostID, post.ID)
+	}
 }

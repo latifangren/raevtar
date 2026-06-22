@@ -2,8 +2,10 @@
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 	"testing"
+	"time"
 
 	"raevtar/internal/model"
 )
@@ -360,3 +362,347 @@ func TestAdminServiceDeleteServerNotFound(t *testing.T) {
 		t.Fatalf("err = %v, want ErrServerNotFound", err)
 	}
 }
+
+
+// ── LogPostUpdated ──────────────────────────────────────────────────────────
+
+func TestAdminServiceLogPostUpdated(t *testing.T) {
+	state := newTestServices(t)
+
+	post, err := state.svc.Blog.CreatePost(model.PostCreate{
+		CategorySlug: "devops",
+		Title:        "Post To Update",
+		ContentMD:    "# Update Me",
+		Published:    true,
+	})
+	if err != nil {
+		t.Fatalf("create post: %v", err)
+	}
+
+	if err := state.svc.Admin.LogPostUpdated("admin", post.Title, "10.0.0.1"); err != nil {
+		t.Fatalf("LogPostUpdated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "UPDATE_POST" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "Post To Update") {
+				t.Fatalf("UPDATE_POST details = %q, want containing title", log.Details)
+			}
+			if log.IP != "10.0.0.1" {
+				t.Fatalf("UPDATE_POST IP = %q, want 10.0.0.1", log.IP)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("UPDATE_POST audit entry not found")
+	}
+}
+
+// ── LogProjectCreated ──────────────────────────────────────────────────────
+
+func TestAdminServiceLogProjectCreated(t *testing.T) {
+	state := newTestServices(t)
+
+	if err := state.svc.Admin.LogProjectCreated("admin", "Test Project", "10.0.0.1"); err != nil {
+		t.Fatalf("LogProjectCreated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "CREATE_PROJECT" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "Test Project") {
+				t.Fatalf("CREATE_PROJECT details = %q, want containing title", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("CREATE_PROJECT audit entry not found")
+	}
+}
+
+// ── LogProjectUpdated ──────────────────────────────────────────────────────
+
+func TestAdminServiceLogProjectUpdated(t *testing.T) {
+	state := newTestServices(t)
+
+	if err := state.svc.Admin.LogProjectUpdated("admin", "Updated Project", "10.0.0.1"); err != nil {
+		t.Fatalf("LogProjectUpdated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "UPDATE_PROJECT" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "Updated Project") {
+				t.Fatalf("UPDATE_PROJECT details = %q, want containing title", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("UPDATE_PROJECT audit entry not found")
+	}
+}
+
+// ── LogCategoryUpdated ──────────────────────────────────────────────────────
+
+func TestAdminServiceLogCategoryUpdated(t *testing.T) {
+	state := newTestServices(t)
+
+	if err := state.svc.Admin.LogCategoryUpdated("admin", "Updated Category", "10.0.0.1"); err != nil {
+		t.Fatalf("LogCategoryUpdated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "UPDATE_CATEGORY" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "Updated Category") {
+				t.Fatalf("UPDATE_CATEGORY details = %q, want containing name", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("UPDATE_CATEGORY audit entry not found")
+	}
+}
+
+// ── Admin DeleteCategory ────────────────────────────────────────────────────
+
+func TestAdminServiceDeleteCategory(t *testing.T) {
+	state := newTestServices(t)
+
+	cat, err := callCreateCategory(t, state, model.Category{
+		Slug:        "delete-by-admin",
+		Name:        "Delete By Admin",
+		Description: "Will be deleted via admin",
+	})
+	if err != nil {
+		t.Fatalf("create category: %v", err)
+	}
+
+	if err := state.svc.Admin.DeleteCategory("admin", cat, "10.0.0.1"); err != nil {
+		t.Fatalf("DeleteCategory: %v", err)
+	}
+
+	// Note: AdminService.DeleteCategory only logs, doesn't delete.
+	// Category should still exist.
+	_, _, err = state.svc.Blog.GetCategoryByID(cat.ID)
+	if err != nil {
+		t.Fatalf("category should still exist after admin log: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "DELETE_CATEGORY" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "Delete By Admin") {
+				t.Fatalf("DELETE_CATEGORY details = %q, want containing name", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("DELETE_CATEGORY audit entry not found")
+	}
+}
+
+// ── LogAgentTokenRotated ───────────────────────────────────────────────────
+
+func TestAdminServiceLogAgentTokenRotated(t *testing.T) {
+	state := newTestServices(t)
+
+	server, err := state.svc.Monitor.CreateServer("token-srv", "10.0.0.1", 9100, "test")
+	if err != nil {
+		t.Fatalf("create server: %v", err)
+	}
+
+	if err := state.svc.Admin.LogAgentTokenRotated("admin", strconv.FormatInt(server.ID, 10), "10.0.0.1"); err != nil {
+		t.Fatalf("LogAgentTokenRotated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "ROTATE_AGENT_TOKEN" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "server id: ") {
+				t.Fatalf("ROTATE_AGENT_TOKEN details = %q, want containing server id", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("ROTATE_AGENT_TOKEN audit entry not found")
+	}
+}
+
+// ── LogEditorialInboxCreated ───────────────────────────────────────────────
+
+func TestAdminServiceLogEditorialInboxCreated(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+
+	item, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/inbox-log",
+		Priority:    50,
+		NotBefore:   now,
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create inbox item: %v", err)
+	}
+
+	if err := state.svc.Admin.LogEditorialInboxCreated("admin", item, "10.0.0.1"); err != nil {
+		t.Fatalf("LogEditorialInboxCreated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "CREATE_EDITORIAL_ITEM" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, item.SourceValue) {
+				t.Fatalf("CREATE_EDITORIAL_ITEM details = %q, want containing source value", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("CREATE_EDITORIAL_ITEM audit entry not found")
+	}
+}
+
+// ── LogEditorialInboxUpdated ───────────────────────────────────────────────
+
+func TestAdminServiceLogEditorialInboxUpdated(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+
+	item, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/inbox-update",
+		Priority:    50,
+		NotBefore:   now,
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create inbox item: %v", err)
+	}
+
+	if err := state.svc.Admin.LogEditorialInboxUpdated("admin", item, "10.0.0.1"); err != nil {
+		t.Fatalf("LogEditorialInboxUpdated: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "UPDATE_EDITORIAL_ITEM" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, "status="+item.Status) {
+				t.Fatalf("UPDATE_EDITORIAL_ITEM details = %q, want containing status", log.Details)
+			}
+			if !strings.Contains(log.Details, item.Status) {
+				t.Fatalf("UPDATE_EDITORIAL_ITEM details = %q, want containing status", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("UPDATE_EDITORIAL_ITEM audit entry not found")
+	}
+}
+
+// ── LogEditorialInboxDeleted ───────────────────────────────────────────────
+
+func TestAdminServiceLogEditorialInboxDeleted(t *testing.T) {
+	state := newTestServices(t)
+	now := time.Now().UTC().Truncate(time.Minute)
+
+	item, err := state.svc.Editorial.CreateInboxItem(model.EditorialInboxCreate{
+		SourceType:  "repo",
+		SourceValue: "https://github.com/example/inbox-delete",
+		Priority:    50,
+		NotBefore:   now,
+		Mode:        model.EditorialModeScheduled,
+		Status:      model.EditorialStatusApproved,
+	})
+	if err != nil {
+		t.Fatalf("create inbox item: %v", err)
+	}
+
+	if err := state.svc.Admin.LogEditorialInboxDeleted("admin", item, "10.0.0.1"); err != nil {
+		t.Fatalf("LogEditorialInboxDeleted: %v", err)
+	}
+
+	logs, err := state.svc.Admin.ListAuditLogs(10, 0)
+	if err != nil {
+		t.Fatalf("ListAuditLogs: %v", err)
+	}
+
+	var found bool
+	for _, log := range logs {
+		if log.Action == "DELETE_EDITORIAL_ITEM" && log.User == "admin" {
+			found = true
+			if !strings.Contains(log.Details, item.SourceValue) {
+				t.Fatalf("DELETE_EDITORIAL_ITEM details = %q, want containing source value", log.Details)
+			}
+			break
+		}
+	}
+	if !found {
+		t.Fatalf("DELETE_EDITORIAL_ITEM audit entry not found")
+	}
+}
+
+
+
+
+
+

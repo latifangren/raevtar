@@ -1,6 +1,7 @@
 ﻿package handler
 
 import (
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -267,4 +268,44 @@ func TestXMLEscapeEmptyString(t *testing.T) {
 	if got != "" {
 		t.Errorf("xmlEscape('') = %q, want empty string", got)
 	}
+}
+
+// ---------- public page rendering ----------
+
+func TestAboutPage(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/about", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "About Raevtar")
+	assertContains(t, body, "Single binary, public-safe by design.")
+}
+
+func TestLabPage(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/lab", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Public lab bench")
+}
+
+func TestDocsPage(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/docs", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Public docs")
+}
+
+func TestProjectDetail(t *testing.T) {
+	app := newPublicTestApp(t)
+	status, body := getBody(t, app, "/projects/whyred-watchtower", nil)
+	if status != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", status, http.StatusOK, body)
+	}
+	assertContains(t, body, "Whyred Watchtower")
+	assertContains(t, body, "Back to projects")
 }

@@ -1,6 +1,7 @@
-﻿package handler
+package handler
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -679,5 +680,73 @@ func TestAPIProjectEndpointsRequireAuth(t *testing.T) {
 				t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusUnauthorized, rr.Body.String())
 			}
 		})
+	}
+}
+
+// ---------- standalone update project ----------
+
+func TestAPIUpdateProject(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	project, err := app.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "API Update Test",
+		ContentMD: "# Test content",
+		Excerpt:   "Test excerpt",
+		State:     model.ProjectStateActive,
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	payload := `{"title":"Updated Title","content_md":"# Updated"}`
+	req := httptest.NewRequest(http.MethodPut, "/api/v1/projects/"+strconv.FormatInt(project.ID, 10), strings.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+
+	var updated model.Project
+	if err := json.NewDecoder(rr.Body).Decode(&updated); err != nil {
+		t.Fatalf("decode response: %v", err)
+	}
+	if updated.Title != "Updated Title" {
+		t.Fatalf("title = %q, want %q", updated.Title, "Updated Title")
+	}
+}
+
+// ---------- standalone record metrics ----------
+
+func TestAPIRecordMetrics(t *testing.T) {
+	app := newPublicTestApp(t)
+
+	payload := []byte(`{"cpu_percent":42.0,"ram_used_mb":512,"ram_total_mb":2048,"disk_used_gb":12,"uptime_seconds":3600,"online":true}`)
+	req := httptest.NewRequest(http.MethodPost, "/api/v1/servers/"+strconv.FormatInt(app.serverID, 10)+"/ping", bytes.NewReader(payload))
+	req.Header.Set("Content-Type", "application/json")
+	req.Header.Set("Authorization", "Bearer admin-key")
+	testRequestCounter++
+	req.RemoteAddr = fmt.Sprintf("203.0.113.%d:1234", testRequestCounter%250+1)
+	rr := httptest.NewRecorder()
+	app.handler.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Fatalf("status = %d, want %d; body: %s", rr.Code, http.StatusOK, rr.Body.String())
+	}
+
+	metrics, err := app.svc.Monitor.GetRecentMetrics(app.serverID, 1)
+	if err != nil {
+		t.Fatalf("get metrics: %v", err)
+	}
+	if len(metrics) != 1 {
+		t.Fatalf("metrics count = %d, want 1", len(metrics))
+	}
+	if metrics[0].CPUPercent != 42.0 {
+		t.Fatalf("CPUPercent = %f, want 42.0", metrics[0].CPUPercent)
 	}
 }
