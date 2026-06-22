@@ -1,0 +1,594 @@
+# Instincts generated from https://github.com/latifangren/raevtar
+# Generated: 2026-06-22T18:38:50.606Z
+# Version: 2.0
+# NOTE: This file supplements (does not replace) any existing curated instincts.
+# High-confidence manually curated instincts should be preserved alongside these.
+
+---
+id: raevtar-commit-length
+trigger: "when writing a commit message"
+confidence: 0.6
+domain: git
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Commit Length
+
+## Action
+
+Write moderate-length commit messages (~62 characters)
+
+## Evidence
+
+- Average commit message length: 62 chars
+- Based on 19 commits
+
+---
+id: raevtar-naming-files
+trigger: "when creating a new file"
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Naming Files
+
+## Action
+
+Use snake_case naming convention
+
+## Evidence
+
+- Analyzed file naming patterns in repository
+- Dominant pattern: snake_case
+
+---
+id: raevtar-import-relative
+trigger: "when importing modules"
+confidence: 0.75
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Import Relative
+
+## Action
+
+Use relative imports for project files
+
+## Evidence
+
+- Import analysis shows relative import pattern
+- Example: import { x } from '../lib/x'
+
+---
+id: raevtar-export-style
+trigger: "when exporting from a module"
+confidence: 0.7
+domain: code-style
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Export Style
+
+## Action
+
+Prefer named exports
+
+## Evidence
+
+- Export pattern analysis
+- Dominant style: named
+
+---
+id: raevtar-test-separate
+trigger: "when writing tests"
+confidence: 0.8
+domain: testing
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Test Separate
+
+## Action
+
+Place tests in the tests/ or __tests__/ directory, mirroring src structure
+
+## Evidence
+
+- Separate test directory pattern detected
+- Tests live in dedicated test folders
+
+---
+id: raevtar-workflow-feature-development
+trigger: "when implementing a new feature"
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Workflow Feature Development
+
+## Action
+
+Follow the feature-development workflow:
+1. Add feature implementation
+2. Add tests for feature
+3. Update documentation
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~14x per month
+- Files: internal/view/components/*, **/*.test.*, **/api/**
+
+---
+id: raevtar-workflow-feature-development-implementation-test-doc
+trigger: "when doing feature development implementation test doc"
+confidence: 0.65
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Workflow Feature Development Implementation Test Doc
+
+## Action
+
+Follow the feature-development-implementation-test-doc workflow:
+1. Create or update handler files in internal/handler/ (e.g., handlers.go, admin.go, api.go, routes.go).
+2. Add or update model files in internal/model/ and repo files in internal/repo/ as needed.
+3. Implement service logic in internal/service/.
+4. Update or create templates in internal/view/pages/, internal/view/admin/, internal/view/components/, and their corresponding *_templ.go files.
+5. Update or add static assets (CSS, JS) if frontend changes are needed.
+6. Add or update tests in internal/handler/, internal/service/, internal/repo/ as appropriate.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~3x per month
+- Files: internal/handler/*.go, internal/model/*.go, internal/repo/*.go
+
+---
+id: raevtar-workflow-test-coverage-phase
+trigger: "when doing test coverage phase"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Workflow Test Coverage Phase
+
+## Action
+
+Follow the test-coverage-phase workflow:
+1. Identify coverage gaps in repo, service, model, and handler code.
+2. Write new *_test.go files or add tests to existing ones in internal/repo/, internal/service/, internal/model/, internal/handler/.
+3. Fix minor bugs or test issues discovered during coverage expansion.
+4. Update .gitignore to exclude coverage artifacts if needed.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: internal/repo/*_test.go, internal/service/*_test.go, internal/model/*_test.go
+
+---
+id: raevtar-workflow-frontend-design-refresh
+trigger: "when doing frontend design refresh"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Workflow Frontend Design Refresh
+
+## Action
+
+Follow the frontend-design-refresh workflow:
+1. Update static/css/style.css and/or static/css/tailwind.src.css with new design tokens, patterns, or utilities.
+2. Modify tailwind.config.js for new colors, fonts, or scale.
+3. Update or refactor templates in internal/view/components/, internal/view/layouts/, internal/view/pages/, and their *_templ.go files.
+4. Add or update font files in static/fonts/ if changing typography.
+5. Test UI changes in browser and adjust as needed.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: static/css/style.css, static/css/tailwind.src.css, tailwind.config.js
+
+---
+id: raevtar-workflow-ci-cd-pipeline-setup-or-update
+trigger: "when doing ci cd pipeline setup or update"
+confidence: 0.55
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Workflow Ci Cd Pipeline Setup Or Update
+
+## Action
+
+Follow the ci-cd-pipeline-setup-or-update workflow:
+1. Add or update .github/workflows/*.yml for CI and release workflows.
+2. Add or update .goreleaser.yaml for release configuration.
+3. Test the pipeline by pushing changes or tags.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~1x per month
+- Files: .github/workflows/*.yml, .goreleaser.yaml
+
+---
+id: raevtar-workflow-documentation-update
+trigger: "when doing documentation update"
+confidence: 0.6
+domain: workflow
+source: repo-analysis
+source_repo: https://github.com/latifangren/raevtar
+---
+
+# Raevtar Workflow Documentation Update
+
+## Action
+
+Follow the documentation-update workflow:
+1. Edit README.md to reflect latest features and usage.
+2. Update or add docs/ARCHITECTURE.md, docs/PRD.md, docs/ROADMAP.md, and docs/CODEMAPS/* for architecture, planning, and navigation.
+3. Commit and push documentation changes.
+
+## Evidence
+
+- Workflow detected from commit patterns
+- Frequency: ~2x per month
+- Files: README.md, docs/ARCHITECTURE.md, docs/PRD.md
+
+---
+id: raevtar-coding-filename-snake-case
+trigger: "When creating or renaming a file."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Coding Filename Snake Case
+
+## Action
+
+Use snake_case for file names.
+
+## Evidence
+
+- Pattern in files: internal/view/components/footer_templ.go
+- internal/handler/handlers.go
+
+---
+id: raevtar-coding-function-camel-case
+trigger: "When defining a function."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Coding Function Camel Case
+
+## Action
+
+Use camelCase for function names.
+
+## Evidence
+
+- Pattern in Go codebase
+- Naming conventions: functions: camelCase
+
+---
+id: raevtar-coding-class-pascal-case
+trigger: "When defining a struct or class."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Coding Class Pascal Case
+
+## Action
+
+Use PascalCase for struct/class names.
+
+## Evidence
+
+- Pattern in Go codebase
+- Naming conventions: classes: PascalCase
+
+---
+id: raevtar-coding-constant-screaming-snake-case
+trigger: "When defining a constant."
+confidence: 0.9
+domain: code-style
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Coding Constant Screaming Snake Case
+
+## Action
+
+Use SCREAMING_SNAKE_CASE for constant names.
+
+## Evidence
+
+- Pattern in Go codebase
+- Naming conventions: constants: SCREAMING_SNAKE_CASE
+
+---
+id: raevtar-coding-import-relative
+trigger: "When importing modules in Go."
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Coding Import Relative
+
+## Action
+
+Use relative import paths.
+
+## Evidence
+
+- importStyle: relative
+
+---
+id: raevtar-coding-export-named
+trigger: "When exporting functions or types."
+confidence: 0.8
+domain: code-style
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Coding Export Named
+
+## Action
+
+Use named exports.
+
+## Evidence
+
+- exportStyle: named
+
+---
+id: raevtar-testing-test-file-naming
+trigger: "When writing tests for Go code."
+confidence: 0.95
+domain: testing
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Testing Test File Naming
+
+## Action
+
+Name test files with *_test.go suffix.
+
+## Evidence
+
+- Pattern in files: internal/handler/handler_test.go
+- internal/service/service_test.go
+
+---
+id: raevtar-testing-test-location-separate
+trigger: "When organizing test files."
+confidence: 0.9
+domain: testing
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Testing Test Location Separate
+
+## Action
+
+Place test files in the same directory as the code they test, but as separate files.
+
+## Evidence
+
+- testLocation: separate
+- Pattern in files: internal/handler/handler_test.go
+
+---
+id: raevtar-testing-test-coverage-phase
+trigger: "When increasing test coverage or after major changes."
+confidence: 0.95
+domain: testing
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Testing Test Coverage Phase
+
+## Action
+
+Add or update *_test.go files in internal/repo/, internal/service/, internal/model/, internal/handler/.
+
+## Evidence
+
+- Workflow: test-coverage-phase
+- Commits: Write new *_test.go files or add tests to existing ones
+
+---
+id: raevtar-testing-update-gitignore-for-coverage
+trigger: "When adding new test coverage."
+confidence: 0.85
+domain: testing
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Testing Update Gitignore For Coverage
+
+## Action
+
+Update .gitignore to exclude coverage artifacts.
+
+## Evidence
+
+- Workflow: test-coverage-phase
+- Commit: Update .gitignore to exclude coverage artifacts
+
+---
+id: raevtar-git-commit-prefix
+trigger: "When writing a commit message."
+confidence: 0.95
+domain: git
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Git Commit Prefix
+
+## Action
+
+Prefix the commit message with a type (feat, fix, test, ci, handler, docs, frontend) followed by a colon.
+
+## Evidence
+
+- Pattern in commits: feat: implement RetroUI-inspired Neo-Brutalist design improvements
+- fix: cleanup Manus-dev artifacts
+
+---
+id: raevtar-git-commit-length
+trigger: "When writing a commit message."
+confidence: 0.8
+domain: git
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Git Commit Length
+
+## Action
+
+Keep the commit message concise, around 60-70 characters.
+
+## Evidence
+
+- averageLength: 62
+- Pattern in commit examples
+
+---
+id: raevtar-workflow-feature-development
+trigger: "When adding a significant new feature."
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Workflow Feature Development
+
+## Action
+
+Create or update handler, model, repo, service, template, static asset, and test files as needed.
+
+## Evidence
+
+- Workflow: feature-development-implementation-test-doc
+- Commits: feat: implement HTMX live search, infinite scroll, and real-time monitoring charts
+
+---
+id: raevtar-workflow-test-coverage-phase
+trigger: "When increasing code coverage or after a major refactor."
+confidence: 0.95
+domain: workflow
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Workflow Test Coverage Phase
+
+## Action
+
+Identify coverage gaps and add/update *_test.go files in repo, service, model, handler layers.
+
+## Evidence
+
+- Workflow: test-coverage-phase
+- Commits: Write new *_test.go files or add tests to existing ones
+
+---
+id: raevtar-workflow-frontend-design-refresh
+trigger: "When updating the visual style or implementing a new design system."
+confidence: 0.9
+domain: workflow
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Workflow Frontend Design Refresh
+
+## Action
+
+Update CSS, Tailwind config, templates, and fonts as needed.
+
+## Evidence
+
+- Workflow: frontend-design-refresh
+- Commits: Update static/css/style.css and/or static/css/tailwind.src.css with new design tokens
+
+---
+id: raevtar-workflow-ci-cd-pipeline-setup
+trigger: "When automating testing, building, or releasing the project."
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Workflow Ci Cd Pipeline Setup
+
+## Action
+
+Add or update .github/workflows/*.yml and .goreleaser.yaml files.
+
+## Evidence
+
+- Workflow: ci-cd-pipeline-setup-or-update
+- Commits: Add or update .github/workflows/*.yml for CI and release workflows
+
+---
+id: raevtar-workflow-documentation-update
+trigger: "When reflecting new features, architecture changes, or roadmap progress in documentation."
+confidence: 0.85
+domain: workflow
+source: repo-analysis
+source_repo: latifangren/raevtar
+---
+
+# Raevtar Workflow Documentation Update
+
+## Action
+
+Edit README.md and update/add docs/ARCHITECTURE.md, docs/PRD.md, docs/ROADMAP.md, docs/CODEMAPS/*.
+
+## Evidence
+
+- Workflow: documentation-update
+- Commits: Edit README.md to reflect latest features and usage
+
