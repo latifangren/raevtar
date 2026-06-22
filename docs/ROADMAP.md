@@ -143,6 +143,56 @@ Perbaikan berdasarkan audit Hermes + feedback real usage.
 
 ---
 
+## Fase 8: Portability & Cross-Device 🔀
+
+Audit hardcoded values agar Raevtar bisa jalan di device/OS lain tanpa recompile besar-besaran.
+Roadmap ini hasil code audit — tiap item dikerjakan urutan dari atas ke bawah.
+
+### Group 1: Path & Environment (Paling Sering Kena)
+
+- [ ] **Systemd service template** — `raevtar.service` hardcoded `User=latif` + `/home/latif/raevtar/`. Buat template yang pakai env vars (`$RAEVTAR_HOME`, `$RAEVTAR_USER`) atau generate via `make install-service`
+- [ ] **Static file serving** — `routes.go:28` + `handlers.go:669` pakai `./static` relative path. Resolve ke binary's directory, bukan CWD. Pakai `os.Executable()` → `filepath.Dir()` sebagai base
+- [ ] **Agent install path configurable** — `admin/data.go:195,208,215` hardcoded `/usr/local/bin/raevtar-agent.sh`. Buat constant/configurable via `SiteMeta` atau env var `RAEVTAR_AGENT_DIR`
+- [ ] **Bootstrap script AGENT_DIR** — `api.go:721` hardcoded `AGENT_DIR="/usr/local/bin"`. Pakai configurable constant yang sama dengan admin data
+
+### Group 2: Domain & Branding (Gampang Fix)
+
+- [ ] **RSS/webmention links** — `base.templ:17-19` hardcoded `raevtar.tech`. Render dari `SiteMeta.Domain()` — sudah ada getter `Domain()`, tinggal pakai di templ
+- [ ] **Footer copyright domain** — `footer.templ:23` hardcoded `raevtar.tech`. Render dari config/domain
+- [ ] **Meta keywords** — `base.templ:28` hardcoded `postmarketOS`. Render dari config, atau buang keywords meta (Google ignore anyway)
+- [ ] **SEO description** — `site_meta.go:56` hardcoded `postmarketOS`. Render dari SiteMeta config, bukan string literal
+- [ ] **OG image domain** — `og_image.go:48` hardcoded `raevtar.tech` di SVG. Render dari config
+- [ ] **OpenAPI contact URL** — `static/openapi.json:9` hardcoded domain. Generate dinamis di handler atau bikin `openapi.json.templ`
+- [ ] **robots.txt sitemap** — `static/robots.txt:3` hardcoded domain. Generate dinamis di handler (`/robots.txt`), bukan static file
+- [ ] **Footer description** — `footer.templ:8` hardcoded `postmarketOS`. Render dari SiteMeta config
+
+### Group 3: OS-Specific Paths (Butuh Abstraction)
+
+- [ ] **Host stats build tags** — `hoststats.go` pakai `/proc/loadavg`, `/proc/meminfo`, `/proc/cpuinfo`, `/sys/class/thermal`. Pisah jadi `hoststats_linux.go` + `hoststats_unsupported.go` dengan `//go:build` tags
+- [ ] **Disk stats** — `diskstats_unix.go:13` pakai `syscall.Statfs("/", ...)` — hardcoded root `/`. Buat configurable `rootPath` atau branch per-OS
+- [ ] **Agent script OS detection** — `agent.sh` baca `/proc/stat`, `/proc/uptime`, `/sys/class/thermal`. Deteksi OS di script, branch ke alternative commands (macOS: `sysctl`, `top -l`; Windows: WMI/PowerShell)
+- [ ] **Bootstrap package manager** — `api.go:680-685` support `apk`, `apt-get`, `opkg`. Tambah `yum`/`dnf` (RHEL), `pacman` (Arch), `brew` (macOS). Deteksi via `/etc/os-release`
+
+### Group 4: Configurable Operational Params
+
+- [ ] **Rate limit configurable** — `security.go:51-52` hardcoded `60 req/min`. Env var `RAEVTAR_RATE_LIMIT` with default `60`
+- [ ] **Server timeouts configurable** — `main.go:44-46` hardcoded `ReadTimeout:10s`, `WriteTimeout:30s`, `IdleTimeout:60s`. Env vars or config struct
+- [ ] **Stale checker intervals** — `main.go:56-57` hardcoded `5min` check / `15min` threshold. Env vars `RAEVTAR_STALE_CHECK_INTERVAL`, `RAEVTAR_STALE_THRESHOLD`
+- [ ] **Scheduler interval** — `main.go:114` hardcoded `60s`. Env var `RAEVTAR_SCHEDULER_INTERVAL`
+- [ ] **Max upload size** — `media.go:22` hardcoded `5MB`. Env var `RAEVTAR_MAX_UPLOAD_MB`
+- [ ] **Hardening limits** — `hardening.go:14-21` hardcoded body limits, login throttling. Env vars with sane defaults
+- [ ] **Cron healthcheck** — `cron/healthcheck.sh:4` hardcoded `URL="http://localhost:8080"`. Env var `RAEVTAR_URL` (sudah ada pattern dari agent)
+- [ ] **Chart.js CDN** — `base.templ:25` hardcoded CDN URL. Self-host ke `/static/vendor/chart.min.js` atau configurable CDN base
+
+### Group 5: Documentation & Examples
+
+- [ ] **DEPLOYMENT.md** — 10+ referensi `/home/latif/raevtar`. Ganti ke generic `$RAEVTAR_HOME`
+- [ ] **README.md** — hardcoded `postmarketOS/aarch64`, `whyred`, `/usr/local/bin/`. Update ke generic example
+- [ ] **AGENTS.md** — hardcoded `systemctl restart raevtar`. Ganti ke generic stop/start command
+- [ ] **PRD.md** — hardcoded `postmarketOS`, `whyred`. Update to generic references
+
+---
+
 ## Legend
 
 - `[x]` — Selesai
