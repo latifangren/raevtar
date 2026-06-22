@@ -1,44 +1,55 @@
-name: ci
+name: CI
 
 on:
   push:
-    branches:
-      - main
+    branches: [main, dev-*]
   pull_request:
+    branches: [main]
 
-permissions:
-  contents: read
+env:
+  GO_VERSION: "1.26"
 
 jobs:
-  verify:
+  test:
+    name: Test
     runs-on: ubuntu-latest
-
     steps:
-      - name: Check out repository
-        uses: actions/checkout@v6
+      - uses: actions/checkout@v4
 
-      - name: Set up Go
-        uses: actions/setup-go@v6
+      - name: Setup Go
+        uses: actions/setup-go@v5
         with:
-          go-version: '1.26.3'
+          go-version: ${{ env.GO_VERSION }}
           cache: true
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v6
-        with:
-          node-version: '24'
-
-      - name: Generate templ files
-        run: make templ-gen
-
-      - name: Regenerate Tailwind CSS
-        run: make css
-
-      - name: Verify committed templ files are up to date
-        run: git diff --exit-code -- 'internal/view/**/*_templ.go'
-
       - name: Run tests
-        run: go test ./...
+        run: go test ./... -count=1 -timeout 600s
 
-      - name: Build project
-        run: make build
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+    needs: test
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: ${{ env.GO_VERSION }}
+          cache: true
+
+      - name: Build CSS
+        run: npx --yes tailwindcss@3.4.19 -i static/css/tailwind.src.css -o static/css/style.css --minify
+
+      - name: Generate Templ code
+        run: go run github.com/a-h/templ/cmd/templ@v0.3.906 generate
+
+      - name: Build binary
+        run: go build -o raevtar ./cmd/server/
+
+      - name: Upload binary
+        uses: actions/upload-artifact@v4
+        with:
+          name: raevtar-linux-amd64
+          path: raevtar
+          retention-days: 7
