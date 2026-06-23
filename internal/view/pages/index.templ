@@ -17,6 +17,20 @@ templ Index(data IndexData) {
 					<a href="/blog" class="nb-button nb-button-primary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Browse Notes</a>
 					<a href="/dashboard" class="nb-button nb-button-secondary text-lg focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Live Status <span aria-hidden="true">&rarr;</span></a>
 				</div>
+				<div class="flex justify-center gap-12 mt-10 pt-8 border-t-2 border-foreground">
+					<div class="text-center">
+						<span class="text-5xl font-black mb-2">{ PortText(data.PostCount) }</span>
+						<span class="text-xs font-black uppercase tracking-widest">Posts</span>
+					</div>
+					<div class="text-center">
+						<span class="text-5xl font-black mb-2">{ PortText(len(data.Categories)) }</span>
+						<span class="text-xs font-black uppercase tracking-widest">Topics</span>
+					</div>
+					<div class="text-center">
+						<span class="text-5xl font-black mb-2">{ PortText(len(data.Servers)) }</span>
+						<span class="text-xs font-black uppercase tracking-widest">Servers</span>
+					</div>
+				</div>
 			</div>
 		</section>
 
