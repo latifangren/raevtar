@@ -70,3 +70,14 @@ func (r *ServerRepo) UpdateAgentTokenHash(id int64, hash string) error {
 	_, err := r.db.Exec("UPDATE servers SET agent_token_hash = ? WHERE id = ?", hash, id)
 	return err
 }
+
+func (r *ServerRepo) GetStaleServers(cutoff time.Time) ([]model.Server, error) {
+	var servers []model.Server
+	err := r.db.Select(&servers,
+		"SELECT * FROM servers WHERE last_seen IS NULL OR last_seen < ? ORDER BY name",
+		cutoff)
+	if err != nil {
+		return nil, err
+	}
+	return servers, nil
+}

@@ -28,6 +28,10 @@ func (h *Handler) serveProjectOGImage(w http.ResponseWriter, r *http.Request) {
 
 func (h *Handler) serveOGImage(w http.ResponseWriter, title, subtitle string) {
 	w.Header().Set("Content-Type", "image/svg+xml")
+	domain := h.cfg.Domain
+	if domain == "" {
+		domain = "raevtar.tech"
+	}
 	// Bold Neo-Brutalist SVG OG Image
 	fmt.Fprintf(w, `<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
 		<rect width="1200" height="630" fill="#F5F2ED"/>
@@ -45,6 +49,6 @@ func (h *Handler) serveOGImage(w http.ResponseWriter, title, subtitle string) {
 		
 		<!-- Branding -->
 		<rect x="60" y="500" width="200" height="60" fill="#2D3748"/>
-		<text x="80" y="540" font-family="sans-serif" font-size="32" font-weight="bold" fill="#F5F2ED">raevtar.tech</text>
+		<text x="80" y="540" font-family="sans-serif" font-size="32" font-weight="bold" fill="#F5F2ED">`+domain+`</text>
 	</svg>`, html.EscapeString(subtitle), html.EscapeString(title))
 }

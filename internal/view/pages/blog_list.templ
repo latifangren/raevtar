@@ -7,8 +7,8 @@ import (
 
 templ BlogList(data BlogListData) {
 	@page("Blog — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="full-width bg-accent nb-border-b mb-10 overflow-hidden">
-			<div class="max-w-5xl mx-auto px-4 py-12 md:py-16">
+		<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				<div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end">
 					<div>
 						<div class="flex flex-wrap gap-2 mb-5">
@@ -39,12 +39,18 @@ templ BlogList(data BlogListData) {
 									<a href={ templ.URL(blogCategoryHref(category.Slug, data.Query)) } class={ categoryClass(data.CurrentCat == category.Slug) }>{ category.Name }</a>
 								}
 							</div>
+							<hr class="nb-border my-4"/>
+							<a href="/blog/feed.xml" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted hover:text-foreground no-underline transition-colors">
+								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+								Subscribe RSS
+							</a>
 						</div>
 					</div>
 				</div>
 			</div>
 		</section>
-		<section class="mb-12">
+		<div class="max-w-6xl mx-auto px-4 sm:px-8">
+			<section class="mb-12">
 			<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
 				<div>
 					<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">Latest dispatches</p>
@@ -75,7 +81,8 @@ templ BlogList(data BlogListData) {
 					<p class="text-xs font-black uppercase tracking-widest text-muted">You've reached the end of the notes.</p>
 				}
 			</div>
-		</section>
+			</section>
+		</div>
 	}
 }
 

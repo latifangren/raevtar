@@ -3,10 +3,10 @@
   "info": {
     "title": "Raevtar Public API",
     "description": "Public read-only API for published posts, published projects, project timelines/changelog/showcase, and categories. Operator and monitoring write endpoints are intentionally omitted from this public spec.",
-    "version": "1.1.0",
+    "version": "1.2.0",
     "contact": {
       "name": "latifangren",
-      "url": "https://raevtar.tech"
+      "url": "/"
     }
   },
   "servers": [
@@ -38,6 +38,80 @@
               }
             }
           }
+        }
+      }
+    },
+    "/api/v1/posts/{id}/read-time": {
+      "post": {
+        "summary": "Record post read session",
+        "description": "Records a read session heartbeat. IP-hashed for privacy. No auth required.",
+        "parameters": [
+          {
+            "name": "id",
+            "in": "path",
+            "required": true,
+            "schema": { "type": "integer" }
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "seconds": {
+                    "type": "integer",
+                    "description": "Session seconds to record (1-60)"
+                  }
+                },
+                "required": ["seconds"]
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": { "description": "No Content — recorded" },
+          "400": { "description": "Invalid post ID or seconds value" }
+        }
+      }
+    },
+    "/api/v1/search": {
+      "get": {
+        "summary": "Search posts, projects, and pages",
+        "description": "Full-text search across published content.",
+        "parameters": [
+          {
+            "name": "q",
+            "in": "query",
+            "description": "Search query",
+            "required": true,
+            "schema": { "type": "string" }
+          },
+          {
+            "name": "scope",
+            "in": "query",
+            "description": "Content scope filter. Supported: posts, projects, pages",
+            "required": false,
+            "schema": { "type": "string", "enum": ["posts", "projects", "pages"] }
+          },
+          {
+            "name": "page",
+            "in": "query",
+            "description": "Page number (default 1)",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1 }
+          },
+          {
+            "name": "page_size",
+            "in": "query",
+            "description": "Results per page (default 10, max 50)",
+            "required": false,
+            "schema": { "type": "integer", "minimum": 1, "maximum": 50 }
+          }
+        ],
+        "responses": {
+          "200": { "description": "Search results" }
         }
       }
     },
@@ -223,6 +297,7 @@
           "title": { "type": "string" },
           "slug": { "type": "string" },
           "content_md": { "type": "string" },
+          "content_html": { "type": "string" },
           "excerpt": { "type": "string" },
           "published": { "type": "boolean" },
           "created_at": { "type": "string", "format": "date-time" },

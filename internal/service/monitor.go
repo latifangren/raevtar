@@ -228,6 +228,29 @@ func agentTokenHash(token string) string {
 	return hex.EncodeToString(sum[:])
 }
 
+// CheckStaleServers finds servers not seen since cutoff and fires stale alerts.
+// Returns the list of stale servers found.
+func (s *MonitorService) CheckStaleServers(cutoff time.Time) []model.Server {
+	servers, err := s.repos.Server.GetStaleServers(cutoff)
+	if err != nil {
+		slog.Error("stale check: query failed", "error", err)
+		return nil
+	}
+	for _, server := range servers {
+		msg := fmt.Sprintf("servers/%d (%s) — last seen: ", server.ID, server.Name)
+		if server.LastSeen == nil {
+			msg += "never"
+		} else {
+			msg += server.LastSeen.Format(time.RFC3339)
+		}
+		slog.Warn("stale server detected", "server_id", server.ID, "name", server.Name, "last_seen", server.LastSeen)
+		if s.webhook != nil {
+			s.webhook.FireAlert(server.ID, "server_stale", msg)
+		}
+	}
+	return servers
+}
+
 // PingServer is called by agents (including Hermes cron) to report status
 func (s *MonitorService) PingServer(host string, port int) (*model.ServerMetric, error) {
 	// Stub: in production, do actual HTTP/ICMP check

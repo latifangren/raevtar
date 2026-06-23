@@ -37,3 +37,13 @@ func (h *Handler) llmsTxt(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
 	_, _ = fmt.Fprint(w, body)
 }
+
+func (h *Handler) robotsTxt(w http.ResponseWriter, r *http.Request) {
+	domain := h.cfg.Domain
+	if domain == "" {
+		domain = "example.com"
+	}
+	body := fmt.Sprintf("User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n", domain)
+	w.Header().Set("Content-Type", "text/plain; charset=utf-8")
+	_, _ = fmt.Fprint(w, body)
+}

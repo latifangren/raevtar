@@ -1,0 +1,132 @@
+package pages
+
+templ APIDocs(data APIDocsData) {
+@page("API Reference — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
+		<section class="full-width bg-card border-b-2 border-foreground mb-12 overflow-hidden">
+			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+				<div class="max-w-3xl">
+					<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">API reference</p>
+					<h1 class="font-head text-5xl md:text-7xl font-black uppercase leading-none text-foreground mb-5">Public API</h1>
+					<p class="text-base md:text-lg font-bold text-foreground opacity-80">Raevtar exposes a small read-only API surface. All endpoints return JSON. No authentication required for public endpoints.</p>
+					<div class="flex flex-wrap gap-2 mt-4">
+						<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-secondary text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">&larr; Docs home</a>
+					</div>
+				</div>
+			</div>
+		</section>
+
+		<div class="grid gap-8 max-w-5xl mx-auto">
+			<nav class="bg-card nb-border p-5 nb-shadow">
+				<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">Endpoints</p>
+				<ul class="space-y-1">
+					<li><a href="#list-posts" class="text-sm font-bold text-foreground no-underline hover:text-muted"><code class="bg-secondary px-1.5 py-0.5 text-xs">GET</code> /api/v1/posts</a></li>
+					<li><a href="#search" class="text-sm font-bold text-foreground no-underline hover:text-muted"><code class="bg-secondary px-1.5 py-0.5 text-xs">GET</code> /api/v1/search</a></li>
+					<li><a href="#list-projects" class="text-sm font-bold text-foreground no-underline hover:text-muted"><code class="bg-secondary px-1.5 py-0.5 text-xs">GET</code> /api/v1/projects</a></li>
+					<li><a href="#list-categories" class="text-sm font-bold text-foreground no-underline hover:text-muted"><code class="bg-secondary px-1.5 py-0.5 text-xs">GET</code> /api/v1/categories</a></li>
+					<li><a href="#read-time" class="text-sm font-bold text-foreground no-underline hover:text-muted"><code class="bg-secondary px-1.5 py-0.5 text-xs">POST</code> /api/v1/posts/&#123;id&#125;/read-time</a></li>
+					<li><a href="#rss-feed" class="text-sm font-bold text-foreground no-underline hover:text-muted"><code class="bg-secondary px-1.5 py-0.5 text-xs">GET</code> /blog/feed.xml</a></li>
+				</ul>
+				<p class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-1">
+					Base URL
+				</p>
+				<p class="text-sm font-mono font-bold text-foreground">https://{ data.Host }</p>
+			</nav>
+
+			<section id="list-posts" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">List posts</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">GET /api/v1/posts</code>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Query parameters</h3>
+				<table class="w-full text-xs font-bold border-collapse mb-3">
+					<thead><tr class="border-b-2 border-foreground"><th class="text-left py-1 pr-4">Param</th><th class="text-left py-1 pr-4">Type</th><th class="text-left py-1">Description</th></tr></thead>
+					<tbody>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">category</td><td class="py-1 pr-4 text-muted">string</td><td class="py-1">Filter by category slug</td></tr>
+					</tbody>
+				</table>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl https://{ data.Host }/api/v1/posts?category=ai-agent</div>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Response</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">@templ.Raw(postsListJSON)</div>
+			</section>
+
+			<section id="search" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">Search</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">GET /api/v1/search</code>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Query parameters</h3>
+				<table class="w-full text-xs font-bold border-collapse mb-3">
+					<thead><tr class="border-b-2 border-foreground"><th class="text-left py-1 pr-4">Param</th><th class="text-left py-1 pr-4">Type</th><th class="text-left py-1">Description</th></tr></thead>
+					<tbody>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">q</td><td class="py-1 pr-4 text-muted">string</td><td class="py-1">Search query</td></tr>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">scope</td><td class="py-1 pr-4 text-muted">string</td><td class="py-1">Filter: posts, projects, pages (default all)</td></tr>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">page</td><td class="py-1 pr-4 text-muted">int</td><td class="py-1">Page number (default 1)</td></tr>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">page_size</td><td class="py-1 pr-4 text-muted">int</td><td class="py-1">Results per page (default 10, max 50)</td></tr>
+					</tbody>
+				</table>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl 'https://{ data.Host }/api/v1/search?q=ai+agent&scope=posts'</div>
+			</section>
+
+			<section id="read-time" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">Record read time</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">POST /api/v1/posts/&#123;id&#125;/read-time</code>
+				<p class="text-sm font-bold text-muted mb-3">Records a read session heartbeat. No auth required. IP-hashed for privacy.</p>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mb-2">Request body</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">&#123;"seconds": 30&#125;</div>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl -X POST https://{ data.Host }/api/v1/posts/1/read-time \
+  -H 'Content-Type: application/json' \
+  -d '&#123;"seconds": 30&#125;'</div>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Response</h3>
+				<p class="text-sm font-bold text-muted"><code class="bg-secondary px-1">204 No Content</code> on success.</p>
+			</section>
+
+			<section id="get-post" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">Get post by slug</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">GET /api/v1/posts/&#123;slug&#125;</code>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl https://{ data.Host }/api/v1/posts/judul-artikel</div>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Response</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">@templ.Raw(postDetailJSON)</div>
+			</section>
+
+			<section id="list-projects" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">List projects</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">GET /api/v1/projects</code>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Query parameters</h3>
+				<table class="w-full text-xs font-bold border-collapse mb-3">
+					<thead><tr class="border-b-2 border-foreground"><th class="text-left py-1 pr-4">Param</th><th class="text-left py-1 pr-4">Type</th><th class="text-left py-1">Description</th></tr></thead>
+					<tbody>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">featured</td><td class="py-1 pr-4 text-muted">bool</td><td class="py-1">Filter featured projects only</td></tr>
+						<tr class="border-b border-foreground/20"><td class="py-1 pr-4">page</td><td class="py-1 pr-4 text-muted">int</td><td class="py-1">Page number (default 1)</td></tr>
+					</tbody>
+				</table>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl https://{ data.Host }/api/v1/projects</div>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Response</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">@templ.Raw(projectsListJSON)</div>
+			</section>
+
+			<section id="list-categories" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">List categories</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">GET /api/v1/categories</code>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl https://{ data.Host }/api/v1/categories</div>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-4 mb-2">Response</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">@templ.Raw(categoriesListJSON)</div>
+			</section>
+
+			<section id="rss-feed" class="bg-card nb-border p-6 nb-shadow scroll-mt-24">
+				<h2 class="font-head text-2xl font-black uppercase mb-1">RSS feed</h2>
+				<code class="inline-block bg-foreground text-primary-foreground px-3 py-1 text-sm font-bold font-mono mb-2">GET /blog/feed.xml</code>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mt-2 mb-2">Returns <code class="bg-secondary px-1">application/rss+xml</code> with recent 20 posts. No auth required.</h3>
+				<h3 class="text-xs font-black uppercase tracking-widest text-muted mb-2">Example request</h3>
+				<div class="bg-background nb-border p-4 text-sm font-mono overflow-x-auto whitespace-pre">curl https://{ data.Host }/blog/feed.xml</div>
+			</section>
+
+			<section class="bg-success/20 nb-border p-6 nb-shadow">
+				<h2 class="font-head text-xl font-black uppercase mb-1">Protected write endpoint</h2>
+				<p class="text-sm font-bold text-muted mb-3">Hermes uses a bearer token to publish posts. Endpoint not listed here — intended for automation only.</p>
+				<a href="/docs" class="inline-block text-sm font-black no-underline hover:bg-card border-2 border-foreground px-4 py-2 bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">&larr; Back to docs home</a>
+			</section>
+		</div>
+	}
+}

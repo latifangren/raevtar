@@ -2,8 +2,8 @@ package pages
 
 templ Docs(data DocsData) {
 @page("Docs - Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-			<section class="full-width bg-destructive border-b-2 border-foreground mb-12 overflow-hidden">
-			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+			<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				<div class="max-w-3xl">
 					<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Public docs</p>
 					<h1 class="font-head text-5xl md:text-7xl font-black uppercase leading-none text-foreground mb-5">What this public room shows.</h1>
@@ -16,6 +16,7 @@ templ Docs(data DocsData) {
 				</div>
 			</div>
 		</section>
+		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-12 grid gap-4 lg:grid-cols-3">
 			@docsCard("01", "Read", "Blog posts and RSS are public. Articles keep category and tag context so Hermes-written and manual notes land in one archive.", "/blog", "Open blog")
 			@docsCard("02", "Watch", "Status cards show public freshness bands: online, stale, and offline. They explain last signal timing without exposing topology.", "/dashboard", "Open status")
@@ -45,6 +46,7 @@ templ Docs(data DocsData) {
 				<code class="border-2 border-foreground bg-card p-3 text-sm font-mono font-black">GET /blog/feed.xml</code>
 			</div>
 			<p class="text-sm font-bold text-muted mt-4">Projects endpoint returns published build logs with featured flag, sort order, timestamps, and public tags. Protected write and operator endpoints stay omitted from public docs.</p>
+			<a href="/docs/api" class="inline-block mt-4 text-sm font-black no-underline hover:bg-card border-2 border-foreground px-4 py-2 bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Full API reference &rarr;</a>
 		</section>
 		<section class="mb-12 bg-card border-2 border-foreground p-6 nb-shadow">
 			<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">related public pages</p>
@@ -55,6 +57,7 @@ templ Docs(data DocsData) {
 				<a href="/contact" class="border-2 border-foreground bg-destructive p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Contact shows best first context routes &rarr;</a>
 			</div>
 		</section>
+	</div>
 	}
 }
 

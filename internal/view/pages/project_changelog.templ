@@ -2,7 +2,8 @@ package pages
 
 templ ProjectChangelog(data ProjectChangelogData) {
 @page(data.Project.Title + " Changelog — Projects — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="mb-12 max-w-5xl mx-auto px-4 py-10">
+		<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 			<div class="mb-6">
 				<a href={ templ.URL("/projects/" + data.Project.Slug) } class="inline-flex items-center gap-1.5 mb-4 px-4 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">&larr; Back to project</a>
 				<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Project changelog</p>
@@ -33,6 +34,7 @@ templ ProjectChangelog(data ProjectChangelogData) {
 					}
 				</div>
 			}
+		</div>
 		</section>
 	}
 }

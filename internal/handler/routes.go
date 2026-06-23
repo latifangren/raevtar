@@ -18,16 +18,18 @@ type Handler struct {
 func New(svc *service.Service, cfg *config.Config) http.Handler {
 	h := &Handler{svc: svc, cfg: cfg}
 	configureTrustedProxies(cfg)
+	initRateLimiter(cfg)
+	initHardening(cfg)
 	r := chi.NewRouter()
 
 	r.Use(middleware.Logger)
 	r.Use(middleware.Recoverer)
 	r.Use(RateLimit)
 
-	// static files
-	fs := http.FileServer(http.Dir("./static"))
+	// static files (resolve relative to binary, not CWD)
+	fs := http.FileServer(http.Dir(h.cfg.StaticDir))
 	r.Handle("/static/*", http.StripPrefix("/static/", fs))
-	r.Get("/robots.txt", h.serveStatic("robots.txt"))
+	r.Get("/robots.txt", h.robotsTxt)
 	r.Get("/favicon.svg", h.serveStatic("favicon.svg"))
 	r.Get("/llms.txt", h.llmsTxt)
 	r.Get("/sitemap.xml", h.sitemapXML)
@@ -43,6 +45,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 	r.Get("/contact", h.contactPage)
 	r.Get("/lab", h.labPage)
 	r.Get("/docs", h.docsPage)
+	r.Get("/docs/api", h.apiDocsPage)
 	r.Get("/lab/docs", h.docsPage)
 	r.Get("/projects", h.projectsPage)
 	r.Get("/search", h.searchPage)
@@ -56,6 +59,9 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 
 	// RSS feed
 	r.Get("/blog/feed.xml", h.rssFeed)
+
+	// Webmention
+	r.Post("/webmention", h.handleWebmention)
 
 	// 404
 	r.NotFound(h.page404)
@@ -124,6 +130,9 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 				r.Get("/manage-users", h.adminUsers)
 				r.Post("/manage-users", h.adminCreateUser)
 				r.Post("/manage-users/delete/{userID}", h.adminDeleteUser)
+				r.Get("/db", h.adminDBPage)
+				r.Get("/db/export", h.adminDBExport)
+				r.Post("/db/import", h.adminDBImport)
 			})
 		})
 	})
@@ -170,6 +179,7 @@ func New(svc *service.Service, cfg *config.Config) http.Handler {
 		r.Post("/servers/{serverID}/ping", h.apiRecordMetrics)
 		r.Get("/servers/{serverID}/commands", h.apiGetPendingCommands)
 		r.Post("/servers/{serverID}/commands/result", h.apiReportCommandResult)
+		r.Get("/bootstrap/{serverID}/{token}", h.apiBootstrap)
 	})
 
 	// Store mux for debugging

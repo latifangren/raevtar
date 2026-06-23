@@ -1,11 +1,11 @@
 package components
 
-templ Footer() {
-	<footer class="mt-20 mb-12 py-12 nb-border-b">
+templ Footer(domain string) {
+	<footer class="">
 		<div class="flex flex-col md:flex-row justify-between items-center gap-8">
 			<div class="text-center md:text-left">
 				<a href="/" class="text-2xl font-head uppercase tracking-tighter no-underline text-foreground">raevtar</a>
-				<p class="text-sm font-bold text-muted mt-2">Single Go binary running on postmarketOS.</p>
+				<p class="text-sm font-bold text-muted mt-2">Single Go binary — blog, server monitoring, and automation hooks.</p>
 			</div>
 			<div class="flex flex-wrap justify-center gap-4" aria-label="Tech stack badges">
 				<span class="nb-badge bg-muted text-muted-foreground">Go 1.26</span>
@@ -15,7 +15,12 @@ templ Footer() {
 			</div>
 		</div>
 		<div class="mt-12 text-center text-xs font-black uppercase tracking-widest text-muted">
-			&copy; 2026 raevtar.tech &bull; Built with RetroUI principles
+			<a href="/blog/feed.xml" class="inline-flex items-center gap-1.5 text-muted hover:text-foreground no-underline transition-colors">
+				<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
+				RSS Feed
+			</a>
+			<span class="mx-3">&bull;</span>
+			&copy; 2026 { domain } &bull; Built with RetroUI principles
 		</div>
 	</footer>
 }

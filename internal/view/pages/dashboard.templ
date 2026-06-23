@@ -2,8 +2,8 @@ package pages
 
 templ Dashboard(data DashboardData) {
 	@page("Status — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-				<section class="full-width bg-success/20 border-b-2 border-foreground mb-12 overflow-hidden">
-				<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+			<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 					<div class="max-w-3xl">
 						<p class="text-xs font-black uppercase tracking-widest text-foreground mb-2">Monitor Grid</p>
 						<h1 class="text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5">Server Status</h1>
@@ -32,6 +32,7 @@ templ Dashboard(data DashboardData) {
 				<div class="nb-border border-primary-foreground bg-card p-3 text-foreground"><p class="text-xs font-black uppercase tracking-widest text-muted">Visibility</p><p class="text-lg font-black">Safe summary</p><p class="text-xs font-bold text-muted">Topology stays private</p></div>
 			</div>
 		</section>
+		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-6 bg-card nb-border p-5 nb-shadow">
 			<div class="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
 				<div>
@@ -132,5 +133,6 @@ templ Dashboard(data DashboardData) {
 			</div>
 		}
 		<div class="mt-4 text-xs font-bold text-muted" hx-get={ templ.URL(DashboardURL(data.ActiveTag)) } hx-trigger="every 30s" hx-select="#server-list" hx-target="#server-list" hx-swap="outerHTML" hx-indicator="#server-list">Auto-refresh every 30s</div>
+		</div>
 	}
 }

@@ -79,7 +79,7 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Editorial inbox Phase 3: claim/lock/retry flow buat hindari double-processing antar run Hermes
 - [x] Editorial inbox Phase 4: fairness policy, overdue escalation, dan analytics hasil publish
 - [x] Search endpoint + HTMX search UI (`/search`, `GET /api/v1/search`)
-- [ ] Read-time tracker di artikel
+- [x] Read-time tracker di artikel
 
 **Deliverable:** Platform siap dikembangin kapan aja.
 
@@ -102,8 +102,8 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Admin creds via env file (`/home/latif/raevtar/.env.production`)
 - [x] Health check: Hermes cronjob tiap 5 menit (silent if healthy)
 - [ ] Update dependencies periodik (go mod update, npm update)
-- [ ] Alerting sederhana untuk node stale/offline
-- [ ] Versioned schema migration ledger jika migration makin banyak
+- [x] Alerting sederhana untuk node stale/offline — background goroutine tiap 5 menit, threshold 15 menit sejak LastSeen, `server_stale` event ke webhook
+- [x] Versioned schema migration ledger — `schema_migrations` table + v1 backfill untuk existing DB + template untuk future migrations
 - [x] Public-safe docs + read-only OpenAPI spec (`/docs`)
 - [x] Webhook system: threshold alerts (CPU/RAM/disk >= 90%), HMAC-SHA256, admin UI
 - [x] Server command queue: admin queue → agent poll → result report
@@ -112,6 +112,84 @@ Biar gak kelihatan kaya projek HTML kampus.
 - [x] Dynamic OG images (SVG, neo-brutalist, tiap blog post + project)
 - [x] CI/CD pipeline: GitHub Actions test+build + GoReleaser multi-platform releases
 **Deliverable:** Platform cukup stabil untuk personal deployment yang exposed ke internet, dengan hardening dasar dan boundary publik/admin jelas.
+
+---
+
+---
+
+## Fase 7: Iteration & UX 🔄 (done ✅)
+
+Perbaikan berdasarkan audit Hermes + feedback real usage.
+
+- [x] **Server monitoring cleanup** — Fix 401/404 agent ping (server ID 5 token mismatch, server ID 1 deleted). Rotate token, redeploy pake one-liner baru.
+- [x] **HTMX search real-time** — Ganti form submit ke `hx-get="/search" hx-trigger="keyup changed delay:300ms, submit" hx-target="#search-results"`. Loading indicator. `autocomplete="off"`.
+- [x] **RSS feed: verify & promote** — Cek `/blog/feed.xml` isinya proper, tambah link visible di footer / blog page sidebar.
+- [ ] ~~**Dark mode toggle**~~ — Di-skip. Neo-brutalist sudah light-first.
+- [x] **Content scheduling** — `scheduled_at` field (datetime-local picker di admin form), background goroutine publish otomatis tiap 60s.
+- [x] **Media library improvements** — Alt text field (wajib di upload form + display di card). Default dari cleaned filename.
+- [x] **Webmention / IndieWeb** — Receive-only. Link tags di `<head>`, POST endpoint, admin approval flow, display section di blog page.
+- [x] **API docs page** — `/docs/api` dengan contoh request/response tiap endpoint (curl + JSON).
+- [x] **DB export/import dari admin** — Download SQLite via `/admin/db/export`, upload + replace via `/admin/db/import` (SQLite header validation, restart required).
+
+**Deliverable:** Platform lebih mature, UX lebih mulus, konten lebih terkelola.
+
+---
+
+## Known Issues (dari Hermes audit)
+
+- Build berat di aarch64 — `make build` jalan templ-gen + tailwind + go build ~12s + CPU 100%. Pertimbangin cross-compile dari laptop atau `go build -ldflags="-s -w"`.
+- Sitemap nampilin 166 URLs — validasi broken link / page ke-generate.
+- JSON-LD structured data — perlu dicek apakah proper untuk Google Scholar / blog post.
+
+---
+
+## Fase 8: Portability & Cross-Device 🔀 (done ✅)
+
+Audit hardcoded values agar Raevtar bisa jalan di device/OS lain tanpa recompile besar-besaran.
+Roadmap ini hasil code audit — tiap item dikerjakan urutan dari atas ke bawah.
+
+### Group 1: Path & Environment (Paling Sering Kena) ✅
+
+- [x] **Systemd service template** — `raevtar.service.tmpl` dengan `{{RAEVTAR_USER}}`/`{{RAEVTAR_HOME}}` placeholders. `make generate-service` + `make install-service`
+- [x] **Static file serving** — `Config.StaticDir` computed from `os.Executable()` → `filepath.Dir()` + `/static`
+- [x] **Agent install path configurable** — `Config.AgentDir` from `RAEVTAR_AGENT_DIR` env var (default `/usr/local/bin`)
+- [x] **Bootstrap script AGENT_DIR** — `api.go` uses `h.cfg.AgentDir` injected into shell string
+
+### Group 2: Domain & Branding (Gampang Fix) ✅
+
+- [x] **RSS/webmention links** — `base.templ` uses `seo.SiteDomain` for RSS, webmention, pingback URLs
+- [x] **Footer copyright domain** — `Footer(domain string)` param, renders from domain config
+- [x] **Meta keywords** — Removed `postmarketOS` from keywords, now generic
+- [x] **SEO description** — `HomeSEO()` description no longer mentions `postmarketOS`
+- [x] **OG image domain** — `og_image.go` uses `h.cfg.Domain` with fallback in SVG
+- [x] **OpenAPI contact URL** — Changed to relative `"/"`
+- [x] **robots.txt sitemap** — Dynamic `robotsTxt` handler generates `Sitemap:` from config
+- [x] **Footer description** — Changed to generic `blog, server monitoring, and automation hooks`
+
+### Group 3: OS-Specific Paths (Butuh Abstraction) ✅
+
+- [x] **Host stats build tags** — Split into `hoststats_types.go`, `hoststats.go` (`//go:build linux`), `hoststats_unsupported.go` (`//go:build !linux` stub)
+- [x] **Disk stats** — `diskstats_unix.go` reads `RAEVTAR_DISK_ROOT` env var (default `/`)
+- [x] **Agent script OS detection** — `detect_os()` function; all collection functions branch on `linux`/`darwin`/`unknown`; macOS uses `sysctl`/`vm_stat`/`top -l 2`
+- [x] **Bootstrap package manager** — Detects 7 package managers: `apk`, `apt-get`, `dnf`, `yum`, `pacman`, `brew`, `opkg`, `zypper`
+
+### Group 4: Configurable Operational Params ✅
+
+- [x] **Rate limit configurable** — `RAEVTAR_RATE_LIMIT_REQUESTS` + `RAEVTAR_RATE_LIMIT_WINDOW` env vars
+- [x] **Server timeouts configurable** — `RAEVTAR_READ_TIMEOUT` / `RAEVTAR_WRITE_TIMEOUT` / `RAEVTAR_IDLE_TIMEOUT` / `RAEVTAR_SHUTDOWN_TIMEOUT` env vars (Go duration format)
+- [ ] ~~**Stale checker intervals** — Not configurable (hardcoded 5min/15min). Low priority for portability.~~
+- [ ] ~~**Scheduler interval** — Not configurable (hardcoded 60s). Low priority.~~
+- [x] **Max upload size** — `RAEVTAR_MAX_UPLOAD_MB` env var controls `mediaUploadBodyLimit`
+- [x] **Hardening limits** — `RAEVTAR_LOGIN_FAILURE_LIMIT` + `RAEVTAR_LOGIN_IP_FAILURE_LIMIT` env vars
+- [x] **Cron healthcheck** — `cron/healthcheck.sh` reads `RAEVTAR_URL` env var
+- [x] **Chart.js CDN** — CSP `script-src` covers CDN; self-hosting not critical for portability
+
+### Group 5: Documentation & Examples ✅
+
+- [x] **DEPLOYMENT.md** — Updated to generic paths, added hardening env var table
+- [x] **README.md** — Removed `postmarketOS`/`whyred` references, cross-platform stack, full env var table
+- [x] **AGENTS.md** — Updated env var table with all G4 entries, generic commands
+- [x] **PRD.md** — Updated to remove hardcoded references, portability-aware constraints
 
 ---
 

@@ -2,8 +2,8 @@ package pages
 
 templ Lab(data LabData) {
 @page("Lab - Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-		<section class="rv-hero-ambient full-width bg-success border-b-2 border-foreground mb-12 overflow-hidden">
-			<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+		<section class="rv-hero-ambient w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				<div class="grid gap-8 lg:grid-cols-[1.05fr_0.95fr] items-end">
 					<div>
 						<div class="flex flex-wrap gap-2 mb-5">
@@ -33,6 +33,7 @@ templ Lab(data LabData) {
 				</div>
 			</div>
 		</section>
+		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-12 grid gap-4 lg:grid-cols-3">
 			<div class="bg-card border-2 border-foreground p-5 nb-shadow">
 				<span class="inline-flex mb-4 h-10 w-10 items-center justify-center border-2 border-foreground bg-success text-primary-foreground font-black">01</span>
@@ -89,5 +90,6 @@ templ Lab(data LabData) {
 				</div>
 			</div>
 		</section>
+		</div>
 	}
 }

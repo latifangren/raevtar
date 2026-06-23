@@ -4,8 +4,11 @@ import (
 	"database/sql"
 	"errors"
 	"fmt"
+	"io"
 	"math"
 	"net/http"
+	"os"
+	"path/filepath"
 	"strconv"
 	"strings"
 	"time"
@@ -334,7 +337,7 @@ func (h *Handler) adminUploadMedia(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer file.Close()
-	_, err = h.svc.Media.Upload(service.MediaUpload{OriginalName: header.Filename, Reader: file})
+	_, err = h.svc.Media.Upload(service.MediaUpload{OriginalName: header.Filename, Reader: file, AltText: r.FormValue("alt_text")})
 	if err != nil {
 		if errors.Is(err, service.ErrInvalidMediaInput) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -373,6 +376,7 @@ func (h *Handler) adminCreatePost(w http.ResponseWriter, r *http.Request) {
 		CoverImageURL: coverImageURL,
 		CategorySlug:  catSlug,
 		Published:     intent == adminPostIntentPublish,
+		ScheduledAt:   parseScheduledAt(r.FormValue("scheduled_at")),
 		Tags:          tags,
 	})
 	if err != nil {
@@ -476,6 +480,7 @@ func (h *Handler) adminUpdatePost(w http.ResponseWriter, r *http.Request) {
 		CoverImageURL: r.FormValue("cover_image_url"),
 		CategorySlug:  r.FormValue("category_slug"),
 		Published:     published,
+		ScheduledAt:   parseScheduledAt(r.FormValue("scheduled_at")),
 		Tags:          splitTags(r.FormValue("tags")),
 	})
 	if err != nil {
@@ -875,6 +880,14 @@ func parseDateTimeValue(value string) time.Time {
 	return parsed
 }
 
+func parseScheduledAt(value string) *time.Time {
+	t := parseDateTimeValue(value)
+	if t.IsZero() {
+		return nil
+	}
+	return &t
+}
+
 func (h *Handler) adminPages(w http.ResponseWriter, r *http.Request) {
 	pagesData, err := h.svc.Pages.ListPages()
 	if err != nil {
@@ -1254,4 +1267,61 @@ func (h *Handler) adminDeleteWebhook(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	http.Redirect(w, r, "/admin/webhooks", http.StatusSeeOther)
+}
+
+func (h *Handler) adminDBPage(w http.ResponseWriter, r *http.Request) {
+	renderHTML(w, r, adminview.DBPage(adminview.DBData{
+		CurrentPath: r.URL.Path,
+		CSRFToken:   csrfTokenForRequest(r),
+	}))
+}
+
+func (h *Handler) adminDBExport(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/vnd.sqlite3")
+	w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="raevtar_%s.db"`, time.Now().Format("20060102_150405")))
+	http.ServeFile(w, r, h.cfg.DatabasePath)
+}
+
+func (h *Handler) adminDBImport(w http.ResponseWriter, r *http.Request) {
+	file, _, err := r.FormFile("db_file")
+	if err != nil {
+		http.Error(w, "Missing file", http.StatusBadRequest)
+		return
+	}
+	defer file.Close()
+
+	tmpPath := filepath.Join(os.TempDir(), "raevtar_import_"+strconv.FormatInt(time.Now().UnixNano(), 10)+".db")
+	dst, err := os.Create(tmpPath)
+	if err != nil {
+		internalServerError(w, r, fmt.Errorf("create temp: %w", err))
+		return
+	}
+	defer dst.Close()
+
+	if _, err := io.Copy(dst, file); err != nil {
+		os.Remove(tmpPath)
+		internalServerError(w, r, fmt.Errorf("write temp: %w", err))
+		return
+	}
+	dst.Close()
+
+	// Quick validation: check SQLite header
+	header := make([]byte, 16)
+	f, _ := os.Open(tmpPath)
+	f.Read(header)
+	f.Close()
+	if string(header[:16]) != "SQLite format 3\x00" {
+		os.Remove(tmpPath)
+		http.Error(w, "Not a valid SQLite database", http.StatusBadRequest)
+		return
+	}
+
+	if err := os.Rename(tmpPath, h.cfg.DatabasePath); err != nil {
+		os.Remove(tmpPath)
+		internalServerError(w, r, fmt.Errorf("replace db: %w", err))
+		return
+	}
+
+	w.Header().Set("Content-Type", "text/html")
+	fmt.Fprint(w, `DB restored. Restart server to apply. <a href="/admin">Back to admin</a>`)
 }

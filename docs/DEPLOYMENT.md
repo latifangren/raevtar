@@ -1,14 +1,25 @@
 # DEPLOYMENT — Raevtar
 
-Cara deploy Raevtar di setup postmarketOS/Linux yang dipakai di mesin ini: systemd, SQLite lokal, dan Cloudflare Tunnel. Ini runbook operator; agent/assistant tidak boleh menjalankan restart/deploy kecuali user minta eksplisit.
+Cara deploy Raevtar di Linux/macOS: systemd (Linux), SQLite lokal, dan Cloudflare Tunnel opsional. Ini runbook operator; agent/assistant tidak boleh menjalankan restart/deploy kecuali user minta eksplisit.
 
 ## Prasyarat
 
-```bash
-apk add go cloudflared
-```
+- **Go** (1.26+) — untuk build
+- **cloudflared** — hanya jika pakai Cloudflare Tunnel
+- **Node/npm** — hanya untuk regenerasi Tailwind CSS (HTMX sudah vendored)
 
-Build juga butuh Node/npm untuk Tailwind CLI kalau `static/css/style.css` mau diregenerate. HTMX sudah vendored di `/static/js/htmx.min.js`, jadi tidak butuh CDN runtime.
+Install Go lewat package manager pilihan Anda:
+
+```bash
+# Alpine
+apk add go
+
+# Debian/Ubuntu
+apt-get install golang
+
+# macOS (Homebrew)
+brew install go
+```
 
 ## Build
 
@@ -21,10 +32,17 @@ make build
 
 ## System Service (systemd)
 
-Biar jalan otomatis pas hp boot + restart kalo crash.
+Biar jalan otomatis pas boot + restart kalo crash.
 Set `RAEVTAR_ENV=production`; kalau `RAEVTAR_ADMIN_KEY` atau `RAEVTAR_ADMIN_PASS` kosong, Raevtar akan gagal start supaya endpoint admin/API tidak hidup tanpa secret.
 
-### 1. Buat service file
+### 1. Generate service file (opsional)
+
+```bash
+make generate-service
+# This creates raevtar.service with your user/home paths
+```
+
+Atau buat manual:
 
 ```bash
 sudo tee /etc/systemd/system/raevtar.service << 'EOF'
@@ -35,16 +53,15 @@ Wants=network-online.target
 
 [Service]
 Type=exec
-User=latif
-WorkingDirectory=/home/latif/raevtar
-ExecStart=/home/latif/raevtar/raevtar
+User=$USER
+WorkingDirectory=$HOME/raevtar
+ExecStart=$HOME/raevtar/raevtar
 Environment=RAEVTAR_ENV=production
 Environment=RAEVTAR_ADMIN_KEY=<isi-admin-key>
 Environment=RAEVTAR_ADMIN_USER=admin
 Environment=RAEVTAR_ADMIN_PASS=<isi-password-admin>
 Restart=on-failure
 RestartSec=5
-# Journald capture stdout/stderr otomatis — gak perlu redirect manual
 
 [Install]
 WantedBy=multi-user.target
@@ -150,6 +167,21 @@ sudo cloudflared service install
 ```
 
 Jangan aktifkan trusted proxy untuk IP publik sembarang. Default Raevtar sengaja mengabaikan `X-Forwarded-For`; hanya `CF-Connecting-IP`/forwarded header dari CIDR tepercaya yang dipakai untuk audit log dan rate limit.
+
+### Hardening env vars (opsional)
+
+| Variable | Default | Keterangan |
+|----------|---------|------------|
+| `RAEVTAR_RATE_LIMIT_REQUESTS` | `60` | Max requests per window per IP |
+| `RAEVTAR_RATE_LIMIT_WINDOW` | `60s` | Rate limit window |
+| `RAEVTAR_READ_TIMEOUT` | `10s` | HTTP read timeout |
+| `RAEVTAR_WRITE_TIMEOUT` | `30s` | HTTP write timeout |
+| `RAEVTAR_IDLE_TIMEOUT` | `60s` | HTTP idle timeout |
+| `RAEVTAR_SHUTDOWN_TIMEOUT` | `15s` | Graceful shutdown timeout |
+| `RAEVTAR_MAX_UPLOAD_MB` | `6` | Max upload size in MB |
+| `RAEVTAR_LOGIN_FAILURE_LIMIT` | `5` | Max login failures per user/IP |
+| `RAEVTAR_LOGIN_IP_FAILURE_LIMIT` | `20` | Max login failures per IP |
+| `RAEVTAR_DISK_ROOT` | `/` | Filesystem root for disk stats |
 
 ## Public Docs
 

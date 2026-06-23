@@ -4,13 +4,14 @@ import (
 	"errors"
 	"log/slog"
 	"net/http"
+	"raevtar/internal/config"
 	"strconv"
 	"strings"
 	"sync"
 	"time"
 )
 
-const (
+var (
 	loginBodyLimit          int64 = 16 << 10
 	apiBodyLimit            int64 = 1 << 20
 	adminFormBodyLimit      int64 = 1 << 20
@@ -20,6 +21,20 @@ const (
 	loginFailureWindow            = 5 * time.Minute
 	loginThrottleRetryAfter       = 60
 )
+
+// initHardening configures body limits and login throttling from the application config.
+// Called once at startup from handler.New().
+func initHardening(cfg *config.Config) {
+	if cfg.MaxUploadMB > 0 {
+		mediaUploadBodyLimit = int64(cfg.MaxUploadMB) << 20
+	}
+	if cfg.LoginFailureLimit > 0 {
+		loginFailureLimit = cfg.LoginFailureLimit
+	}
+	if cfg.LoginIPFailureLimit > 0 {
+		loginIPFailureLimit = cfg.LoginIPFailureLimit
+	}
+}
 
 type loginThrottleStore struct {
 	mu       sync.Mutex

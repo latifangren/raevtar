@@ -2,15 +2,14 @@
 
 **Product Requirements Document**
 Domain: raevtar.tech
-Runtime: postmarketOS (aarch64) — Redmi Note 5 (whyred)
 
 ---
 
 ## 1. Tujuan
 
-Platform pribadi all-in-one yang jalan di HP (postmarketOS) dengan akses publik via Cloudflare Tunnel. Isinya blog rekomendasi projek GitHub, dashboard monitoring server lokal, public lab, landing page profil, admin panel, dan API kecil untuk integrasi agent.
+Platform pribadi all-in-one dengan akses publik via Cloudflare Tunnel. Isinya blog rekomendasi projek GitHub, dashboard monitoring server multi-platform, public lab, landing page profil, admin panel, dan API untuk integrasi agent.
 
-Observed di deployment whyred saat idle: Raevtar berjalan di sekitar **24 MB RSS**, CPU time nyaris tidak bergerak, binary sekitar **17.5 MB**, dan SQLite database masih sub-1 MB pada pemakaian sekarang. Ini memperkuat constraint bahwa stack harus tetap hemat resource di device target.
+Observed di deployment referensi (Alpine Linux, aarch64) saat idle: Raevtar berjalan di sekitar **24 MB RSS**, CPU time nyaris tidak bergerak, binary sekitar **17.5 MB**, dan SQLite database masih sub-1 MB pada pemakaian sekarang. Ini memperkuat constraint bahwa stack harus tetap hemat resource di device target.
 
 ## 2. Target User
 
@@ -122,14 +121,12 @@ Hanya satu: **Latifan**. Bukan produk publik. Semua keputusan desain dibuat untu
 
 | Constraint | Detail |
 |------------|--------|
-| RAM | 3.6GB total (~2GB available). Harus hemat. |
-| Storage | 50GB (32GB free). SQLite dan binary kecil. |
-| CPU | aarch64 (SDM660). Build harus cepet. |
+| RAM | Target < 50 MB RSS. Harus hemat. |
+| Storage | SQLite dan binary kecil (< 25 MB). |
 | Network | Gak ada IP publik. Harus Cloudflare Tunnel. |
-| Arsitektur | aarch64 — semua binary harus ARM64 native. |
-| OS | Alpine-based (postmarketOS). Pakai apk. |
+| OS | Cross-platform: Linux (Alpine/Debian/Arch), macOS, BSD. Static binary, no CGO. |
 
-Catatan observasional saat ini: virtual memory Go process bisa terlihat besar karena mapping runtime, tapi footprint yang lebih relevan untuk operasi harian adalah RSS nyata. Build cache Go juga bisa ratusan MB, namun itu overhead toolchain/dev, bukan biaya runtime aplikasi.
+Catatan observasional: virtual memory Go process bisa terlihat besar karena mapping runtime, tapi footprint yang lebih relevan untuk operasi harian adalah RSS nyata. Build cache Go juga bisa ratusan MB, namun itu overhead toolchain/dev, bukan biaya runtime aplikasi.
 
 ## 6. Stack Decision
 

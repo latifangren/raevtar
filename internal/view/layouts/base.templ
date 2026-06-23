@@ -14,7 +14,9 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 			<title>{ title }</title>
 			<link rel="stylesheet" href="/static/css/style.css"/>
 			<link rel="icon" type="image/svg+xml" href="/static/favicon.svg"/>
-			<link rel="alternate" type="application/rss+xml" title="Raevtar" href="https://raevtar.tech/blog/feed.xml"/>
+			<link rel="alternate" type="application/rss+xml" title="Raevtar" href={ templ.URL("https://" + seo.SiteDomain + "/blog/feed.xml") }/>
+			<link rel="webmention" href={ templ.URL("https://" + seo.SiteDomain + "/webmention") }/>
+			<link rel="pingback" href={ templ.URL("https://" + seo.SiteDomain + "/webmention") }/>
 			if seo.CanonicalURL != "" {
 				<link rel="canonical" href={ seo.CanonicalURL }/>
 			}
@@ -23,7 +25,7 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 				<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 				<script src="/static/js/raevtar-ui.js" defer></script>
 			<meta name="description" content={ seo.Description }/>
-			<meta name="keywords" content="raevtar, blog, server monitoring, postmarketOS, linux"/>
+			<meta name="keywords" content="raevtar, blog, server monitoring, linux, go, htmx, sqlite"/>
 			<meta name="author" content="latifangren"/>
 			<meta property="og:type" content="website"/>
 			<meta property="og:site_name" content="Raevtar"/>
@@ -44,13 +46,22 @@ templ Base(title string, currentPath string, categories []model.Category, seo mo
 			}
 		</head>
 		<body class="min-h-screen bg-background text-foreground antialiased selection:bg-accent selection:text-accent-foreground">
-			<div class="max-w-6xl mx-auto px-4 sm:px-8">
-				@components.Nav(categories, currentPath)
-				<main role="main" aria-label="Main content">
-					{ children... }
-				</main>
-				@components.Footer()
-			</div>
+			<!-- Nav: full-width bar, sticky -->
+			<section class="w-full bg-card border-b-2 border-foreground sticky top-0 z-50">
+				<div class="max-w-6xl mx-auto px-4 sm:px-8">
+					@components.Nav(categories, currentPath)
+				</div>
+			</section>
+			<!-- Main content: pages control their own section widths -->
+			<main role="main" aria-label="Main content">
+				{ children... }
+			</main>
+			<!-- Footer: full-width bar -->
+			<section class="w-full bg-background border-t-2 border-foreground py-12">
+				<div class="max-w-6xl mx-auto px-4 sm:px-8">
+					@components.Footer(seo.SiteDomain)
+				</div>
+			</section>
 		</body>
 	</html>
 }

@@ -1,8 +1,8 @@
 # Raevtar
 
-Raevtar adalah platform personal yang jalan sebagai satu binary Go: blog, public lab, dashboard monitoring server lokal, admin panel, dan REST API kecil. Target utamanya tetap sederhana: bisa hidup di postmarketOS/aarch64, hemat resource, dan cukup aman untuk dibuka lewat domain pribadi.
+Raevtar adalah platform personal yang jalan sebagai satu binary Go: blog, public lab, dashboard monitoring server lokal, admin panel, dan REST API kecil. Target utamanya tetap sederhana: hemat resource, cukup aman untuk dibuka lewat domain pribadi, dan bisa jalan di Linux, macOS, atau Windows tanpa CGO.
 
-Observed di deployment whyred/postmarketOS saat idle, footprint runtime Raevtar biasanya tetap kecil: sekitar **24 MB RSS**, CPU idle nyaris nol, binary sekitar **17.5 MB**, dan SQLite database masih di bawah **1 MB** untuk pemakaian saat ini. Angka ini adalah observasi operasional pada host sekarang, bukan benchmark universal lintas semua deployment.
+Footprint runtime Raevtar biasanya tetap kecil: sekitar **24 MB RSS**, CPU idle nyaris nol, binary sekitar **17.5 MB**, dan SQLite database masih di bawah **1 MB** untuk pemakaian saat ini. Angka ini adalah observasi operasional, bukan benchmark universal lintas semua deployment.
 
 <p align="center">
   <img src="docs/images/public.png" alt="Public Raevtar surface" width="900">
@@ -70,7 +70,8 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 
 | Method | Path | Scope |
 |--------|------|-------|
-| `GET` | `/api/v1/posts` | Public list posts |
+| `GET` | `/api/v1/posts` | Public list posts; supports `category` filter |
+| `POST` | `/api/v1/posts/{id}/read-time` | Public record read session (IP-hashed) |
 | `POST` | `/api/v1/posts` | Admin key required |
 | `GET` | `/api/v1/search` | Public search; supports `q`, `scope=posts\|projects\|pages`, `page`, `page_size` |
 | `GET` | `/api/v1/projects` | Public list projects; supports `featured=true`, `state=planning\|active\|paused\|shipped\|archived`, `sort=newest\|oldest` |
@@ -106,7 +107,9 @@ Raevtar bukan multi-tenant SaaS. Ini personal app untuk `raevtar.tech`, dengan b
 | `POST` | `/api/v1/editorial-inbox/{itemID}` | Admin key; update item |
 | `POST` | `/api/v1/editorial-inbox/{itemID}/complete` | Admin key; mark done |
 | `POST` | `/api/v1/editorial-inbox/{itemID}/fail` | Admin key; mark failed |
+| `GET` | `/api/v1/bootstrap/{serverID}/{token}` | Agent bootstrap (one-time token auth) |
 | `GET` | `/docs`, `/lab/docs` | Public-safe docs |
+| `GET` | `/docs/api` | Public API reference page |
 
 Public docs sengaja hanya menjelaskan read-only surface dan privacy boundary. Endpoint admin/server setup tetap operator-only.
 
@@ -220,7 +223,7 @@ Search mencakup database query terhadap posts (title + excerpt + content), proje
 
 - **Sitemap XML** di `/sitemap.xml` — mencakup semua halaman statis, blog posts, projects, dan changelog pages.
 - **LLMs.txt** di `/llms.txt` — ringkasan site buat LLM discovery, berisi core pages, RSS, sitemap, dan recent content.
-- **Robots.txt** di `/robots.txt` — mengizinkan indexing penuh.
+- **Robots.txt** dinamis di `/robots.txt` — mengizinkan indexing penuh, Sitemap URL dari konfigurasi domain.
 - **JSON-LD structured data** — `BlogPosting` schema untuk artikel, `CreativeWork` untuk projects, `WebSite` untuk homepage.
 - **Canonical URLs** — semua halaman punya canonical link.
 - **Open Graph images** — dynamic SVG OG image tiap blog post (`/og-image/blog/{slug}`) dan project (`/og-image/project/{slug}`) dengan gaya neo-brutalist (1200x630px).
@@ -262,10 +265,11 @@ SEO data disiapkan oleh `SiteMetaService` dan di-render via Templ di layout `bas
 
 - Production mode menolak start kalau `RAEVTAR_ADMIN_KEY` atau `RAEVTAR_ADMIN_PASS` kosong.
 - API auth pakai bearer token dengan constant-time validation.
-- Global rate limit in-memory: 60 request/menit per IP.
+- Global rate limit in-memory: configurable per IP (`RAEVTAR_RATE_LIMIT_REQUESTS` per `RAEVTAR_RATE_LIMIT_WINDOW`).
 - Admin login throttling in-memory: per `IP + username` dan IP-only spray guard.
-- Request body dibatasi untuk login, API payload, admin forms, dan upload media.
+- Request body dibatasi untuk login, API payload, admin forms, dan upload media (`RAEVTAR_MAX_UPLOAD_MB`).
 - Internal server errors dikembalikan sebagai pesan generik; detail masuk log server.
+- HTTP timeouts configurable: `RAEVTAR_READ_TIMEOUT`, `RAEVTAR_WRITE_TIMEOUT`, `RAEVTAR_IDLE_TIMEOUT`, `RAEVTAR_SHUTDOWN_TIMEOUT`.
 - CSP memakai `script-src 'self'`; HTMX dan UI helper disajikan dari `/static/js/`.
 - `RAEVTAR_TRUSTED_PROXY_CIDRS` opsional untuk membaca `CF-Connecting-IP` dari proxy tepercaya saja.
 
@@ -279,7 +283,7 @@ SEO data disiapkan oleh `SiteMetaService` dan di-render via Templ di layout `bas
 | Database | SQLite via `modernc.org/sqlite` + `github.com/jmoiron/sqlx` |
 | Markdown | `github.com/yuin/goldmark` |
 | CI/CD | GitHub Actions + GoReleaser |
-| Runtime target | postmarketOS/aarch64, Cloudflare Tunnel |
+| Runtime target | Cross-platform (Linux/macOS/Windows), Cloudflare Tunnel optional |
 
 ## Struktur
 
@@ -326,6 +330,18 @@ Handler -> Service -> Repo -> SQLite
 | `RAEVTAR_ADMIN_PASS` | `""` | Wajib untuk admin login |
 | `RAEVTAR_ENV` | `""` | Set `production` untuk strict secret check |
 | `RAEVTAR_TRUSTED_PROXY_CIDRS` | `""` | CIDR proxy tepercaya untuk forwarded client IP |
+| `RAEVTAR_STATIC_DIR` | `{bin}/static` | Static files directory (computed from binary path) |
+| `RAEVTAR_AGENT_DIR` | `/usr/local/bin` | Agent install directory |
+| `RAEVTAR_RATE_LIMIT_REQUESTS` | `60` | Max requests per window per IP |
+| `RAEVTAR_RATE_LIMIT_WINDOW` | `60s` | Rate limit window (Go duration) |
+| `RAEVTAR_READ_TIMEOUT` | `10s` | HTTP server read timeout |
+| `RAEVTAR_WRITE_TIMEOUT` | `30s` | HTTP server write timeout |
+| `RAEVTAR_IDLE_TIMEOUT` | `60s` | HTTP server idle timeout |
+| `RAEVTAR_SHUTDOWN_TIMEOUT` | `15s` | Graceful shutdown timeout |
+| `RAEVTAR_MAX_UPLOAD_MB` | `6` | Max media upload size in MB |
+| `RAEVTAR_LOGIN_FAILURE_LIMIT` | `5` | Max login failures per user/IP before throttle |
+| `RAEVTAR_LOGIN_IP_FAILURE_LIMIT` | `20` | Max login failures per IP before throttle |
+| `RAEVTAR_DISK_ROOT` | `/` | Filesystem root for disk stats |
 
 ## Build & Run
 

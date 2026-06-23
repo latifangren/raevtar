@@ -31,7 +31,7 @@ func Nav(categories []model.Category, currentPath string) templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"sticky top-4 z-50 flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-4 px-6 mb-12 bg-card nb-border nb-shadow max-w-6xl mx-auto\" aria-label=\"Main navigation\"><a href=\"/\" class=\"text-xl sm:text-2xl font-head text-foreground hover:bg-accent no-underline uppercase tracking-tighter\">raevtar</a><div class=\"h-8 w-px bg-foreground mx-2\" aria-hidden=\"true\"></div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<nav class=\"flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-4\" aria-label=\"Main navigation\"><a href=\"/\" class=\"text-xl sm:text-2xl font-head text-foreground hover:bg-accent no-underline uppercase tracking-tighter\">raevtar</a><div class=\"h-8 w-px bg-foreground mx-2\" aria-hidden=\"true\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

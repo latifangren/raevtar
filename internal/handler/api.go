@@ -641,6 +641,148 @@ func (h *Handler) apiReportCommandResult(w http.ResponseWriter, r *http.Request)
 	writeJSON(w, http.StatusOK, map[string]string{"status": "ok"})
 }
 
+func (h *Handler) apiBootstrap(w http.ResponseWriter, r *http.Request) {
+	serverID, err := strconv.ParseInt(r.PathValue("serverID"), 10, 64)
+	if err != nil {
+		http.Error(w, "invalid server id", http.StatusBadRequest)
+		return
+	}
+	token := r.PathValue("token")
+	if token == "" {
+		http.Error(w, "missing token", http.StatusBadRequest)
+		return
+	}
+
+	if !h.svc.Monitor.VerifyAgentToken(serverID, token) {
+		http.Error(w, "invalid server or token", http.StatusForbidden)
+		return
+	}
+
+	url := agentURLExample(h.cfg.Domain)
+
+	script := `#!/bin/sh
+set -eu
+
+RAEVTAR_URL='` + url + `'
+RAEVTAR_SERVER_ID='` + strconv.FormatInt(serverID, 10) + `'
+RAEVTAR_AGENT_TOKEN='` + token + `'
+
+echo ""
+echo "=== Raevtar Agent Setup ==="
+echo "Server ID : ${RAEVTAR_SERVER_ID}"
+echo "Server URL: ${RAEVTAR_URL}"
+echo ""
+
+# Step 1: Detect OS and package manager
+echo "[1/5] Detecting operating system..."
+OS=""
+PKG_INSTALL=""
+if command -v apk >/dev/null 2>&1; then
+	OS="alpine (apk)"; PKG_INSTALL="apk add --no-cache"
+elif command -v apt-get >/dev/null 2>&1; then
+	OS="debian/ubuntu (apt)"; PKG_INSTALL="apt-get install -y"
+elif command -v dnf >/dev/null 2>&1; then
+	OS="fedora/rhel (dnf)"; PKG_INSTALL="dnf install -y"
+elif command -v yum >/dev/null 2>&1; then
+	OS="centos/rhel (yum)"; PKG_INSTALL="yum install -y"
+elif command -v pacman >/dev/null 2>&1; then
+	OS="arch (pacman)"; PKG_INSTALL="pacman -S --noconfirm"
+elif command -v brew >/dev/null 2>&1; then
+	OS="macos (homebrew)"; PKG_INSTALL="brew install"
+elif command -v opkg >/dev/null 2>&1; then
+	OS="openwrt (opkg)"; PKG_INSTALL="opkg install"
+elif command -v zypper >/dev/null 2>&1; then
+	OS="suse (zypper)"; PKG_INSTALL="zypper install -y"
+else
+	echo "[!] Unknown package manager. Dependencies may be missing."
+	echo "    Install curl manually and re-run this script."
+fi
+echo "  => Detected: ${OS:-unknown}"
+echo ""
+
+# Step 2: Install dependencies
+echo "[2/5] Checking dependencies..."
+if command -v curl >/dev/null 2>&1; then
+	echo "  => curl: OK"
+else
+	echo "  => curl: installing..."
+	if [ -n "${PKG_INSTALL}" ]; then
+		${PKG_INSTALL} curl
+		echo "  => curl: installed"
+	else
+		echo "  => curl: FAILED - install curl manually"
+	fi
+fi
+
+if command -v jq >/dev/null 2>&1; then
+	echo "  => jq: OK"
+else
+	echo "  => jq: installing..."
+	if [ -n "${PKG_INSTALL}" ]; then
+		${PKG_INSTALL} jq 2>/dev/null && echo "  => jq: installed" || echo "  => jq: skipped (not critical)"
+	else
+		echo "  => jq: skipped (install manually if needed)"
+	fi
+fi
+echo ""
+
+# Step 3: Install agent script
+echo "[3/5] Installing agent script..."
+AGENT_DIR="` + h.cfg.AgentDir + `"
+AGENT_PATH="${AGENT_DIR}/raevtar-agent.sh"
+mkdir -p "${AGENT_DIR}"
+if curl -fsSL -o "${AGENT_PATH}" "${RAEVTAR_URL}/static/agent/raevtar-agent.sh"; then
+	chmod +x "${AGENT_PATH}"
+	echo "  => Agent installed: ${AGENT_PATH}"
+else
+	echo "  => FAILED: could not download agent script"
+	exit 1
+fi
+echo ""
+
+# Step 4: Save config
+echo "[4/5] Saving agent configuration..."
+CONF_DIR="${HOME:-/tmp}/.raevtar"
+mkdir -p "${CONF_DIR}"
+cat > "${CONF_DIR}/agent.env" << EOF
+RAEVTAR_URL=${RAEVTAR_URL}
+RAEVTAR_SERVER_ID=${RAEVTAR_SERVER_ID}
+RAEVTAR_AGENT_TOKEN=${RAEVTAR_AGENT_TOKEN}
+EOF
+echo "  => Config saved: ${CONF_DIR}/agent.env"
+echo ""
+
+# Step 5: Setup cron
+echo "[5/5] Setting up periodic ping via cron..."
+CRON_LINE="*/5 * * * * RAEVTAR_URL=${RAEVTAR_URL} RAEVTAR_SERVER_ID=${RAEVTAR_SERVER_ID} RAEVTAR_AGENT_TOKEN=${RAEVTAR_AGENT_TOKEN} ${AGENT_PATH} >/dev/null 2>&1"
+EXISTING_CRON=$(crontab -l 2>/dev/null || true)
+if echo "${EXISTING_CRON}" | grep -qF "${AGENT_PATH}"; then
+	echo "  => Cron entry already exists, skipping"
+else
+	(echo "${EXISTING_CRON}"; echo "${CRON_LINE}") | crontab - 2>/dev/null && echo "  => Cron: added (every 5 minutes)" || echo "  => Cron: skipped (no crontab access)"
+fi
+echo ""
+
+# Test ping
+echo "=== Testing connection ==="
+if ${AGENT_PATH}; then
+	echo "  => [OK] Ping successful. Server is reporting."
+else
+	echo "  => [FAIL] Ping failed. Check RAEVTAR_URL and network."
+fi
+
+echo ""
+echo "=== Setup Complete ==="
+echo "Next ping in 5 minutes (via cron)."
+echo "Manual run: ${AGENT_PATH}"
+echo "Config:     ${CONF_DIR}/agent.env"
+`
+
+	w.Header().Set("Content-Type", "text/x-shellscript")
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte(script))
+}
+
 func (h *Handler) canRecordMetrics(serverID int64, r *http.Request) bool {
 	token, ok := bearerToken(r)
 	if !ok {

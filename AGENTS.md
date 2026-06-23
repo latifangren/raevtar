@@ -123,6 +123,18 @@ make db-reset
 | `RAEVTAR_ADMIN_PASS` | `""` | **Ya** (untuk admin panel login) |
 | `RAEVTAR_ENV` | `""` | Set `production` untuk strict secret check |
 | `RAEVTAR_TRUSTED_PROXY_CIDRS` | `""` | Opsional, CIDR proxy tepercaya untuk `CF-Connecting-IP` |
+| `RAEVTAR_STATIC_DIR` | `{bin}/static` | Direktori static files (computed dari path binary) |
+| `RAEVTAR_AGENT_DIR` | `/usr/local/bin` | Direktori install agent script |
+| `RAEVTAR_RATE_LIMIT_REQUESTS` | `60` | Max requests per window per IP |
+| `RAEVTAR_RATE_LIMIT_WINDOW` | `60s` | Rate limit window duration (Go duration) |
+| `RAEVTAR_READ_TIMEOUT` | `10s` | HTTP server read timeout |
+| `RAEVTAR_WRITE_TIMEOUT` | `30s` | HTTP server write timeout |
+| `RAEVTAR_IDLE_TIMEOUT` | `60s` | HTTP server idle timeout |
+| `RAEVTAR_SHUTDOWN_TIMEOUT` | `15s` | Graceful shutdown timeout |
+| `RAEVTAR_MAX_UPLOAD_MB` | `6` | Max media upload size in MB |
+| `RAEVTAR_LOGIN_FAILURE_LIMIT` | `5` | Max login failures per user/IP before throttle |
+| `RAEVTAR_LOGIN_IP_FAILURE_LIMIT` | `20` | Max login failures per IP before throttle |
+| `RAEVTAR_DISK_ROOT` | `/` | Filesystem root for disk stats (macOS/Linux) |
 
 ## Ketika Lo Bingung
 

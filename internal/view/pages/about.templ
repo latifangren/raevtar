@@ -2,8 +2,8 @@ package pages
 
 templ About(data AboutData) {
 @page("About — Raevtar", data.CurrentPath, data.Categories, data.SEO) {
-			<section class="full-width bg-success border-b-2 border-foreground mb-12 overflow-hidden">
-				<div class="max-w-5xl mx-auto px-4 py-14 md:py-20">
+		<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
+			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 					<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
 						<div>
 							<p class="text-xs font-black uppercase tracking-widest text-foreground mb-2">About Raevtar</p>
@@ -27,6 +27,7 @@ templ About(data AboutData) {
 				</div>
 			</div>
 		</section>
+	<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-12 bg-card border-2 border-foreground p-6 md:p-8 nb-shadow">
 			<div class="prose text-foreground max-w-none">@templ.Raw(data.Page.ContentHTML)</div>
 		</section>
@@ -65,5 +66,6 @@ templ About(data AboutData) {
 				</div>
 			</div>
 		</section>
+	</div>
 	}
 }

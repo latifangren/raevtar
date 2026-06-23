@@ -8,7 +8,7 @@ package components
 import "github.com/a-h/templ"
 import templruntime "github.com/a-h/templ/runtime"
 
-func Footer() templ.Component {
+func Footer(domain string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
 		if templ_7745c5c3_CtxErr := ctx.Err(); templ_7745c5c3_CtxErr != nil {
@@ -29,7 +29,20 @@ func Footer() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<footer class=\"mt-20 mb-12 py-12 nb-border-b\"><div class=\"flex flex-col md:flex-row justify-between items-center gap-8\"><div class=\"text-center md:text-left\"><a href=\"/\" class=\"text-2xl font-head uppercase tracking-tighter no-underline text-foreground\">raevtar</a><p class=\"text-sm font-bold text-muted mt-2\">Single Go binary running on postmarketOS.</p></div><div class=\"flex flex-wrap justify-center gap-4\" aria-label=\"Tech stack badges\"><span class=\"nb-badge bg-muted text-muted-foreground\">Go 1.26</span> <span class=\"nb-badge bg-accent text-accent-foreground\">HTMX</span> <span class=\"nb-badge bg-card text-card-foreground\">SQLite</span> <span class=\"nb-badge bg-destructive text-destructive-foreground\">Cloudflare</span></div></div><div class=\"mt-12 text-center text-xs font-black uppercase tracking-widest text-muted\">&copy; 2026 raevtar.tech &bull; Built with RetroUI principles</div></footer>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<footer class=\"\"><div class=\"flex flex-col md:flex-row justify-between items-center gap-8\"><div class=\"text-center md:text-left\"><a href=\"/\" class=\"text-2xl font-head uppercase tracking-tighter no-underline text-foreground\">raevtar</a><p class=\"text-sm font-bold text-muted mt-2\">Single Go binary — blog, server monitoring, and automation hooks.</p></div><div class=\"flex flex-wrap justify-center gap-4\" aria-label=\"Tech stack badges\"><span class=\"nb-badge bg-muted text-muted-foreground\">Go 1.26</span> <span class=\"nb-badge bg-accent text-accent-foreground\">HTMX</span> <span class=\"nb-badge bg-card text-card-foreground\">SQLite</span> <span class=\"nb-badge bg-destructive text-destructive-foreground\">Cloudflare</span></div></div><div class=\"mt-12 text-center text-xs font-black uppercase tracking-widest text-muted\"><a href=\"/blog/feed.xml\" class=\"inline-flex items-center gap-1.5 text-muted hover:text-foreground no-underline transition-colors\"><svg width=\"12\" height=\"12\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 11a9 9 0 0 1 9 9\"></path><path d=\"M4 4a16 16 0 0 1 16 16\"></path><circle cx=\"5\" cy=\"19\" r=\"1\"></circle></svg> RSS Feed</a> <span class=\"mx-3\">&bull;</span> &copy; 2026 ")
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		var templ_7745c5c3_Var2 string
+		templ_7745c5c3_Var2, templ_7745c5c3_Err = templ.JoinStringErrs(domain)
+		if templ_7745c5c3_Err != nil {
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/footer.templ`, Line: 23, Col: 23}
+		}
+		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var2))
+		if templ_7745c5c3_Err != nil {
+			return templ_7745c5c3_Err
+		}
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, " &bull; Built with RetroUI principles</div></footer>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

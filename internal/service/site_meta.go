@@ -25,6 +25,10 @@ func NewSiteMetaService(blog *BlogService, projects *ProjectService, domain stri
 	return &SiteMetaService{blog: blog, projects: projects, domain: strings.TrimSpace(domain)}
 }
 
+func (s *SiteMetaService) Domain() string {
+	return s.domain
+}
+
 func (s *SiteMetaService) CanonicalURL(path string) string {
 	path = strings.TrimSpace(path)
 	if path == "" {
@@ -44,12 +48,13 @@ func (s *SiteMetaService) DefaultSEO(path string) model.SEOData {
 	return model.SEOData{
 		Description:  defaultSEODescription,
 		CanonicalURL: s.CanonicalURL(canonicalPath),
+		SiteDomain:   s.domain,
 	}
 }
 
 func (s *SiteMetaService) HomeSEO() model.SEOData {
 	seo := s.DefaultSEO("/")
-	seo.Description = "Raevtar — personal blog, server status board, docs, projects, and automation hooks running on postmarketOS."
+	seo.Description = "Raevtar — personal blog, server status board, docs, projects, and automation hooks."
 	seo.JSONLD = model.MustJSONLD(map[string]any{
 		"@context":    "https://schema.org",
 		"@type":       "WebSite",

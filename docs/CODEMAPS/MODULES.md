@@ -1,6 +1,6 @@
 # Modules Codemap
 
-**Last Updated:** 2026-06-22
+**Last Updated:** 2026-06-23
 
 ## Module Overview
 
@@ -61,9 +61,12 @@ raevtar/
 - `security.go` — Security headers middleware, rate limiter, trusted proxies
 - `hardening.go` — Request body limits, login throttling, error helpers
 - `editorial.go` — Editorial inbox admin handlers
-- `hoststats.go` — Local host stats collection (/proc/sysfs)
+- `hoststats.go` — Local host stats collection (/proc/sysfs) — Linux only
+- `hoststats_handler.go` — Host stats API handler (`apiHostStats()`)
+- `hoststats_types.go` — Host stats struct definitions (`HostStats`, `CPUStats`, etc.)
+- `hoststats_unsupported.go` — Non-Linux stub (returns empty stats)
 - `rss.go` — RSS 2.0 feed generation
-- `discovery.go` — sitemap.xml and llms.txt generation
+- `discovery.go` — sitemap.xml, llms.txt, and robots.txt generation
 - `og_image.go` — SVG-based Open Graph image generation
 - `render.go` — HTML render helper (Templ)
 - `middleware_test.go` — Middleware tests
@@ -85,6 +88,7 @@ raevtar/
 | `GET /contact` | `contactPage` | Contact page |
 | `GET /lab` | `labPage` | Lab landing page |
 | `GET /docs` | `docsPage` | Documentation page |
+| `GET /docs/api` | `apiDocsPage` | Public API reference |
 | `GET /projects` | `projectsPage` | Project portfolio |
 | `GET /projects/{slug}` | `projectDetail` | Project detail with timeline |
 | `GET /projects/{slug}/changelog` | `projectChangelogPage` | Full changelog |
@@ -102,11 +106,14 @@ raevtar/
 
 **API v1 Routes** (under `/api/v1`):
 - `GET /posts`, `GET /projects` — public read
+- `POST /posts/{id}/read-time` — public record read session
+- `GET /search` — public search with scope/pagination
 - `POST /posts`, `POST /projects` — admin auth (Bearer)
 - Full CRUD for projects, updates, relations, showcase
 - Editorial inbox API (admin auth)
 - Server ping/command endpoints (agent auth)
-- Host stats endpoint (admin auth)
+- Host stats endpoint (`GET /hoststats`, admin auth)
+- Bootstrap endpoint (`GET /bootstrap/{serverID}/{token}`, one-time token auth)
 
 ---
 
@@ -351,6 +358,8 @@ raevtar/
 | `page.templ` | — | Generic content page |
 | `not_found.templ` | NotFoundData | 404 page |
 | `blog_list_partial.templ` | — | HTMX blog list partial |
+| `api_docs.templ` | APIDocsData | API reference page |
+| `api_docs.go` | (constants) | JSON response examples for API docs |
 
 ### Admin (`internal/view/admin/`)
 
