@@ -3,19 +3,48 @@ package components
 import "raevtar/internal/model"
 
 templ Nav(categories []model.Category, currentPath string) {
-	<nav class="flex w-full flex-nowrap items-center gap-4 overflow-x-auto whitespace-nowrap sm:gap-6 py-4" aria-label="Main navigation">
-		<a href="/" class="text-xl sm:text-2xl font-head text-foreground hover:bg-accent no-underline uppercase tracking-tighter">raevtar</a>
-		<div class="h-8 w-px bg-foreground mx-2" aria-hidden="true"></div>
-		<a href="/about" aria-current={ ariaCurrent(currentPath == "/about") } class={ navClass(currentPath == "/about") }>about</a>
-		<a href="/blog" aria-current={ ariaCurrent(currentPath == "/blog") } class={ navClass(currentPath == "/blog") }>blog</a>
-		<a href="/projects" aria-current={ ariaCurrent(isProjectsPath(currentPath)) } class={ navClass(isProjectsPath(currentPath)) }>projects</a>
-		<a href="/search" aria-current={ ariaCurrent(currentPath == "/search") } class={ navClass(currentPath == "/search") }>search</a>
-		<a href="/topics" aria-current={ ariaCurrent(currentPath == "/topics") } class={ navClass(currentPath == "/topics") }>topics</a>
-		<a href="/lab" aria-current={ ariaCurrent(currentPath == "/lab") } class={ navClass(currentPath == "/lab") }>lab</a>
-		<a href="/docs" aria-current={ ariaCurrent(currentPath == "/docs" || currentPath == "/lab/docs") } class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
-		<a href="/contact" aria-current={ ariaCurrent(currentPath == "/contact") } class={ navClass(currentPath == "/contact") }>contact</a>
-		<a href="/dashboard" aria-current={ ariaCurrent(isDashboardPath(currentPath)) } class={ navClass(isDashboardPath(currentPath)) }>status</a>
+	<nav class="flex w-full items-center justify-between py-4" aria-label="Main navigation">
+		<div class="flex items-center gap-4 sm:gap-6">
+			<a href="/" class="text-xl sm:text-2xl font-head text-foreground hover:bg-accent no-underline uppercase tracking-tighter">raevtar</a>
+			<div class="h-8 w-px bg-foreground mx-2 hidden md:block" aria-hidden="true"></div>
+			<!-- Desktop links -->
+			<div class="hidden md:flex items-center gap-4 sm:gap-6">
+				<a href="/about" aria-current={ ariaCurrent(currentPath == "/about") } class={ navClass(currentPath == "/about") }>about</a>
+				<a href="/blog" aria-current={ ariaCurrent(currentPath == "/blog") } class={ navClass(currentPath == "/blog") }>blog</a>
+				<a href="/projects" aria-current={ ariaCurrent(isProjectsPath(currentPath)) } class={ navClass(isProjectsPath(currentPath)) }>projects</a>
+				<a href="/search" aria-current={ ariaCurrent(currentPath == "/search") } class={ navClass(currentPath == "/search") }>search</a>
+				<a href="/topics" aria-current={ ariaCurrent(currentPath == "/topics") } class={ navClass(currentPath == "/topics") }>topics</a>
+				<a href="/lab" aria-current={ ariaCurrent(currentPath == "/lab") } class={ navClass(currentPath == "/lab") }>lab</a>
+				<a href="/docs" aria-current={ ariaCurrent(currentPath == "/docs" || currentPath == "/lab/docs") } class={ navClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
+				<a href="/contact" aria-current={ ariaCurrent(currentPath == "/contact") } class={ navClass(currentPath == "/contact") }>contact</a>
+				<a href="/dashboard" aria-current={ ariaCurrent(isDashboardPath(currentPath)) } class={ navClass(isDashboardPath(currentPath)) }>status</a>
+			</div>
+		</div>
+		<!-- Mobile menu toggle -->
+		<button
+			class="md:hidden nb-border bg-card p-2 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
+			onclick="document.getElementById('rv-mobile-nav').classList.toggle('hidden')"
+			aria-expanded="false"
+			aria-controls="rv-mobile-nav"
+			aria-label="Toggle navigation menu"
+		>
+			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
+		</button>
 	</nav>
+	<!-- Mobile dropdown -->
+	<div id="rv-mobile-nav" class="hidden md:hidden nb-border bg-card mb-4">
+		<div class="grid grid-cols-3 gap-0">
+			<a href="/about" class={ mobileNavClass(currentPath == "/about") }>about</a>
+			<a href="/blog" class={ mobileNavClass(currentPath == "/blog") }>blog</a>
+			<a href="/projects" class={ mobileNavClass(isProjectsPath(currentPath)) }>projects</a>
+			<a href="/search" class={ mobileNavClass(currentPath == "/search") }>search</a>
+			<a href="/topics" class={ mobileNavClass(currentPath == "/topics") }>topics</a>
+			<a href="/lab" class={ mobileNavClass(currentPath == "/lab") }>lab</a>
+			<a href="/docs" class={ mobileNavClass(currentPath == "/docs" || currentPath == "/lab/docs") }>docs</a>
+			<a href="/contact" class={ mobileNavClass(currentPath == "/contact") }>contact</a>
+			<a href="/dashboard" class={ mobileNavClass(isDashboardPath(currentPath)) }>status</a>
+		</div>
+	</div>
 }
 
 func ariaCurrent(active bool) string {
@@ -34,9 +63,17 @@ func isProjectsPath(path string) bool {
 }
 
 func navClass(active bool) string {
-	base := "text-sm font-black uppercase tracking-widest no-underline transition-all px-2 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring "
+	base := "text-sm font-bold uppercase tracking-widest no-underline transition-all px-2 py-1 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring "
 	if active {
 		return base + "bg-foreground text-background"
 	}
 	return base + "text-foreground hover:bg-accent/50"
+}
+
+func mobileNavClass(active bool) string {
+	base := "text-sm font-bold uppercase tracking-wide no-underline text-center py-3 border-b border-r border-foreground/20 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring "
+	if active {
+		return base + "bg-foreground text-background"
+	}
+	return base + "text-foreground hover:bg-accent/30"
 }

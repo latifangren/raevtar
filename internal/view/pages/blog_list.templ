@@ -15,19 +15,19 @@ templ BlogList(data BlogListData) {
 							<span class="nb-badge bg-card">Blog</span>
 							<span class="nb-badge bg-success/20">Latest dispatches</span>
 						</div>
-						<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Field Notes</p>
+						<p class="text-xs font-bold uppercase tracking-widest text-muted mb-2">Field Notes</p>
 						<h1 class="nb-h1 font-head mb-5">Project dispatches from small-machine lab.</h1>
 						<p class="text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl">Fresh notes on tools, automation, security, and infrastructure, filed as compact public logs.</p>
 					</div>
 					<div class="relative">
-						<div class="absolute -right-5 -top-5 h-16 w-16 nb-border bg-destructive nb-shadow" aria-hidden="true"></div>
+						<div class="absolute -right-5 -top-5 h-16 w-16 nb-border bg-blush nb-shadow" aria-hidden="true"></div>
 						<div class="relative bg-card nb-border p-5 nb-shadow rotate-1">
-							<p class="text-xs font-black uppercase tracking-widest text-muted mb-4">topic switchboard</p>
+							<p class="text-xs font-bold uppercase tracking-widest text-muted mb-4">topic switchboard</p>
 							<form method="get" action="/blog" class="grid gap-3 mb-4">
 								if data.CurrentCat != "" {
 									<input type="hidden" name="category" value={ data.CurrentCat }/>
 								}
-								<label for="blog-search" class="text-xs font-black uppercase tracking-widest text-muted">Search notes</label>
+								<label for="blog-search" class="text-xs font-bold uppercase tracking-widest text-muted">Search notes</label>
 								<div class="flex gap-2">
 									<input id="blog-search" type="search" name="q" value={ data.Query } placeholder="Cari judul, excerpt, isi..." class="min-w-0 flex-1 nb-border bg-background px-3 py-2 text-sm font-bold text-foreground focus:bg-card outline-none focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 									<button type="submit" class="nb-button nb-button-primary py-2 px-4 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Go</button>
@@ -40,7 +40,7 @@ templ BlogList(data BlogListData) {
 								}
 							</div>
 							<hr class="nb-border my-4"/>
-							<a href="/blog/feed.xml" class="flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted hover:text-foreground no-underline transition-colors">
+							<a href="/blog/feed.xml" class="flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted hover:text-foreground no-underline transition-colors">
 								<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11a9 9 0 0 1 9 9"/><path d="M4 4a16 16 0 0 1 16 16"/><circle cx="5" cy="19" r="1"/></svg>
 								Subscribe RSS
 							</a>
@@ -53,7 +53,7 @@ templ BlogList(data BlogListData) {
 			<section class="mb-12">
 			<div class="flex flex-wrap items-end justify-between gap-4 mb-8">
 				<div>
-					<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">Latest dispatches</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-muted mb-1">Latest dispatches</p>
 					<h2 class="nb-h2 font-head text-3xl">Field Notes</h2>
 					if data.Query != "" {
 						<p class="text-sm font-bold text-muted mt-2">{ PortText(data.ResultCount) } result for "{ data.Query }".</p>
@@ -76,9 +76,9 @@ templ BlogList(data BlogListData) {
 			
 			<div class="mt-12 text-center" id="blog-pagination">
 				if data.Page < data.TotalPages {
-					<p class="text-xs font-black uppercase tracking-widest text-muted animate-pulse">Scrolling to load more...</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-muted animate-pulse">Scrolling to load more...</p>
 				} else if len(data.Posts) > 0 {
-					<p class="text-xs font-black uppercase tracking-widest text-muted">You've reached the end of the notes.</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-muted">You've reached the end of the notes.</p>
 				}
 			</div>
 			</section>

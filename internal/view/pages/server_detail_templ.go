@@ -324,7 +324,7 @@ func ServerDetailLive(data ServerDetailData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</p><p class=\"text-xs font-bold text-muted mt-2\">Used / total / percent.</p></div><div class=\"nb-card bg-destructive p-5\"><p class=\"text-xs font-black uppercase text-muted mb-1\">Temperature</p><p class=\"text-3xl font-black font-mono text-foreground\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "</p><p class=\"text-xs font-bold text-muted mt-2\">Used / total / percent.</p></div><div class=\"nb-card bg-blush p-5\"><p class=\"text-xs font-black uppercase text-muted mb-1\">Temperature</p><p class=\"text-3xl font-black font-mono text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

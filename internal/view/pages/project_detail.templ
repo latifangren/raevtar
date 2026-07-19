@@ -11,16 +11,16 @@ templ ProjectDetail(data ProjectDetailData) {
 					<div class="grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end">
 						<div>
 							<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Project entry</p>
-							<h1 class="text-4xl md:text-6xl font-head font-black uppercase leading-none text-foreground mb-5">{ data.Project.Title }</h1>
+							<h1 class="text-3xl md:text-5xl font-head font-black uppercase leading-tight tracking-normal text-foreground mb-5">{ data.Project.Title }</h1>
 							<p class="text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl mb-5">{ data.Project.Excerpt }</p>
 							<div class="flex flex-wrap gap-2 max-w-2xl">
 								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground">Public write-up</span>
 								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-sageLight text-foreground">{ ProjectStateLabel(data.Project.State) }</span>
 								if data.Project.Featured {
-									<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">Featured build</span>
+									<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-blush text-foreground">Featured build</span>
 								}
 								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-sageLight text-foreground">Markdown body</span>
-								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">{ len(data.Project.Tags) } tags linked</span>
+								<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-blush text-foreground">{ len(data.Project.Tags) } tags linked</span>
 							</div>
 						</div>
 						<aside class="relative">
@@ -56,7 +56,7 @@ templ ProjectDetail(data ProjectDetailData) {
 						if data.Project.CoverImageURL != "" {
 							<img src={ data.Project.CoverImageURL } alt={ data.Project.Title } class="w-full max-h-[460px] object-cover border-2 border-foreground bg-background mb-6"/>
 						}
-						<div class="prose text-foreground max-w-none">@templ.Raw(data.Project.ContentHTML)</div>
+						<div class="prose text-foreground max-w-[65ch]">@templ.Raw(data.Project.ContentHTML)</div>
 					</div>
 					if len(data.ShowcaseItems) > 0 {
 						<section class="bg-card border-2 border-foreground p-5 md:p-8 nb-shadow">
@@ -80,7 +80,7 @@ templ ProjectDetail(data ProjectDetailData) {
 											<img src={ item.AssetURL } alt={ item.Title } class="w-full max-h-[360px] object-cover border-2 border-foreground bg-card mb-3"/>
 										}
 										if item.BodyHTML != "" {
-											<div class="prose text-foreground max-w-none">@templ.Raw(item.BodyHTML)</div>
+											<div class="prose text-foreground max-w-[65ch]">@templ.Raw(item.BodyHTML)</div>
 										}
 									</article>
 								}
@@ -105,13 +105,13 @@ templ ProjectDetail(data ProjectDetailData) {
 											<div class="flex flex-wrap items-center gap-2">
 												<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground">{ ProjectStateLabel(item.Kind) }</span>
 												if item.Pinned {
-													<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground">Pinned</span>
+													<span class="text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-blush text-foreground">Pinned</span>
 												}
 											</div>
 											<p class="text-xs font-mono font-bold text-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
 										</div>
 										<h3 class="text-xl font-black uppercase text-foreground mb-2">{ item.Title }</h3>
-										<div class="prose text-foreground max-w-none">@templ.Raw(item.ContentHTML)</div>
+										<div class="prose text-foreground max-w-[65ch]">@templ.Raw(item.ContentHTML)</div>
 									</article>
 								}
 							</div>
@@ -126,7 +126,7 @@ templ ProjectDetail(data ProjectDetailData) {
 							<p class="border-2 border-foreground bg-retro-sageLight px-3 py-3">Every section below is rendered server-side. No client-side editor shell required on public view.</p>
 						</div>
 					</div>
-					<div class="bg-retro-blush border-2 border-foreground p-5 nb-shadow">
+					<div class="bg-blush border-2 border-foreground p-5 nb-shadow">
 						<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">Move next</p>
 						<div class="grid gap-2">
 							<a href="/projects" class="border-2 border-foreground bg-card px-3 py-3 text-sm font-black no-underline hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Back to archive &rarr;</a>

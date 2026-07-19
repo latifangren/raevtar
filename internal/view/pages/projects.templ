@@ -10,19 +10,19 @@ templ Projects(data ProjectsData) {
 			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 				<div class="grid gap-8 lg:grid-cols-[1.1fr_0.9fr] items-end">
 					<div>
-						<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Projects</p>
+						<p class="text-xs font-bold uppercase tracking-widest text-muted mb-2">Projects</p>
 						<h1 class="text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5">Three public lanes, one small machine.</h1>
 						<p class="text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl">This is the public workbench view of Raevtar: writing lane, signal lane, and automation lane stitched together so readers can move around the platform without bumping into operator-only tooling.</p>
 						<div class="flex flex-wrap gap-2 mt-4 max-w-xl">
-							<a href="/about" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground no-underline hover:bg-destructive hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">about</a>
+							<a href="/about" class="text-xs px-3 py-1 font-bold uppercase tracking-widest border-2 border-foreground bg-card text-foreground no-underline hover:bg-blush focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">about</a>
 							<a href="/docs" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-success/20 text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">docs</a>
-							<a href="/dashboard" class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-destructive text-destructive-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">status</a>
+							<a href="/dashboard" class="text-xs px-3 py-1 font-bold uppercase tracking-widest border-2 border-foreground bg-blush text-blush-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">status</a>
 						</div>
 					</div>
 					<div class="relative">
-						<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-foreground bg-destructive nb-shadow"></div>
+						<div class="absolute -right-5 -top-5 h-16 w-16 border-2 border-foreground bg-blush nb-shadow"></div>
 						<div class="relative bg-card border-2 border-foreground p-5 nb-shadow-lg -rotate-1">
-							<p class="text-xs font-black uppercase tracking-widest text-muted mb-4">public board</p>
+							<p class="text-xs font-bold uppercase tracking-widest text-muted mb-4">public board</p>
 						<div class="grid grid-cols-3 gap-3 text-center">
 							<div class="border-2 border-foreground bg-card p-3"><span class="block text-3xl font-black text-foreground">{ PortText(data.PostCount) }</span><span class="text-xs font-bold uppercase text-muted">posts</span></div>
 							<div class="border-2 border-foreground bg-success/20 p-3"><span class="block text-3xl font-black text-foreground">{ PortText(data.ServerCount) }</span><span class="text-xs font-bold uppercase text-muted">nodes</span></div>
@@ -37,7 +37,7 @@ templ Projects(data ProjectsData) {
 		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-12 grid gap-4 lg:grid-cols-3">
 			<div class="bg-card border-2 border-foreground p-5 nb-shadow">
-				<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">01 lane</p>
+				<p class="text-xs font-bold uppercase tracking-widest text-muted mb-3">01 lane</p>
 				<h2 class="text-2xl font-head font-black uppercase mb-3">Publishing System</h2>
 				<p class="text-sm font-bold text-muted mb-4">{ PortText(data.PostCount) } published notes move through a category-backed archive, so field logs and longer essays stay in one public trail instead of splitting across separate project pages.</p>
 				<div class="grid gap-2 mb-4">
@@ -47,7 +47,7 @@ templ Projects(data ProjectsData) {
 				<p class="text-xs font-bold uppercase tracking-widest text-muted">Best for: notes, categories, archive paths.</p>
 			</div>
 			<div class="bg-success/20 border-2 border-foreground p-5 nb-shadow lg:translate-y-4">
-				<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">02 lane</p>
+				<p class="text-xs font-bold uppercase tracking-widest text-muted mb-3">02 lane</p>
 				<h2 class="text-2xl font-head font-black uppercase mb-3">Signal Board</h2>
 				<p class="text-sm font-bold text-muted mb-4">{ PortText(data.ServerCount) } registered nodes feed the public status board through safe summaries, freshness windows, and redacted drill-down pages that keep topology offstage.</p>
 				<div class="grid gap-2 mb-4">
@@ -56,8 +56,8 @@ templ Projects(data ProjectsData) {
 				</div>
 				<p class="text-xs font-bold uppercase tracking-widest text-muted">Best for: live pulse, safe telemetry, freshness checks.</p>
 			</div>
-			<div class="bg-destructive text-destructive-foreground border-2 border-foreground p-5 nb-shadow">
-				<p class="text-xs font-black uppercase tracking-widest opacity-90 mb-3">03 lane</p>
+			<div class="bg-blush text-blush-foreground border-2 border-foreground p-5 nb-shadow">
+				<p class="text-xs font-bold uppercase tracking-widest opacity-90 mb-3">03 lane</p>
 				<h2 class="text-2xl font-head font-black uppercase mb-3">Automation Surface</h2>
 				<p class="text-sm font-bold opacity-90 mb-4">{ PortText(data.CategoryCount) } seeded topics help automated publishing stay organized and readable, while public docs explain what automation touches without turning this page into an operator handbook.</p>
 				<div class="grid gap-2 mb-4">
@@ -70,14 +70,14 @@ templ Projects(data ProjectsData) {
 		<section class="mb-12">
 			<div class="flex flex-wrap items-end justify-between gap-4 mb-5">
 				<div>
-					<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">Project postings</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-muted mb-1">Project postings</p>
 					<h2 class="text-3xl font-head font-black uppercase text-foreground">Build log archive</h2>
 					<p class="text-sm font-bold text-muted mt-2 max-w-2xl">Public-facing project notes stay compact in list view, then expand into full write-ups with Markdown body, tags, and cover imagery on detail pages.</p>
 				</div>
 				<div class="flex flex-wrap gap-2">
 					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-card text-foreground">Projects</span>
 					if data.FeaturedCount > 0 {
-						<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-destructive text-destructive-foreground">{ PortText(data.FeaturedCount) } featured lane</span>
+						<span class="text-xs px-3 py-1 font-bold uppercase tracking-widest border-2 border-foreground bg-blush text-blush-foreground">{ PortText(data.FeaturedCount) } featured lane</span>
 					}
 					<span class="text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-success/20 text-foreground">{ PortText(data.VisibleProjectCount) } visible entries</span>
 					if data.VisibleProjectCount != data.TotalProjectCount {
@@ -87,18 +87,18 @@ templ Projects(data ProjectsData) {
 			</div>
 			<form method="get" action="/projects" class="mb-5 grid gap-4 border-2 border-foreground bg-card p-4 nb-shadow md:grid-cols-2 xl:grid-cols-[1.2fr_auto_auto_auto] md:items-end">
 				<div class="md:col-span-2 xl:col-span-1">
-					<label for="project-search" class="block text-xs font-black uppercase tracking-widest text-muted mb-2">Search archive</label>
+					<label for="project-search" class="block text-xs font-bold uppercase tracking-widest text-muted mb-2">Search archive</label>
 					<input id="project-search" type="search" name="q" value={ data.Query } placeholder="Cari project, excerpt, isi..." class="w-full border-2 border-foreground bg-background px-3 py-2 text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 				</div>
 				<div>
-					<label for="sort" class="block text-xs font-black uppercase tracking-widest text-muted mb-2">Sort archive</label>
+					<label for="sort" class="block text-xs font-bold uppercase tracking-widest text-muted mb-2">Sort archive</label>
 					<select id="sort" name="sort" class="w-full border-2 border-foreground bg-background px-3 py-2 text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 						<option value="newest" if data.CurrentSort == "" || data.CurrentSort == "newest" { selected }>Newest first</option>
 						<option value="oldest" if data.CurrentSort == "oldest" { selected }>Oldest first</option>
 					</select>
 				</div>
 				<div>
-					<label for="state" class="block text-xs font-black uppercase tracking-widest text-muted mb-2">Project state</label>
+					<label for="state" class="block text-xs font-bold uppercase tracking-widest text-muted mb-2">Project state</label>
 					<select id="state" name="state" class="w-full border-2 border-foreground bg-background px-3 py-2 text-sm font-bold text-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 						<option value="">All states</option>
 						<option value="planning" if data.CurrentState == "planning" { selected }>Planning</option>
@@ -108,7 +108,7 @@ templ Projects(data ProjectsData) {
 						<option value="archived" if data.CurrentState == "archived" { selected }>Archived</option>
 					</select>
 				</div>
-				<label class="inline-flex items-center gap-3 border-2 border-foreground bg-destructive text-destructive-foreground px-4 py-2 text-sm font-black uppercase tracking-wide cursor-pointer focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
+			<label class="inline-flex items-center gap-3 border-2 border-foreground bg-blush text-blush-foreground px-4 py-2 text-sm font-bold uppercase tracking-wide cursor-pointer focus-within:outline focus-within:outline-2 focus-within:outline-offset-2 focus-within:outline-ring">
 					<input type="checkbox" name="featured" value="true" checked?={ data.CurrentFeaturedOnly } class="h-4 w-4 accent-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"/>
 					Featured only
 				</label>
@@ -135,21 +135,6 @@ templ Projects(data ProjectsData) {
 				</div>
 			}
 			@components.PaginationWithBase("/projects", data.Page, data.TotalPages, map[string]string{"featured": projectsFeaturedValue(data.CurrentFeaturedOnly), "state": data.CurrentState, "sort": data.CurrentSort, "q": data.Query})
-		</section>
-		<section class="mb-12 bg-card border-2 border-foreground nb-shadow-lg overflow-hidden">
-			<div class="grid gap-0 lg:grid-cols-[0.8fr_1.2fr]">
-				<div class="bg-foreground text-primary-foreground p-6 md:p-8">
-					<p class="text-xs font-black uppercase tracking-widest text-secondary mb-3">route map</p>
-					<h2 class="text-3xl md:text-4xl font-head font-black uppercase leading-tight mb-4">Move sideways, not only downward.</h2>
-					<p class="text-sm font-bold text-success">Each public page should hand off to another one naturally: origin, notes, routes, and live status all reinforce each other.</p>
-				</div>
-				<div class="grid gap-3 p-6 md:p-8 sm:grid-cols-2">
-					<a href="/about" class="border-2 border-foreground bg-card p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><p class="text-xs font-black uppercase text-muted mb-2">about</p><p class="text-sm font-bold text-foreground">Personal framing, stack choices, and public/private split.</p></a>
-					<a href="/topics" class="border-2 border-foreground bg-success/20 p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><p class="text-xs font-black uppercase text-muted mb-2">topics</p><p class="text-sm font-bold text-foreground">Category index for finding writing by subject, not chronology.</p></a>
-					<a href="/docs" class="border-2 border-foreground bg-secondary p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><p class="text-xs font-black uppercase text-muted mb-2">docs</p><p class="text-sm font-bold text-foreground">Read-only route list and boundary notes for public readers.</p></a>
-					<a href="/contact" class="border-2 border-foreground bg-destructive text-destructive-foreground p-4 nb-shadow no-underline hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"><p class="text-xs font-black uppercase opacity-90 mb-2">contact</p><p class="text-sm font-bold opacity-90">Where to start if you need context before reaching elsewhere.</p></a>
-				</div>
-			</div>
 		</section>
 	</div>
 	}

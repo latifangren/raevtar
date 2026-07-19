@@ -11,7 +11,7 @@ templ PostCardWithHighlight(post model.Post, query string) {
 		<div class="flex flex-wrap items-center justify-between gap-4 mb-4">
 			<div class="flex items-center gap-3">
 				<div class="nb-badge bg-accent text-accent-foreground">{ post.CategoryName }</div>
-				<span class="text-xs font-black uppercase tracking-widest text-muted">{ post.CreatedAt.Format("Jan 2, 2006") }</span>
+				<span class="text-xs font-bold text-muted">{ post.CreatedAt.Format("Jan 2, 2006") }</span>
 			</div>
 			<div class="flex gap-2">
 				@TagBadges(post.Tags)
@@ -36,7 +36,7 @@ func tagClass(slug string) string {
 	case "auto":
 		return "bg-success text-success-foreground"
 	case "commissioned":
-		return "bg-destructive text-destructive-foreground"
+		return "bg-blush text-blush-foreground"
 	default:
 		return "bg-card text-card-foreground"
 	}

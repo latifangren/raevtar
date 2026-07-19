@@ -2039,7 +2039,7 @@ func Projects(data ProjectsData) templ.Component {
 					}
 				}
 				if project.Featured {
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 164, "<span class=\"inline-flex px-2 py-1 border-2 border-foreground bg-destructive text-foreground uppercase tracking-wide\">featured</span>")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 164, "<span class=\"inline-flex px-2 py-1 border-2 border-foreground bg-blush text-foreground uppercase tracking-wide\">featured</span>")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

@@ -73,14 +73,14 @@ func PostCardWithHighlight(post model.Post, query string) templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-xs font-black uppercase tracking-widest text-muted\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 2, "</div><span class=\"text-xs font-bold text-muted\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		var templ_7745c5c3_Var4 string
 		templ_7745c5c3_Var4, templ_7745c5c3_Err = templ.JoinStringErrs(post.CreatedAt.Format("Jan 2, 2006"))
 		if templ_7745c5c3_Err != nil {
-			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 14, Col: 112}
+			return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/components/post_card.templ`, Line: 14, Col: 85}
 		}
 		_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var4))
 		if templ_7745c5c3_Err != nil {
@@ -211,7 +211,7 @@ func tagClass(slug string) string {
 	case "auto":
 		return "bg-success text-success-foreground"
 	case "commissioned":
-		return "bg-destructive text-destructive-foreground"
+		return "bg-blush text-blush-foreground"
 	default:
 		return "bg-card text-card-foreground"
 	}

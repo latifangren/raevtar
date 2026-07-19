@@ -41,7 +41,7 @@ func Topics(data TopicsData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Topics</p><h1 class=\"text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5\">Browse the archive by category.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p><p class=\"text-sm font-bold text-muted mt-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><p class=\"text-xs font-bold uppercase tracking-widest text-muted mb-2\">Topics</p><h1 class=\"text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5\">Browse the archive by category.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">These categories reuse the existing blog archive filters, so every topic link drops directly into the public post list for that slug. It is the quickest way to see what keeps recurring in the lab notebook.</p><p class=\"text-sm font-bold text-muted mt-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -85,7 +85,7 @@ func Topics(data TopicsData) templ.Component {
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-card border-2 border-foreground p-5 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">topic</p><h2 class=\"text-2xl font-head font-black uppercase text-foreground mb-2\">")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" class=\"block bg-card border-2 border-foreground p-5 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\"><p class=\"text-xs font-bold uppercase tracking-widest text-muted mb-2\">topic</p><h2 class=\"text-2xl font-head font-black uppercase text-foreground mb-2\">")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
@@ -116,7 +116,7 @@ func Topics(data TopicsData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</section><section class=\"mb-12 bg-card border-2 border-foreground p-6 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">next stops</p><div class=\"grid gap-3 md:grid-cols-3\"><a href=\"/projects\" class=\"border-2 border-foreground bg-retro-wheat p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">See how topics fit inside public project lanes &rarr;</a> <a href=\"/about\" class=\"border-2 border-foreground bg-retro-sageLight p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Read why public writing sits next to monitoring &rarr;</a> <a href=\"/contact\" class=\"border-2 border-foreground bg-retro-blush p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Use topic context before reaching elsewhere &rarr;</a></div></section></div>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 8, "</section><section class=\"mb-12 bg-card border-2 border-foreground p-6 nb-shadow\"><p class=\"text-xs font-bold uppercase tracking-widest text-muted mb-3\">next stops</p><div class=\"grid gap-3 md:grid-cols-3\"><a href=\"/projects\" class=\"border-2 border-foreground bg-retro-wheat p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">See how topics fit inside public project lanes &rarr;</a> <a href=\"/about\" class=\"border-2 border-foreground bg-retro-sageLight p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Read why public writing sits next to monitoring &rarr;</a> <a href=\"/contact\" class=\"border-2 border-foreground bg-blush p-4 text-sm font-black text-foreground no-underline hover:bg-retro-paper focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Use topic context before reaching elsewhere &rarr;</a></div></section></div>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

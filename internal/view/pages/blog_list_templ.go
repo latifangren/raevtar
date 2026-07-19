@@ -45,7 +45,7 @@ func BlogList(data BlogListData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"nb-badge bg-card\">Blog</span> <span class=\"nb-badge bg-success/20\">Latest dispatches</span></div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Field Notes</p><h1 class=\"nb-h1 font-head mb-5\">Project dispatches from small-machine lab.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">Fresh notes on tools, automation, security, and infrastructure, filed as compact public logs.</p></div><div class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 nb-border bg-destructive nb-shadow\" aria-hidden=\"true\"></div><div class=\"relative bg-card nb-border p-5 nb-shadow rotate-1\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-4\">topic switchboard</p><form method=\"get\" action=\"/blog\" class=\"grid gap-3 mb-4\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<section class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><div class=\"flex flex-wrap gap-2 mb-5\"><span class=\"nb-badge bg-card\">Blog</span> <span class=\"nb-badge bg-success/20\">Latest dispatches</span></div><p class=\"text-xs font-bold uppercase tracking-widest text-muted mb-2\">Field Notes</p><h1 class=\"nb-h1 font-head mb-5\">Project dispatches from small-machine lab.</h1><p class=\"text-base md:text-lg font-bold text-foreground opacity-80 max-w-2xl\">Fresh notes on tools, automation, security, and infrastructure, filed as compact public logs.</p></div><div class=\"relative\"><div class=\"absolute -right-5 -top-5 h-16 w-16 nb-border bg-blush nb-shadow\" aria-hidden=\"true\"></div><div class=\"relative bg-card nb-border p-5 nb-shadow rotate-1\"><p class=\"text-xs font-bold uppercase tracking-widest text-muted mb-4\">topic switchboard</p><form method=\"get\" action=\"/blog\" class=\"grid gap-3 mb-4\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -68,7 +68,7 @@ func BlogList(data BlogListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<label for=\"blog-search\" class=\"text-xs font-black uppercase tracking-widest text-muted\">Search notes</label><div class=\"flex gap-2\"><input id=\"blog-search\" type=\"search\" name=\"q\" value=\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 4, "<label for=\"blog-search\" class=\"text-xs font-bold uppercase tracking-widest text-muted\">Search notes</label><div class=\"flex gap-2\"><input id=\"blog-search\" type=\"search\" name=\"q\" value=\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -170,7 +170,7 @@ func BlogList(data BlogListData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><hr class=\"nb-border my-4\"><a href=\"/blog/feed.xml\" class=\"flex items-center gap-2 text-xs font-black uppercase tracking-widest text-muted hover:text-foreground no-underline transition-colors\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 11a9 9 0 0 1 9 9\"></path><path d=\"M4 4a16 16 0 0 1 16 16\"></path><circle cx=\"5\" cy=\"19\" r=\"1\"></circle></svg> Subscribe RSS</a></div></div></div></div></section><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-8\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-1\">Latest dispatches</p><h2 class=\"nb-h2 font-head text-3xl\">Field Notes</h2>")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 13, "</div><hr class=\"nb-border my-4\"><a href=\"/blog/feed.xml\" class=\"flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-muted hover:text-foreground no-underline transition-colors\"><svg width=\"14\" height=\"14\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2.5\" stroke-linecap=\"round\" stroke-linejoin=\"round\"><path d=\"M4 11a9 9 0 0 1 9 9\"></path><path d=\"M4 4a16 16 0 0 1 16 16\"></path><circle cx=\"5\" cy=\"19\" r=\"1\"></circle></svg> Subscribe RSS</a></div></div></div></div></section><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><section class=\"mb-12\"><div class=\"flex flex-wrap items-end justify-between gap-4 mb-8\"><div><p class=\"text-xs font-bold uppercase tracking-widest text-muted mb-1\">Latest dispatches</p><h2 class=\"nb-h2 font-head text-3xl\">Field Notes</h2>")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -244,12 +244,12 @@ func BlogList(data BlogListData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if data.Page < data.TotalPages {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"text-xs font-black uppercase tracking-widest text-muted animate-pulse\">Scrolling to load more...</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 24, "<p class=\"text-xs font-bold uppercase tracking-widest text-muted animate-pulse\">Scrolling to load more...</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			} else if len(data.Posts) > 0 {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<p class=\"text-xs font-black uppercase tracking-widest text-muted\">You've reached the end of the notes.</p>")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 25, "<p class=\"text-xs font-bold uppercase tracking-widest text-muted\">You've reached the end of the notes.</p>")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}

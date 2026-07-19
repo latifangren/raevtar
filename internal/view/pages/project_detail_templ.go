@@ -43,14 +43,14 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 				}()
 			}
 			ctx = templ.InitializeContext(ctx)
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"mb-12\"><header class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><a href=\"/projects\" class=\"inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Back to projects</a><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Project entry</p><h1 class=\"text-4xl md:text-6xl font-head font-black uppercase leading-none text-foreground mb-5\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<article class=\"mb-12\"><header class=\"w-full bg-background border-b-2 border-foreground py-14 md:py-20\"><div class=\"max-w-6xl mx-auto px-4 sm:px-8\"><a href=\"/projects\" class=\"inline-flex items-center gap-1.5 mb-6 px-4 py-2 border-2 border-foreground bg-card text-foreground font-bold text-sm no-underline nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">&larr; Back to projects</a><div class=\"grid gap-8 lg:grid-cols-[1.15fr_0.85fr] items-end\"><div><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-2\">Project entry</p><h1 class=\"text-3xl md:text-5xl font-head font-black uppercase leading-tight tracking-normal text-foreground mb-5\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var3 string
 			templ_7745c5c3_Var3, templ_7745c5c3_Err = templ.JoinStringErrs(data.Project.Title)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_detail.templ`, Line: 14, Col: 125}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_detail.templ`, Line: 14, Col: 142}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var3))
 			if templ_7745c5c3_Err != nil {
@@ -87,19 +87,19 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 				return templ_7745c5c3_Err
 			}
 			if data.Project.Featured {
-				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground\">Featured build</span> ")
+				templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "<span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-blush text-foreground\">Featured build</span> ")
 				if templ_7745c5c3_Err != nil {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-sageLight text-foreground\">Markdown body</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 6, "<span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-sageLight text-foreground\">Markdown body</span> <span class=\"text-xs px-3 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-blush text-foreground\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
 			var templ_7745c5c3_Var6 string
 			templ_7745c5c3_Var6, templ_7745c5c3_Err = templ.JoinStringErrs(len(data.Project.Tags))
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_detail.templ`, Line: 23, Col: 159}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/view/pages/project_detail.templ`, Line: 23, Col: 153}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var6))
 			if templ_7745c5c3_Err != nil {
@@ -177,7 +177,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"prose text-foreground max-w-none\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"prose text-foreground max-w-[65ch]\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -281,7 +281,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 						}
 					}
 					if item.BodyHTML != "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"prose text-foreground max-w-none\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"prose text-foreground max-w-[65ch]\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -351,7 +351,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 						return templ_7745c5c3_Err
 					}
 					if item.Pinned {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<span class=\"text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-retro-blush text-foreground\">Pinned</span>")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 38, "<span class=\"text-xs px-2.5 py-1 font-black uppercase tracking-widest border-2 border-foreground bg-blush text-foreground\">Pinned</span>")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -382,7 +382,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</h3><div class=\"prose text-foreground max-w-none\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</h3><div class=\"prose text-foreground max-w-[65ch]\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
@@ -400,7 +400,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div><aside class=\"space-y-4\"><div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">Reading lane</p><div class=\"space-y-3 text-sm font-bold text-foreground\"><p class=\"border-2 border-foreground bg-background px-3 py-3\">Start with excerpt above, then skim badges for topic shape before diving into full body.</p><p class=\"border-2 border-foreground bg-retro-sageLight px-3 py-3\">Every section below is rendered server-side. No client-side editor shell required on public view.</p></div></div><div class=\"bg-retro-blush border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">Move next</p><div class=\"grid gap-2\"><a href=\"/projects\" class=\"border-2 border-foreground bg-card px-3 py-3 text-sm font-black no-underline hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Back to archive &rarr;</a> ")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 44, "</div><aside class=\"space-y-4\"><div class=\"bg-card border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">Reading lane</p><div class=\"space-y-3 text-sm font-bold text-foreground\"><p class=\"border-2 border-foreground bg-background px-3 py-3\">Start with excerpt above, then skim badges for topic shape before diving into full body.</p><p class=\"border-2 border-foreground bg-retro-sageLight px-3 py-3\">Every section below is rendered server-side. No client-side editor shell required on public view.</p></div></div><div class=\"bg-blush border-2 border-foreground p-5 nb-shadow\"><p class=\"text-xs font-black uppercase tracking-widest text-muted mb-3\">Move next</p><div class=\"grid gap-2\"><a href=\"/projects\" class=\"border-2 border-foreground bg-card px-3 py-3 text-sm font-black no-underline hover:bg-retro-wheat focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring\">Back to archive &rarr;</a> ")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}

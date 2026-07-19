@@ -22,7 +22,7 @@ templ ProjectCardWithHighlight(project model.Project, query string) {
 		</div>
 		<div class="space-y-4">
 			<div class="flex items-center gap-3">
-				<span class="text-xs font-black uppercase tracking-widest text-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
+				<span class="text-xs font-bold text-muted">{ project.CreatedAt.Format("Jan 2, 2006") }</span>
 				if project.Featured {
 					<span class="nb-badge nb-badge-sm bg-accent text-accent-foreground">Featured</span>
 				}

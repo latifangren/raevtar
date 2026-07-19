@@ -5,7 +5,7 @@ templ Dashboard(data DashboardData) {
 			<section class="w-full bg-background border-b-2 border-foreground py-14 md:py-20">
 			<div class="max-w-6xl mx-auto px-4 sm:px-8">
 					<div class="max-w-3xl">
-						<p class="text-xs font-black uppercase tracking-widest text-foreground mb-2">Monitor Grid</p>
+						<p class="text-xs font-bold uppercase tracking-widest text-foreground mb-2">Monitor Grid</p>
 						<h1 class="text-5xl md:text-7xl font-head font-black uppercase leading-none text-foreground mb-5">Server Status</h1>
 						<p class="text-base md:text-lg font-bold text-foreground opacity-80">Public-safe signal board showing status windows, last signal age, and drill-down history without private topology.</p>
 						<div class="flex flex-wrap gap-2 mt-4">
@@ -19,24 +19,24 @@ templ Dashboard(data DashboardData) {
 		<section class="mb-6 bg-foreground text-primary-foreground nb-border p-5 nb-shadow">
 			<div class="flex flex-wrap items-end justify-between gap-3 mb-4">
 				<div>
-					<p class="text-xs font-black uppercase tracking-widest text-secondary mb-1">Raevtar host</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-secondary mb-1">Raevtar host</p>
 					<h2 class="text-xl font-head font-black uppercase leading-tight">Platform System Health</h2>
 				</div>
 				<p class="text-xs font-bold text-success">Public-safe local resource snapshot</p>
 			</div>
 			<div class="grid gap-3 sm:grid-cols-2 xl:grid-cols-5">
-				<div class="nb-border border-primary-foreground bg-card p-3 text-foreground"><p class="text-xs font-black uppercase tracking-widest text-muted">CPU load</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.CPULoad }</p><p class="text-xs font-bold text-muted">1m / 5m / 15m · { data.PlatformHealth.CPUCores } cores</p></div>
-				<div class="nb-border border-primary-foreground bg-secondary p-3 text-foreground"><p class="text-xs font-black uppercase tracking-widest text-muted">RAM</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.RAMUsage }</p><p class="text-xs font-bold text-muted">{ data.PlatformHealth.RAMPercent }</p></div>
-				<div class="nb-border border-primary-foreground bg-success/20 p-3 text-foreground"><p class="text-xs font-black uppercase tracking-widest text-muted">Disk</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.DiskUsage }</p><p class="text-xs font-bold text-muted">{ data.PlatformHealth.DiskPercent }</p></div>
-				<div class="nb-border border-primary-foreground bg-destructive p-3 text-foreground"><p class="text-xs font-black uppercase tracking-widest text-muted">Temperature</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.Temperature }</p><p class="text-xs font-bold text-muted">Thermal sensor</p></div>
-				<div class="nb-border border-primary-foreground bg-card p-3 text-foreground"><p class="text-xs font-black uppercase tracking-widest text-muted">Visibility</p><p class="text-lg font-black">Safe summary</p><p class="text-xs font-bold text-muted">Topology stays private</p></div>
+				<div class="nb-border border-primary-foreground bg-card p-3 text-foreground"><p class="text-xs font-bold uppercase tracking-widest text-muted">CPU load</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.CPULoad }</p><p class="text-xs font-bold text-muted">1m / 5m / 15m · { data.PlatformHealth.CPUCores } cores</p></div>
+				<div class="nb-border border-primary-foreground bg-secondary p-3 text-foreground"><p class="text-xs font-bold uppercase tracking-widest text-muted">RAM</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.RAMUsage }</p><p class="text-xs font-bold text-muted">{ data.PlatformHealth.RAMPercent }</p></div>
+				<div class="nb-border border-primary-foreground bg-success/20 p-3 text-foreground"><p class="text-xs font-bold uppercase tracking-widest text-muted">Disk</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.DiskUsage }</p><p class="text-xs font-bold text-muted">{ data.PlatformHealth.DiskPercent }</p></div>
+				<div class="nb-border border-primary-foreground bg-blush p-3 text-foreground"><p class="text-xs font-bold uppercase tracking-widest text-muted">Temperature</p><p class="text-lg font-mono font-black">{ data.PlatformHealth.Temperature }</p><p class="text-xs font-bold text-muted">Thermal sensor</p></div>
+				<div class="nb-border border-primary-foreground bg-card p-3 text-foreground"><p class="text-xs font-bold uppercase tracking-widest text-muted">Visibility</p><p class="text-lg font-black">Safe summary</p><p class="text-xs font-bold text-muted">Topology stays private</p></div>
 			</div>
 		</section>
 		<div class="max-w-6xl mx-auto px-4 sm:px-8">
 		<section class="mb-6 bg-card nb-border p-5 nb-shadow">
 			<div class="grid gap-4 lg:grid-cols-[0.9fr_1.1fr] lg:items-start">
 				<div>
-					<p class="text-xs font-black uppercase tracking-widest text-muted mb-2">Signal legend</p>
+					<p class="text-xs font-bold uppercase tracking-widest text-muted mb-2">Signal legend</p>
 					<h2 class="text-xl font-head font-black uppercase text-foreground leading-tight">Public status map</h2>
 					<p class="text-sm font-bold text-muted mt-2">Each card reports signal age plus safe resource telemetry. The server grid refresh every 30s without exposing private network details.</p>
 				</div>
@@ -51,26 +51,17 @@ templ Dashboard(data DashboardData) {
 						<p class="text-2xl font-black text-foreground">{ PortText(StaleServerCount(data.Servers)) }</p>
 						<p class="text-xs font-bold text-muted">Signal is between 3m and 15m old: delayed, not yet offline.</p>
 					</div>
-					<div class="nb-border bg-destructive p-3">
-						<div class="flex items-center gap-2 mb-2"><span class="inline-block w-3 h-3 nb-border bg-destructive" aria-hidden="true"></span><span class="text-sm font-black text-foreground">Offline</span></div>
+				<div class="nb-border bg-destructive/20 p-3">
+					<div class="flex items-center gap-2 mb-2"><span class="inline-block w-3 h-3 nb-border bg-destructive" aria-hidden="true"></span><span class="text-sm font-bold text-foreground">Offline</span></div>
 						<p class="text-2xl font-black text-foreground">{ PortText(OfflineServerCount(data.Servers)) }</p>
 						<p class="text-xs font-bold text-muted">No signal inside 15m, or no first signal has arrived.</p>
 					</div>
 				</div>
 			</div>
 		</section>
-		<section class="mb-6 bg-card nb-border p-5 nb-shadow">
-			<p class="text-xs font-black uppercase tracking-widest text-muted mb-3">related public routes</p>
-			<div class="grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-				<a href="/projects" class="nb-border bg-secondary p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Projects explains how status fits platform-wide &rarr;</a>
-				<a href="/docs" class="nb-border bg-card p-4 text-sm font-black text-foreground no-underline hover:bg-secondary focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Docs lists what public status does and does not show &rarr;</a>
-				<a href="/lab" class="nb-border bg-success/20 p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Lab shows aggregate signal room context &rarr;</a>
-				<a href="/contact" class="nb-border bg-destructive p-4 text-sm font-black text-foreground no-underline hover:bg-card focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">Contact points readers toward public context first &rarr;</a>
-			</div>
-		</section>
 		if len(data.UniqueTags) > 0 {
 			<div class="flex flex-wrap items-center gap-2 mb-4">
-				<span class="text-xs font-black uppercase tracking-widest text-muted mr-1">Filter:</span>
+				<span class="text-xs font-bold uppercase tracking-widest text-muted mr-1">Filter:</span>
 				<a href="/dashboard" class={ "text-xs px-3 py-1 font-black uppercase tracking-widest nb-border no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring", tern(data.ActiveTag == "", "bg-foreground text-primary-foreground", "bg-card text-foreground hover:bg-accent") }>All</a>
 				for _, tag := range data.UniqueTags {
 					<a href={ templ.URL("/dashboard?tag=" + tag) } class={ "text-xs px-3 py-1 font-black uppercase tracking-widest nb-border no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring", tern(data.ActiveTag == tag, "bg-foreground text-primary-foreground", "bg-card text-foreground hover:bg-accent") }>{ tag }</a>
@@ -88,19 +79,19 @@ templ Dashboard(data DashboardData) {
 					<a href={ templ.URL("/dashboard/" + IDText(summary.Server.ID)) } class="rv-card-lift group block min-h-full bg-card nb-border p-5 nb-shadow hover:translate-x-[2px] hover:translate-y-[2px] transition-all no-underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring">
 						<div class="flex items-start justify-between gap-4 mb-5">
 							<div>
-								<p class="text-xs font-black uppercase tracking-widest text-muted mb-1">node</p>
+								<p class="text-xs font-bold uppercase tracking-widest text-muted mb-1">node</p>
 								<h3 class="text-xl font-black text-foreground uppercase leading-tight">{ summary.Server.Name }</h3>
 							</div>
 							<div class="flex items-center gap-1.5 text-sm nb-border bg-secondary px-2 py-1"><span class={ "inline-block w-3 h-3 nb-border", StatusDotClass(summary.Server.LastSeen) } aria-hidden="true"></span><span class="font-black text-foreground">{ ServerStatusText(summary.Server.LastSeen) }</span></div>
 						</div>
 						<div class="space-y-3">
 							<div class="nb-border bg-success/20 p-3">
-								<p class="text-xs font-black uppercase tracking-widest text-muted">signal age</p>
+								<p class="text-xs font-bold uppercase tracking-widest text-muted">signal age</p>
 								<p class="text-lg font-black text-foreground">{ DashboardStatusText(summary.Server.LastSeen) }</p>
 								<p class="text-xs font-bold text-muted mt-1">{ DashboardFreshnessReason(summary.Server.LastSeen) }</p>
 							</div>
 							<div class="nb-border bg-foreground p-3 text-primary-foreground">
-								<div class="flex items-center justify-between gap-3 mb-2"><p class="text-xs font-black uppercase tracking-widest text-secondary">System Health</p><p class="text-xs font-bold text-success">Hidden on public view · endpoint redacted · { PublicServerLabel(summary.Server) }</p></div>
+								<div class="flex items-center justify-between gap-3 mb-2"><p class="text-xs font-bold uppercase tracking-widest text-secondary">System Health</p><p class="text-xs font-bold text-success">Hidden on public view · endpoint redacted · { PublicServerLabel(summary.Server) }</p></div>
 								if len(summary.Metrics) == 0 {
 									<div class="grid grid-cols-2 gap-2 text-xs font-mono font-bold">
 										<p>CPU <span class="text-secondary">N/A</span></p>
@@ -124,7 +115,7 @@ templ Dashboard(data DashboardData) {
 								}
 							</div>
 							<div class="flex items-center justify-between border-t-2 border-foreground pt-3">
-								<span class="text-xs font-black uppercase tracking-widest text-muted">details</span>
+								<span class="text-xs font-bold uppercase tracking-widest text-muted">details</span>
 								<span class="text-sm font-black text-foreground group-hover:bg-secondary">Open &rarr;</span>
 							</div>
 						</div>

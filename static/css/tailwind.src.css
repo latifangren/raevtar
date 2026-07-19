@@ -149,6 +149,13 @@ body {
   @apply bg-destructive-hover;
 }
 
+.nb-button-blush {
+  @apply bg-blush text-blush-foreground;
+}
+.nb-button-blush:hover {
+  @apply bg-blush-hover;
+}
+
 /* Button sizes */
 .nb-button-sm {
   @apply px-3 py-1 text-xs;
@@ -160,7 +167,7 @@ body {
 
 /* Badge */
 .nb-badge {
-  @apply inline-flex items-center px-2.5 py-1.5 text-sm font-semibold nb-border rounded;
+  @apply inline-flex items-center px-2.5 py-1 text-xs font-bold nb-border rounded;
 }
 
 .nb-badge-sm {
@@ -199,8 +206,9 @@ body {
 
 /* Prose content */
 .prose { max-width: 100%; overflow-wrap: break-word; }
-.prose h1 { @apply nb-h1; }
-.prose h2 { @apply nb-h2; }
+.prose h1 { @apply text-4xl font-black uppercase tracking-normal leading-tight mb-5; }
+.prose h2 { @apply text-2xl font-black uppercase tracking-normal leading-tight mb-4 mt-8; }
+.prose h3 { @apply text-xl font-bold uppercase tracking-normal leading-tight mb-3 mt-6; }
 .prose p { margin-bottom: 1rem; line-height: 1.7; }
 .prose code {
   @apply bg-accent px-2 py-0.5 border-2 border-foreground font-mono text-sm rounded;

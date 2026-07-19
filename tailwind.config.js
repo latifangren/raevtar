@@ -45,6 +45,11 @@ module.exports = {
           foreground: '#FFFFFF',
         },
         destructive: {
+          DEFAULT: '#DC2626',
+          hover: '#B91C1C',
+          foreground: '#FFFFFF',
+        },
+        blush: {
           DEFAULT: '#E9B7A5',
           hover: '#DDA08B',
           foreground: '#000000',
