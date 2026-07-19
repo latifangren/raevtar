@@ -8,7 +8,7 @@ import (
 )
 
 func (h *Handler) apiHostStats(w http.ResponseWriter, r *http.Request) {
-	stats := collectHostStats()
+	stats := h.svc.Monitor.GetHostSnapshot()
 	w.Header().Set("Content-Type", "application/json")
 	if err := json.NewEncoder(w).Encode(stats); err != nil {
 		logHandlerError(r, err)

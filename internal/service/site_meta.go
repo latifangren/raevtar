@@ -2,6 +2,7 @@ package service
 
 import (
 	"fmt"
+	"html"
 	"strings"
 	"time"
 
@@ -198,6 +199,139 @@ func (s *SiteMetaService) LLMSText() (string, error) {
 		}
 	}
 	return strings.Join(lines, "\n") + "\n", nil
+}
+
+func (s *SiteMetaService) RSSFeed() (string, error) {
+	posts, _, err := s.blog.ListPosts("", 1, 20)
+	if err != nil {
+		return "", fmt.Errorf("list posts for rss: %w", err)
+	}
+
+	domain := s.domain
+	if domain == "" {
+		domain = "raevtar.tech"
+	}
+	now := time.Now().Format(time.RFC1123Z)
+
+	xml := `<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+<channel>
+	<title>Raevtar</title>
+	<link>https://` + domain + `</link>
+	<description>Personal blog about development, AI agents, security, and DevOps</description>
+	<language>en</language>
+	<lastBuildDate>` + now + `</lastBuildDate>
+	<atom:link href="https://` + domain + `/blog/feed.xml" rel="self" type="application/rss+xml"/>
+`
+
+	for _, p := range posts {
+		pubDate := p.CreatedAt.Format(time.RFC1123Z)
+		xml += fmt.Sprintf(`	<item>
+		<title>%s</title>
+		<link>https://%s/blog/%s</link>
+		<guid isPermaLink="true">https://%s/blog/%s</guid>
+		<description><![CDATA[%s]]></description>
+		<pubDate>%s</pubDate>
+		<category>%s</category>
+	</item>
+`, XMLEscape(p.Title), domain, p.Slug, domain, p.Slug, XMLEscape(p.Excerpt), pubDate, p.CategorySlug)
+	}
+
+	xml += `</channel>
+</rss>`
+
+	return xml, nil
+}
+
+func (s *SiteMetaService) SitemapXML() (string, error) {
+	entries, err := s.SitemapEntries()
+	if err != nil {
+		return "", err
+	}
+	var b strings.Builder
+	b.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n")
+	b.WriteString("<urlset xmlns=\"http://www.sitemaps.org/schemas/sitemap/0.9\">\n")
+	for _, entry := range entries {
+		b.WriteString("  <url>\n")
+		b.WriteString("    <loc>" + XMLEscape(entry.URL) + "</loc>\n")
+		if !entry.LastMod.IsZero() {
+			b.WriteString("    <lastmod>" + entry.LastMod.UTC().Format("2006-01-02T15:04:05Z") + "</lastmod>\n")
+		}
+		b.WriteString("  </url>\n")
+	}
+	b.WriteString("</urlset>")
+	return b.String(), nil
+}
+
+func (s *SiteMetaService) RobotsTxt() string {
+	domain := s.domain
+	if domain == "" {
+		domain = "example.com"
+	}
+	return fmt.Sprintf("User-agent: *\nAllow: /\nSitemap: https://%s/sitemap.xml\n", domain)
+}
+
+func (s *SiteMetaService) OGImageBlogSVG(slug string) (string, error) {
+	post, err := s.blog.GetPublishedPost(slug)
+	if err != nil {
+		return "", err
+	}
+	return s.OGImageSVG(post.Title, "Blog dispatch from Raevtar"), nil
+}
+
+func (s *SiteMetaService) OGImageProjectSVG(slug string) (string, error) {
+	project, err := s.projects.GetPublishedProject(slug)
+	if err != nil {
+		return "", err
+	}
+	return s.OGImageSVG(project.Title, "Project from small-machine lab"), nil
+}
+
+func (s *SiteMetaService) OGImageSVG(title, subtitle string) string {
+	domain := s.domain
+	if domain == "" {
+		domain = "raevtar.tech"
+	}
+	return fmt.Sprintf(`<svg width="1200" height="630" viewBox="0 0 1200 630" xmlns="http://www.w3.org/2000/svg">
+		<rect width="1200" height="630" fill="#F5F2ED"/>
+		<!-- Layered borders -->
+		<rect x="20" y="20" width="1160" height="590" fill="none" stroke="#2D3748" stroke-width="8"/>
+		<rect x="40" y="40" width="1160" height="590" fill="none" stroke="#2D3748" stroke-width="8"/>
+		<!-- Background highlight -->
+		<rect x="30" y="30" width="1140" height="570" fill="#FACC15" stroke="#2D3748" stroke-width="4"/>
+		
+		<!-- Subtitle -->
+		<text x="60" y="100" font-family="sans-serif" font-size="24" font-weight="900" fill="#2D3748" text-transform="uppercase">%s</text>
+		
+		<!-- Main Title (wrapped manually for simplicity in SVG) -->
+		<text x="60" y="300" font-family="sans-serif" font-size="72" font-weight="900" fill="#2D3748">%s</text>
+		
+		<!-- Branding -->
+		<rect x="60" y="500" width="200" height="60" fill="#2D3748"/>
+		<text x="80" y="540" font-family="sans-serif" font-size="32" font-weight="bold" fill="#F5F2ED">`+domain+`</text>
+	</svg>`, html.EscapeString(subtitle), html.EscapeString(title))
+}
+
+func XMLEscape(s string) string {
+	escaped := make([]byte, 0, len(s))
+	for i := 0; i < len(s); i++ {
+		c := s[i]
+		switch c {
+		case '&':
+			escaped = append(escaped, "&amp;"...)
+		case '<':
+			escaped = append(escaped, "&lt;"...)
+		case '>':
+			escaped = append(escaped, "&gt;"...)
+		case '"':
+			escaped = append(escaped, "&quot;"...)
+		case '\'':
+			escaped = append(escaped, "&apos;"...)
+		default:
+			escaped = append(escaped, c)
+		}
+	}
+	return string(escaped)
 }
 
 func absoluteAssetURL(domain, asset string) string {

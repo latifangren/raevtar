@@ -40,7 +40,7 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	stats := collectHostStats()
+	stats := h.svc.Monitor.GetHostSnapshot()
 
 	onlineCount := 0
 	for _, server := range servers {
@@ -62,29 +62,27 @@ func (h *Handler) adminIndex(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) adminUsers(w http.ResponseWriter, r *http.Request) {
-	users, err := h.svc.Admin.ListUsers()
+	entry, _ := getSessionEntry(r)
+	managed, manageableRoles, err := h.svc.Admin.ListManagedUsers(entry.role, entry.username)
 	if err != nil {
 		internalServerError(w, r, err)
 		return
 	}
-	entry, _ := getSessionEntry(r)
 
-	rows := make([]adminview.UserRow, 0, len(users))
-	for _, user := range users {
+	rows := make([]adminview.UserRow, 0, len(managed))
+	for _, m := range managed {
 		rows = append(rows, adminview.UserRow{
-			User:      user,
-			CanDelete: model.CanManage(entry.role, user.Role) && user.Username != entry.username,
+			User:      m.User,
+			CanDelete: m.CanDelete,
 		})
 	}
 
-	roleOptions := make([]adminview.RoleOption, 0, len(model.ValidRoles()))
-	for _, role := range model.ValidRoles() {
-		if model.CanManage(entry.role, role) {
-			roleOptions = append(roleOptions, adminview.RoleOption{
-				Value:    role,
-				Selected: role == model.RoleOperator,
-			})
-		}
+	roleOptions := make([]adminview.RoleOption, 0, len(manageableRoles))
+	for _, role := range manageableRoles {
+		roleOptions = append(roleOptions, adminview.RoleOption{
+			Value:    role,
+			Selected: role == model.RoleOperator,
+		})
 	}
 
 	renderHTML(w, r, adminview.Users(adminview.UsersData{

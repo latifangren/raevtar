@@ -10,6 +10,11 @@ import (
 	"raevtar/internal/repo"
 )
 
+type ManagedUser struct {
+	User      model.User
+	CanDelete bool
+}
+
 type AdminService struct {
 	repos *repo.Repositories
 }
@@ -20,6 +25,30 @@ func (s *AdminService) ListUsers() ([]model.User, error) {
 		return nil, fmt.Errorf("list users: %w", err)
 	}
 	return users, nil
+}
+
+func (s *AdminService) ListManagedUsers(actorRole, actorUsername string) ([]ManagedUser, []string, error) {
+	users, err := s.ListUsers()
+	if err != nil {
+		return nil, nil, err
+	}
+
+	managed := make([]ManagedUser, 0, len(users))
+	for _, user := range users {
+		managed = append(managed, ManagedUser{
+			User:      user,
+			CanDelete: model.CanManage(actorRole, user.Role) && user.Username != actorUsername,
+		})
+	}
+
+	manageableRoles := make([]string, 0, len(model.ValidRoles()))
+	for _, role := range model.ValidRoles() {
+		if model.CanManage(actorRole, role) {
+			manageableRoles = append(manageableRoles, role)
+		}
+	}
+
+	return managed, manageableRoles, nil
 }
 
 func (s *AdminService) Authenticate(username, password, ip string) (*model.User, error) {

@@ -223,13 +223,13 @@ func (h *Handler) projectsPage(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
-	project, err := h.svc.Projects.GetPublishedProject(r.PathValue("slug"))
+	detail, err := h.svc.Projects.GetProjectDetail(r.PathValue("slug"))
 	if err != nil {
-		if !errors.Is(err, sql.ErrNoRows) {
-			internalServerError(w, r, err)
+		if errors.Is(err, sql.ErrNoRows) || errors.Is(err, service.ErrProjectNotFound) {
+			http.Error(w, "Project not found", http.StatusNotFound)
 			return
 		}
-		http.Error(w, "Project not found", http.StatusNotFound)
+		internalServerError(w, r, err)
 		return
 	}
 	categories, err := h.svc.Blog.ListCategories()
@@ -237,35 +237,15 @@ func (h *Handler) projectDetail(w http.ResponseWriter, r *http.Request) {
 		internalServerError(w, r, err)
 		return
 	}
-	timeline, err := h.svc.Projects.ListProjectTimeline(project.ID, true, 8)
-	if err != nil {
-		internalServerError(w, r, err)
-		return
-	}
-	changelog, err := h.svc.Projects.ListProjectChangelog(project.ID, true, 8)
-	if err != nil {
-		internalServerError(w, r, err)
-		return
-	}
-	related, err := h.svc.Projects.GetResolvedProjectRelations(project.ID, true)
-	if err != nil {
-		internalServerError(w, r, err)
-		return
-	}
-	showcase, err := h.svc.Projects.ListProjectShowcase(project.ID, true)
-	if err != nil {
-		internalServerError(w, r, err)
-		return
-	}
 	renderHTML(w, r, pages.ProjectDetail(pages.ProjectDetailData{
 		CurrentPath:   r.URL.Path,
-		SEO:           h.svc.SiteMeta.ProjectSEO(project),
-		Project:       project,
+		SEO:           h.svc.SiteMeta.ProjectSEO(detail.Project),
+		Project:       detail.Project,
 		Categories:    categories,
-		Timeline:      timeline,
-		Changelog:     changelog,
-		RelatedItems:  related,
-		ShowcaseItems: showcase,
+		Timeline:      detail.Timeline,
+		Changelog:     detail.Changelog,
+		RelatedItems:  detail.RelatedItems,
+		ShowcaseItems: detail.ShowcaseItems,
 	}))
 }
 
@@ -533,7 +513,7 @@ func (h *Handler) dashboardIndex(w http.ResponseWriter, r *http.Request) {
 		}
 		summaries = append(summaries, pages.PublicServerSummary{Server: server, Metrics: metrics})
 	}
-	stats := collectHostStats()
+	stats := h.svc.Monitor.GetHostSnapshot()
 
 	renderHTML(w, r, pages.Dashboard(pages.DashboardData{
 		CurrentPath:     r.URL.Path,

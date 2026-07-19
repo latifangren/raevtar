@@ -304,3 +304,68 @@ func TestAdminServiceListServerAuditLogs(t *testing.T) {
 		t.Fatalf("server audit logs len = %d, want 2 (UPDATE_SERVER + DELETE_SERVER)", len(logs))
 	}
 }
+
+func TestListManagedUsers(t *testing.T) {
+	state := adminTestServices(t)
+
+	// SeedData created owner user 'admin'
+	// Add an operator user as owner
+	opUser, err := state.svc.Admin.CreateUser("owner", "admin", "operator1", "op-pass-123", "operator", "127.0.0.1")
+	if err != nil {
+		t.Fatalf("create operator user: %v", err)
+	}
+
+	// Test as owner 'admin'
+	managed, manageableRoles, err := state.svc.Admin.ListManagedUsers("owner", "admin")
+	if err != nil {
+		t.Fatalf("ListManagedUsers: %v", err)
+	}
+
+	if len(managed) != 2 {
+		t.Fatalf("len(managed) = %d, want 2", len(managed))
+	}
+
+	var adminRowFound, opRowFound bool
+	for _, m := range managed {
+		if m.User.Username == "admin" {
+			adminRowFound = true
+			if m.CanDelete {
+				t.Fatalf("admin user CanDelete = true for self 'admin', want false")
+			}
+		}
+		if m.User.Username == "operator1" {
+			opRowFound = true
+			if !m.CanDelete {
+				t.Fatalf("operator1 user CanDelete = false for actor 'admin', want true")
+			}
+		}
+	}
+	if !adminRowFound || !opRowFound {
+		t.Fatalf("expected entries for admin and operator1, got managed: %+v", managed)
+	}
+
+	if len(manageableRoles) == 0 {
+		t.Fatalf("manageableRoles empty, want roles manageable by owner")
+	}
+
+	var operatorRoleFound bool
+	for _, role := range manageableRoles {
+		if role == model.RoleOperator {
+			operatorRoleFound = true
+		}
+	}
+	if !operatorRoleFound {
+		t.Fatalf("manageableRoles missing RoleOperator: %+v", manageableRoles)
+	}
+
+	// Test as operator 'operator1' (cannot delete admin, cannot delete self)
+	opManaged, _, err := state.svc.Admin.ListManagedUsers("operator", opUser.Username)
+	if err != nil {
+		t.Fatalf("ListManagedUsers as operator: %v", err)
+	}
+	for _, m := range opManaged {
+		if m.CanDelete {
+			t.Fatalf("operator actor should have CanDelete = false for user %s", m.User.Username)
+		}
+	}
+}

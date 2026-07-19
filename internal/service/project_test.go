@@ -1239,3 +1239,92 @@ func TestProjectServiceDeleteProjectRelation(t *testing.T) {
 		t.Fatalf("relations after delete = %d, want 0", len(relations))
 	}
 }
+
+func TestGetProjectDetail(t *testing.T) {
+	state := newTestServices(t)
+
+	proj, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Detail Composite Project",
+		ContentMD: "# Detail\nComposite test content",
+		Excerpt:   "Composite test excerpt",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create project: %v", err)
+	}
+
+	_, err = state.svc.Projects.CreateProjectUpdate(proj.ID, model.ProjectUpdateEntryCreate{
+		Kind:      model.ProjectUpdateKindTimeline,
+		Title:     "Timeline Milestone",
+		ContentMD: "Milestone detail",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create timeline entry: %v", err)
+	}
+
+	_, err = state.svc.Projects.CreateProjectUpdate(proj.ID, model.ProjectUpdateEntryCreate{
+		Kind:      model.ProjectUpdateKindChangelog,
+		Title:     "Changelog Entry",
+		ContentMD: "Changelog detail",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create changelog entry: %v", err)
+	}
+
+	_, err = state.svc.Projects.CreateProjectShowcase(proj.ID, model.ProjectShowcaseItemCreate{
+		Kind:      model.ProjectShowcaseKindImage,
+		Title:     "Showcase Item",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create showcase item: %v", err)
+	}
+
+	targetProj, err := state.svc.Projects.CreateProject(model.ProjectCreate{
+		Title:     "Related Target Project",
+		ContentMD: "# Target",
+		Excerpt:   "Target excerpt",
+		Published: true,
+	})
+	if err != nil {
+		t.Fatalf("create target project: %v", err)
+	}
+
+	_, err = state.svc.Projects.CreateProjectRelation(proj.ID, model.ContentRelationCreate{
+		TargetType:   model.ContentRelationTypeProject,
+		TargetID:     targetProj.ID,
+		RelationKind: model.ContentRelationKindRelated,
+	})
+	if err != nil {
+		t.Fatalf("create relation: %v", err)
+	}
+
+	detail, err := state.svc.Projects.GetProjectDetail(proj.Slug)
+	if err != nil {
+		t.Fatalf("GetProjectDetail(%q): %v", proj.Slug, err)
+	}
+
+	if detail.Project == nil || detail.Project.ID != proj.ID {
+		t.Fatalf("Project = %+v, want project ID %d", detail.Project, proj.ID)
+	}
+	if len(detail.Timeline) != 2 {
+		t.Fatalf("Timeline count = %d, want 2", len(detail.Timeline))
+	}
+	if len(detail.Changelog) != 1 || detail.Changelog[0].Title != "Changelog Entry" {
+		t.Fatalf("Changelog = %+v, want 1 item titled 'Changelog Entry'", detail.Changelog)
+	}
+	if len(detail.ShowcaseItems) != 1 || detail.ShowcaseItems[0].Title != "Showcase Item" {
+		t.Fatalf("ShowcaseItems = %+v, want 1 item titled 'Showcase Item'", detail.ShowcaseItems)
+	}
+	if len(detail.RelatedItems) != 1 || detail.RelatedItems[0].TargetID != targetProj.ID {
+		t.Fatalf("RelatedItems = %+v, want 1 item targeting ID %d", detail.RelatedItems, targetProj.ID)
+	}
+
+	// Test non-existent slug
+	_, err = state.svc.Projects.GetProjectDetail("non-existent-slug")
+	if err == nil {
+		t.Fatalf("GetProjectDetail(non-existent-slug) error = nil, want error")
+	}
+}

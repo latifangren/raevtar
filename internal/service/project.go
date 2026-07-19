@@ -36,6 +36,14 @@ type ProjectListOptions struct {
 	Query        string
 }
 
+type ProjectDetailComposite struct {
+	Project       *model.Project
+	Timeline      []model.ProjectUpdateEntry
+	Changelog     []model.ProjectUpdateEntry
+	RelatedItems  []model.ContentRelationView
+	ShowcaseItems []model.ProjectShowcaseItem
+}
+
 type ProjectService struct {
 	repos    *repo.Repositories
 	markdown goldmark.Markdown
@@ -144,6 +152,36 @@ func (s *ProjectService) GetPublishedProject(slug string) (*model.Project, error
 		return nil, fmt.Errorf("project not found: %s", slug)
 	}
 	return project, nil
+}
+
+func (s *ProjectService) GetProjectDetail(slug string) (*ProjectDetailComposite, error) {
+	project, err := s.GetPublishedProject(slug)
+	if err != nil {
+		return nil, err
+	}
+	timeline, err := s.ListProjectTimeline(project.ID, true, 8)
+	if err != nil {
+		return nil, fmt.Errorf("timeline: %w", err)
+	}
+	changelog, err := s.ListProjectChangelog(project.ID, true, 8)
+	if err != nil {
+		return nil, fmt.Errorf("changelog: %w", err)
+	}
+	related, err := s.GetResolvedProjectRelations(project.ID, true)
+	if err != nil {
+		return nil, fmt.Errorf("relations: %w", err)
+	}
+	showcase, err := s.ListProjectShowcase(project.ID, true)
+	if err != nil {
+		return nil, fmt.Errorf("showcase: %w", err)
+	}
+	return &ProjectDetailComposite{
+		Project:       project,
+		Timeline:      timeline,
+		Changelog:     changelog,
+		RelatedItems:  related,
+		ShowcaseItems: showcase,
+	}, nil
 }
 
 func (s *ProjectService) GetProjectByID(id int64) (*model.Project, error) {
