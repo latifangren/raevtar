@@ -21,18 +21,17 @@ templ Nav(categories []model.Category, currentPath string) {
 			</div>
 		</div>
 		<!-- Mobile menu toggle -->
-		<button
-			class="md:hidden nb-border bg-card p-2 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring"
-			onclick="document.getElementById('rv-mobile-nav').classList.toggle('hidden')"
-			aria-expanded="false"
-			aria-controls="rv-mobile-nav"
+		<label
+			for="mobile-menu-toggle"
+			class="md:hidden nb-border bg-card p-2 cursor-pointer focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring select-none"
 			aria-label="Toggle navigation menu"
 		>
 			<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="square"><line x1="3" y1="6" x2="21" y2="6"></line><line x1="3" y1="12" x2="21" y2="12"></line><line x1="3" y1="18" x2="21" y2="18"></line></svg>
-		</button>
+		</label>
 	</nav>
 	<!-- Mobile dropdown -->
-	<div id="rv-mobile-nav" class="hidden md:hidden nb-border bg-card mb-4">
+	<input type="checkbox" id="mobile-menu-toggle" class="peer hidden" aria-hidden="true" autocomplete="off" />
+	<div id="rv-mobile-nav" class="hidden peer-checked:block md:hidden nb-border bg-card mb-4">
 		<div class="grid grid-cols-3 gap-0">
 			<a href="/about" class={ mobileNavClass(currentPath == "/about") }>about</a>
 			<a href="/blog" class={ mobileNavClass(currentPath == "/blog") }>blog</a>
