@@ -11,6 +11,10 @@ raevtar
 node_modules/
 package-lock.json
 
+# Python (cron)
+__pycache__/
+*.pyc
+
 # SQLite databases
 *.db
 *.db-*
