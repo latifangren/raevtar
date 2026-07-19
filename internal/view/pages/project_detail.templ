@@ -50,13 +50,13 @@ templ ProjectDetail(data ProjectDetailData) {
 					</div>
 				</div>
 			</header>
-			<div class="max-w-5xl mx-auto grid gap-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(18rem,0.28fr)]">
+			<div class="max-w-6xl mx-auto grid gap-8 lg:grid-cols-[1fr_18rem]">
 				<div class="space-y-6">
 					<div class="bg-card border-2 border-foreground p-5 md:p-8 nb-shadow">
 						if data.Project.CoverImageURL != "" {
 							<img src={ data.Project.CoverImageURL } alt={ data.Project.Title } class="w-full max-h-[460px] object-cover border-2 border-foreground bg-background mb-6"/>
 						}
-						<div class="prose text-foreground max-w-[65ch]">@templ.Raw(data.Project.ContentHTML)</div>
+						<div class="prose text-foreground max-w-none">@templ.Raw(data.Project.ContentHTML)</div>
 					</div>
 					if len(data.ShowcaseItems) > 0 {
 						<section class="bg-card border-2 border-foreground p-5 md:p-8 nb-shadow">
@@ -80,7 +80,7 @@ templ ProjectDetail(data ProjectDetailData) {
 											<img src={ item.AssetURL } alt={ item.Title } class="w-full max-h-[360px] object-cover border-2 border-foreground bg-card mb-3"/>
 										}
 										if item.BodyHTML != "" {
-											<div class="prose text-foreground max-w-[65ch]">@templ.Raw(item.BodyHTML)</div>
+											<div class="prose text-foreground max-w-none">@templ.Raw(item.BodyHTML)</div>
 										}
 									</article>
 								}
@@ -111,7 +111,7 @@ templ ProjectDetail(data ProjectDetailData) {
 											<p class="text-xs font-mono font-bold text-muted">{ item.EventAt.Format("Jan 2, 2006 15:04") }</p>
 										</div>
 										<h3 class="text-xl font-black uppercase text-foreground mb-2">{ item.Title }</h3>
-										<div class="prose text-foreground max-w-[65ch]">@templ.Raw(item.ContentHTML)</div>
+										<div class="prose text-foreground max-w-none">@templ.Raw(item.ContentHTML)</div>
 									</article>
 								}
 							</div>

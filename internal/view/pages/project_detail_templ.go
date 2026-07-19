@@ -141,7 +141,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><p class=\"text-xs font-bold leading-5 text-muted\">Same SSR renderer as public writing pages, tuned for project logs with optional cover image and tag context.</p></div></aside></div></div></header><div class=\"max-w-5xl mx-auto grid gap-6 lg:grid-cols-[minmax(0,0.72fr)_minmax(18rem,0.28fr)]\"><div class=\"space-y-6\"><div class=\"bg-card border-2 border-foreground p-5 md:p-8 nb-shadow\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 12, "</div><p class=\"text-xs font-bold leading-5 text-muted\">Same SSR renderer as public writing pages, tuned for project logs with optional cover image and tag context.</p></div></aside></div></div></header><div class=\"max-w-6xl mx-auto grid gap-8 lg:grid-cols-[1fr_18rem]\"><div class=\"space-y-6\"><div class=\"bg-card border-2 border-foreground p-5 md:p-8 nb-shadow\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -177,7 +177,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 					return templ_7745c5c3_Err
 				}
 			}
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"prose text-foreground max-w-[65ch]\">")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, "<div class=\"prose text-foreground max-w-none\">")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -281,7 +281,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 						}
 					}
 					if item.BodyHTML != "" {
-						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"prose text-foreground max-w-[65ch]\">")
+						templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 28, "<div class=\"prose text-foreground max-w-none\">")
 						if templ_7745c5c3_Err != nil {
 							return templ_7745c5c3_Err
 						}
@@ -382,7 +382,7 @@ func ProjectDetail(data ProjectDetailData) templ.Component {
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}
-					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</h3><div class=\"prose text-foreground max-w-[65ch]\">")
+					templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 41, "</h3><div class=\"prose text-foreground max-w-none\">")
 					if templ_7745c5c3_Err != nil {
 						return templ_7745c5c3_Err
 					}

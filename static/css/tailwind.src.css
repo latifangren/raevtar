@@ -206,9 +206,9 @@ body {
 
 /* Prose content */
 .prose { max-width: 100%; overflow-wrap: break-word; }
-.prose h1 { @apply text-4xl font-black uppercase tracking-normal leading-tight mb-5; }
-.prose h2 { @apply text-2xl font-black uppercase tracking-normal leading-tight mb-4 mt-8; }
-.prose h3 { @apply text-xl font-bold uppercase tracking-normal leading-tight mb-3 mt-6; }
+.prose h1 { @apply text-3xl md:text-4xl font-black tracking-tight leading-tight mb-5; }
+.prose h2 { @apply text-2xl font-black tracking-tight leading-tight mb-4 mt-8; }
+.prose h3 { @apply text-xl font-bold tracking-tight leading-tight mb-3 mt-6; }
 .prose p { margin-bottom: 1rem; line-height: 1.7; }
 .prose code {
   @apply bg-accent px-2 py-0.5 border-2 border-foreground font-mono text-sm rounded;
